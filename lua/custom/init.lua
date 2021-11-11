@@ -123,6 +123,9 @@ vim.cmd [[
   au BufRead * set foldlevel=99
 ]]
 
+vim.cmd [[ 
+  command Bd :up | %bd | e#
+]]
 -- vim.api.nvim_del_keymap("o","i%")
 
 -- alternatively, put this in a sub-folder like "lua/custom/plugins/mkdir"

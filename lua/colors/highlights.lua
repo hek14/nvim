@@ -1,3 +1,5 @@
+local override = require("core.utils").load_config().ui.hl_override
+
 local cmd = vim.cmd
 
 local colors = require("colors").get()
@@ -19,30 +21,13 @@ local purple = colors.purple
 local red = colors.red
 local white = colors.white
 local yellow = colors.yellow
+local one_bg3 = colors.one_bg3
 
 local ui = require("core.utils").load_config().ui
 
--- Define bg color
--- @param group Group
--- @param color Color
-local function bg(group, color)
-   cmd("hi " .. group .. " guibg=" .. color)
-end
-
--- Define fg color
--- @param group Group
--- @param color Color
-local function fg(group, color)
-   cmd("hi " .. group .. " guifg=" .. color)
-end
-
--- Define bg and fg color
--- @param group Group
--- @param fgcol Fg Color
--- @param bgcol Bg Color
-local function fg_bg(group, fgcol, bgcol)
-   cmd("hi " .. group .. " guifg=" .. fgcol .. " guibg=" .. bgcol)
-end
+local fg = require("core.utils").fg
+local fg_bg = require("core.utils").fg_bg
+local bg = require("core.utils").bg
 
 -- Comments
 if ui.italic_comments then
@@ -76,7 +61,7 @@ fg("CmpItemMenu", white)
 -- misc
 
 -- inactive statuslines as thin lines
-fg("StatusLineNC", one_bg2 .. " gui=underline")
+fg("StatusLineNC", one_bg3 .. " gui=underline")
 
 fg("LineNr", grey)
 fg("NvimInternalError", red)
@@ -150,7 +135,11 @@ if ui.transparency then
 end
 
 -- Telescope
-fg("TelescopeBorder", line)
-fg("TelescopePreviewBorder", grey)
-fg("TelescopePromptBorder", line)
-fg("TelescopeResultsBorder", line)
+fg("TelescopeBorder", one_bg)
+fg_bg("TelescopePreviewTitle", green, one_bg)
+fg_bg("TelescopePromptTitle", blue, one_bg)
+fg_bg("TelescopeResultsTitle", red, one_bg)
+
+if #override ~= 0 then
+   require(override)
+end

@@ -114,6 +114,7 @@ hooks.add("install_plugins", function(use)
       vim.g.SimpylFold_docstring_preview = 1
     end
   }
+  use { "nathom/filetype.nvim" }
 end
 )
 

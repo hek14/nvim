@@ -22,15 +22,16 @@ M.options, M.ui, M.mappings, M.plugins = {}, {}, {}, {}
 -- NvChad included plugin options & overrides
 M.plugins = {
   status = {
-    vim_matchup = false,
+    vim_matchup = true,
+    dashboard = true,
+    lspsignature = false,
   },
-  options = {
-    clipboard = "",
-    lspconfig = {
-      -- path of file containing setups of different lsps (ex : "custom.plugins.lspconfig"), read the docs for more info
-      setup_lspconf = "custom.plugins.lspconfig",
-    },
-  },
+ options = {
+   lspconfig = {
+     -- path of file containing setups of different lsps (ex : "custom.plugins.lspconfig"), read the docs for more info
+     setup_lspconf = "custom.plugins.lspconfig",
+   },
+ },
   -- To change the Packer `config` of a plugin that comes with NvChad,
   -- add a table entry below matching the plugin github name
   --              '-' -> '_', remove any '.lua', '.nvim' extensions
@@ -38,6 +39,32 @@ M.plugins = {
   --              use "(custom.configs).my_func()" to call a function
   --              use "custom.blankline" to call a file
   default_plugin_config_replace = {},
+}
+
+M.mappings = {
+  terminal = {
+    esc_termmode = { "jj" }, -- multiple mappings allowed
+    -- get out of terminal mode and hide it
+    esc_hide_termmode = { "J" }, -- multiple mappings allowed
+    new_horizontal = "<leader>tt",
+    new_window = "<leader>tw",
+    new_vertical = "<leader>tv",
+  },
+  insert_nav = {
+    beginning_of_line = "<C-a>",
+    end_of_line = "<C-e>",
+    backward = "<C-h>",
+    prev_line = "<C-n>",
+    next_line = "<C-e>",
+    forward = "<C-i>",
+  },
+  --better window movement
+  window_nav = {
+    moveLeft = "<C-h>",
+    moveRight = "<C-l>",
+    moveUp = "<C-k>",
+    moveDown = "<C-j>",
+  },
 }
 
 return M

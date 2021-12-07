@@ -13,7 +13,6 @@ local hooks = require "core.hooks"
 -- this will run your config instead of the NvChad config for the given plugin
 
 hooks.override("lsp", "publish_diagnostics", function(current)
-  print("overwriting lsp diag")
   current.virtual_text = false;
   return current;
 end)
@@ -23,9 +22,8 @@ end)
 -- example below:
 
 hooks.add("setup_mappings", function(map)
-  print("using my keymaps")
   map("n", "<leader>cd", "<cmd>:cd %:p:h<cr>", {silent=false}) -- example to delete the buffer
-  map("n", "<leader>so", "<cmd>: lua Source_curr_file()<cr>", {silent=false}) -- example to delete the buffer
+  map("c", "So", "lua Source_curr_file()<cr>", {silent=false}) -- example to delete the buffer
 
   map("n", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
   map("x", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
@@ -102,9 +100,17 @@ hooks.add("install_plugins", function(use)
   }
   use {
     'RishabhRD/nvim-lsputils',
+    disable = true,
     requires = 'RishabhRD/popfix',
     after = "nvim-lspconfig",
-    config = require"custom.plugins.lsputils".setup
+    config = require"custom.plugins.lsputils".setup,
+  }
+  use {
+    "folke/trouble.nvim",
+    requires = "kyazdani42/nvim-web-devicons",
+    config = function()
+      require("trouble").setup {}
+    end
   }
   use {
     "ahmedkhalf/project.nvim",
@@ -116,16 +122,34 @@ hooks.add("install_plugins", function(use)
       vim.g.SimpylFold_docstring_preview = 1
     end
   }
+  use { "nathom/filetype.nvim" }
+  -- dap stuff
+  use { 
+    'mfussenegger/nvim-dap',
+    requires = {
+      "nvim-telescope/telescope-dap.nvim",
+      "theHamsta/nvim-dap-virtual-text",
+      "mfussenegger/nvim-dap-python",
+    },
+    event = 'VimEnter',
+    config = function ()
+      require('custom.plugins.dap')
+    end
+  }
 end
 )
 
-vim.cmd [[
+hooks.add('ready',function ()
+  vim.cmd [[
   au BufRead * set foldlevel=99
-]]
+  autocmd BufWinEnter,WinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | silent! nnoremap <buffer> <silent> <Esc> :q!<cr>| endif
+  ]]
+  vim.g.matchup_surround_enabled = 1
+  vim.g.matchup_text_obj_enabled = 1
+  vim.api.nvim_set_keymap('x','u%','<Plug>(matchup-i%)',{silent=true, noremap=false})
+end)
 
-vim.cmd [[ 
-  command Bd :up | %bd | e#
-]]
+-- autocmd BufWinEnter,WinEnter * if &buftype =~? '\(terminal\|prompt\)' | silent! normal! i | endif
 -- vim.api.nvim_del_keymap("o","i%")
 
 -- alternatively, put this in a sub-folder like "lua/custom/plugins/mkdir"

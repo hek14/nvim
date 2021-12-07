@@ -2,6 +2,7 @@
 -- See the wiki for a guide on how to extend NvChad
 
 local hooks = require "core.hooks"
+local map = require('core/utils').map
 
 -- NOTE: To use this, make a copy with `cp example_init.lua init.lua`
 
@@ -68,6 +69,7 @@ hooks.add("setup_mappings", function(map)
 
   map("x", ">", ">gv", {silent=false,noremap=true})
   map("x", "<", "<gv", {silent=false,noremap=true})
+  map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
 end)
 
 function Source_curr_file ()
@@ -145,6 +147,33 @@ hooks.add("install_plugins", function(use)
       require('custom.plugins.dap')
     end
   }
+  use {
+    "Pocco81/TrueZen.nvim",
+    cmd = {
+      "TZAtaraxis",
+      "TZMinimalist",
+      "TZFocus",
+    },
+    config = function()
+      -- check https://github.com/Pocco81/TrueZen.nvim#setup-configuration (init.lua version)
+      map("n","gq","<cmd>TZFocus<CR>")
+      map("i","<C-q>","<cmd>TZFocus<CR>")
+    end
+  }
+  use {
+    "blackCauldron7/surround.nvim",
+    event = "BufEnter",
+    config = function ()
+      require"surround".setup {mappings_style = "surround"}
+    end
+  }
+  use {
+    "ggandor/lightspeed.nvim",
+    event = "VimEnter",
+    config = function ()
+      require('lightspeed').setup({})
+    end
+  }
 end
 )
 
@@ -152,6 +181,11 @@ hooks.add('ready',function ()
   vim.cmd [[
   au BufRead * set foldlevel=99
   autocmd BufWinEnter,WinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | silent! nnoremap <buffer> <silent> <Esc> :q!<cr>| endif
+  " Return to last edit position when opening files (You want this!)
+  autocmd BufReadPost *
+       \ if line("'\"") > 0 && line("'\"") <= line("$") |
+       \   exe "normal! g`\"" |
+       \ endif
   ]]
   vim.g.matchup_surround_enabled = 1
   vim.g.matchup_text_obj_enabled = 1

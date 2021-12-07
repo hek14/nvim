@@ -130,7 +130,6 @@ hooks.add("install_plugins", function(use)
       "nvim-telescope/telescope-dap.nvim",
       "theHamsta/nvim-dap-virtual-text",
       "mfussenegger/nvim-dap-python",
-      "Pocco81/DAPInstall.nvim"
     },
     event = 'VimEnter',
     config = function ()

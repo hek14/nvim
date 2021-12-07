@@ -89,6 +89,15 @@ function _G.put(...)
   return ...
 end
 
+vim.cmd [[
+  cnoremap li let i = 1 \| 
+  function Inc(...)
+    let result = g:i
+    let g:i += a:0 > 0 ? a:1 : 1
+    return result
+  endfunction
+]]
+
 -- To add new plugins, use the "install_plugin" hook,
 -- NOTE: we heavily suggest using Packer's lazy loading (with the 'event' field)
 -- see: https://github.com/wbthomason/packer.nvim

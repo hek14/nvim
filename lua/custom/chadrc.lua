@@ -38,7 +38,9 @@ M.plugins = {
   -- this string will be called in a `require`
   --              use "(custom.configs).my_func()" to call a function
   --              use "custom.blankline" to call a file
-  default_plugin_config_replace = {},
+  default_plugin_config_replace = {
+    bufferline="custom/plugins/bufferline"
+  },
 }
 
 M.mappings = {
@@ -65,6 +67,12 @@ M.mappings = {
     moveUp = "<C-k>",
     moveDown = "<C-j>",
   },
+  plugins = {
+    bufferline = {
+      next_buffer = {"]b","<TAB>"},
+      prev_buffer = {"[b","<S-Tab>"}
+    }
+  }
 }
 
 return M

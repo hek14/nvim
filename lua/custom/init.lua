@@ -174,6 +174,27 @@ hooks.add("install_plugins", function(use)
       require('lightspeed').setup({})
     end
   }
+  use {
+    "hrsh7th/cmp-cmdline",
+    after = "cmp-buffer",
+    config = function ()
+      local cmp = require("cmp")
+      cmp.setup.cmdline('/', {
+        sources = {
+          { name = 'buffer' }
+        }
+      })
+
+      -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline(':', {
+        sources = cmp.config.sources({
+          { name = 'path' }
+        }, {
+          { name = 'cmdline' }
+        })
+      })
+    end
+  }
 end
 )
 

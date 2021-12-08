@@ -199,7 +199,29 @@ end
 )
 
 hooks.add('ready',function ()
-  vim.cmd [[
+  vim.g.matchup_surround_enabled = 1
+  vim.g.matchup_text_obj_enabled = 1
+  vim.api.nvim_set_keymap('x','u%','<Plug>(matchup-i%)',{silent=true, noremap=false})
+
+  local lazy_timer = 50
+  function LazyLoad()
+    local loader = require"packer".loader
+    _G.PLoader = loader
+    print("I am lazy")
+    loader('nvim-cmp cmp-cmdline telescope.nvim nvim-lspconfig')
+  end
+  vim.cmd([[autocmd User LoadLazyPlugin lua LazyLoad()]])
+  vim.defer_fn(function()
+    vim.cmd([[doautocmd User LoadLazyPlugin]])
+  end, lazy_timer)
+end)
+
+-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+vim.cmd [[
+  autocmd VimEnter lua require('custom.plugins.cmp')
+]]
+
+vim.cmd [[
   au BufRead * set foldlevel=99
   autocmd BufWinEnter,WinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | silent! nnoremap <buffer> <silent> <Esc> :q!<cr>| endif
   " Return to last edit position when opening files (You want this!)
@@ -207,16 +229,6 @@ hooks.add('ready',function ()
        \ if line("'\"") > 0 && line("'\"") <= line("$") |
        \   exe "normal! g`\"" |
        \ endif
-  ]]
-  vim.g.matchup_surround_enabled = 1
-  vim.g.matchup_text_obj_enabled = 1
-  vim.api.nvim_set_keymap('x','u%','<Plug>(matchup-i%)',{silent=true, noremap=false})
-end)
-
+]]
 -- autocmd BufWinEnter,WinEnter * if &buftype =~? '\(terminal\|prompt\)' | silent! normal! i | endif
 -- vim.api.nvim_del_keymap("o","i%")
-
--- alternatively, put this in a sub-folder like "lua/custom/plugins/mkdir"
--- then source it with
-
--- require "custom.plugins.mkdir"

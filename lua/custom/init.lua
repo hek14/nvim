@@ -1,6 +1,7 @@
 -- This is where your custom modules and plugins go.
 -- See the wiki for a guide on how to extend NvChad
 
+_G.lprint = require('custom.utils').lprint
 local hooks = require "core.hooks"
 local map = require('core/utils').map
 
@@ -13,10 +14,10 @@ local map = require('core/utils').map
 -- or you can override the whole plugin config with 'chadrc' -> M.plugins.default_plugin_config_replace{}
 -- this will run your config instead of the NvChad config for the given plugin
 
-hooks.override("lsp", "publish_diagnostics", function(current)
-  current.virtual_text = false;
-  return current;
-end)
+-- hooks.override("lsp", "publish_diagnostics", function(current)
+--   current.virtual_text = false;
+--   return current;
+-- end)
 
 -- To add new mappings, use the "setup_mappings" hook,
 -- you can set one or many mappings
@@ -106,6 +107,7 @@ vim.cmd [[
 -- examples below:
 
 hooks.add("install_plugins", function(use)
+  print('in the hook of install_plugins')
   use {
     "williamboman/nvim-lsp-installer",
   }

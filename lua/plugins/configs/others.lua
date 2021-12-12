@@ -62,7 +62,7 @@ M.colorizer = function()
 end
 
 M.comment = function()
-   local present, nvim_comment = pcall(require, "nvim_comment")
+   local present, nvim_comment = pcall(require, "Comment")
    if present then
       nvim_comment.setup()
    end
@@ -132,7 +132,7 @@ M.lsp_handlers = function()
    })
 
    -- suppress error messages from lang servers
-   vim.notify = function(msg, log_level, _opts)
+   vim.notify = function(msg, log_level)
       if msg:match "exit code" then
          return
       end

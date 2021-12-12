@@ -1,8 +1,5 @@
-local userconf = pcall(require, "custom")
-
-if userconf then
-   require "custom"
-end
+-- try to call custom init
+pcall(require, "custom")
 
 local core_modules = {
    "core.options",

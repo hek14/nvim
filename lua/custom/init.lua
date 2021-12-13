@@ -3,7 +3,6 @@
 
 _G.lprint = require('custom.utils').lprint
 local hooks = require "core.hooks"
-local map = require('core/utils').map
 
 -- NOTE: To use this, make a copy with `cp example_init.lua init.lua`
 
@@ -156,11 +155,10 @@ hooks.add("install_plugins", function(use)
       "TZMinimalist",
       "TZFocus",
     },
-    config = function()
-      -- check https://github.com/Pocco81/TrueZen.nvim#setup-configuration (init.lua version)
-      map("n","gq","<cmd>TZFocus<CR>")
-      map("i","<C-q>","<cmd>TZFocus<CR>")
-    end
+    setup = function()
+      require'core.utils'.map("n","gq","<cmd>TZFocus<CR>")
+      require'core.utils'.map("i","<C-q>","<cmd>TZFocus<CR>")
+    end,
   }
   use {
     "blackCauldron7/surround.nvim",

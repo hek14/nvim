@@ -24,7 +24,6 @@ local hooks = require "core.hooks"
 
 hooks.add("setup_mappings", function(map)
   map("n", "<leader>cd", "<cmd>:cd %:p:h<cr>", {silent=false}) -- example to delete the buffer
-  map("c", "So", "lua Source_curr_file()<cr>", {silent=false}) -- example to delete the buffer
 
   map("n", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
   map("x", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
@@ -74,6 +73,14 @@ hooks.add("setup_mappings", function(map)
   map("t","<C-w>n", "<C-\\><C-n><C-w>j")
   map("t","<C-w>e", "<C-\\><C-n><C-w>k")
   map("t","<C-w>i", "<C-\\><C-n><C-w>l")
+  vim.cmd([[
+    call Cabbrev('pi', 'PackerInstall')
+    call Cabbrev('pud', 'PackerUpdate')
+    call Cabbrev('pc', 'PackerClean')
+    call Cabbrev('ps', 'PackerSync')
+    call Cabbrev('so', 'lua Source_curr_file()<CR>')
+    call Cabbrev('li', 'let i =1 \|')
+  ]])
 end)
 
 function Source_curr_file ()
@@ -96,7 +103,6 @@ function _G.put(...)
 end
 
 vim.cmd [[
-  cnoremap li let i = 1 \| 
   function! Inc(...)
     let result = g:i
     let g:i += a:0 > 0 ? a:1 : 1
@@ -308,8 +314,8 @@ vim.cmd [[
 
 vim.cmd [[
   au BufRead * set foldlevel=99
- autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | exec "startinsert"| endif
- autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | silent! nnoremap <buffer> <silent> <Esc> :bd!<CR>| endif
+ autocmd BufWinEnter * if &buftype =~? '\(terminal\)' | exec "startinsert"| endif
+ autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | silent! nnoremap <buffer> <silent> <Esc> :bd<CR>| endif
   " Return to last edit position when opening files (You want this!)
   autocmd BufReadPost *
        \ if line("'\"") > 0 && line("'\"") <= line("$") |

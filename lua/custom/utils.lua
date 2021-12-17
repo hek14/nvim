@@ -46,4 +46,15 @@ local global = {
   home=home,
 }
 
+vim.cmd[[
+  function! Cabbrev(key, value) abort
+    execute printf('cabbrev <expr> %s (getcmdtype() == ":" && getcmdpos() <= %d) ? %s : %s',
+          \ a:key, 1+len(a:key), Single_quote(a:value), Single_quote(a:key))
+  endfunction
+
+  function! Single_quote(str) abort
+    return "'" . substitute(copy(a:str), "'", "''", 'g') . "'"
+  endfunction
+]]
+
 return {lprint=lprint,timer=add_timer,global_env=global}

@@ -1,5 +1,10 @@
 -- try to call custom init
-pcall(require, "custom")
+local ok, _ = pcall(require, "custom")
+print("custom loaded: " .. tostring(ok))
+
+if not ok then
+  print(vim.inspect(debug.traceback()))
+end
 
 local core_modules = {
    "core.options",

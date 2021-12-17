@@ -18,7 +18,7 @@ M.setup = function ()
 
     -- Table of lsp clients to ignore by name
     -- eg: { "efm", ... }
-    ignore_lsp = {},
+    ignore_lsp = {'efm'}, -- and do :LspUninstall efm too
 
     -- Don't calculate root dir on specific directories
     -- Ex: { "~/.cargo/*", ... }

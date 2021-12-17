@@ -209,6 +209,21 @@ hooks.add("install_plugins", function(use)
       })
     end
   }
+  -- enhance grep and quickfix list
+  -- 1. populate the quickfix
+  use {
+    "mhinz/vim-grepper",
+    config = function()
+      vim.g.grepper = {tools = {'rg', 'grep'}, searchreg = 1, next_tool = '<leader>gw' }
+      vim.cmd([[
+        nnoremap <leader>gw :Grepper<cr>
+        nmap <leader>gs  <plug>(GrepperOperator)
+        xmap <leader>gs  <plug>(GrepperOperator)
+      ]])
+    end
+  }
+  -- 2. setup better qf buffer
+  use {'kevinhwang91/nvim-bqf'}
 end
 )
 

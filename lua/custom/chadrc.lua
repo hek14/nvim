@@ -11,15 +11,19 @@ M.options, M.ui, M.mappings, M.plugins = {}, {}, {}, {}
 -- To use this file, copy the structure of `core/default_config.lua`,
 -- examples of setting relative number & changing theme:
 
--- M.options = {
---    relativenumber = true,
--- }
+local global_env = require('custom.utils').global_env
+M.options = {
+   relativenumber = true,
+   clipboard = "unnamedplus" and global_env.is_mac or "",
+}
 
 -- M.ui = {
 --   theme = "nord"
 -- }
 
 -- NvChad included plugin options & overrides
+
+
 M.plugins = {
   status = {
     vim_matchup = true,

@@ -27,4 +27,23 @@ local lprint = function(...)
   end
 end
 
-return {lprint=lprint}
+local add_timer = function(fn)
+  local function timedFn()
+    local wait = fn()
+    if wait>0 then
+      vim.defer_fn(timedFn, wait)
+    end
+  end
+  timedFn()
+end
+
+local os_name = vim.loop.os_uname().sysname
+local home = os.getenv("HOME")
+local global = {
+  is_mac = os_name == 'Darwin',
+  is_linux = os_name == 'Linux',
+  is_windows = os_name == 'Windows' or os_name == 'Windows_NT',
+  home=home,
+}
+
+return {lprint=lprint,timer=add_timer,global_env=global}

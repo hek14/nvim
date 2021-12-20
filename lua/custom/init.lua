@@ -224,6 +224,12 @@ hooks.add("install_plugins", function(use)
   }
   -- 2. setup better qf buffer
   use {'kevinhwang91/nvim-bqf'}
+  use {
+    'nvim-lualine/lualine.nvim',
+    config = function ()
+      require'lualine'.setup()
+    end
+  }
 end
 )
 

@@ -76,7 +76,7 @@ hooks.add("setup_mappings", function(map)
   vim.cmd([[
     call Cabbrev('pi', 'PackerInstall')
     call Cabbrev('pud', 'PackerUpdate')
-    call Cabbrev('pc', 'PackerClean')
+    call Cabbrev('pc', 'PackerCompile')
     call Cabbrev('ps', 'PackerSync')
     call Cabbrev('so', 'lua Source_curr_file()<CR>')
     call Cabbrev('li', 'let i =1 \|')

@@ -329,7 +329,10 @@ vim.cmd [[
 
 vim.cmd [[
   au BufRead * set foldlevel=99
- autocmd BufWinEnter * if &buftype =~? '\(terminal\)' | exec "startinsert"| endif
+ autocmd BufWinEnter,WinEnter term://* startinsert
+ autocmd BufLeave term://* stopinsert
+ autocmd BufRead *.py nmap <buffer> gm /^if.*__main__<cr> :noh <cr> 0
+
  autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | silent! nnoremap <buffer> <silent> <Esc> :bd<CR>| endif
   " Return to last edit position when opening files (You want this!)
   autocmd BufReadPost *

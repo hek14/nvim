@@ -29,7 +29,7 @@ M.plugins = {
     vim_matchup = true,
     dashboard = true,
     lspsignature = false,
-    feline = false,
+    feline = true,
   },
  options = {
    lspconfig = {

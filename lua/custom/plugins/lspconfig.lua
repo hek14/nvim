@@ -3,6 +3,13 @@ local telescope_present,telescope = pcall(require,'telescope')
 local trouble_present,trouble = pcall(require,'trouble')
 local M = {}
 
+ vim.diagnostic.config {
+    virtual_text = false,    signs = true,
+    underline = false,
+    signs = true,
+    update_in_insert = false,
+ }
+
 M.setup_lsp = function(attach, capabilities)
    local lsp_installer = require "nvim-lsp-installer"
 

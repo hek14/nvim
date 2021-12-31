@@ -224,6 +224,14 @@ hooks.add("install_plugins", function(use)
   }
   -- 2. setup better qf buffer
   use {'kevinhwang91/nvim-bqf'}
+
+  use {
+    "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",
+    after = 'nvim-lspconfig',
+    config = function ()
+      vim.cmd [[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]]
+    end
+  }
 end
 )
 

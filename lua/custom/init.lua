@@ -232,6 +232,27 @@ hooks.add("install_plugins", function(use)
       vim.cmd [[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]]
     end
   }
+  use {
+    'SmiteshP/nvim-gps',
+    after = {"nvim-treesitter","nvim-web-devicons"},
+    config = function ()
+      if not packer_plugins["nvim-treesitter"].loaded then
+        print("treesitter not ready")
+        packer_plugins["nvim-treesitter"].loaded = true
+        require"packer".loader("nvim-treesitter")
+      end
+      require("nvim-gps").setup({
+        disable_icons = false,           -- Setting it to true will disable all icons
+        icons = {
+          ["class-name"] = ' ',      -- Classes and class-like objects
+          ["function-name"] = ' ',   -- Functions
+          ["method-name"] = ' ',     -- Methods (functions inside class-like objects)
+          ["container-name"] = '⛶ ',  -- Containers (example: lua tables)
+          ["tag-name"] = '炙'         -- Tags (example: html tags)
+        },
+      })
+    end
+  }
 end
 )
 

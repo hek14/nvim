@@ -185,6 +185,23 @@ components.active[1][10] = {
    icon = "  ",
 }
 
+local ok, gps = pcall(require,"nvim-gps")
+if ok then
+  components.active[1][11] = {
+    provider = function()
+      local gps = require("nvim-gps")
+      return string.format(" ctx: %s",gps.get_location())
+    end,
+    enabled = function()
+      local gps = require("nvim-gps")
+      return gps.is_available()
+    end
+  }
+else
+  print("gps not available")
+end
+
+
 components.active[2][1] = {
    provider = function()
       local Lsp = vim.lsp.util.get_progress_messages()[1]

@@ -45,7 +45,8 @@ M.plugins = {
   --              use "custom.blankline" to call a file
   default_plugin_config_replace = {
     bufferline="custom/plugins/bufferline",
-    nvim_cmp="custom/plugins/cmp"
+    nvim_cmp="custom/plugins/cmp",
+    gitsigns="custom/plugins/gitsigns"
   },
 }
 

@@ -1,5 +1,4 @@
 local util = require'lspconfig'.util
-local telescope_present,telescope = pcall(require,'telescope')
 local trouble_present,trouble = pcall(require,'trouble')
 local M = {}
 
@@ -12,16 +11,6 @@ local M = {}
 
 M.setup_lsp = function(attach, capabilities)
    local lsp_installer = require "nvim-lsp-installer"
-
-   if telescope_present then
-     vim.lsp.handlers["textDocument/references"] = require("telescope.builtin").lsp_references
-     vim.lsp.handlers['textDocument/codeAction'] = require("telescope.builtin").lsp_code_actions
-     vim.lsp.handlers['textDocument/definition'] = require("telescope.builtin").lsp_definitions
-     vim.lsp.handlers['textDocument/typeDefinition'] = require("telescope.builtin").lsp_type_definitions
-     vim.lsp.handlers['textDocument/implementation'] = require("telescope.builtin").lsp_implementations
-     vim.lsp.handlers['textDocument/documentSymbol'] = require("telescope.builtin").lsp_document_symbols
-   end
-
    lsp_installer.on_server_ready(function(server)
       local opts = {
          on_attach = attach,

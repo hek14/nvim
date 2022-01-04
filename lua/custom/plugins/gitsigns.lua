@@ -9,8 +9,11 @@ if present then
       changedelete = { hl = "DiffChangeDelete", text = "~", numhl = "GitSignsChangeNr" },
     },
     keymaps = {
-       ['o uh'] = ':<C-U>Gitsigns select_hunk<CR>',
-       ['x uh'] = ':<C-U>Gitsigns select_hunk<CR>',
+      noremap = true,
+      ['n ]c'] = { expr = true, "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'"},
+      ['n [c'] = { expr = true, "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'"},
+      ['o uh'] = ':<C-U>Gitsigns select_hunk<CR>',
+      ['x uh'] = ':<C-U>Gitsigns select_hunk<CR>',
     }
   }
 end

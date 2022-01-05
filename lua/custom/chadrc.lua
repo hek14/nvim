@@ -46,7 +46,8 @@ M.plugins = {
   default_plugin_config_replace = {
     bufferline="custom/plugins/bufferline",
     nvim_cmp="custom/plugins/cmp",
-    gitsigns="custom/plugins/gitsigns"
+    gitsigns="custom/plugins/gitsigns",
+    nvim_treesitter='custom/plugins/treesitter'
   },
 }
 

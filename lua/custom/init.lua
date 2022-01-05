@@ -69,6 +69,7 @@ hooks.add("setup_mappings", function(map)
   map("x", ">", ">gv", {silent=false,noremap=true})
   map("x", "<", "<gv", {silent=false,noremap=true})
   map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
+  map("n", "<C-x>u", "<cmd>UndotreeToggle<CR>")
   
   map("t","<C-w>n", "<C-\\><C-n><C-w>j")
   map("t","<C-w>e", "<C-\\><C-n><C-w>k")
@@ -252,6 +253,14 @@ hooks.add("install_plugins", function(use)
         },
       })
     end
+  }
+  use {
+    "mbbill/undotree",
+    cmd = "UndotreeToggle",
+  }
+  use {
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    after = 'nvim-treesitter'
   }
 end
 )

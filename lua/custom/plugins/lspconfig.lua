@@ -40,6 +40,8 @@ M.setup_lsp = function(attach, capabilities)
         end
         buf_set_keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", map_opts)
         buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", map_opts)
+        buf_set_keymap("n", "[r", "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(-1)<CR>", map_opts)
+        buf_set_keymap("n", "]r", "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(1)<CR>", map_opts)
         buf_set_keymap("n", "gt", "<cmd>lua vim.lsp.buf.document_symbol()<CR>", map_opts)
         buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", map_opts)
         buf_set_keymap("n", "<leader>gt", "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<CR>", map_opts)

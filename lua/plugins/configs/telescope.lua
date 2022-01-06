@@ -15,9 +15,6 @@ telescope.setup {
          "--column",
          "--smart-case",
       },
-      prompt_prefix = "   ",
-      selection_caret = "  ",
-      entry_prefix = "  ",
       initial_mode = "insert",
       selection_strategy = "reset",
       sorting_strategy = "ascending",
@@ -53,8 +50,6 @@ telescope.setup {
    },
 }
 
-local extensions = { "themes", "terms" }
-
  vim.lsp.handlers["textDocument/references"] = require("telescope.builtin").lsp_references
  vim.lsp.handlers['textDocument/codeAction'] = require("telescope.builtin").lsp_code_actions
  vim.lsp.handlers['textDocument/definition'] = require("telescope.builtin").lsp_definitions
@@ -62,6 +57,7 @@ local extensions = { "themes", "terms" }
  vim.lsp.handlers['textDocument/implementation'] = require("telescope.builtin").lsp_implementations
  vim.lsp.handlers['textDocument/documentSymbol'] = require("telescope.builtin").lsp_document_symbols
 
+local extensions = { "themes", "terms" }
 pcall(function()
    for _, ext in ipairs(extensions) do
       telescope.load_extension(ext)

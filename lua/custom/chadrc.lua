@@ -13,7 +13,7 @@ M.options, M.ui, M.mappings, M.plugins = {}, {}, {}, {}
 
 local global_env = require('custom.utils').global_env
 M.options = {
-   relativenumber = true,
+   relativenumber = false,
    clipboard = global_env.is_mac and "unnamedplus" or "",
 }
 

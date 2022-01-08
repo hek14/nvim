@@ -57,9 +57,9 @@ M.mappings = {
     -- get out of terminal mode and hide it
     esc_hide_termmode = { "J" }, -- multiple mappings allowed
     pick_term ="<space>T",
-    new_horizontal = "<leader>tt",
-    new_window = "<leader>tw",
-    new_vertical = "<leader>tv",
+    new_horizontal = {},
+    new_window = {},
+    new_vertical = {},
   },
   insert_nav = {
     beginning_of_line = "<C-a>",

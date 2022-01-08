@@ -81,6 +81,8 @@ hooks.add("setup_mappings", function(map)
     call Cabbrev('ps', 'PackerSync')
     call Cabbrev('so', 'lua Source_curr_file()<CR>')
     call Cabbrev('li', 'let i =1 \|')
+    call Cabbrev('py', 'PYTHON')
+    call Cabbrev('lg', 'Lazygit')
   ]])
 end)
 
@@ -262,6 +264,56 @@ hooks.add("install_plugins", function(use)
     'nvim-treesitter/nvim-treesitter-textobjects',
     after = 'nvim-treesitter'
   }
+  use {
+    "akinsho/toggleterm.nvim",
+    disable = true,
+    config = function()
+      require("custom.plugins.toggleterm")
+    end
+  }
+  use {
+    'voldikss/vim-floaterm',
+    opt = false,
+    config = function ()
+      vim.cmd[[command! PYTHON FloatermNew python]]
+      vim.cmd[[command! Lazygit FloatermNew --height=0.8 --width=0.8 lazygit]]
+      vim.g.floaterm_keymap_new = "<leader>n"
+      vim.g.floaterm_keymap_toggle = "<leader>tt"
+      vim.g.floaterm_keymap_next = "<leader>tn"
+      vim.g.floaterm_keymap_prev = "<leader>tp"
+      vim.g.floaterm_keymap_kill = "<leader>tk"
+      vim.cmd([[
+        function! Floaterm_open_in_normal_window() abort
+          let f = findfile(expand('<cfile>'))
+          if !empty(f) && has_key(nvim_win_get_config(win_getid()), 'anchor')
+            FloatermHide
+            execute 'e ' . f
+          endif
+        endfunction
+        autocmd FileType floaterm nnoremap <silent><buffer> gf :call Floaterm_open_in_normal_window()<CR>
+      ]])
+      vim.cmd([[
+        function! Floaterm_toggleOrCreateTerm(bang, name) abort
+          if a:bang
+              call floaterm#toggle(a:bang, -1, a:name)
+          endif
+          if !empty(a:name)
+              let bufnr = floaterm#terminal#get_bufnr(a:name)
+              if bufnr == -1
+                  execute('FloatermNew --name='.a:name)
+              else
+                  call floaterm#toggle(a:bang, bufnr, a:name)
+              endif
+          else
+              call floaterm#util#show_msg('Name is empty')
+          endif
+        endfunction
+
+        command! -nargs=? -bang -complete=customlist,floaterm#cmdline#complete
+                                \ FloatermToggleOrCreate call Floaterm_toggleOrCreateTerm(<bang>0, <q-args>)
+      ]])
+    end
+  }
 end
 )
 
@@ -367,13 +419,11 @@ vim.cmd [[
 
 vim.cmd [[
   au BufRead * set foldlevel=99
- autocmd BufWinEnter,WinEnter term://* startinsert
  autocmd BufLeave term://* stopinsert
  autocmd BufRead *.py nmap <buffer> gm /^if.*__main__<cr> :noh <cr> 0
-
  autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | silent! nnoremap <buffer> <silent> <Esc> :bd<CR>| endif
   " Return to last edit position when opening files (You want this!)
-  autocmd BufReadPost *
+ autocmd BufReadPost *
        \ if line("'\"") > 0 && line("'\"") <= line("$") |
        \   exe "normal! g`\"" |
        \ endif

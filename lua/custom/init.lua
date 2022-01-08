@@ -1,90 +1,65 @@
--- This is where your custom modules and plugins go.
--- See the wiki for a guide on how to extend NvChad
+local map = require('core.utils').map
+map("n", "<leader>cd", "<cmd>:cd %:p:h<cr>", {silent=false}) -- example to delete the buffer
 
-_G.lprint = require('custom.utils').lprint
-local hooks = require "core.hooks"
+map("n", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
+map("x", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
+map("n", "N", "J",   {silent=true,noremap=true}) -- example to delete the buffer
+map("x", "N", "J",   {silent=true,noremap=true}) -- example to delete the buffer
+map("n", "gn", "gj", {silent=false,noremap=true}) -- example to delete the buffer
 
--- NOTE: To use this, make a copy with `cp example_init.lua init.lua`
+map("n", "e", "k",   {silent=true,noremap=true}) -- example to delete the buffer
+map("x", "e", "k",   {silent=true,noremap=true}) -- example to delete the buffer
+map("n", "E", "K",   {silent=true,noremap=false}) -- example to delete the buffer
+map("x", "E", "K",   {silent=true,noremap=false}) -- example to delete the buffer
+map("n", "ge", "gk", {silent=false,noremap=true}) -- example to delete the buffer
 
---------------------------------------------------------------------
+map("n", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
+map("x", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
+map("o", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
 
--- To modify packaged plugin configs, use the overrides functionality
--- if the override does not exist in the plugin config, make or request a PR,
--- or you can override the whole plugin config with 'chadrc' -> M.plugins.default_plugin_config_replace{}
--- this will run your config instead of the NvChad config for the given plugin
+map("n", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
+map("x", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
+map("o", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
+map("n", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
+map("x", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
+map("o", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
 
--- hooks.override("lsp", "publish_diagnostics", function(current)
---   current.virtual_text = false;
---   return current;
--- end)
+map("n", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
+map("x", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
+map("o", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
+map("n", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
+map("x", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
+map("o", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
 
--- To add new mappings, use the "setup_mappings" hook,
--- you can set one or many mappings
--- example below:
+map("n", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
+map("x", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
+map("o", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
+map("n", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
+map("x", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
+map("o", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
 
-hooks.add("setup_mappings", function(map)
-  map("n", "<leader>cd", "<cmd>:cd %:p:h<cr>", {silent=false}) -- example to delete the buffer
+map({"n","x"}, "<C-w>n", "<C-w>j", {silent=false,noremap=true})
+map({"n","x"}, "<C-w>e", "<C-w>k", {silent=false,noremap=true})
+map({"n","x"}, "<C-w>i", "<C-w>l", {silent=false,noremap=true})
 
-  map("n", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
-  map("x", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
-  map("n", "N", "J",   {silent=true,noremap=true}) -- example to delete the buffer
-  map("x", "N", "J",   {silent=true,noremap=true}) -- example to delete the buffer
-  map("n", "gn", "gj", {silent=false,noremap=true}) -- example to delete the buffer
+map("x", ">", ">gv", {silent=false,noremap=true})
+map("x", "<", "<gv", {silent=false,noremap=true})
+map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
+map("n", "<C-x>u", "<cmd>UndotreeToggle<CR>")
 
-  map("n", "e", "k",   {silent=true,noremap=true}) -- example to delete the buffer
-  map("x", "e", "k",   {silent=true,noremap=true}) -- example to delete the buffer
-  map("n", "E", "K",   {silent=true,noremap=false}) -- example to delete the buffer
-  map("x", "E", "K",   {silent=true,noremap=false}) -- example to delete the buffer
-  map("n", "ge", "gk", {silent=false,noremap=true}) -- example to delete the buffer
-
-  map("n", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("x", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("o", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
-
-  map("n", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("x", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("o", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("n", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("x", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("o", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
-
-  map("n", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("x", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("o", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("n", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("x", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("o", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
-
-  map("n", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("x", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("o", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("n", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("x", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-  map("o", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-
-  map({"n","x"}, "<C-w>n", "<C-w>j", {silent=false,noremap=true})
-  map({"n","x"}, "<C-w>e", "<C-w>k", {silent=false,noremap=true})
-  map({"n","x"}, "<C-w>i", "<C-w>l", {silent=false,noremap=true})
-
-  map("x", ">", ">gv", {silent=false,noremap=true})
-  map("x", "<", "<gv", {silent=false,noremap=true})
-  map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
-  map("n", "<C-x>u", "<cmd>UndotreeToggle<CR>")
-  
-  map("t","<C-w>n", "<C-\\><C-n><C-w>j")
-  map("t","<C-w>e", "<C-\\><C-n><C-w>k")
-  map("t","<C-w>i", "<C-\\><C-n><C-w>l")
-  vim.cmd([[
-    call Cabbrev('pi', 'PackerInstall')
-    call Cabbrev('pud', 'PackerUpdate')
-    call Cabbrev('pc', 'PackerCompile')
-    call Cabbrev('ps', 'PackerSync')
-    call Cabbrev('so', 'lua Source_curr_file()<CR>')
-    call Cabbrev('li', 'let i =1 \|')
-    call Cabbrev('py', 'PYTHON')
-    call Cabbrev('lg', 'Lazygit')
-  ]])
-end)
+map("t","<C-w>n", "<C-\\><C-n><C-w>j")
+map("t","<C-w>e", "<C-\\><C-n><C-w>k")
+map("t","<C-w>i", "<C-\\><C-n><C-w>l")
+vim.cmd([[
+  call Cabbrev('pi', 'PackerInstall')
+  call Cabbrev('pud', 'PackerUpdate')
+  call Cabbrev('pc', 'PackerCompile')
+  call Cabbrev('ps', 'PackerSync')
+  call Cabbrev('so', 'lua Source_curr_file()<CR>')
+  call Cabbrev('li', 'let i =1 \|')
+  call Cabbrev('py', 'PYTHON')
+  call Cabbrev('lg', 'Lazygit')
+]])
 
 function Source_curr_file ()
   if vim.bo.ft == "lua" then
@@ -94,6 +69,7 @@ function Source_curr_file ()
   end
 end
 
+_G.lprint = require('custom.utils').lprint
 function _G.put(...)
   local objects = {}
   for i = 1, select('#', ...) do
@@ -113,12 +89,8 @@ vim.cmd [[
   endfunction
 ]]
 
--- To add new plugins, use the "install_plugin" hook,
--- NOTE: we heavily suggest using Packer's lazy loading (with the 'event' field)
--- see: https://github.com/wbthomason/packer.nvim
--- examples below:
-
-hooks.add("install_plugins", function(use)
+local customPlugins = require "core.customPlugins"
+customPlugins.add(function(use)
   print('in the hook of install_plugins')
   use {
     "williamboman/nvim-lsp-installer",

@@ -24,7 +24,6 @@ if present then
   local function copy(args)
     return args[1]
   end
-  print("my luaSnip config")
 
   ls.snippets = {
     all = {

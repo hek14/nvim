@@ -59,6 +59,7 @@ vim.cmd([[
   call Cabbrev('li', 'let i =1 \|')
   call Cabbrev('py', 'PYTHON')
   call Cabbrev('lg', 'Lazygit')
+  call Cabbrev('ft', 'FloatermNew')
 ]])
 
 function Source_curr_file ()
@@ -91,7 +92,6 @@ vim.cmd [[
 
 local customPlugins = require "core.customPlugins"
 customPlugins.add(function(use)
-  print('in the hook of install_plugins')
   use {
     "williamboman/nvim-lsp-installer",
   }
@@ -267,6 +267,7 @@ customPlugins.add(function(use)
       vim.g.floaterm_keymap_next = "<leader>tn"
       vim.g.floaterm_keymap_prev = "<leader>tp"
       vim.g.floaterm_keymap_kill = "<leader>tk"
+      vim.g.floaterm_autoinsert = true
       vim.cmd([[
         function! Floaterm_open_in_normal_window() abort
           let f = findfile(expand('<cfile>'))
@@ -309,7 +310,6 @@ local lazy_timer = 50
 function LazyLoad()
   local loader = require"packer".loader
   _G.PLoader = loader
-  print("I am lazy")
   loader('nvim-cmp cmp-cmdline vim-matchup gitsigns.nvim telescope.nvim nvim-lspconfig')
 
 end
@@ -404,14 +404,35 @@ vim.cmd [[
 
 vim.cmd [[
   au BufRead * set foldlevel=99
- autocmd BufLeave term://* stopinsert
  autocmd BufRead *.py nmap <buffer> gm /^if.*__main__<cr> :noh <cr> 0
- autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' | silent! nnoremap <buffer> <silent> <Esc> :bd<CR>| endif
-  " Return to last edit position when opening files (You want this!)
+ " autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' echom 'hello'
+ function! Toggle_start_insert_terminal()
+    if g:terminal_start_insert == 1
+      let g:terminal_start_insert = 0
+    else
+      let g:terminal_start_insert = 1
+    endif
+    echom "Toggle startinsert: " . g:terminal_start_insert
+ endfunction
+ function! TerminalOptions()
+   let g:terminal_start_insert=1 
+   let l:bufnr = bufnr()
+   silent! nnoremap <C-g> :call Toggle_start_insert_terminal()<CR> 
+   silent! inoremap <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
+   silent! xnoremap <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
+   silent! inoremap <buffer> <silent> <C-w>n <Esc><C-w>j
+   silent! inoremap <buffer> <silent> <C-w>e <Esc><C-w>k
+   silent! inoremap <buffer> <silent> <C-w>i <Esc><C-w>l
+   silent! tnoremap <buffer> <silent> Q <C-\><C-n>:q<CR>
+   silent! au BufEnter,BufWinEnter,WinEnter <buffer> startinsert!
+   silent! au BufLeave <buffer> stopinsert!
+   startinsert
+ endfunction
+ au TermOpen * call TerminalOptions()
+ autocmd BufWinEnter,WinEnter * if &filetype=="dap-repl" | startinsert | endif
+ " Return to last edit position when opening files (You want this!)
  autocmd BufReadPost *
        \ if line("'\"") > 0 && line("'\"") <= line("$") |
        \   exe "normal! g`\"" |
        \ endif
 ]]
--- autocmd BufWinEnter,WinEnter * if &buftype =~? '\(terminal\|prompt\)' | silent! normal! i | endif
--- vim.api.nvim_del_keymap("o","i%")

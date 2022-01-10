@@ -45,7 +45,6 @@ vim.cmd [[
 
 vim.api.nvim_set_keymap("n", "<C-g>", "<Cmd>exe v:count1 . 'ToggleTerm'<CR>", {noremap = true, silent = true})
 vim.api.nvim_set_keymap("i", "<C-g>", "<Esc><Cmd>exe v:count1 . 'ToggleTerm'<CR>", {noremap = true, silent = true})
--- vim.cmd[[ autocmd BufWinEnter,WinEnter term://* startinsert ]]
 
 local Terminal = require("toggleterm.terminal").Terminal
 local lazygit = Terminal:new({ cmd = "lazygit", hidden = true })

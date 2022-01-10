@@ -34,7 +34,7 @@ M.setup_lsp = function(attach, capabilities)
 
         local map_opts = { noremap = true, silent = true }
         buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", map_opts)
-        buf_set_keymap("n", "gl", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", map_opts)
+        buf_set_keymap("n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", map_opts)
         if trouble_present then
           buf_set_keymap("n", "<leader>D", "<cmd>TroubleToggle lsp_document_diagnostics<CR>", map_opts)
         end

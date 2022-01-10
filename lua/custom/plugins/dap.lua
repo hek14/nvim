@@ -21,12 +21,13 @@ map('n', '<leader>lp',":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('
 map('n', '<F12>', ':lua require"dap".step_out()<CR>')
 map('n', '<F11>', ':lua require"dap".step_into()<CR>')
 map('n', '<F10>', ':lua require"dap".step_over()<CR>')
-map('n', '<F5>', ':lua require"dap".continue()<CR>:lua require"dap".repl.toggle({},"10 split")<CR>')
-map('n', '<leader>dt', ':lua require"dap".run_to_cursor()<CR>')
+map('n', '<F5>', ':lua require"dap".continue()<CR>')
+map('n', '<F4>', ':lua require"dap".run_to_cursor()<CR>')
+map('n', '<F8>', ':lua require"dap".toggle_breakpoint()<CR>')
 map('n', '<leader>dn', ':lua require"dap".down()<CR>')
 map('n', '<leader>de', ':lua require"dap".up()<CR>')
 map('n', '<leader>dq', ':lua require"dap".close()<CR>')
-map('n', '<leader>dr', ':lua require"dap".repl.toggle({},"10 split")<CR><C-w>ji')
+map('n', '<leader>dr', ':lua require"dap".repl.toggle({},"10 split")<CR>')
 map('n', '<leader>di', ':lua require"dap.ui.widgets".hover()<CR>')
 map('n', '<leader>d?', ':lua local widgets=require"dap.ui.widgets";widgets.centered_float(widgets.scopes)<CR>')
 
@@ -39,7 +40,7 @@ vim.cmd [[  au FileType dap-repl lua require('dap.ext.autocompl').attach() ]]
 
 -- theHamsta/nvim-dap-virtual-text and mfussenegger/nvim-dap
 require('nvim-dap-virtual-text').setup({
-  enabled = true,                     -- enable this plugin (the default)
+  enabled = false,                     -- enable this plugin (the default)
   enabled_commands = true,            -- create commands DapVirtualTextEnable, DapVirtualTextDisable, DapVirtualTextToggle, (DapVirtualTextForceRefresh for refreshing when debug adapter did not notify its termination)
   highlight_changed_variables = true, -- highlight changed values with NvimDapVirtualTextChanged, else always NvimDapVirtualText
   highlight_new_as_changed = false,   -- highlight new variables in the same way as changed variables (if highlight_changed_variables)
@@ -52,3 +53,14 @@ require('nvim-dap-virtual-text').setup({
   virt_text_win_col = nil
 }
 )
+local dapui = require("dapui")
+dapui.setup()
+dap.listeners.after.event_initialized["dapui_config"] = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated["dapui_config"] = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited["dapui_config"] = function()
+  dapui.close()
+end

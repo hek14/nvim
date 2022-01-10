@@ -123,19 +123,32 @@ customPlugins.add(function(use)
   -- dap stuff
   use { 
     'mfussenegger/nvim-dap',
-    disable = true,
+    disable = false,
+    after = "telescope.nvim",
     requires = {
       "nvim-telescope/telescope-dap.nvim",
       "theHamsta/nvim-dap-virtual-text",
       "mfussenegger/nvim-dap-python",
+      "rcarriga/nvim-dap-ui"
     },
-    event = 'VimEnter',
     config = function ()
       require('custom.plugins.dap')
     end
   }
   use {
     'sakhnik/nvim-gdb',
+    setup = function ()
+      vim.g.nvimgdb_disable_start_keymaps = true
+    end,
+    config = function ()
+      vim.cmd([[
+        nnoremap <expr> <Leader>dd ":GdbStartPDB python -m pdb " . expand('%')
+      ]])
+      vim.cmd([[
+        command! GdbExit lua NvimGdb.i():send('exit')
+        nnoremap <Leader>ds :GdbExit<CR>
+      ]])
+    end
   }
   use {
     "Pocco81/TrueZen.nvim",

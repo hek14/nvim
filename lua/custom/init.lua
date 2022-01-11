@@ -45,7 +45,6 @@ map({"n","x"}, "<C-w>i", "<C-w>l", {silent=false,noremap=true})
 map("x", ">", ">gv", {silent=false,noremap=true})
 map("x", "<", "<gv", {silent=false,noremap=true})
 map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
-map("n", "<C-x>u", "<cmd>UndotreeToggle<CR>")
 
 map("t","<C-w>n", "<C-\\><C-n><C-w>j")
 map("t","<C-w>e", "<C-\\><C-n><C-w>k")
@@ -226,7 +225,7 @@ customPlugins.add(function(use)
     end
   }
   -- 2. setup better qf buffer
-  use {'kevinhwang91/nvim-bqf'}
+  use {'kevinhwang91/nvim-bqf', ft = 'qf'}
 
   use {
     "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",
@@ -237,6 +236,7 @@ customPlugins.add(function(use)
   }
   use {
     'SmiteshP/nvim-gps',
+    -- this plugin shows the code context in the statusline: check ~/.config/nvim/lua/plugins/configs/statusline.lua
     after = {"nvim-treesitter","nvim-web-devicons"},
     config = function ()
       if not packer_plugins["nvim-treesitter"].loaded then
@@ -259,6 +259,10 @@ customPlugins.add(function(use)
   use {
     "mbbill/undotree",
     cmd = "UndotreeToggle",
+    config = function ()
+      local map = require('core.utils').map
+      map("n", "<C-x>u", ":UndotreeToggle | UndotreeFocus<CR>")
+    end
   }
   use {
     'nvim-treesitter/nvim-treesitter-textobjects',
@@ -275,47 +279,23 @@ customPlugins.add(function(use)
     'voldikss/vim-floaterm',
     opt = false,
     config = function ()
-      vim.cmd[[command! PYTHON FloatermNew python]]
-      vim.cmd[[command! Lazygit FloatermNew --height=0.8 --width=0.8 lazygit]]
-      local map = require('core.utils').map
-      map("n", "<leader>ts", "<cmd>FloatermNew --wintype=split --height=0.3 <CR>")
-      vim.g.floaterm_keymap_new = "<leader>n"
-      vim.g.floaterm_keymap_toggle = "<leader>tt"
-      vim.g.floaterm_keymap_next = "<leader>tn"
-      vim.g.floaterm_keymap_prev = "<leader>tp"
-      vim.g.floaterm_keymap_kill = "<leader>tk"
-      vim.g.floaterm_autoinsert = true
-      vim.cmd([[
-        function! Floaterm_open_in_normal_window() abort
-          let f = findfile(expand('<cfile>'))
-          if !empty(f) && has_key(nvim_win_get_config(win_getid()), 'anchor')
-            FloatermHide
-            execute 'e ' . f
-          endif
-        endfunction
-        autocmd FileType floaterm nnoremap <silent><buffer> gf :call Floaterm_open_in_normal_window()<CR>
-      ]])
-      vim.cmd([[
-        function! Floaterm_toggleOrCreateTerm(bang, name) abort
-          if a:bang
-              call floaterm#toggle(a:bang, -1, a:name)
-          endif
-          if !empty(a:name)
-              let bufnr = floaterm#terminal#get_bufnr(a:name)
-              if bufnr == -1
-                  execute('FloatermNew --name='.a:name)
-              else
-                  call floaterm#toggle(a:bang, bufnr, a:name)
-              endif
-          else
-              call floaterm#util#show_msg('Name is empty')
-          endif
-        endfunction
-
-        command! -nargs=? -bang -complete=customlist,floaterm#cmdline#complete
-                                \ FloatermToggleOrCreate call Floaterm_toggleOrCreateTerm(<bang>0, <q-args>)
-      ]])
+      require("custom.plugins.floaterm")
     end
+  }
+  use {
+    -- after = 'telescope.nvim', -- do not lazy load telescope extensions, will cause bugs: module not found
+    'dhruvmanila/telescope-bookmarks.nvim',
+  }
+  use {
+    "AckslD/nvim-neoclip.lua",
+    -- after = 'telescope.nvim', -- do not lazy load telescope extensions, will cause bugs: module not found
+    config = function()
+      require('neoclip').setup()
+      vim.cmd([[inoremap <C-p> <cmd>Telescope neoclip<CR>]])
+    end
+  }
+  use {
+    "tpope/vim-scriptease"
   }
 end
 )
@@ -335,122 +315,8 @@ vim.defer_fn(function()
   vim.cmd([[doautocmd User LoadLazyPlugin]])
 end, lazy_timer)
 
-function Buf_attach()
-  vim.defer_fn(function ()
-    local cmd_str = [[xunmap <buffer> ih]] -- NOTES: xunmap ih will not work in this case!!! buffer local keymaps should unmap using <buffer> too
-    lprint(cmd_str)
-    local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    ok_all = ok_all and ok
+-- vim.cmd [[
+--   autocmd VimEnter lua require('custom.plugins.cmp')
+-- ]]
 
-    local cmd_str = [[ounmap <buffer> ih]]
-    lprint(cmd_str)
-    local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    ok_all = ok_all and ok
-
-    local cmd_str = [[xunmap i%]]
-    lprint(cmd_str)
-    local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    ok_all = ok_all and ok
-
-    local cmd_str = [[ounmap i%]]
-    lprint(cmd_str)
-    local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    ok_all = ok_all and ok
-  end,250) -- 250 should be enough for buffer local plugins to load
-  -- require("custom.utils").timer(function ()
-    --   local bufnr = vim.api.nvim_get_current_buf()
-    --   if vim.api.nvim_buf_is_valid(bufnr) then
-    --     local ok,timer = pcall(vim.api.nvim_buf_get_var,bufnr,'timer')
-    --     if not ok then
-    --       timer = 0
-    --     else
-    --       timer = vim.api.nvim_buf_get_var(bufnr,'timer')
-    --     end
-    --     local ok_all = true
-    --
-    --     local cmd_str = [[xunmap <buffer> ih]] -- NOTES: xunmap ih will not work in this case!!! buffer local keymaps should unmap using <buffer> too
-    --     lprint(cmd_str)
-    --     local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    --     ok_all = ok_all and ok
-    --
-    --     local cmd_str = [[ounmap <buffer> ih]]
-    --     lprint(cmd_str)
-    --     local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    --     ok_all = ok_all and ok
-    --
-    --     local cmd_str = [[xunmap i%]]
-    --     lprint(cmd_str)
-    --     local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    --     ok_all = ok_all and ok
-    --
-    --     local cmd_str = [[ounmap i%]]
-    --     lprint(cmd_str)
-    --     local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    --     ok_all = ok_all and ok
-    --
-    --     -- local cmd_str = [[lua vim.api.nvim_buf_del_keymap(]] .. tostring(bufnr) .. [[ , 'x' , 'i%')]]
-    --     -- lprint(cmd_str)
-    --     -- local ok,_ = pcall(vim.api.nvim_command,cmd_str)
-    --     -- ok_all = ok_all and ok
-    --
-    --     if packer_plugins['vim-matchup'].loaded then
-    --       vim.api.nvim_buf_set_keymap(bufnr,'x','u%','<Plug>(matchup-i%)',{silent=true, noremap=false})
-    --     end
-    --     if packer_plugins['gitsigns.nvim'].loaded then
-    --       vim.api.nvim_buf_set_keymap(bufnr,'x','uh',':<C-U>Gitsigns select_hunk<CR>',{silent=true, noremap=false})
-    --       vim.api.nvim_buf_set_keymap(bufnr,'o','uh',':<C-U>Gitsigns select_hunk<CR>',{silent=true, noremap=false})
-    --     end
-    --     if ok then
-    --       return -1
-    --     else
-    --       if timer<300 then
-    --         vim.api.nvim_buf_set_var(bufnr,"timer",timer+10)
-    --         return 10
-    --       else
-    --         return -1
-    --       end
-    --     end
-    --   end
-    -- end)
-  end
-vim.cmd([[autocmd BufEnter * lua Buf_attach()]])
--- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-vim.cmd [[
-  autocmd VimEnter lua require('custom.plugins.cmp')
-]]
-
-vim.cmd [[
-  au BufRead * set foldlevel=99
- autocmd BufRead *.py nmap <buffer> gm /^if.*__main__<cr> :noh <cr> 0
- " autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' echom 'hello'
- function! Toggle_start_insert_terminal()
-    if g:terminal_start_insert == 1
-      let g:terminal_start_insert = 0
-    else
-      let g:terminal_start_insert = 1
-    endif
-    echom "Toggle startinsert: " . g:terminal_start_insert
- endfunction
- function! TerminalOptions()
-   let g:terminal_start_insert=1 
-   let l:bufnr = bufnr()
-   silent! nnoremap <buffer> <C-g> :call Toggle_start_insert_terminal()<CR> 
-   silent! inoremap <buffer> <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
-   silent! xnoremap <buffer> <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
-   silent! nnoremap <buffer> cc a<C-u>
-   silent! inoremap <buffer> <silent> <C-w>n <Esc><C-w>j
-   silent! inoremap <buffer> <silent> <C-w>e <Esc><C-w>k
-   silent! inoremap <buffer> <silent> <C-w>i <Esc><C-w>l
-   silent! tnoremap <buffer> <silent> Q <C-\><C-n>:q<CR>
-   silent! au BufEnter,BufWinEnter,WinEnter <buffer> startinsert!
-   silent! au BufLeave <buffer> stopinsert!
-   startinsert
- endfunction
- au TermOpen * call TerminalOptions()
- autocmd BufWinEnter,WinEnter * if &filetype=="dap-repl" | startinsert | endif
- " Return to last edit position when opening files (You want this!)
- autocmd BufReadPost *
-       \ if line("'\"") > 0 && line("'\"") <= line("$") |
-       \   exe "normal! g`\"" |
-       \ endif
-]]
+require("custom.autocmd")

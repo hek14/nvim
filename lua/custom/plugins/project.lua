@@ -35,6 +35,7 @@ M.setup = function ()
     -- telescope
     datapath = vim.fn.stdpath("data"),
   }
+  require('core.utils').map("n","<leader>fp","<cmd>Telescope projects<CR>")
 end
 
 return M

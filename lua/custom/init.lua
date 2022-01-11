@@ -50,6 +50,11 @@ map("n", "<C-x>u", "<cmd>UndotreeToggle<CR>")
 map("t","<C-w>n", "<C-\\><C-n><C-w>j")
 map("t","<C-w>e", "<C-\\><C-n><C-w>k")
 map("t","<C-w>i", "<C-\\><C-n><C-w>l")
+map("n","<Up>",    "5<C-w>+")
+map("n","<Down>",  "5<C-w>-")
+map("n","<left>",  "5<C-w><")
+map("n","<right>", "5<C-w>>")
+map("n", "<Esc>", ":lua Closing_float_window()<CR>:noh<CR>")
 vim.cmd([[
   call Cabbrev('pi', 'PackerInstall')
   call Cabbrev('pud', 'PackerUpdate')
@@ -61,6 +66,16 @@ vim.cmd([[
   call Cabbrev('lg', 'Lazygit')
   call Cabbrev('ft', 'FloatermNew')
 ]])
+
+function Closing_float_window()
+  for _, win in ipairs(vim.api.nvim_list_wins()) do 
+    local config = vim.api.nvim_win_get_config(win) 
+    if config.relative ~= "" then 
+      vim.api.nvim_win_close(win, false) 
+      print('Closing window', win) 
+    end 
+  end
+end
 
 function Source_curr_file ()
   if vim.bo.ft == "lua" then
@@ -262,6 +277,8 @@ customPlugins.add(function(use)
     config = function ()
       vim.cmd[[command! PYTHON FloatermNew python]]
       vim.cmd[[command! Lazygit FloatermNew --height=0.8 --width=0.8 lazygit]]
+      local map = require('core.utils').map
+      map("n", "<leader>ts", "<cmd>FloatermNew --wintype=split --height=0.3 <CR>")
       vim.g.floaterm_keymap_new = "<leader>n"
       vim.g.floaterm_keymap_toggle = "<leader>tt"
       vim.g.floaterm_keymap_next = "<leader>tn"
@@ -417,9 +434,10 @@ vim.cmd [[
  function! TerminalOptions()
    let g:terminal_start_insert=1 
    let l:bufnr = bufnr()
-   silent! nnoremap <C-g> :call Toggle_start_insert_terminal()<CR> 
-   silent! inoremap <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
-   silent! xnoremap <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
+   silent! nnoremap <buffer> <C-g> :call Toggle_start_insert_terminal()<CR> 
+   silent! inoremap <buffer> <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
+   silent! xnoremap <buffer> <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
+   silent! nnoremap <buffer> cc a<C-u>
    silent! inoremap <buffer> <silent> <C-w>n <Esc><C-w>j
    silent! inoremap <buffer> <silent> <C-w>e <Esc><C-w>k
    silent! inoremap <buffer> <silent> <C-w>i <Esc><C-w>l

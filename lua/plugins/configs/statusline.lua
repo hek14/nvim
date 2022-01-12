@@ -198,7 +198,7 @@ local diagnostic = {
 
 local ok, gps = pcall(require,"nvim-gps")
 if ok then
-  components.active[1][11] = {
+  gps_code_context = { -- should not use local gps_code_context: wrong namescope for later usage
     provider = function()
       local gps = require("nvim-gps")
       return string.format(" ctx: %s",gps.get_location())
@@ -213,7 +213,7 @@ else
 end
 
 
-components.active[2][1] = {
+local lsp_progress = {
    provider = function()
       local Lsp = vim.lsp.util.get_progress_messages()[1]
 
@@ -408,6 +408,7 @@ add_table(left, diagnostic.error)
 add_table(left, diagnostic.warning)
 add_table(left, diagnostic.hint)
 add_table(left, diagnostic.info)
+add_table(left, gps_code_context)
 
 add_table(middle, lsp_progress)
 

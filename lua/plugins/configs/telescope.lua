@@ -48,7 +48,13 @@ telescope.setup {
       -- Developer configurations: Not meant for general override
       buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
    },
-}
+   extensions = {
+     bookmarks = {
+       -- Available: 'brave', 'chrome', 'edge', 'firefox', 'safari'
+       selected_browser = 'chrome',
+     }
+   }
+ }
 
  vim.lsp.handlers["textDocument/references"] = require("telescope.builtin").lsp_references
  vim.lsp.handlers['textDocument/codeAction'] = require("telescope.builtin").lsp_code_actions
@@ -57,9 +63,12 @@ telescope.setup {
  vim.lsp.handlers['textDocument/implementation'] = require("telescope.builtin").lsp_implementations
  vim.lsp.handlers['textDocument/documentSymbol'] = require("telescope.builtin").lsp_document_symbols
 
-local extensions = { "themes", "terms" }
-pcall(function()
-   for _, ext in ipairs(extensions) do
-      telescope.load_extension(ext)
-   end
-end)
+local extensions = { "themes", "terms", "bookmarks", "neoclip" ,"projects" }
+-- pcall(function()
+--    for _, ext in ipairs(extensions) do
+--       telescope.load_extension(ext)
+--    end
+-- end)
+for _, ext in ipairs(extensions) do
+  telescope.load_extension(ext)
+end

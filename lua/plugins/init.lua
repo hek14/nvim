@@ -110,7 +110,9 @@ return packer.startup(function()
       disable = not plugin_settings.status.vim_matchup,
       opt = true,
       setup = function()
-         require("core.utils").packer_lazy_load "vim-matchup"
+        vim.g.matchup_text_obj_enabled = 0
+        vim.g.matchup_surround_enabled = 1
+        require("core.utils").packer_lazy_load "vim-matchup"
       end,
    }
 

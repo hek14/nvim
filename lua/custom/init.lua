@@ -300,9 +300,6 @@ customPlugins.add(function(use)
 end
 )
 
-vim.g.matchup_surround_enabled = 1
-vim.g.matchup_text_obj_enabled = 1
-
 local lazy_timer = 50
 function LazyLoad()
   local loader = require"packer".loader

@@ -38,7 +38,7 @@ return packer.startup(function()
    use {
       "feline-nvim/feline.nvim",
       disable = not plugin_settings.status.feline,
-      after = {"nvim-web-devicons","nvim-treesitter"},
+      after = {"nvim-web-devicons","nvim-treesitter","nvim-gps"},
       config = override_req("feline", "plugins.configs.statusline"),
    }
 

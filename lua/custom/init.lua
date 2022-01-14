@@ -137,6 +137,18 @@ customPlugins.add(function(use)
     config = require"custom.plugins.lsputils".setup,
   }
   use {
+    "jose-elias-alvarez/null-ls.nvim",
+    after = 'nvim-lspconfig',
+    config = function ()
+      require("null-ls").setup({
+        sources = {
+          require("null-ls").builtins.formatting.lua_format,
+          require("null-ls").builtins.formatting.black,
+        },
+      })
+    end
+  }
+  use {
     "folke/trouble.nvim",
     requires = "kyazdani42/nvim-web-devicons",
     config = function()

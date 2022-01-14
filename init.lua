@@ -21,4 +21,3 @@ print("custom loaded: " .. tostring(ok))
 if not ok then
   print(vim.inspect(debug.traceback()))
 end
-

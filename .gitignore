@@ -7,3 +7,4 @@ contrib/lspkind.lua
 contrib/lspwrapper.lua
 contrib/render.lua
 contrib/util.lua
+contrib/nui.nvim

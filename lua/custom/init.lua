@@ -53,7 +53,9 @@ map("n","<Up>",    "5<C-w>+")
 map("n","<Down>",  "5<C-w>-")
 map("n","<left>",  "5<C-w><")
 map("n","<right>", "5<C-w>>")
-map("n", "<Esc>", ":lua Closing_float_window()<CR>:noh<CR>")
+map("n","<Esc>", ":lua Closing_float_window()<CR>:noh<CR>")
+map("n","<leader>mc","<cmd>Messages clear<CR>")
+map("n","<leader>mm","<cmd>Messages<CR>")
 vim.cmd([[
   call Cabbrev('pi', 'PackerInstall')
   call Cabbrev('pud', 'PackerUpdate')
@@ -94,6 +96,24 @@ function _G.put(...)
 
   print(table.concat(objects, '\n'))
   return ...
+end
+
+function _G.P(...)
+  local printResult = ""
+  local sep = " "
+  local args = {...}
+  for i,var in ipairs(args) do
+    if i>1 then
+      printResult = printResult .. sep .. vim.inspect(var)
+    else
+      printResult = vim.inspect(var)
+    end
+  end
+  print(printResult)
+  -- vim.cmd[[10sp | drop ~/.cache/nvim/debug.log]]
+  -- vim.api.nvim_buf_set_lines(0,-1,-1,true,{printResult})
+  -- vim.cmd[[silent! w | normal! G]]
+  return printResult
 end
 
 vim.cmd [[
@@ -297,6 +317,14 @@ customPlugins.add(function(use)
   use {
     "tpope/vim-scriptease"
   }
+  use {
+    disable = true, -- just use simple nui
+    'ray-x/guihua.lua', 
+    run = 'cd lua/fzy && make'
+  }
+  use {
+    'MunifTanjim/nui.nvim'
+  }
 end
 )
 
@@ -317,3 +345,4 @@ end, lazy_timer)
 -- ]]
 
 require("custom.autocmd")
+require('contrib.my_lsp_handler') -- setup my peek definition

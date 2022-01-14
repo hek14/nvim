@@ -10,6 +10,7 @@ local M = {}
  }
 
 M.setup_lsp = function(attach, capabilities)
+  require('contrib.my_lsp_handler').setup()
    local lsp_installer = require "nvim-lsp-installer"
    lsp_installer.on_server_ready(function(server)
       local opts = {

@@ -1,2 +1,9 @@
 plugin
 spell
+
+contrib/navigator.lua
+contrib/nvim-lspfuzzy
+contrib/lspkind.lua
+contrib/lspwrapper.lua
+contrib/render.lua
+contrib/util.lua

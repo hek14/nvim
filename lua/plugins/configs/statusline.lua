@@ -80,7 +80,10 @@ local file_name = {
          icon = " "
          return icon
       end
-      return " " .. icon .. " " .. filename .. " "
+      local bo = vim.bo
+      local readonly_str = bo.readonly and '🔒' or ' '
+      local modified_str = bo.modified and '●' or ' '
+      return " " .. readonly_str .. " " .. icon .. " " .. filename .." " .. modified_str
    end,
    enabled = shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70

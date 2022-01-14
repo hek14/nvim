@@ -13,6 +13,18 @@ ts_config.setup {
     enable = true,
     use_languagetree = true,
   },
+  indent = {
+    enable = true
+  },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "<leader>n",
+      node_incremental = "gnn",
+      scope_incremental = "gne",
+      node_decremental = "gee",
+    },
+  },
   textobjects = {
     select = {
       enable = true,

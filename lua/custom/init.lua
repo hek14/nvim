@@ -343,6 +343,5 @@ end, lazy_timer)
 -- vim.cmd [[
 --   autocmd VimEnter lua require('custom.plugins.cmp')
 -- ]]
-
+vim.cmd [[set viminfo+=:2000]]
 require("custom.autocmd")
-require('contrib.my_lsp_handler') -- setup my peek definition

@@ -15,7 +15,7 @@ local popup_options = {
   border = {
     style = "rounded",
     text = {
-      top = "Peek Definition by KK",
+      top = "PIG:🐷",
       top_align = "center",
     },
   },
@@ -38,9 +38,14 @@ local sort_locations = function(locations)
       local i_range = i.range or i.targetRange
       local j_range = j.range or j.targetRange
       if i_range and i_range.start then
-        return i_range.start.line < j_range.start.line
+        if i_range.start.line == j_range.start.line then
+          return i_range.start.character < j_range.start.character
+        else
+          return i_range.start.line < j_range.start.line
+        end
+      else
+        return true
       end
-      return false
     else
       return i_uri < j_uri
     end
@@ -156,36 +161,44 @@ local make_menu = function(groups)
   local menus = {}
   local ctx_lines = 1 -- lines of context
   local total_lines = 0
+  local location_id = 0
   local menu_locs = {}
   for i,group in ipairs(groups) do
     local file_name = fn.fnamemodify(vim.uri_to_fname(group[1]),':~:.')
-    table.insert(menus,Menu.separator(file_name))
+    table.insert(menus,Menu.separator(file_name,{text_align = "left"}))
     total_lines = total_lines + 1
     for i = 2, #group do
       local loc = group[i]
       local item = lsp.util.locations_to_items({loc})[1]
-      table.insert(menus,Menu.separator("location " .. i-1))
+      local range = loc.range or loc.targetSelectionRange
+      location_id = location_id + 1
+      table.insert(menus,Menu.separator("location " .. location_id, {text_align = "left"}))
       total_lines = total_lines + 1
       for k = -ctx_lines,ctx_lines do
-        local _loc = Inc_loc(loc,k)
-        local _item = lsp.util.locations_to_items({_loc})[1]
-        local _range = _loc.range or _loc.targetSelectionRange
-        -- P("k",k,"current _loc",_loc.targetSelectionRange.start.line)
-        table.insert(menus,Menu.item(_item.text, {loc=_loc,item=_item}))
+        ---- NOTE: any lines in the same context block refer to the same location
+        local ctx_loc = Inc_loc(loc,k)
+        local ctx_item = lsp.util.locations_to_items({ctx_loc})[1]
+        -- local _range = _loc.range or _loc.targetSelectionRange
+        -- table.insert(menus,Menu.item(_item.text, {loc=_loc,item=_item}))
+        table.insert(menus,Menu.item(ctx_item.text, {loc=loc,item=item,ns_id="Error"}))
         total_lines = total_lines + 1
         if k==0 then
-          table.insert(menu_locs,{line=total_lines,col=_range.start.character})
+          table.insert(menu_locs,{line=total_lines,col=range.start.character})
         end
       end
     end
   end
-  table.sort(menu_locs,function(i,j)
-    if i.line == j.line then
-      return i.col < j.col
-    else
-      return i.line < j.line
-    end
-  end)
+  -- table.sort(menu_locs,function(i,j)
+  --   if i.uri == j.uri then
+  --     if i.line == j.line then
+  --       return i.col < j.col
+  --     else
+  --       return i.line < j.line
+  --     end
+  --   else
+  --     return i.uri < j.uri
+  --   end
+  -- end)
   return menus,menu_locs
 end
 
@@ -260,6 +273,9 @@ local function location_handler(label, result, ctx, config)
       on_close = function()
         print("CLOSED")
       end,
+      on_change = function(node,menu)
+        _G.PIG_loc = node.loc
+      end,
       on_submit = function(item)
         local loc = item.loc
         if loc then
@@ -271,12 +287,15 @@ local function location_handler(label, result, ctx, config)
     }
   )
   menu:mount()
+  _G.PIG_menu = menu
   vim.api.nvim_buf_call(menu.bufnr,function ()
     _goto_next_loc_in_menu(1)
   end)
   vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft)
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","k",":lua _goto_next_loc_in_menu(1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","K",":lua _goto_next_loc_in_menu(-1)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":silent lua PIG_menu.menu_props.on_close()<CR>:silent sp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":silent lua PIG_menu.menu_props.on_close()<CR>:silent vsp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
 end
 
 local function wrap_handler(handler)
@@ -303,12 +322,28 @@ local function wrap_handler(handler)
   return wrapper
 end
 
-local handlers = {['textDocument/definition'] = {label = 'Definitions', target = location_handler}}
+local handlers = {
+  ['textDocument/definition'] = {label = 'Definitions', target = location_handler},
+  ['textDocument/references'] = {label = 'References', target = location_handler}
+}
 
 local M = {}
-M.setup = function ()
-  lsp.handlers['textDocument/definition'] = wrap_handler(handlers['textDocument/definition'])
-  -- you can compare mine with the built-in preview location
-  -- lsp.handlers['textDocument/definition'] = wrap_handler({label = "Builtin Definition", target = builtin_preview_handler})
+M.setup_handler = function ()
+  for k,v in pairs(handlers) do
+    vim.lsp.handlers[k] = wrap_handler(v)
+  end
 end
+
+M.async_ref = function ()
+  local ref_params = vim.lsp.util.make_position_params()
+  ref_params.context = { includeDeclaration = false }
+  vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'References', target = location_handler})
+end
+
+M.async_def = function ()
+  local ref_params = vim.lsp.util.make_position_params()
+  ref_params.context = { includeDeclaration = false }
+  vim.lsp.buf_request(0,'textDocument/definition', ref_params, wrap_handler{label = 'Definitions', target = location_handler})
+end
+
 return M

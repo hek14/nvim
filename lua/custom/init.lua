@@ -1,5 +1,5 @@
 local lhs = "neilukj"
-local rhs = "jkluike"
+local rhs = "jkluine"
 local modes = {"n","x","o"}
 local opt = {silent=true,noremap=true}
 for i = 1,#lhs do

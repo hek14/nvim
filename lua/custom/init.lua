@@ -257,7 +257,50 @@ customPlugins.add(function(use)
     end
   }
   -- 2. setup better qf buffer
-  use {'kevinhwang91/nvim-bqf', ft = 'qf'}
+  use {
+    'kevinhwang91/nvim-bqf', 
+    config = function ()
+      -- need this to use with quickfix-reflector
+      vim.cmd [[
+        augroup nvim-bqf-kk
+          autocmd FileType qf lua vim.defer_fn(function() require('bqf').enable() end,50)
+        augroup END
+      ]]
+    end
+  }
+  -- 3. editable qf (similar to emacs wgrep)
+  use {
+    'stefandtw/quickfix-reflector.vim',
+    -- this plugin conflicts with the above nvim-bqf, it will cause nvim-bqf not working, there is two solutions:
+    -- soluction 1: defer the nvim-bqf loading just like above
+    -- solution 2: modify the quickfix-reflector.vim init_buffer like below:
+    -- function! s:PrepareBuffer()
+    --   try 
+    --     lua require('bqf').enable()
+    --   catch
+    --     echom "nvim-bqf is not installed"
+    --   endtry
+    --   if g:qf_modifiable == 1
+    --     setlocal modifiable
+    --   endif
+    --   let s:qfBufferLines = getline(1, '$')
+    -- endfunction
+  }
+  -- 4. preview location
+  use { 
+    'ronakg/quickr-preview.vim',
+    disable = true,
+    config = function ()
+      vim.g.quickr_preview_keymaps = 0
+      vim.cmd [[
+        augroup qfpreview
+          autocmd!
+          autocmd FileType qf nmap <buffer> p <plug>(quickr_preview)
+          autocmd FileType qf nmap <buffer> q exe "normal \<plug>(quickr_preview_qf_close)<CR>"
+        augroup END
+      ]]
+    end
+  }
 
   use {
     "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",

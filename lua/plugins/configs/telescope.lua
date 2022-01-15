@@ -52,9 +52,9 @@ telescope.setup {
      bookmarks = {
        -- Available: 'brave', 'chrome', 'edge', 'firefox', 'safari'
        selected_browser = 'chrome',
-     }
-   }
- }
+     },
+  }
+}
 
  vim.lsp.handlers['textDocument/definition'] = require("telescope.builtin").lsp_definitions
  vim.lsp.handlers["textDocument/references"] = require("telescope.builtin").lsp_references
@@ -63,7 +63,18 @@ telescope.setup {
  vim.lsp.handlers['textDocument/implementation'] = require("telescope.builtin").lsp_implementations
  vim.lsp.handlers['textDocument/documentSymbol'] = require("telescope.builtin").lsp_document_symbols
 
-local extensions = { "themes", "terms", "bookmarks", "neoclip" ,"projects" }
+local extensions = { "themes", "terms", "bookmarks", "neoclip", "projects", "zoxide", "file_browser"}
 for _, ext in ipairs(extensions) do
   telescope.load_extension(ext)
 end
+
+require("telescope._extensions.zoxide.config").setup({
+  mappings = {
+    ["<C-b>"] = {
+      keepinsert = true,
+      action = function(selection)
+        require"telescope".extensions.file_browser.file_browser({ cwd = selection.path })
+      end
+    },
+  }
+})

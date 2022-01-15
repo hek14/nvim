@@ -33,4 +33,5 @@ vim.cmd [[
        \ if line("'\"") > 0 && line("'\"") <= line("$") |
        \   exe "normal! g`\"" |
        \ endif
+ autocmd BufWinEnter,BufEnter,WinEnter,WinNew * if &ft=="TelescopePrompt" | startinsert | endif
 ]]

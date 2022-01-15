@@ -162,7 +162,6 @@ local make_menu = function(groups)
   local ctx_lines = 1 -- lines of context
   local total_lines = 0
   local location_id = 0
-  local menu_locs = {}
   for i,group in ipairs(groups) do
     local file_name = fn.fnamemodify(vim.uri_to_fname(group[1]),':~:.')
     table.insert(menus,Menu.separator(file_name,{text_align = "left"}))
@@ -180,26 +179,12 @@ local make_menu = function(groups)
         local ctx_item = lsp.util.locations_to_items({ctx_loc})[1]
         -- local _range = _loc.range or _loc.targetSelectionRange
         -- table.insert(menus,Menu.item(_item.text, {loc=_loc,item=_item}))
-        table.insert(menus,Menu.item(ctx_item.text, {loc=loc,item=item,ns_id="Error"}))
         total_lines = total_lines + 1
-        if k==0 then
-          table.insert(menu_locs,{line=total_lines,col=range.start.character})
-        end
+        table.insert(menus,Menu.item(ctx_item.text, {loc=loc,item=item,is_ref=k==0,line=total_lines-k,col=range.start.character}))
       end
     end
   end
-  -- table.sort(menu_locs,function(i,j)
-  --   if i.uri == j.uri then
-  --     if i.line == j.line then
-  --       return i.col < j.col
-  --     else
-  --       return i.line < j.line
-  --     end
-  --   else
-  --     return i.uri < j.uri
-  --   end
-  -- end)
-  return menus,menu_locs
+  return menus
 end
 
 local function builtin_preview_handler(label, result, ctx, config)
@@ -208,45 +193,114 @@ local function builtin_preview_handler(label, result, ctx, config)
 end
 
 function _goto_next_loc_in_menu(index)
-  local locs = _G._menu_locs
-  local current = vim.api.nvim_win_get_cursor(0)
+  local nodes = _G.PIG_menu._tree:get_nodes()
+  local length = #nodes
+  local current_line = vim.api.nvim_win_get_cursor(0)[1]
+  local current_col = vim.api.nvim_win_get_cursor(0)[2]
+
   local result = nil
   if index < 0 then
-    Start = #locs
+    Start = length
     End = 1
     Step = -1
   else
     Start = 1
-    End = #locs
+    End = length
     Step = 1
   end
+  local first_ref_node = nil
+  local last_ref_node  = nil
   for i = Start,End,Step do
-    local loc = locs[i]
-    if index > 0 then
-      if loc.line > current[1] then
-        result = loc
-        break
-      elseif loc.line == current[1] and loc.col > current[2] then
-        result = loc
-        break
+    local node = nodes[i]
+    if node.is_ref then
+      if index > 0 then
+        if not first_ref_node then
+          first_ref_node = node
+        end
+        if node.line > current_line then
+          result = node
+          break
+        elseif node.line == current_line and node.col > current_col then
+          result = node
+          break
+        end
+      else
+        if not last_ref_node then
+          last_ref_node = node
+        end
+        if node.line < current_line then
+          result = node
+          break
+        elseif node.line == current_line and node.col < current_col then
+          result = node
+          break
+        end
       end
+    end
+  end
+  if result == nil then
+    if index > 0 then
+      result = first_ref_node
     else
-      if loc.line < current[1] then
-        result = loc
-        break
-      elseif loc.line == current[1] and loc.col < current[2] then
-        result = loc
+      result = last_ref_node
+    end
+  end
+  P('jump to next loc: ',result.line,result.col)
+  vim.api.nvim_win_set_cursor(0, {result.line, result.col})
+  return result
+end
+
+function _goto_next_file_in_menu(index)
+  local nodes = _G.PIG_menu._tree:get_nodes()
+  local length = #nodes
+  local current_line = vim.api.nvim_win_get_cursor(0)[1]
+  local current_node = _G.PIG_menu._tree:get_node(current_line)
+  while not current_node.loc do
+    current_line = current_line + 1
+    current_node = _G.PIG_menu._tree:get_node(current_line)
+  end
+  current_uri = current_node.loc.uri or current_node.loc.targetUri
+
+  local result = nil
+  if index < 0 then
+    Start = current_line - 1
+    End = 1
+    Step = -1
+  else
+    Start = current_line + 1
+    End = length
+    Step = 1
+  end
+  for i = 1,length,1 do
+    if nodes[i].is_ref then
+      first_ref_node = nodes[i]
+      break
+    end
+  end
+  for i = length,1,-1 do
+    if nodes[i].is_ref then
+      last_ref_node = nodes[i]
+      break
+    end
+  end
+  for i = Start,End,Step do
+    local node = nodes[i]
+    if node.is_ref then
+      node_uri = node.loc.uri or node.loc.targetUri
+      if node_uri~=current_uri then
+        result = node
         break
       end
     end
   end
   if result == nil then
     if index > 0 then
-      result = locs[1]
+      result = first_ref_node
     else
-      result = locs[#locs]
+      result = last_ref_node
     end
   end
+  P('jump to next loc: ',result.line,result.col)
   vim.api.nvim_win_set_cursor(0, {result.line, result.col})
   return result
 end
@@ -256,9 +310,7 @@ local function location_handler(label, result, ctx, config)
   local locations = vim.tbl_islist(result) and result or {result}
   local sorted_locations = sort_locations(locations)
   local groups = group_by_uri(sorted_locations)
-  -- items = lsp.util.locations_to_items(locations)
-  local menus,menu_locs = make_menu(groups)
-  _G._menu_locs = menu_locs
+  local menus = make_menu(groups)
   local menu = Menu(
     popup_options,
     {
@@ -274,6 +326,7 @@ local function location_handler(label, result, ctx, config)
         print("PIG CLOSED")
       end,
       on_change = function(node,menu)
+        _G.PIG_node = node
         _G.PIG_loc = node.loc
       end,
       on_submit = function(item)
@@ -292,8 +345,10 @@ local function location_handler(label, result, ctx, config)
     _goto_next_loc_in_menu(1)
   end)
   vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft)
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","k",":lua _goto_next_loc_in_menu(1)<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","K",":lua _goto_next_loc_in_menu(-1)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]]",":lua _goto_next_loc_in_menu(1)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[[",":lua _goto_next_loc_in_menu(-1)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]f",":lua _goto_next_file_in_menu(1)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[f",":lua _goto_next_file_in_menu(-1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":silent lua PIG_menu.menu_props.on_close()<CR>:silent sp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":silent lua PIG_menu.menu_props.on_close()<CR>:silent vsp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
 end

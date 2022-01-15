@@ -370,6 +370,15 @@ customPlugins.add(function(use)
     end
   }
   use {
+    'jvgrootveld/telescope-zoxide',
+    setup = function ()
+      require('core.utils').map("n", "<leader>z", ":Telescope zoxide list<CR>")
+    end,
+  }
+  use { 
+    "nvim-telescope/telescope-file-browser.nvim" 
+  }
+  use {
     "tpope/vim-scriptease"
   }
   use {
@@ -391,7 +400,6 @@ function LazyLoad()
   local loader = require"packer".loader
   _G.PLoader = loader
   loader('nvim-cmp cmp-cmdline vim-matchup gitsigns.nvim telescope.nvim nvim-lspconfig')
-
 end
 vim.cmd([[autocmd User LoadLazyPlugin lua LazyLoad()]])
 vim.defer_fn(function()

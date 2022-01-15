@@ -1,51 +1,25 @@
+local lhs = "neilukj"
+local rhs = "jkluike"
+local modes = {"n","x","o"}
+local opt = {silent=true,noremap=true}
+for i = 1,#lhs do
+  local colemak = lhs:sub(i,i)
+  local qwerty  = rhs:sub(i,i)
+  for _,mode in ipairs(modes) do
+    vim.api.nvim_set_keymap(mode,colemak,qwerty,opt)
+    vim.api.nvim_set_keymap(mode,vim.fn.toupper(colemak),vim.fn.toupper(qwerty),opt)
+    if i < 4 then -- for direction keys
+      vim.api.nvim_set_keymap(mode,"<C-w>" .. colemak,"<C-w>" .. qwerty,opt)
+      vim.api.nvim_set_keymap(mode,"<C-w><C-" .. colemak .. ">","<C-w><C-" .. qwerty .. ">",opt)
+    end
+  end
+end
+
 local map = require('core.utils').map
 map("n", "<leader>cd", "<cmd>:cd %:p:h<cr>", {silent=false}) -- example to delete the buffer
-
-map("n", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
-map("x", "n", "j",   {silent=true,noremap=true}) -- example to delete the buffer
-map("n", "N", "J",   {silent=true,noremap=true}) -- example to delete the buffer
-map("x", "N", "J",   {silent=true,noremap=true}) -- example to delete the buffer
-map("n", "gn", "gj", {silent=false,noremap=true}) -- example to delete the buffer
-
-map("n", "e", "k",   {silent=true,noremap=true}) -- example to delete the buffer
-map("x", "e", "k",   {silent=true,noremap=true}) -- example to delete the buffer
-map("n", "E", "K",   {silent=true,noremap=false}) -- example to delete the buffer
-map("x", "E", "K",   {silent=true,noremap=false}) -- example to delete the buffer
-map("n", "ge", "gk", {silent=false,noremap=true}) -- example to delete the buffer
-
-map("n", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
-map("x", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
-map("o", "i",  "l",  {silent=false,noremap=true}) -- example to delete the buffer
-
-map("n", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
-map("x", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
-map("o", "k",  "n",  {silent=false,noremap=true}) -- example to delete the buffer
-map("n", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
-map("x", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
-map("o", "K",  "N",  {silent=false,noremap=true}) -- example to delete the buffer
-
-map("n", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
-map("x", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
-map("o", "u",  "i",  {silent=false,noremap=true}) -- example to delete the buffer
-map("n", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
-map("x", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
-map("o", "U",  "I",  {silent=false,noremap=true}) -- example to delete the buffer
-
-map("n", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-map("x", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-map("o", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-map("n", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-map("x", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-map("o", "l",  "u",  {silent=false,noremap=true}) -- example to delete the buffer
-
-map({"n","x"}, "<C-w>n", "<C-w>j", {silent=false,noremap=true})
-map({"n","x"}, "<C-w>e", "<C-w>k", {silent=false,noremap=true})
-map({"n","x"}, "<C-w>i", "<C-w>l", {silent=false,noremap=true})
-
 map("x", ">", ">gv", {silent=false,noremap=true})
 map("x", "<", "<gv", {silent=false,noremap=true})
 map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
-
 map("t","<C-w>n", "<C-\\><C-n><C-w>j")
 map("t","<C-w>e", "<C-\\><C-n><C-w>k")
 map("t","<C-w>i", "<C-\\><C-n><C-w>l")

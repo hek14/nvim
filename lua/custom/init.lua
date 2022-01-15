@@ -380,6 +380,9 @@ customPlugins.add(function(use)
   use {
     'MunifTanjim/nui.nvim'
   }
+  use {
+    'danilamihailov/beacon.nvim'
+  }
 end
 )
 
@@ -399,4 +402,20 @@ end, lazy_timer)
 --   autocmd VimEnter lua require('custom.plugins.cmp')
 -- ]]
 vim.cmd [[set viminfo+=:2000]]
+vim.cmd [[
+  xnoremap ul g_o^
+  onoremap ul :normal vul<CR>
+  xnoremap al $o0
+  onoremap al :normal val<CR>
+  xnoremap u% GoggV
+  onoremap u% :normal vu%<CR>
+]]
+
+vim.cmd [[
+  xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
+  function! ExecuteMacroOverVisualRange()
+    echo "@".getcmdline()
+    execute ":'<,'>normal @".nr2char(getchar())
+  endfunction
+]]
 require("custom.autocmd")

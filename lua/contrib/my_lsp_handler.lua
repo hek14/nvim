@@ -328,6 +328,7 @@ local handlers = {
 }
 
 local M = {}
+
 M.setup_handler = function ()
   for k,v in pairs(handlers) do
     vim.lsp.handlers[k] = wrap_handler(v)
@@ -344,6 +345,24 @@ M.async_def = function ()
   local ref_params = vim.lsp.util.make_position_params()
   ref_params.context = { includeDeclaration = false }
   vim.lsp.buf_request(0,'textDocument/definition', ref_params, wrap_handler{label = 'Definitions', target = location_handler})
+end
+
+M.async_typedef = function ()
+  local ref_params = vim.lsp.util.make_position_params()
+  ref_params.context = { includeDeclaration = false }
+  vim.lsp.buf_request(0,'textDocument/typeDefinition', ref_params, wrap_handler{label = 'TypeDefinitions', target = location_handler})
+end
+
+M.async_declare = function ()
+  local ref_params = vim.lsp.util.make_position_params()
+  ref_params.context = { includeDeclaration = false }
+  vim.lsp.buf_request(0,'textDocument/declaration', ref_params, wrap_handler{label = 'Declarations', target = location_handler})
+end
+
+M.async_implement = function ()
+  local ref_params = vim.lsp.util.make_position_params()
+  ref_params.context = { includeDeclaration = false }
+  vim.lsp.buf_request(0,'textDocument/implementation', ref_params, wrap_handler{label = 'Implementations', target = location_handler})
 end
 
 return M

@@ -28,7 +28,7 @@ local popup_options = {
 
 local function echo(hlgroup, msg)
   cmd(fmt('echohl %s', hlgroup))
-  cmd(fmt('echo "[PID] %s"', msg))
+  cmd(fmt('echo "[PIG] %s"', msg))
   cmd('echohl None')
 end
 
@@ -318,6 +318,46 @@ function _goto_next_file_in_menu(index)
   return result
 end
 
+local function next_ref_handler(label, result, ctx, config)
+  local locations = vim.tbl_islist(result) and result or {result}
+  local sorted_locations = sort_locations(locations)
+  local current_line = vim.api.nvim_win_get_cursor(0)[1]
+  local current_col = vim.api.nvim_win_get_cursor(0)[2]
+  local current_file = "file://" .. vim.api.nvim_buf_get_name(ctx.bufnr or 0)
+  local current_loc = nil
+  local index = ctx.index 
+  if not index or index==0 then
+    return 
+  end
+  for i,loc in ipairs(sorted_locations) do
+    if loc.uri == current_file then
+      local _start = loc.range.start
+      local _end = loc.range['end']
+      local condition = _start.line+1 == current_line and
+        _start.character <= current_col and
+        _end.line+1 >= current_line and
+        _end.character >= current_col
+      if condition then 
+        current_loc = i
+        break
+      end
+    end
+  end
+  if not current_loc then
+    error("weird: cannot find current location")
+    return false
+  end
+  local target = current_loc + index
+  if target > #sorted_locations then
+    target = 1
+  end
+  if target < 1 then
+    target = #sorted_locations
+  end
+  vim.lsp.util.jump_to_location(sorted_locations[target])
+  return true
+end
+
 local function location_handler(label, result, ctx, config)
   local ft = vim.api.nvim_buf_get_option(ctx.bufnr, 'ft')
   local locations = vim.tbl_islist(result) and result or {result}
@@ -380,14 +420,16 @@ local function wrap_handler(handler)
       end
       return echo('ErrorMsg: ', err and err.message or fmt('No %s found', string.lower(handler.label)))
     end
-
+    if handler.index then
+      ctx.index = handler.index
+    end
     local hdl_result = handler.target(handler.label, result, ctx, config)
     if not hdl_result then
       PIG_state[handler.label] = false
       if handler.fallback then
         handler.fallback()
       end
-      return echo('ErrorMsg: ', err.message and err.message or "PIG failed (maybe not lsp)")
+      return echo('ErrorMsg: ', err and err.message or "PIG failed (maybe not lsp)")
     end
   end
 
@@ -417,7 +459,7 @@ end
 
 M.async_ref = function (fallback)
   local ref_params = vim.lsp.util.make_position_params()
-  ref_params.context = { includeDeclaration = false }
+  ref_params.context = { includeDeclaration = true }
   vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'References', target = location_handler,fallback=fallback})
 end
 
@@ -443,6 +485,12 @@ M.async_implement = function (fallback)
   local ref_params = vim.lsp.util.make_position_params()
   ref_params.context = { includeDeclaration = false }
   vim.lsp.buf_request(0,'textDocument/implementation', ref_params, wrap_handler{label = 'Implementations', target = location_handler,fallback=fallback})
+end
+
+M.next_lsp_reference = function (index,fallback)
+  local ref_params = vim.lsp.util.make_position_params()
+  ref_params.context = { includeDeclaration = true }
+  vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'NextReference', target = next_ref_handler, fallback=fallback, index=index})
 end
 
 return M

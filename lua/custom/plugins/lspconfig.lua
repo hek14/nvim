@@ -24,6 +24,20 @@ function _G.Smart_goto_definition()
   )
 end
 
+function _G.Smart_goto_next_ref(index)
+  local bufnr = vim.fn.bufnr()
+  vim.cmd [[normal! m`]]
+  require('contrib.my_lsp_handler').next_lsp_reference(index,
+    function ()
+      print('using fallback')
+      if index>0 then
+        require'nvim-treesitter-refactor.navigation'.goto_next_usage()
+      else
+        require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
+      end
+    end)
+end
+
 M.setup_lsp = function(attach, capabilities)
     -- require('contrib.my_lsp_handler').setup()
     local lsp_installer = require "nvim-lsp-installer"
@@ -77,12 +91,12 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",
                            map_opts)
-            -- buf_set_keymap("n", "[r",
-            --                "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(-1)<CR>",
-            --                map_opts)
-            -- buf_set_keymap("n", "]r",
-            --                "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(1)<CR>",
-            --                map_opts)
+            buf_set_keymap("n", "[r",
+                           "<cmd>lua Smart_goto_next_ref(-1)<CR>",
+                           map_opts)
+            buf_set_keymap("n", "]r",
+                           "<cmd>lua Smart_goto_next_ref(1)<CR>",
+                           map_opts)
             buf_set_keymap("n", "gs",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
             buf_set_keymap("n", "<C-k>",

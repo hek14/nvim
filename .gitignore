@@ -8,3 +8,5 @@ contrib/lspwrapper.lua
 contrib/render.lua
 contrib/util.lua
 contrib/nui.nvim
+lua/contrib/navigator.lua
+lua/contrib/nvim-lspfuzzy

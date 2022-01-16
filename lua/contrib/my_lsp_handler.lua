@@ -205,23 +205,32 @@ function _goto_next_loc_in_menu(index)
 
   local result = nil
   if index < 0 then
-    Start = length
+    Start = current_line - 1
     End = 1
     Step = -1
   else
-    Start = 1
+    Start = current_line + 1 -- the line number is also the id of node
     End = length
     Step = 1
   end
-  local first_ref_node = nil
-  local last_ref_node  = nil
+  local first_ref_node
+  local last_ref_node
+  for i = 1,length,1 do
+    if nodes[i].is_ref then
+      first_ref_node = nodes[i]
+      break
+    end
+  end
+  for i = length,1,-1 do
+    if nodes[i].is_ref then
+      last_ref_node = nodes[i]
+      break
+    end
+  end
   for i = Start,End,Step do
     local node = nodes[i]
     if node.is_ref then
       if index > 0 then
-        if not first_ref_node then
-          first_ref_node = node
-        end
         if node.line > current_line then
           result = node
           break
@@ -230,9 +239,6 @@ function _goto_next_loc_in_menu(index)
           break
         end
       else
-        if not last_ref_node then
-          last_ref_node = node
-        end
         if node.line < current_line then
           result = node
           break
@@ -264,8 +270,10 @@ function _goto_next_file_in_menu(index)
     current_line = current_line + 1
     current_node = _G.PIG_menu._tree:get_node(current_line)
   end
-  current_uri = current_node.loc.uri or current_node.loc.targetUri
+  local current_uri = current_node.loc.uri or current_node.loc.targetUri
 
+  local first_ref_node
+  local last_ref_node
   local result = nil
   if index < 0 then
     Start = current_line - 1
@@ -291,7 +299,7 @@ function _goto_next_file_in_menu(index)
   for i = Start,End,Step do
     local node = nodes[i]
     if node.is_ref then
-      node_uri = node.loc.uri or node.loc.targetUri
+      local node_uri = node.loc.uri or node.loc.targetUri
       if node_uri~=current_uri then
         result = node
         break
@@ -373,7 +381,7 @@ local function wrap_handler(handler)
       return echo('ErrorMsg: ', err and err.message or fmt('No %s found', string.lower(handler.label)))
     end
 
-    hdl_result = handler.target(handler.label, result, ctx, config)
+    local hdl_result = handler.target(handler.label, result, ctx, config)
     if not hdl_result then
       PIG_state[handler.label] = false
       if handler.fallback then

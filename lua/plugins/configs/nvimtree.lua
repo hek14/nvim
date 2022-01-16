@@ -59,6 +59,8 @@ nvimtree.setup {
    hijack_netrw = true,
    ignore_ft_on_setup = { "dashboard" },
    auto_close = false,
+   close_command = ":bp|sp|bn|bd",	
+   right_mouse_command = ":bp|sp|bn|bd",
    open_on_tab = false,
    hijack_cursor = true,
    update_cwd = true,

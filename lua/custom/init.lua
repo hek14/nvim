@@ -330,6 +330,10 @@ customPlugins.add(function(use)
     after = 'nvim-treesitter'
   }
   use {
+    'nvim-treesitter/nvim-treesitter-refactor',
+    after = 'nvim-treesitter'
+  }
+  use {
     "akinsho/toggleterm.nvim",
     disable = true,
     config = function()

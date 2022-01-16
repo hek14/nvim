@@ -30,6 +30,15 @@ map("n","<right>", "5<C-w>>")
 map("n","<Esc>", ":lua Closing_float_window()<CR>:noh<CR>")
 map("n","<leader>mc","<cmd>Messages clear<CR>")
 map("n","<leader>mm","<cmd>Messages<CR>")
+
+vim.cmd [[
+  cmap <C-a> <Home>
+  cmap <C-e> <End>
+  cmap <C-f> <Right>
+  cmap <C-b> <Left>
+  cnoremap <C-t> <Esc>q:i
+]]
+
 vim.cmd([[
   call Cabbrev('pi', 'PackerInstall')
   call Cabbrev('pud', 'PackerUpdate')
@@ -321,8 +330,7 @@ customPlugins.add(function(use)
     "mbbill/undotree",
     cmd = "UndotreeToggle",
     config = function ()
-      local map = require('core.utils').map
-      map("n", "<C-x>u", ":UndotreeToggle | UndotreeFocus<CR>")
+      require('core.utils').map("n", "<C-x>u", ":UndotreeToggle | UndotreeFocus<CR>")
     end
   }
   use {

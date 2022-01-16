@@ -112,12 +112,24 @@ customPlugins.add(function(use)
   }
   use {
     "jose-elias-alvarez/null-ls.nvim",
+    -- providing extra formatting and linting
+    -- NullLsInfo to show what's now used
+    -- if other formatting method is enabled by the lspconfig(pyright for example), then you should turn that of in the on_attach function like below:
+    -- function on_attach(client,bufnr) 
+    --    if client.name = "pyright" then 
+    --         client.resolved_capabilities.document_formatting = false
+    --    end
+    -- end
     after = 'nvim-lspconfig',
     config = function ()
+      local formatting = require("null-ls").builtins.formatting
+      local diagnostics = require("null-ls").builtins.diagnostics
+      local code_actions = require("null-ls").builtins.code_actions
       require("null-ls").setup({
         sources = {
-          require("null-ls").builtins.formatting.lua_format,
-          require("null-ls").builtins.formatting.black,
+          formatting.lua_format,
+          formatting.black.with({extra_args = "--fast"}),
+          code_actions.gitsigns,
         },
       })
     end

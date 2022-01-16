@@ -33,9 +33,9 @@ M.setup_lsp = function(attach, capabilities)
                                         "v:lua.vim.lsp.omnifunc")
 
             local map_opts = {noremap = true, silent = true}
-            buf_set_keymap("n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>",
+            buf_set_keymap("n", "<leader>gd", "<cmd>lua require('telescope.builtin').lsp_definitions()<CR>",
                            map_opts)
-            buf_set_keymap("n", "<leader>gr", "<cmd>lua vim.lsp.buf.references()<CR>",
+            buf_set_keymap("n", "<leader>gr", "<cmd>lua require('telescope.builtin').lsp_references()<CR>",
                            map_opts)
             buf_set_keymap("n", "gr",
                            "<cmd>lua require('contrib.my_lsp_handler').async_ref()<CR>",
@@ -44,10 +44,13 @@ M.setup_lsp = function(attach, capabilities)
                            "<cmd>lua require('contrib.my_lsp_handler').async_def()<CR>",
                            map_opts)
             buf_set_keymap("n", "gt",
-                           "<cmd>lua vim.lsp.buf.document_symbol()<CR>",
+                           "<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>",
                            map_opts)
             buf_set_keymap("n", "<leader>gt",
                            "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<CR>",
+                           map_opts)
+            buf_set_keymap("n", "<leader>ca",
+                           "<cmd>lua require('telescope.builtin').lsp_code_actions()<CR>",
                            map_opts)
             buf_set_keymap("n", "gl",
                            "<cmd>lua vim.diagnostic.open_float()<CR>", map_opts)
@@ -67,6 +70,8 @@ M.setup_lsp = function(attach, capabilities)
                            "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(1)<CR>",
                            map_opts)
             buf_set_keymap("n", "gs",
+                           "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
+            buf_set_keymap("n", "<C-k>",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
             buf_set_keymap("i", "<C-k>",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)

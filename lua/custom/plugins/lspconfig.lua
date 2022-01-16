@@ -10,6 +10,20 @@ vim.diagnostic.config {
     update_in_insert = false
 }
 
+function _G.Smart_goto_definition() 
+  local bufnr = vim.fn.bufnr()
+  vim.cmd [[normal! m`]]
+  require('contrib.my_lsp_handler').async_def(
+    function ()
+      print('using fallback')
+      require'nvim-treesitter-refactor.navigation'.goto_definition(bufnr,function ()
+        print("dumb goto")
+        vim.cmd [[normal! gd]] -- dumb goto definition
+      end)
+    end
+  )
+end
+
 M.setup_lsp = function(attach, capabilities)
     -- require('contrib.my_lsp_handler').setup()
     local lsp_installer = require "nvim-lsp-installer"
@@ -37,11 +51,11 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "<leader>gr", "<cmd>lua require('telescope.builtin').lsp_references()<CR>",
                            map_opts)
+            buf_set_keymap("n", "gd",
+                           "<cmd>lua Smart_goto_definition()<CR>",
+                           map_opts)
             buf_set_keymap("n", "gr",
                            "<cmd>lua require('contrib.my_lsp_handler').async_ref()<CR>",
-                           map_opts)
-            buf_set_keymap("n", "gd",
-                           "<cmd>lua require('contrib.my_lsp_handler').async_def()<CR>",
                            map_opts)
             buf_set_keymap("n", "gt",
                            "<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>",
@@ -63,12 +77,12 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",
                            map_opts)
-            buf_set_keymap("n", "[r",
-                           "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(-1)<CR>",
-                           map_opts)
-            buf_set_keymap("n", "]r",
-                           "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(1)<CR>",
-                           map_opts)
+            -- buf_set_keymap("n", "[r",
+            --                "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(-1)<CR>",
+            --                map_opts)
+            -- buf_set_keymap("n", "]r",
+            --                "<cmd>lua require('custom.lsp_utils').goto_adjacent_usage(1)<CR>",
+            --                map_opts)
             buf_set_keymap("n", "gs",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
             buf_set_keymap("n", "<C-k>",

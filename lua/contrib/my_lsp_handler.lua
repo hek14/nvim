@@ -6,6 +6,8 @@ local last_results = {}     -- hold last location results
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
 
+_G.PIG_state = {}
+
 local popup_options = {
   relative = "cursor",
   position = {
@@ -26,7 +28,7 @@ local popup_options = {
 
 local function echo(hlgroup, msg)
   cmd(fmt('echohl %s', hlgroup))
-  cmd(fmt('echo "[lspconfig] %s"', msg))
+  cmd(fmt('echo "[PID] %s"', msg))
   cmd('echohl None')
 end
 
@@ -176,6 +178,9 @@ local make_menu = function(groups)
       for k = -ctx_lines,ctx_lines do
         ---- NOTE: any lines in the same context block refer to the same location
         local ctx_loc = Inc_loc(loc,k)
+        if not ctx_loc then
+          return error("ErrorMsg loc nil: " .. vim.inspect(loc))
+        end
         local ctx_item = lsp.util.locations_to_items({ctx_loc})[1]
         -- local _range = _loc.range or _loc.targetSelectionRange
         -- table.insert(menus,Menu.item(_item.text, {loc=_loc,item=_item}))
@@ -310,7 +315,10 @@ local function location_handler(label, result, ctx, config)
   local locations = vim.tbl_islist(result) and result or {result}
   local sorted_locations = sort_locations(locations)
   local groups = group_by_uri(sorted_locations)
-  local menus = make_menu(groups)
+  local ok,menus = pcall(make_menu,groups)
+  if not ok then
+    return false
+  end
   local menu = Menu(
     popup_options,
     {
@@ -351,19 +359,28 @@ local function location_handler(label, result, ctx, config)
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[f",":lua _goto_next_file_in_menu(-1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":silent lua PIG_menu.menu_props.on_close()<CR>:silent sp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":silent lua PIG_menu.menu_props.on_close()<CR>:silent vsp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
+  return true
 end
 
 local function wrap_handler(handler)
   local wrapper = function(err, result, ctx, config)
-    if err then
-      return echo('ErrorMsg', err.message)
+    PIG_state[handler.label] = true
+    if err or (not result or vim.tbl_isempty(result)) then
+      PIG_state[handler.label] = false
+      if handler.fallback then
+        handler.fallback()
+      end
+      return echo('ErrorMsg: ', err and err.message or fmt('No %s found', string.lower(handler.label)))
     end
 
-    if not result or vim.tbl_isempty(result) then
-      return echo('ErrorMsg', fmt('No %s found', string.lower(handler.label)))
+    hdl_result = handler.target(handler.label, result, ctx, config)
+    if not hdl_result then
+      PIG_state[handler.label] = false
+      if handler.fallback then
+        handler.fallback()
+      end
+      return echo('ErrorMsg: ', err.message and err.message or "PIG failed (maybe not lsp)")
     end
-
-    return handler.target(handler.label, result, ctx, config)
   end
 
   -- See neovim#15504
@@ -390,34 +407,34 @@ M.setup_handler = function ()
   end
 end
 
-M.async_ref = function ()
+M.async_ref = function (fallback)
   local ref_params = vim.lsp.util.make_position_params()
   ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'References', target = location_handler})
+  vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'References', target = location_handler,fallback=fallback})
 end
 
-M.async_def = function ()
+M.async_def = function (fallback)
   local ref_params = vim.lsp.util.make_position_params()
   ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/definition', ref_params, wrap_handler{label = 'Definitions', target = location_handler})
+  vim.lsp.buf_request(0,'textDocument/definition', ref_params, wrap_handler{label = 'Definitions', target = location_handler, fallback=fallback})
 end
 
-M.async_typedef = function ()
+M.async_typedef = function (fallback)
   local ref_params = vim.lsp.util.make_position_params()
   ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/typeDefinition', ref_params, wrap_handler{label = 'TypeDefinitions', target = location_handler})
+  vim.lsp.buf_request(0,'textDocument/typeDefinition', ref_params, wrap_handler{label = 'TypeDefinitions', target = location_handler,fallback=fallback})
 end
 
-M.async_declare = function ()
+M.async_declare = function (fallback)
   local ref_params = vim.lsp.util.make_position_params()
   ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/declaration', ref_params, wrap_handler{label = 'Declarations', target = location_handler})
+  vim.lsp.buf_request(0,'textDocument/declaration', ref_params, wrap_handler{label = 'Declarations', target = location_handler,fallback=fallback})
 end
 
-M.async_implement = function ()
+M.async_implement = function (fallback)
   local ref_params = vim.lsp.util.make_position_params()
   ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/implementation', ref_params, wrap_handler{label = 'Implementations', target = location_handler})
+  vim.lsp.buf_request(0,'textDocument/implementation', ref_params, wrap_handler{label = 'Implementations', target = location_handler,fallback=fallback})
 end
 
 return M

@@ -127,6 +127,30 @@ local function deepcopy(orig)
     return copy
 end
 
+local node_to_item = function (node)
+  local uri = (node.loc.uri or node.loc.targetUri)  
+  local filename = string.gsub(uri,"file://","")
+  local range = node.loc.range or node.loc.targetSelectionRange
+  local lnum = range.start.line+1
+  local col = range.start.character+1
+  local text = node.text
+  return {filename=filename,lnum=lnum,col=col,text=text}
+end
+
+function _G.dump_qflist()
+  _G.PIG_menu.menu_props.on_close() 
+  vim.fn.setqflist({},'r')
+  local nodes = _G.PIG_menu._tree:get_nodes()
+  local items = {}
+  for i,node in ipairs(nodes) do
+    if node.is_ref then
+      table.insert(items,node_to_item(node))
+    end
+  end
+  vim.fn.setqflist(items)
+  vim.cmd [[copen]]
+end
+
 local Inc_loc = function(loc,index)
   local new_loc = deepcopy(loc)
   if loc.targetSelectionRange then
@@ -197,7 +221,7 @@ local function builtin_preview_handler(label, result, ctx, config)
   vim.lsp.util.preview_location(locations[1])
 end
 
-function _goto_next_loc_in_menu(index)
+function _G._goto_next_loc_in_menu(index)
   local nodes = _G.PIG_menu._tree:get_nodes()
   local length = #nodes
   local current_line = vim.api.nvim_win_get_cursor(0)[1]
@@ -261,7 +285,7 @@ function _goto_next_loc_in_menu(index)
   return result
 end
 
-function _goto_next_file_in_menu(index)
+function _G._goto_next_file_in_menu(index)
   local nodes = _G.PIG_menu._tree:get_nodes()
   local length = #nodes
   local current_line = vim.api.nvim_win_get_cursor(0)[1]
@@ -405,6 +429,7 @@ local function location_handler(label, result, ctx, config)
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[[",":lua _goto_next_loc_in_menu(-1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]f",":lua _goto_next_file_in_menu(1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[f",":lua _goto_next_file_in_menu(-1)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>q",":lua dump_qflist()<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":silent lua PIG_menu.menu_props.on_close()<CR>:silent sp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":silent lua PIG_menu.menu_props.on_close()<CR>:silent vsp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
   return true

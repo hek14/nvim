@@ -26,7 +26,7 @@ M.options = {
 
 M.plugins = {
   status = {
-    vim_matchup = true,
+    vim_matchup = false,
     dashboard = true,
     lspsignature = true,
     feline = true,

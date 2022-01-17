@@ -342,6 +342,14 @@ customPlugins.add(function(use)
     after = 'nvim-treesitter'
   }
   use {
+    'p00f/nvim-ts-rainbow',
+    after = 'nvim-treesitter'
+  }
+  use {
+    'theHamsta/nvim-treesitter-pairs',
+    after = 'nvim-treesitter'
+  }
+  use {
     "akinsho/toggleterm.nvim",
     disable = true,
     config = function()
@@ -390,6 +398,12 @@ customPlugins.add(function(use)
   use {
     'danilamihailov/beacon.nvim'
   }
+  use {
+    'rcarriga/nvim-notify',
+    config = function ()
+      vim.notify = require("notify")
+    end
+  }
 end
 )
 
@@ -397,7 +411,7 @@ local lazy_timer = 50
 function LazyLoad()
   local loader = require"packer".loader
   _G.PLoader = loader
-  loader('nvim-cmp cmp-cmdline vim-matchup gitsigns.nvim telescope.nvim nvim-lspconfig')
+  loader('nvim-cmp cmp-cmdline gitsigns.nvim telescope.nvim nvim-lspconfig')
 end
 vim.cmd([[autocmd User LoadLazyPlugin lua LazyLoad()]])
 vim.defer_fn(function()

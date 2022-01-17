@@ -61,6 +61,8 @@ function Closing_float_window()
   end
 end
 
+-- vim.tbl_contains to check whether an item is in a table
+
 function Source_curr_file ()
   if vim.bo.ft == "lua" then
     vim.cmd[[luafile %]]

@@ -572,6 +572,7 @@ M.rename = function(new_name)
   local function on_confirm(input)
     if not (input and #input > 0) then return end
     local ref_params = vim.lsp.util.make_position_params()
+    ref_params.context = { includeDeclaration = true }
     local rename_params = deepcopy(ref_params)
     rename_params.newName = input
     vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'Refactor', target = location_handler, new_name = input, rename_params = rename_params})

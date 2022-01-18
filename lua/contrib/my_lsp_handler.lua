@@ -151,6 +151,17 @@ function _G.dump_qflist()
   vim.cmd [[copen]]
 end
 
+local function prepare_new_text(line,loc,new_name)
+  local range = loc.range or loc.targetSelectionRange
+  local start_char = range.start.character + 1
+  local end_char = range['end'].character
+  local old_name = string.sub(line, start_char, end_char)
+  local left = string.sub(line,1,start_char-1)
+  local mid = new_name
+  local right = string.sub(line,end_char+1,#line)
+  return require('nui.text')(left .. mid .. right, "Comment")
+end
+
 local Inc_loc = function(loc,index)
   local new_loc = deepcopy(loc)
   if loc.targetSelectionRange then
@@ -182,7 +193,7 @@ local Inc_loc = function(loc,index)
   return new_loc
 end
 
-local make_menu = function(groups)
+local make_menu = function(groups,ctx)
   -- groups: seperated by files
   local menus = {}
   local ctx_lines = 1 -- lines of context
@@ -192,8 +203,8 @@ local make_menu = function(groups)
     local file_name = fn.fnamemodify(vim.uri_to_fname(group[1]),':~:.')
     table.insert(menus,Menu.separator(file_name,{text_align = "left"}))
     total_lines = total_lines + 1
-    for i = 2, #group do
-      local loc = group[i]
+    for j = 2, #group do
+      local loc = group[j]
       local item = lsp.util.locations_to_items({loc})[1]
       local range = loc.range or loc.targetSelectionRange
       location_id = location_id + 1
@@ -209,7 +220,15 @@ local make_menu = function(groups)
         -- local _range = _loc.range or _loc.targetSelectionRange
         -- table.insert(menus,Menu.item(_item.text, {loc=_loc,item=_item}))
         total_lines = total_lines + 1
-        table.insert(menus,Menu.item(ctx_item.text, {loc=loc,item=item,is_ref=k==0,line=total_lines-k,col=range.start.character}))
+        if ctx.new_name and k==0 then
+          local new_line = prepare_new_text(ctx_item.text,loc,ctx.new_name)
+          -- NOTE: total_lines-k means: always point to the true ref line, not the ctx line
+          table.insert(menus,Menu.item(ctx_item.text, {new_name=ctx.new_name,loc=loc,item=item,is_ref=true,line=total_lines-k,col=range.start.character}))
+          total_lines = total_lines + 1
+          table.insert(menus,Menu.item(new_line, {PIG_skip=true,loc=loc,item=item,is_ref=false,line=total_lines-k,col=range.start.character}))
+        else
+          table.insert(menus,Menu.item(ctx_item.text, {loc=loc,item=item,is_ref=(k==0),line=total_lines-k,col=range.start.character}))
+        end
       end
     end
   end
@@ -280,7 +299,6 @@ function _G._goto_next_loc_in_menu(index)
       result = last_ref_node
     end
   end
-  P('jump to next loc: ',result.line,result.col)
   vim.api.nvim_win_set_cursor(0, {result.line, result.col})
   return result
 end
@@ -337,7 +355,6 @@ function _G._goto_next_file_in_menu(index)
       result = last_ref_node
     end
   end
-  P('jump to next loc: ',result.line,result.col)
   vim.api.nvim_win_set_cursor(0, {result.line, result.col})
   return result
 end
@@ -387,7 +404,7 @@ local function location_handler(label, result, ctx, config)
   local locations = vim.tbl_islist(result) and result or {result}
   local sorted_locations = sort_locations(locations)
   local groups = group_by_uri(sorted_locations)
-  local ok,menus = pcall(make_menu,groups)
+  local ok,menus = pcall(make_menu,groups,ctx)
   if not ok then
     return false
   end
@@ -402,6 +419,13 @@ local function location_handler(label, result, ctx, config)
         close =  { "<Esc>", "<C-c>" },
         submit = { "<CR>", "<Space>" },
       },
+      should_skip_item = function(item)
+        if item._type == "separator" then 
+          return true
+        else
+          return item.PIG_skip
+        end
+      end,
       on_close = function()
         print("PIG CLOSED")
       end,
@@ -410,21 +434,28 @@ local function location_handler(label, result, ctx, config)
         _G.PIG_loc = node.loc
       end,
       on_submit = function(item)
-        local loc = item.loc
-        if loc then
-          lsp.util.jump_to_location(loc)
+        if label == "Refactor" then
+          -- _G.PIG_menu:unmount() -- focus on the original buffer
+          local params = _G.PIG_menu.rename_params
+          vim.lsp.buf_request(0,'textDocument/rename', params)
         else
-          echo('ErrorMsg', "can't jump to location")
+          local loc = item.loc
+          if loc then
+            lsp.util.jump_to_location(loc)
+          else
+            echo('ErrorMsg', "can't jump to location")
+          end
         end
       end,
     }
   )
-  menu:mount()
+  menu.rename_params = ctx.rename_params
+  menu:mount() -- call the render here
   _G.PIG_menu = menu
   vim.api.nvim_buf_call(menu.bufnr,function ()
     _goto_next_loc_in_menu(1)
   end)
-  vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft)
+  vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft) -- set the highlight for ft
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]]",":lua _goto_next_loc_in_menu(1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[[",":lua _goto_next_loc_in_menu(-1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]f",":lua _goto_next_file_in_menu(1)<CR>",{noremap=true})
@@ -445,8 +476,22 @@ local function wrap_handler(handler)
       end
       return echo('ErrorMsg: ', err and err.message or fmt('No %s found', string.lower(handler.label)))
     end
-    if handler.index then
-      ctx.index = handler.index
+    -- for next_lsp_reference handler
+    if handler.label == "NextReference" then
+      if handler.index then
+        ctx.index = handler.index
+      else
+        error("ErrorMsg","no index for the next_lsp_reference")
+      end
+    end
+    -- for refact
+    if handler.label == "Refactor" then
+      if handler.new_name then
+        ctx.new_name = handler.new_name
+      else
+        error("ErrorMsg","no new_name for the refactor")
+      end
+      ctx.rename_params = handler.rename_params
     end
     local hdl_result = handler.target(handler.label, result, ctx, config)
     if not hdl_result then
@@ -516,6 +561,45 @@ M.next_lsp_reference = function (index,fallback)
   local ref_params = vim.lsp.util.make_position_params()
   ref_params.context = { includeDeclaration = true }
   vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'NextReference', target = next_ref_handler, fallback=fallback, index=index})
+end
+
+M.rename = function(new_name)
+  local opts = {
+    prompt = "New Name: "
+  }
+
+  ---@private
+  local function on_confirm(input)
+    if not (input and #input > 0) then return end
+    local ref_params = vim.lsp.util.make_position_params()
+    local rename_params = deepcopy(ref_params)
+    rename_params.newName = input
+    vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'Refactor', target = location_handler, new_name = input, rename_params = rename_params})
+  end
+
+  ---@private
+  local function prepare_rename(err, result)
+    if err == nil and result == nil then
+      vim.notify('nothing to rename', vim.log.levels.INFO)
+      return
+    end
+    if result and result.placeholder then
+      opts.default = result.placeholder
+      if not new_name then pcall(vim.ui.input, opts, on_confirm) end
+    elseif result and result.start and result['end'] and
+      result.start.line == result['end'].line then
+      local line = vim.fn.getline(result.start.line+1)
+      local start_char = result.start.character+1
+      local end_char = result['end'].character
+      opts.default = string.sub(line, start_char, end_char)
+      if not new_name then pcall(vim.ui.input, opts, on_confirm) end
+    else
+      opts.default = vim.fn.expand('<cword>')
+      if not new_name then pcall(vim.ui.input, opts, on_confirm) end
+    end
+    if new_name then on_confirm(new_name) end
+  end
+  vim.lsp.buf_request(0,'textDocument/prepareRename', vim.lsp.util.make_position_params(), prepare_rename)
 end
 
 return M

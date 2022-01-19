@@ -352,6 +352,29 @@ customPlugins.add(function(use)
     after = 'nvim-treesitter'
   }
   use {
+    "ThePrimeagen/refactoring.nvim",
+    event = "BufRead",
+    requires = {
+      {"nvim-lua/plenary.nvim"},
+      {"nvim-treesitter/nvim-treesitter"}
+    },
+    config = function ()
+      require('refactoring').setup({})
+      -- Remaps for each of the four debug operations currently offered by the plugin
+      vim.api.nvim_set_keymap("v", "<Leader>re", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
+      vim.api.nvim_set_keymap("v", "<Leader>rf", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
+      vim.api.nvim_set_keymap("v", "<Leader>rv", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Variable')<CR>]], {noremap = true, silent = true, expr = false})
+      vim.api.nvim_set_keymap("v", "<Leader>ri", [[ <Esc><Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
+    end
+  }
+  use  {
+    'stevearc/dressing.nvim',
+    event = "VimEnter",
+    config = function ()
+      require('dressing').setup({})
+    end
+  }
+  use {
     "akinsho/toggleterm.nvim",
     disable = true,
     config = function()

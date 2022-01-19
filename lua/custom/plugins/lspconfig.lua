@@ -104,7 +104,7 @@ M.setup_lsp = function(attach, capabilities)
             buf_set_keymap("i", "<C-k>",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
             buf_set_keymap("n", "<leader>rn",
-                           "<cmd>lua vim.lsp.buf.rename()<CR>", map_opts)
+                           "<cmd>lua require('contrib.my_lsp_handler').rename()<CR>", map_opts)
             buf_set_keymap("n", "<leader>wa",
                            "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
                            map_opts)

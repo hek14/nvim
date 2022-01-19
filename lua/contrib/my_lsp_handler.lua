@@ -408,6 +408,9 @@ local function location_handler(label, result, ctx, config)
   if not ok then
     return false
   end
+  if _G.PIG_menu then
+    _G.PIG_menu = nil
+  end
   local menu = Menu(
     popup_options,
     {

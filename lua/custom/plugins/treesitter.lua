@@ -8,7 +8,8 @@ ts_config.setup {
   ensure_installed = {
     "lua",
     "vim",
-    "python"
+    "python",
+    "latex"
   },
   highlight = {
     enable = true,

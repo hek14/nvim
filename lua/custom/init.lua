@@ -429,6 +429,30 @@ customPlugins.add(function(use)
       vim.notify = require("notify")
     end
   }
+  if is_mac then
+    use {
+      "kdheepak/cmp-latex-symbols",
+      after = "nvim-cmp"
+    }
+    use {
+      'lervag/vimtex',
+      config = function ()
+        vim.g.vimtex_view_method = 'skim'
+        vim.cmd [[
+          let maplocalleader = ","
+        ]]
+      end
+    }
+    use {
+      'rhysd/vim-grammarous',
+      disable = true, -- very hard to use: cannot ignore the latex keywords
+      setup = function ()
+        vim.cmd [[
+          let g:grammarous#languagetool_cmd = 'languagetool -l en-US'
+        ]]
+      end
+    }
+  end
 end
 )
 

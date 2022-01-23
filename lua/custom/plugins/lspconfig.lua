@@ -141,6 +141,33 @@ M.setup_lsp = function(attach, capabilities)
             end
         end
 
+        if server.name == 'texlab' then 
+          opts.settings = {
+            texlab = {
+              build = {
+                args = {
+                  "-xelatex",
+                  "-verbose",
+                  "-file-line-error",
+                  "-synctex=1",
+                  "-interaction=nonstopmode",
+                  "%f"
+                },
+                executable = "latexmk",
+                forwardSearchAfter = true
+              },
+              chktex = {onOpenAndSave = true},
+              forwardSearch = {
+                args = {
+                  "--synctex-forward",
+                  "%l:1:%f",
+                  "%p"
+                },
+                executable = "zathura"
+              }
+            }
+          }
+        end
         server:setup(opts)
         vim.cmd [[ do User LspAttachBuffers ]]
     end)

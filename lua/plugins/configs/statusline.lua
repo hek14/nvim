@@ -457,4 +457,3 @@ M.setup = function(override_flag)
 end
 
 return M
->>>>>>> ddd13df5afe188e52ea797b1011f7fac6f77460c

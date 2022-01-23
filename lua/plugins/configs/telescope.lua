@@ -15,13 +15,21 @@ local default = {
          "--column",
          "--smart-case",
       },
-      initial_mode = "insert",
-      selection_strategy = "reset",
-      sorting_strategy = "ascending",
-      layout_strategy = "horizontal",
-      layout_config = {
-         horizontal = {
-            prompt_position = "top",
+    mappings = {
+      i = {
+        ["<cr>"] = function(prompt_bufnr)
+          require('telescope.actions').select_default(prompt_bufnr)
+          -- vim.cmd[[normal! zv]]
+          vim.cmd[[echom "telescope hello"]]
+        end}
+    },
+    initial_mode = "insert",
+    selection_strategy = "reset",
+    sorting_strategy = "ascending",
+    layout_strategy = "horizontal",
+    layout_config = {
+      horizontal = {
+      prompt_position = "top",
             preview_width = 0.55,
             results_width = 0.8,
          },
@@ -64,21 +72,21 @@ M.setup = function(override_flag)
 
    telescope.setup(default)
 
-	local extensions = { "themes", "terms", "bookmarks", "neoclip", "projects", "zoxide", "file_browser"}
-	for _, ext in ipairs(extensions) do
-	  telescope.load_extension(ext)
-	end
+  local extensions = { "themes", "terms", "bookmarks", "neoclip", "projects", "zoxide", "file_browser"}
+  for _, ext in ipairs(extensions) do
+    telescope.load_extension(ext)
+  end
 
-	require("telescope._extensions.zoxide.config").setup({
-	  mappings = {
-	    ["<C-b>"] = {
-	      keepinsert = true,
-	      action = function(selection)
-		require"telescope".extensions.file_browser.file_browser({ cwd = selection.path })
-	      end
-	    },
-	  }
-	})
-end
+  require("telescope._extensions.zoxide.config").setup({
+      mappings = {
+        ["<C-b>"] = {
+          keepinsert = true,
+          action = function(selection)
+            require"telescope".extensions.file_browser.file_browser({ cwd = selection.path })
+          end
+        },
+      }
+    })
+  end
 
 return M

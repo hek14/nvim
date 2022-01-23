@@ -60,6 +60,7 @@ default.shortline = default.config.shortline == false and true
 -- Initialize the components table
 default.components = {
    active = {},
+   inactive = {}
 }
 
 default.main_icon = {
@@ -104,6 +105,31 @@ default.file_name = {
    right_sep = {
       str = default.statusline_style.right,
       hl = { fg = default.colors.lightbg, bg = default.colors.lightbg2 },
+   },
+}
+
+default.inactive_file_name = {
+   provider = function()
+      local filename = vim.fn.expand "%:."
+      local extension = vim.fn.expand "%:e"
+      local icon = require("nvim-web-devicons").get_icon(filename, extension)
+      if icon == nil then
+         icon = " "
+         return icon
+      end
+      local bo = vim.bo
+      return " " .. icon .. " " .. filename
+   end,
+   enabled = default.shortline or function(winid)
+      return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
+   end,
+   hl = {
+      fg = default.colors.white,
+      bg = default.colors.black,
+   },
+   right_sep = {
+      str = default.statusline_style.right,
+      hl = { fg = default.colors.black, bg = default.colors.black },
    },
 }
 
@@ -446,6 +472,8 @@ M.setup = function(override_flag)
    default.components.active[1] = default.left
    default.components.active[2] = default.middle
    default.components.active[3] = default.right
+
+   default.components.inactive[1] = {default.inactive_file_name}
 
    feline.setup {
       theme = {

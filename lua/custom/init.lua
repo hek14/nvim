@@ -170,6 +170,7 @@ customPlugins.add(function(use)
   }
   use {
     "tmhedberg/SimpylFold",
+    disable = true,
     config = function ()
       vim.g.SimpylFold_docstring_preview = 1
     end

@@ -134,3 +134,8 @@ vim.cmd [[
     autocmd BufRead * lua vim.defer_fn(ensure_ts_indent,20)
   augroup END
 ]]
+
+vim.cmd [[
+  set foldmethod=expr
+  set foldexpr=nvim_treesitter#foldexpr()
+]]

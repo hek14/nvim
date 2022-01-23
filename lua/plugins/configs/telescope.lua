@@ -4,7 +4,33 @@ if not present then
    return
 end
 
+local fixfolds = {
+  hidden = true,
+  attach_mappings = function(_)
+    require("telescope.actions.set").select:enhance({
+      post = function()
+        vim.cmd[[normal! zx]]
+      end,
+    })
+    return true
+  end,
+}
+
 local default = {
+   pickers = {
+      buffers = fixfolds,
+      file_browser = fixfolds,
+      find_files = fixfolds,
+      git_files = fixfolds,
+      grep_string = fixfolds,
+      live_grep = fixfolds,
+      oldfiles = fixfolds,
+      lsp_definitions = fixfolds,
+      lsp_references = fixfolds,
+      lsp_document_symbols = fixfolds,
+      lsp_workspace_symbols = fixfolds,
+      lsp_dynamic_workspace_symbols = fixfolds,
+    },
    defaults = {
       vimgrep_arguments = {
          "rg",
@@ -15,14 +41,14 @@ local default = {
          "--column",
          "--smart-case",
       },
-    mappings = {
-      i = {
-        ["<cr>"] = function(prompt_bufnr)
-          require('telescope.actions').select_default(prompt_bufnr)
-          -- vim.cmd[[normal! zv]]
-          vim.cmd[[echom "telescope hello"]]
-        end}
-    },
+    -- mappings = {
+    --   i = {
+    --     ["<cr>"] = function(prompt_bufnr)
+    --       require('telescope.actions').select_default(prompt_bufnr)
+    --       -- vim.cmd[[normal! zv]]
+    --       vim.cmd[[echom "telescope hello"]]
+    --     end}
+    -- },
     initial_mode = "insert",
     selection_strategy = "reset",
     sorting_strategy = "ascending",

@@ -82,9 +82,13 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "gl",
                            "<cmd>lua vim.diagnostic.open_float()<CR>", map_opts)
-            if trouble_present then
+            if trouble_present and _G.diagnostic_choice=="Trouble" then
                 buf_set_keymap("n", "<leader>D",
                                "<cmd>TroubleToggle document_diagnostics<CR>",
+                               map_opts)
+            else
+                buf_set_keymap("n", "<leader>D",
+                               "<cmd>lua require('telescope.builtin').diagnostics({bufnr=0})<CR>",
                                map_opts)
             end
             buf_set_keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>",

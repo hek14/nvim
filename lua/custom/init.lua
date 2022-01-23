@@ -2,6 +2,7 @@ local os_name = vim.loop.os_uname().sysname
 _G.is_mac     = os_name == 'Darwin'
 _G.is_linux   = os_name == 'Linux'
 _G.is_windows = os_name == 'Windows'
+_G.diagnostic_choice = "telescope" -- telescope or Trouble
 
 local lhs = "neilukj"
 local rhs = "jkluine"

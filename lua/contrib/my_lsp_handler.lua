@@ -167,28 +167,38 @@ local Inc_loc = function(loc,index)
   if loc.targetSelectionRange then
     new_loc.targetSelectionRange = {
       ['end'] = {
-        character = loc.targetSelectionRange['end'].character,
+        character = 0,
         line = loc.targetSelectionRange['end'].line + index
       },
       ['start'] = {
-        character = loc.targetSelectionRange['start'].character,
+        character = 0,
         line = loc.targetSelectionRange['start'].line + index
       }
     }
-  elseif loc.range then
+  end
+  if loc.range then
     new_loc.range = {
       ['end'] = {
-        character = loc.range['end'].character,
+        character = 0,
         line = loc.range['end'].line + index
       },
       ['start'] = {
-        character = loc.range['start'].character,
+        character = 0,
         line = loc.range['start'].line + index
       }
     }
-  else
-    new_loc = nil
-    echo("ErrorMsg","loc nil" .. vim.inspect(loc))
+  end
+  if loc.targetRange then
+    new_loc.targetRange = {
+      ['end'] = {
+        character = 0,
+        line = loc.targetRange['end'].line + index
+      },
+      ['start'] = {
+        character = 0,
+        line = loc.targetRange['start'].line + index
+      }
+    }
   end
   return new_loc
 end

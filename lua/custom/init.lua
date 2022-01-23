@@ -1,3 +1,8 @@
+local os_name = vim.loop.os_uname().sysname
+_G.is_mac     = os_name == 'Darwin'
+_G.is_linux   = os_name == 'Linux'
+_G.is_windows = os_name == 'Windows'
+
 local lhs = "neilukj"
 local rhs = "jkluine"
 local modes = {"n","x","o"}
@@ -16,7 +21,7 @@ for i = 1,#lhs do
 end
 
 local map = require('core.utils').map
-map("n", "<leader>cd", "<cmd>:cd %:p:h<cr>", {silent=false}) -- example to delete the buffer
+map("n", "<leader>cd", "<cmd>lua Smart_current_dir()<cr>", {silent=false}) -- example to delete the buffer
 map("x", ">", ">gv", {silent=false,noremap=true})
 map("x", "<", "<gv", {silent=false,noremap=true})
 map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
@@ -50,6 +55,12 @@ vim.cmd([[
   call Cabbrev('lg', 'Lazygit')
   call Cabbrev('ft', 'FloatermNew')
 ]])
+
+function Smart_current_dir()
+  local fname = vim.api.nvim_buf_get_name(0)
+  local dir = require('lspconfig').util.find_git_ancestor(fname) or vim.fn.expand('%:p:h')
+  vim.cmd("cd " .. dir)
+end
 
 function Closing_float_window()
   for _, win in ipairs(vim.api.nvim_list_wins()) do 
@@ -353,7 +364,7 @@ customPlugins.add(function(use)
   }
   use {
     "ThePrimeagen/refactoring.nvim",
-    event = "BufRead",
+    after = 'nvim-treesitter',
     requires = {
       {"nvim-lua/plenary.nvim"},
       {"nvim-treesitter/nvim-treesitter"}

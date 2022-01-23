@@ -4,7 +4,7 @@ if not present then
    return
 end
 
-telescope.setup {
+local default = {
    defaults = {
       vimgrep_arguments = {
          "rg",
@@ -56,18 +56,29 @@ telescope.setup {
   }
 }
 
-local extensions = { "themes", "terms", "bookmarks", "neoclip", "projects", "zoxide", "file_browser"}
-for _, ext in ipairs(extensions) do
-  telescope.load_extension(ext)
+local M = {}
+M.setup = function(override_flag)
+   if override_flag then
+      default = require("core.utils").tbl_override_req("telescope", default)
+   end
+
+   telescope.setup(default)
+
+	local extensions = { "themes", "terms", "bookmarks", "neoclip", "projects", "zoxide", "file_browser"}
+	for _, ext in ipairs(extensions) do
+	  telescope.load_extension(ext)
+	end
+
+	require("telescope._extensions.zoxide.config").setup({
+	  mappings = {
+	    ["<C-b>"] = {
+	      keepinsert = true,
+	      action = function(selection)
+		require"telescope".extensions.file_browser.file_browser({ cwd = selection.path })
+	      end
+	    },
+	  }
+	})
 end
 
-require("telescope._extensions.zoxide.config").setup({
-  mappings = {
-    ["<C-b>"] = {
-      keepinsert = true,
-      action = function(selection)
-        require"telescope".extensions.file_browser.file_browser({ cwd = selection.path })
-      end
-    },
-  }
-})
+return M

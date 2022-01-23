@@ -14,10 +14,12 @@ end
 -- non plugin mappings
 require("core.mappings").misc()
 
--- try to call custom init
-local ok, _ = pcall(require, "custom")
-print("custom loaded: " .. tostring(ok))
-
-if not ok then
-  print(vim.inspect(debug.traceback()))
+-- check if custom init.lua file exists
+if vim.fn.filereadable(vim.fn.stdpath "config" .. "/lua/custom/init.lua") == 1 then
+   -- try to call custom init, if not successful, show error
+   local ok, err = pcall(require, "custom")
+   if not ok then
+      vim.notify("Error loading custom/init.lua\n\n" .. err)
+   end
+   return
 end

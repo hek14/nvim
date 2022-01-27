@@ -78,8 +78,8 @@ ts_config.setup {
         ["uf"] = "@function.inner",
         ["ac"] = "@class.outer",
         ["uc"] = "@class.inner",
-        ["ac"] = "@parameter.outer",
-        ["uc"] = "@parameter.inner",
+        ["aa"] = "@parameter.outer",
+        ["ua"] = "@parameter.inner",
       },
     },
     swap = {

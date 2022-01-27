@@ -10,7 +10,9 @@ M.setup = function ()
     -- lsp, while **"pattern"** uses vim-rooter like glob pattern matching. Here
     -- order matters: if one is not detected, the other is used as fallback. You
     -- can also delete or rearangne the detection methods.
-    detection_methods = { "lsp", "pattern" },
+
+    -- important FIX: remove lsp detection, just using the pattern, because WinEnter autocmd not working well with the lsp detection
+    detection_methods = { "pattern" }, 
 
     -- All the patterns used to detect root dir, when **"pattern"** is in
     -- detection_methods
@@ -36,6 +38,8 @@ M.setup = function ()
     datapath = vim.fn.stdpath("data"),
   }
   require('core.utils').map("n","<leader>fp","<cmd>Telescope projects<CR>")
+  -- important: just change root per window
+  vim.cmd[[autocmd WinEnter * ++nested lua require("project_nvim.project").on_buf_enter()]]
 end
 
 return M

@@ -123,6 +123,7 @@ vim.cmd [[
 
 local customPlugins = require "core.customPlugins"
 customPlugins.add(function(use)
+<<<<<<< HEAD
   use {
     "williamboman/nvim-lsp-installer",
   }
@@ -152,11 +153,16 @@ customPlugins.add(function(use)
         sources = {
           formatting.lua_format,
           formatting.black.with({extra_args = "--fast"}),
-          code_actions.gitsigns,
-        },
-      })
-    end
-  }
+          code_actions.gitsigns},
+
+	-- format on save
+	-- on_attach = function(client)
+	--   if client.resolved_capabilities.document_formatting then
+	--       vim.cmd "autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()"
+	--   end
+	-- end
+	})
+end}
   use {
     "folke/trouble.nvim",
     requires = "kyazdani42/nvim-web-devicons",

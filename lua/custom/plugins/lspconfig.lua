@@ -123,6 +123,15 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "<leader>fm",
                            "<cmd>lua vim.lsp.buf.formatting()<CR>", map_opts)
+	    buf_set_keymap("n", "<leader>[r",
+	    	       "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_previous_usage()<CR>",
+	    	       map_opts)
+	    buf_set_keymap("n", "<leader>]r",
+		       "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",
+		       map_opts)
+		if vim.tbl_contains({"pyright", "sumneko_lua"}, client.name) then
+		    client.resolved_capabilities.document_formatting = false
+		end
         end
 
         if server.name == "pyright" then

@@ -10,31 +10,29 @@ vim.diagnostic.config {
     update_in_insert = false
 }
 
-function _G.Smart_goto_definition() 
-  local bufnr = vim.fn.bufnr()
-  vim.cmd [[normal! m`]]
-  require('contrib.my_lsp_handler').async_def(
-    function ()
-      print('using fallback')
-      require'nvim-treesitter-refactor.navigation'.goto_definition(bufnr,function ()
-        print("dumb goto")
-        vim.cmd [[normal! gd]] -- dumb goto definition
-      end)
-    end
-  )
+function _G.Smart_goto_definition()
+    local bufnr = vim.fn.bufnr()
+    vim.cmd [[normal! m`]]
+    require('contrib.my_lsp_handler').async_def(function()
+        print('using fallback')
+        require'nvim-treesitter-refactor.navigation'.goto_definition(bufnr,
+                                                                     function()
+            print("dumb goto")
+            vim.cmd [[normal! gd]] -- dumb goto definition
+        end)
+    end)
 end
 
 function _G.Smart_goto_next_ref(index)
-  local bufnr = vim.fn.bufnr()
-  vim.cmd [[normal! m`]]
-  require('contrib.my_lsp_handler').next_lsp_reference(index,
-    function ()
-      print('using fallback')
-      if index>0 then
-        require'nvim-treesitter-refactor.navigation'.goto_next_usage()
-      else
-        require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
-      end
+    local bufnr = vim.fn.bufnr()
+    vim.cmd [[normal! m`]]
+    require('contrib.my_lsp_handler').next_lsp_reference(index, function()
+        print('using fallback')
+        if index > 0 then
+            require'nvim-treesitter-refactor.navigation'.goto_next_usage()
+        else
+            require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
+        end
     end)
 end
 
@@ -61,12 +59,13 @@ M.setup_lsp = function(attach, capabilities)
                                         "v:lua.vim.lsp.omnifunc")
 
             local map_opts = {noremap = true, silent = true}
-            buf_set_keymap("n", "<leader>gd", "<cmd>lua require('telescope.builtin').lsp_definitions()<CR>",
+            buf_set_keymap("n", "<leader>gd",
+                           "<cmd>lua require('telescope.builtin').lsp_definitions()<CR>",
                            map_opts)
-            buf_set_keymap("n", "<leader>gr", "<cmd>lua require('telescope.builtin').lsp_references()<CR>",
+            buf_set_keymap("n", "<leader>gr",
+                           "<cmd>lua require('telescope.builtin').lsp_references()<CR>",
                            map_opts)
-            buf_set_keymap("n", "gd",
-                           "<cmd>lua Smart_goto_definition()<CR>",
+            buf_set_keymap("n", "gd", "<cmd>lua Smart_goto_definition()<CR>",
                            map_opts)
             buf_set_keymap("n", "gr",
                            "<cmd>lua require('contrib.my_lsp_handler').async_ref()<CR>",
@@ -82,7 +81,7 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "gl",
                            "<cmd>lua vim.diagnostic.open_float()<CR>", map_opts)
-            if trouble_present and _G.diagnostic_choice=="Trouble" then
+            if trouble_present and _G.diagnostic_choice == "Trouble" then
                 buf_set_keymap("n", "<leader>D",
                                "<cmd>TroubleToggle document_diagnostics<CR>",
                                map_opts)
@@ -95,11 +94,9 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",
                            map_opts)
-            buf_set_keymap("n", "[r",
-                           "<cmd>lua Smart_goto_next_ref(-1)<CR>",
+            buf_set_keymap("n", "[r", "<cmd>lua Smart_goto_next_ref(-1)<CR>",
                            map_opts)
-            buf_set_keymap("n", "]r",
-                           "<cmd>lua Smart_goto_next_ref(1)<CR>",
+            buf_set_keymap("n", "]r", "<cmd>lua Smart_goto_next_ref(1)<CR>",
                            map_opts)
             buf_set_keymap("n", "gs",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
@@ -108,7 +105,8 @@ M.setup_lsp = function(attach, capabilities)
             buf_set_keymap("i", "<C-k>",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
             buf_set_keymap("n", "<leader>rn",
-                           "<cmd>lua require('contrib.my_lsp_handler').rename()<CR>", map_opts)
+                           "<cmd>lua require('contrib.my_lsp_handler').rename()<CR>",
+                           map_opts)
             buf_set_keymap("n", "<leader>wa",
                            "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
                            map_opts)
@@ -123,15 +121,15 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "<leader>fm",
                            "<cmd>lua vim.lsp.buf.formatting()<CR>", map_opts)
-	    buf_set_keymap("n", "<leader>[r",
-	    	       "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_previous_usage()<CR>",
-	    	       map_opts)
-	    buf_set_keymap("n", "<leader>]r",
-		       "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",
-		       map_opts)
-		if vim.tbl_contains({"pyright", "sumneko_lua"}, client.name) then
-		    client.resolved_capabilities.document_formatting = false
-		end
+            buf_set_keymap("n", "<leader>[r",
+                           "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_previous_usage()<CR>",
+                           map_opts)
+            buf_set_keymap("n", "<leader>]r",
+                           "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",
+                           map_opts)
+            if vim.tbl_contains({"pyright", "sumneko_lua"}, client.name) then
+                client.resolved_capabilities.document_formatting = false
+            end
         end
 
         if server.name == "pyright" then
@@ -154,32 +152,24 @@ M.setup_lsp = function(attach, capabilities)
             end
         end
 
-        if server.name == 'texlab' then 
-          opts.settings = {
-            texlab = {
-              build = {
-                args = {
-                  "-xelatex",
-                  "-verbose",
-                  "-file-line-error",
-                  "-synctex=1",
-                  "-interaction=nonstopmode",
-                  "%f"
-                },
-                executable = "latexmk",
-                forwardSearchAfter = true
-              },
-              chktex = {onOpenAndSave = true},
-              forwardSearch = {
-                args = {
-                  "--synctex-forward",
-                  "%l:1:%f",
-                  "%p"
-                },
-                executable = "zathura"
-              }
+        if server.name == 'texlab' then
+            opts.settings = {
+                texlab = {
+                    build = {
+                        args = {
+                            "-xelatex", "-verbose", "-file-line-error",
+                            "-synctex=1", "-interaction=nonstopmode", "%f"
+                        },
+                        executable = "latexmk",
+                        forwardSearchAfter = true
+                    },
+                    chktex = {onOpenAndSave = true},
+                    forwardSearch = {
+                        args = {"--synctex-forward", "%l:1:%f", "%p"},
+                        executable = "zathura"
+                    }
+                }
             }
-          }
         end
         server:setup(opts)
         vim.cmd [[ do User LspAttachBuffers ]]

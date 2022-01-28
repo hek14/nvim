@@ -215,7 +215,7 @@ local make_menu = function(groups,ctx)
     total_lines = total_lines + 1
     for j = 2, #group do
       local loc = group[j]
-      local item = lsp.util.locations_to_items({loc})[1]
+      local item = lsp.util.locations_to_items({loc},vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)[1]
       local range = loc.range or loc.targetSelectionRange
       location_id = location_id + 1
       table.insert(menus,Menu.separator("location " .. location_id, {text_align = "left"}))
@@ -226,18 +226,16 @@ local make_menu = function(groups,ctx)
         if not ctx_loc then
           return error("ErrorMsg loc nil: " .. vim.inspect(loc))
         end
-        local ctx_item = lsp.util.locations_to_items({ctx_loc})[1]
-        -- local _range = _loc.range or _loc.targetSelectionRange
-        -- table.insert(menus,Menu.item(_item.text, {loc=_loc,item=_item}))
+        local ctx_item = lsp.util.locations_to_items({ctx_loc},vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)[1]
         total_lines = total_lines + 1
         if ctx.new_name and k==0 then
           local new_line = prepare_new_text(ctx_item.text,loc,ctx.new_name)
           -- NOTE: total_lines-k means: always point to the true ref line, not the ctx line
-          table.insert(menus,Menu.item(ctx_item.text, {new_name=ctx.new_name,loc=loc,item=item,is_ref=true,line=total_lines-k,col=range.start.character}))
+          table.insert(menus,Menu.item(ctx_item.text, {new_name=ctx.new_name,loc=loc,ctx=ctx,item=item,is_ref=true,line=total_lines-k,col=range.start.character}))
           total_lines = total_lines + 1
-          table.insert(menus,Menu.item(new_line, {PIG_skip=true,loc=loc,item=item,is_ref=false,line=total_lines-k,col=range.start.character}))
+          table.insert(menus,Menu.item(new_line, {PIG_skip=true,loc=loc,ctx=ctx,item=item,is_ref=false,line=total_lines-k,col=range.start.character}))
         else
-          table.insert(menus,Menu.item(ctx_item.text, {loc=loc,item=item,is_ref=(k==0),line=total_lines-k,col=range.start.character}))
+          table.insert(menus,Menu.item(ctx_item.text, {loc=loc,ctx=ctx,item=item,is_ref=(k==0),line=total_lines-k,col=range.start.character}))
         end
       end
     end
@@ -369,29 +367,39 @@ function _G._goto_next_file_in_menu(index)
   return result
 end
 
+local filter_locations_by_uri = function(locations,pattern)
+  local results = {} 
+  for _,loc in ipairs(locations) do
+    local uri = loc.uri or loc.targetUri
+    if string.match(uri,pattern) then
+      table.insert(results,loc)
+    end
+  end 
+  return results
+end
+
 local function next_ref_handler(label, result, ctx, config)
   local locations = vim.tbl_islist(result) and result or {result}
   local sorted_locations = sort_locations(locations)
   local current_line = vim.api.nvim_win_get_cursor(0)[1]
   local current_col = vim.api.nvim_win_get_cursor(0)[2]
   local current_file = "file://" .. vim.api.nvim_buf_get_name(ctx.bufnr or 0)
+  local filtered_locations = filter_locations_by_uri(sorted_locations,current_file) -- only search the next_ref in current file
   local current_loc = nil
   local index = ctx.index 
   if not index or index==0 then
     return 
   end
-  for i,loc in ipairs(sorted_locations) do
-    if loc.uri == current_file then
-      local _start = loc.range.start
-      local _end = loc.range['end']
-      local condition = _start.line+1 == current_line and
-        _start.character <= current_col and
-        _end.line+1 >= current_line and
-        _end.character >= current_col
-      if condition then 
-        current_loc = i
-        break
-      end
+  for i,loc in ipairs(filtered_locations) do
+    local _start = loc.range.start
+    local _end = loc.range['end']
+    local condition = _start.line+1 == current_line and
+    _start.character <= current_col and
+    _end.line+1 >= current_line and
+    _end.character >= current_col
+    if condition then 
+      current_loc = i
+      break
     end
   end
   if not current_loc then
@@ -399,13 +407,13 @@ local function next_ref_handler(label, result, ctx, config)
     return false
   end
   local target = current_loc + index
-  if target > #sorted_locations then
+  if target > #filtered_locations then
     target = 1
   end
   if target < 1 then
-    target = #sorted_locations
+    target = #filtered_locations
   end
-  vim.lsp.util.jump_to_location(sorted_locations[target])
+  vim.lsp.util.jump_to_location(filtered_locations[target],vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
   return true
 end
 
@@ -444,7 +452,6 @@ local function location_handler(label, result, ctx, config)
       end,
       on_change = function(node,menu)
         _G.PIG_node = node
-        _G.PIG_loc = node.loc
       end,
       on_submit = function(item)
         if label == "Refactor" then
@@ -454,7 +461,7 @@ local function location_handler(label, result, ctx, config)
         else
           local loc = item.loc
           if loc then
-            lsp.util.jump_to_location(loc)
+            lsp.util.jump_to_location(loc,vim.lsp.get_client_by_id(item.ctx.client_id).offset_encoding)
           else
             echo('ErrorMsg', "can't jump to location")
           end
@@ -474,8 +481,8 @@ local function location_handler(label, result, ctx, config)
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]f",":lua _goto_next_file_in_menu(1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[f",":lua _goto_next_file_in_menu(-1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>q",":lua dump_qflist()<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":silent lua PIG_menu.menu_props.on_close()<CR>:silent sp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":silent lua PIG_menu.menu_props.on_close()<CR>:silent vsp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_loc)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":silent lua PIG_menu.menu_props.on_close()<CR>:silent sp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_node.loc,vim.lsp.get_client_by_id(PIG_node.ctx.client_id).offset_encoding)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":silent lua PIG_menu.menu_props.on_close()<CR>:silent vsp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_node.loc,vim.lsp.get_client_by_id(PIG_node.ctx.client_id).offset_encoding)<CR>",{noremap=true})
   return true
 end
 

@@ -418,6 +418,19 @@ customPlugins.add(function(use)
         setup = function()
             require('core.utils').map("n", "<leader>z",
                                       ":Telescope zoxide list<CR>")
+        end, 
+        config = function ()
+          require("telescope._extensions.zoxide.config").setup({
+            mappings = {
+              ["<C-b>"] = {
+                keepinsert = true,
+                action = function(selection)
+                  require"telescope".extensions.file_browser.file_browser({ cwd = selection.path })
+                  -- vim.cmd('Telescope file_browser path=' .. selection.path)
+                end
+              },
+            }
+          })
         end
     }
     use {"nvim-telescope/telescope-file-browser.nvim"}
@@ -463,8 +476,7 @@ function LazyLoad()
     loader('nvim-cmp cmp-cmdline gitsigns.nvim telescope.nvim nvim-lspconfig')
 end
 vim.cmd([[autocmd User LoadLazyPlugin lua LazyLoad()]])
-vim.defer_fn(function() vim.cmd([[doautocmd User LoadLazyPlugin]]) end,
-             lazy_timer)
+vim.defer_fn(function() vim.cmd([[doautocmd User LoadLazyPlugin]]) end,lazy_timer)
 
 -- vim.cmd [[
 --   autocmd VimEnter lua require('custom.plugins.cmp')

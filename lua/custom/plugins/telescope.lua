@@ -105,17 +105,6 @@ M.setup = function(override_flag)
   for _, ext in ipairs(extensions) do
     telescope.load_extension(ext)
   end
-
-  require("telescope._extensions.zoxide.config").setup({
-      mappings = {
-        ["<C-b>"] = {
-          keepinsert = true,
-          action = function(selection)
-            require"telescope".extensions.file_browser.file_browser({ cwd = selection.path })
-          end
-        },
-      }
-    })
-  end
+end
 
 return M

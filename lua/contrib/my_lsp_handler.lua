@@ -206,7 +206,7 @@ end
 local make_menu = function(groups,ctx)
   -- groups: seperated by files
   local menus = {}
-  local ctx_lines = 1 -- lines of context
+  local ctx_lines = 2 -- lines of context
   local total_lines = 0
   local location_id = 0
   for i,group in ipairs(groups) do
@@ -371,7 +371,8 @@ local filter_locations_by_uri = function(locations,pattern)
   local results = {} 
   for _,loc in ipairs(locations) do
     local uri = loc.uri or loc.targetUri
-    if string.match(uri,pattern) then
+    local matched = vim.api.nvim_eval(string.format([['%s' =~ '%s']],uri,pattern))
+    if matched==1 then
       table.insert(results,loc)
     end
   end 
@@ -434,6 +435,7 @@ local function location_handler(label, result, ctx, config)
     {
       lines = menus,
       min_width = 40,
+      max_width = 80,
       keymap = {
         focus_next = { "n", "<Down>", "<Tab>" },
         focus_prev = { "e", "<Up>", "<S-Tab>" },

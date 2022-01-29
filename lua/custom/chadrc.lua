@@ -51,7 +51,8 @@ M.plugins = {
     nvim_cmp="custom/plugins/cmp",
     gitsigns="custom/plugins/gitsigns",
     nvim_treesitter='custom/plugins/treesitter',
-    luasnip="custom/plugins/luasnip" 
+    luasnip="custom/plugins/luasnip",
+    telescope="custom/plugins/telescope",
   },
 }
 

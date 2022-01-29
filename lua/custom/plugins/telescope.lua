@@ -4,7 +4,33 @@ if not present then
    return
 end
 
+local fixfolds = {
+  hidden = true,
+  attach_mappings = function(_)
+    require("telescope.actions.set").select:enhance({
+      post = function()
+        vim.cmd[[normal! zx]]
+      end,
+    })
+    return true
+  end,
+}
+
 local default = {
+   pickers = {
+      buffers = fixfolds,
+      file_browser = fixfolds,
+      find_files = fixfolds,
+      git_files = fixfolds,
+      grep_string = fixfolds,
+      live_grep = fixfolds,
+      oldfiles = fixfolds,
+      lsp_definitions = fixfolds,
+      lsp_references = fixfolds,
+      lsp_document_symbols = fixfolds,
+      lsp_workspace_symbols = fixfolds,
+      lsp_dynamic_workspace_symbols = fixfolds,
+    },
    defaults = {
       vimgrep_arguments = {
          "rg",
@@ -15,6 +41,14 @@ local default = {
          "--column",
          "--smart-case",
       },
+    -- mappings = {
+    --   i = {
+    --     ["<cr>"] = function(prompt_bufnr)
+    --       require('telescope.actions').select_default(prompt_bufnr)
+    --       -- vim.cmd[[normal! zv]]
+    --       vim.cmd[[echom "telescope hello"]]
+    --     end}
+    -- },
       prompt_prefix = "   ",
       selection_caret = "  ",
       entry_prefix = "  ",
@@ -51,6 +85,12 @@ local default = {
       -- Developer configurations: Not meant for general override
       buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
    },
+   extensions = {
+     bookmarks = {
+       -- Available: 'brave', 'chrome', 'edge', 'firefox', 'safari'
+       selected_browser = 'chrome',
+     },
+  }
 }
 
 local M = {}
@@ -61,13 +101,21 @@ M.setup = function(override_flag)
 
    telescope.setup(default)
 
-   local extensions = { "themes", "terms" }
+  local extensions = { "themes", "terms", "bookmarks", "neoclip", "projects", "zoxide", "file_browser"}
+  for _, ext in ipairs(extensions) do
+    telescope.load_extension(ext)
+  end
 
-   pcall(function()
-      for _, ext in ipairs(extensions) do
-         telescope.load_extension(ext)
-      end
-   end)
-end
+  require("telescope._extensions.zoxide.config").setup({
+      mappings = {
+        ["<C-b>"] = {
+          keepinsert = true,
+          action = function(selection)
+            require"telescope".extensions.file_browser.file_browser({ cwd = selection.path })
+          end
+        },
+      }
+    })
+  end
 
 return M

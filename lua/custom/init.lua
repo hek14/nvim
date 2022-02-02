@@ -446,6 +446,15 @@ customPlugins.add(function(use)
         'rcarriga/nvim-notify',
         config = function() vim.notify = require("notify") end
     }
+    use { 
+        "iamcco/markdown-preview.nvim", 
+        run = function() vim.fn['mkdp#util#install'](0) end,
+        setup = function() 
+          vim.g.mkdp_filetypes = { "markdown" } 
+          vim.g.mkdp_port = '9999'
+        end, 
+      ft = { "markdown" }, 
+    }
     if is_mac then
         use {"kdheepak/cmp-latex-symbols", after = "nvim-cmp"}
         use {

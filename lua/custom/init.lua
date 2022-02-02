@@ -451,6 +451,13 @@ customPlugins.add(function(use)
         run = function() vim.fn['mkdp#util#install'](0) end,
         setup = function() 
           vim.g.mkdp_filetypes = { "markdown" } 
+          vim.cmd [[
+            function! Clippy_open_browser(url) abort
+              echom('opening ' . a:url)
+              call system('clippy openurl ' . a:url)
+            endfunction
+          ]]
+          vim.g.mkdp_browserfunc = 'Clippy_open_browser'
           vim.g.mkdp_port = '9999'
         end, 
       ft = { "markdown" }, 
@@ -498,6 +505,23 @@ vim.cmd [[
   onoremap al :normal val<CR>
   xnoremap u% GoggV
   onoremap u% :normal vu%<CR>
+]]
+
+-- setup clipboard
+vim.cmd [[
+  set clipboard+=unnamed,unnamedplus
+  let g:clipboard = {
+      \   'name': 'ClippyRemoteClipboard',
+      \   'copy': {
+      \      '+': 'clippy set',
+      \      '*': 'clippy set',
+      \    },
+      \   'paste': {
+      \      '+': 'clippy get',
+      \      '*': 'clippy get',
+      \   },
+      \   'cache_enabled': 0,
+      \ }
 ]]
 
 vim.cmd [[

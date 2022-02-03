@@ -23,8 +23,10 @@ M.options = {
 
 -- NvChad included plugin options & overrides
 
+local customPlugins = require('custom.plugins')
 
 M.plugins = {
+  install = customPlugins,
   status = {
     vim_matchup = false,
     dashboard = true,
@@ -33,8 +35,8 @@ M.plugins = {
   },
  options = {
    lspconfig = {
-     -- path of file containing setups of different lsps (ex : "custom.plugins.lspconfig"), read the docs for more info
-     setup_lspconf = "custom.plugins.lspconfig",
+     -- path of file containing setups of different lsps (ex : "custom.pluginConfs.lspconfig"), read the docs for more info
+     setup_lspconf = "custom.pluginConfs.lspconfig",
    },
    luasnip = {
      snippet_path = {}
@@ -47,12 +49,12 @@ M.plugins = {
   --              use "(custom.configs).my_func()" to call a function
   --              use "custom.blankline" to call a file
   default_plugin_config_replace = {
-    bufferline="custom/plugins/bufferline",
-    nvim_cmp="custom/plugins/cmp",
-    gitsigns="custom/plugins/gitsigns",
-    nvim_treesitter='custom/plugins/treesitter',
-    luasnip="custom/plugins/luasnip",
-    telescope="custom/plugins/telescope",
+    bufferline="custom/pluginConfs/bufferline",
+    nvim_cmp="custom/pluginConfs/cmp",
+    gitsigns="custom/pluginConfs/gitsigns",
+    nvim_treesitter='custom/pluginConfs/treesitter',
+    luasnip="custom/pluginConfs/luasnip",
+    telescope="custom/pluginConfs/telescope",
   },
 }
 

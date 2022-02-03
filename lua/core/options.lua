@@ -46,7 +46,6 @@ opt.updatetime = options.updatetime
 opt.whichwrap:append "<>[]hl"
 
 g.mapleader = options.mapleader
-g.did_load_filetypes = 1
 
 -- disable some builtin vim plugins
 local disabled_built_ins = {

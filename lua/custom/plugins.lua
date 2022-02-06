@@ -24,8 +24,8 @@ local common_plugins = {
       local code_actions = require("null-ls").builtins.code_actions
       require("null-ls").setup({
         sources = {
-          formatting.lua_format,
-          formatting.black.with({ extra_args = "--fast" }),
+          formatting.stylua.with({ extra_args = {"--indent-type", "Spaces"}}),
+          formatting.black.with({ extra_args = {"--fast" }}),
           code_actions.gitsigns,
         },
 

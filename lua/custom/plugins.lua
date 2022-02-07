@@ -1,4 +1,4 @@
-local common_plugins = {
+local custom_plugins = {
   { "williamboman/nvim-lsp-installer" },
   {
     "RishabhRD/nvim-lsputils",
@@ -355,6 +355,7 @@ local common_plugins = {
 }
 
 local specific_plugins = {}
+local is_mac = vim.loop.os_uname().sysname=="Darwin"
 if is_mac then
   specific_plugins = {
     { "kdheepak/cmp-latex-symbols", after = "nvim-cmp" },
@@ -379,4 +380,7 @@ if is_mac then
   }
 end
 
-return vim.tbl_extend("keep", common_plugins, specific_plugins)
+for _,v in ipairs(specific_plugins) do
+  custom_plugins[#custom_plugins+1] = v
+end
+return custom_plugins

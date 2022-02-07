@@ -45,7 +45,7 @@ vim.cmd [[
   cmap <C-e> <End>
   cmap <C-f> <Right>
   cmap <C-b> <Left>
-  cnoremap <C-t> <Esc>q:i
+  cnoremap <C-t> <C-f>
 ]]
 
 vim.cmd([[

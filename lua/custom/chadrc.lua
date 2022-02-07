@@ -59,6 +59,10 @@ M.plugins = {
 }
 
 M.mappings = {
+  misc = {
+      copy_whole_file = {}, -- copy all contents of current buffer
+      copy_to_system_clipboard = {}, -- copy selected text (visual mode) or curent line (normal)
+  },
   terminal = {
     esc_termmode = { "jj" }, -- multiple mappings allowed
     -- get out of terminal mode and hide it

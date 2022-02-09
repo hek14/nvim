@@ -1,12 +1,14 @@
 plugin
 spell
 
-contrib/navigator.lua
-contrib/nvim-lspfuzzy
-contrib/lspkind.lua
-contrib/lspwrapper.lua
-contrib/render.lua
-contrib/util.lua
-contrib/nui.nvim
 lua/contrib/navigator.lua
 lua/contrib/nvim-lspfuzzy
+lua/contrib/lspkind.lua
+lua/contrib/lspwrapper.lua
+lua/contrib/render.lua
+lua/contrib/util.lua
+lua/contrib/nui.nvim
+lua/contrib/navigator.lua
+lua/contrib/nvim-lspfuzzy
+lua/contrib/cmp-rg
+lua/contrib/goto-preview

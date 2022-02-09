@@ -380,7 +380,8 @@ if is_mac then
   }
 end
 
-for _,v in ipairs(specific_plugins) do
-  custom_plugins[#custom_plugins+1] = v
-end
+custom_plugins = vim.list_extend(custom_plugins,specific_plugins)
+-- for _,v in ipairs(specific_plugins) do
+--   custom_plugins[#custom_plugins+1] = v
+-- end
 return custom_plugins

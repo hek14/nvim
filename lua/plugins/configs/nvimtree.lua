@@ -58,6 +58,7 @@ local default = {
    right_mouse_command = ":bp|sp|bn|bd",
    open_on_tab = false,
    hijack_cursor = true,
+   hijack_unnamed_buffer_when_opening = false,
    update_cwd = true,
    update_focused_file = {
       enable = true,

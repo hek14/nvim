@@ -14,6 +14,9 @@ local check_back_space = function()
   return col == 0 or vim.fn.getline('.'):sub(col, col):match '%s' ~= nil
 end
 
+local mine_config_yaml = require("contrib.cmp_config_yaml")
+cmp.register_source("mine_config_yaml", mine_config_yaml.new())
+
 cmp.setup {
    snippet = {
       expand = function(args)
@@ -29,6 +32,7 @@ cmp.setup {
             nvim_lsp = "[LSP]",
             nvim_lua = "[Lua]",
             buffer = "[BUF]",
+            mine_config_yaml = "[Config]"
          })[entry.source.name]
 
          return vim_item
@@ -75,3 +79,27 @@ cmp.setup {
       { name = "latex_symbols"}
    },
 }
+_G.vimrc = _G.vimrc or {}
+_G.vimrc.cmp = _G.vimrc.cmp or {}
+_G.vimrc.cmp.mine = function()
+  cmp.complete({
+    config = {
+      sources = {
+        { name = "mine_config_yaml" },
+      }
+    }
+  })
+end
+
+_G.vimrc.cmp.rg = function()
+  cmp.complete({
+    config = {
+      sources = {
+        { name = "rg" }, -- should install the cmp-rg
+      }
+    }
+  })
+end
+vim.cmd([[
+  inoremap <C-l> <Cmd>lua vimrc.cmp.mine()<CR>
+]])

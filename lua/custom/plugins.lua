@@ -117,6 +117,9 @@ local custom_plugins = {
       })
     end,
   }, -- enhance grep and quickfix list
+  {
+    "lukas-reineke/cmp-rg",
+  },
   -- 1. populate the quickfix
   {
     "mhinz/vim-grepper",

@@ -17,9 +17,9 @@ M.options = {
    clipboard = global_env.is_mac and "unnamedplus" or "",
 }
 
--- M.ui = {
---   theme = "nord"
--- }
+M.ui = {
+  theme = "tomorrow-night",
+}
 
 -- NvChad included plugin options & overrides
 

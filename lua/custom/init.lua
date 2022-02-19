@@ -25,6 +25,7 @@ for i = 1, #lhs do
 end
 
 local map = require('core.utils').map
+map("n", "<space>", "<Nop>", {noremap = true, silent = true})
 map("n", "<leader>cd", "<cmd>lua Smart_current_dir()<cr>", {silent = false}) -- example to delete the buffer
 map("x", ">", ">gv", {silent = false, noremap = true})
 map("x", "<", "<gv", {silent = false, noremap = true})

@@ -24,7 +24,7 @@ local custom_plugins = {
       local code_actions = require("null-ls").builtins.code_actions
       require("null-ls").setup({
         sources = {
-          formatting.stylua.with({ extra_args = {"--indent-type", "Spaces"}}),
+          formatting.lua_format,
           formatting.black.with({ extra_args = {"--fast" }}),
           code_actions.gitsigns,
         },
@@ -302,6 +302,9 @@ local custom_plugins = {
       require("neoclip").setup()
       vim.cmd([[inoremap <C-p> <cmd>Telescope neoclip<CR>]])
     end,
+  },
+  {
+    "tversteeg/registers.nvim"
   },
   {
     "jvgrootveld/telescope-zoxide",

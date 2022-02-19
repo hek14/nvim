@@ -34,4 +34,5 @@ vim.cmd [[
        \   exe "normal! g`\"" |
        \ endif
  autocmd BufWinEnter,BufEnter,WinEnter,WinNew * if &ft=="TelescopePrompt" | startinsert | endif
+ autocmd FileType lua setlocal shiftwidth=4
 ]]

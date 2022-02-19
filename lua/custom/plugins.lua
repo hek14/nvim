@@ -24,7 +24,7 @@ local custom_plugins = {
       local code_actions = require("null-ls").builtins.code_actions
       require("null-ls").setup({
         sources = {
-          formatting.lua_format,
+          formatting.lua_format.with({ extra_args = {"--indent-width=2"}}),
           formatting.black.with({ extra_args = {"--fast" }}),
           code_actions.gitsigns,
         },
@@ -293,7 +293,11 @@ local custom_plugins = {
   },
   {
     -- after = 'telescope.nvim', -- do not lazy load telescope extensions, will ca bugs: module not found
-    "dhruvmanila/telescope-bookmarks.nvim",
+    "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
+  },
+  {
+    'ThePrimeagen/harpoon',
+    module = "harpoon"
   },
   {
     "AckslD/nvim-neoclip.lua",

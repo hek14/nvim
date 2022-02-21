@@ -11,10 +11,15 @@ M.options, M.ui, M.mappings, M.plugins = {}, {}, {}, {}
 -- To use this file, copy the structure of `core/default_config.lua`,
 -- examples of setting relative number & changing theme:
 
-local global_env = require('custom.utils').global_env
+local os_name = vim.loop.os_uname().sysname
+_G.is_mac = os_name == 'Darwin'
+_G.is_linux = os_name == 'Linux'
+_G.is_windows = os_name == 'Windows'
+_G.diagnostic_choice = "telescope" -- telescope or Trouble
+
 M.options = {
    relativenumber = false,
-   clipboard = global_env.is_mac and "unnamedplus" or "",
+   clipboard = is_mac and "unnamedplus" or "",
 }
 
 M.ui = {

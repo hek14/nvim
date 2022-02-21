@@ -1,9 +1,3 @@
-local os_name = vim.loop.os_uname().sysname
-_G.is_mac = os_name == 'Darwin'
-_G.is_linux = os_name == 'Linux'
-_G.is_windows = os_name == 'Windows'
-_G.diagnostic_choice = "telescope" -- telescope or Trouble
-
 local lhs = "neilukj"
 local rhs = "jkluine"
 local modes = {"n", "x", "o"}
@@ -50,6 +44,15 @@ vim.cmd [[
 ]]
 
 vim.cmd([[
+  function! Cabbrev(key, value) abort
+    execute printf('cabbrev <expr> %s (getcmdtype() == ":" && getcmdpos() <= %d) ? %s : %s',
+          \ a:key, 1+len(a:key), Single_quote(a:value), Single_quote(a:key))
+  endfunction
+
+  function! Single_quote(str) abort
+    return "'" . substitute(copy(a:str), "'", "''", 'g') . "'"
+  endfunction
+
   call Cabbrev('pi', 'PackerInstall')
   call Cabbrev('pud', 'PackerUpdate')
   call Cabbrev('pc', 'PackerCompile')
@@ -173,3 +176,7 @@ vim.cmd [[
   endfunction
 ]]
 require("custom.autocmd")
+
+
+-- debug 
+map("n",',l',"<Cmd>lua Reload_module('contrib.treesitter.python')<cr>")

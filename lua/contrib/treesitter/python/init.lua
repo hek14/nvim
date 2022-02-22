@@ -107,6 +107,18 @@ local get_args = function(argument_string)
   if arguments[1] == "self" then
     arguments = vim.list_slice(arguments,2,#arguments)
   end
+  for j = 1,#arguments do
+    if string.find(arguments[j],"\n") then
+      arguments[j] = string.gsub(arguments[j],"\n","")
+    end
+    if string.sub(arguments[j],1,1)==" "then
+      arguments[j] = string.gsub(arguments[j]," *(.*)","%1")
+    end
+    if string.find(arguments[j],"=") then
+      arguments[j] = string.gsub(arguments[j],"(.-) *= *(.-)","%1 = %2")
+    end
+  end
+  -- P('good arguments: ',arguments)
   return arguments
 end
 
@@ -129,15 +141,32 @@ def test_{}():
         -- local offset = vim.api.nvim_win_get_cursor(0)[2]
         for kk,arg in ipairs(user_args) do
           if kk < #user_args then 
-            table.insert(nodes,sn(kk,fmt("{} = {}{}",{t("        " .. arg),i(1,"arg" .. kk),t{" ",""}})))
+            if not string.find(arg,'=') then
+              table.insert(nodes,sn(kk,fmt("{} = {}{}",{t("        " .. arg),i(1,"arg" .. kk),t{" ",""}})))
+            else
+              table.insert(nodes,sn(kk,fmt("{}{}{}",{t("        "),i(1,arg),t{" ",""}})))
+            end
           else
-            table.insert(nodes,sn(kk,fmt("{} = {}",{t("        " .. arg),i(1,"arg" .. kk)})))
+            if not string.find(arg,'=') then
+              table.insert(nodes,sn(kk,fmt("{} = {}",{t("        " .. arg),i(1,"arg" .. kk)})))
+            else
+              table.insert(nodes,sn(kk,fmt("{}{}",{t("        "),i(1,arg)})))
+            end
           end
         end
         return sn(nil,nodes)
       end,{},init_args),
       f(function(_, _, user_args)
-        return table.concat(user_args,",") 
+        local args = {} 
+        for j,arg in ipairs(user_args) do
+          if arg:find("=") then
+            local to_sub = string.gsub(arg,"(.-) *=.+","%1")
+            table.insert(args,to_sub)
+          else
+            table.insert(args,arg)
+          end
+        end
+        return table.concat(args,",") 
       end, {}, init_args),
       rep(1),
       rep(1),
@@ -160,15 +189,32 @@ def test_{}():
           -- local offset = vim.api.nvim_win_get_cursor(0)[2]
           for kk,arg in ipairs(user_args) do
             if kk < #user_args then 
-              table.insert(nodes,sn(kk,fmt("{} = {}{}",{t("        " .. arg),i(1,"arg" .. kk),t{" ",""}})))
+              if not string.find(arg,'=') then
+                table.insert(nodes,sn(kk,fmt("{} = {}{}",{t("        " .. arg),i(1,"arg" .. kk),t{" ",""}})))
+              else
+                table.insert(nodes,sn(kk,fmt("{}{}{}",{t("        "),i(1,arg),t{" ",""}})))
+              end
             else
-              table.insert(nodes,sn(kk,fmt("{} = {}",{t("        " .. arg),i(1,"arg" .. kk)})))
+              if not string.find(arg,'=') then
+                table.insert(nodes,sn(kk,fmt("{} = {}",{t("        " .. arg),i(1,"arg" .. kk)})))
+              else
+                table.insert(nodes,sn(kk,fmt("{}{}",{t("        "),i(1,arg)})))
+              end
             end
           end
           return sn(nil,nodes)
         end,{},call_args),
         f(function(_, _, user_args)
-          return table.concat(user_args,",") 
+          local args = {} 
+          for j,arg in ipairs(user_args) do
+            if arg:find("=") then
+              local to_sub = string.gsub(arg,"(.-) *=.+","%1")
+              table.insert(args,to_sub)
+            else
+              table.insert(args,arg)
+            end
+          end
+          return table.concat(args,",") 
         end, {}, call_args),
         f(function(args, _, _)
           return 'obj_' .. args[1][1]

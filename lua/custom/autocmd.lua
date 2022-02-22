@@ -1,6 +1,6 @@
 vim.cmd [[
  au BufRead * set foldlevel=99
- autocmd BufRead *.py nmap <buffer> gm /^if.*__main__<cr> :noh <cr> 0
+ autocmd BufRead *.py nmap <buffer> gm <Cmd>lua require('contrib.treesitter.python').goto_python_main()<cr>
  " autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' echom 'hello'
  function! Toggle_start_insert_terminal()
     if g:terminal_start_insert == 1

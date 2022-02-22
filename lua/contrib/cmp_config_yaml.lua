@@ -51,7 +51,7 @@ source.complete = function(self, request, callback)
             table.insert(
               curr_items,
               #curr_items + 1,
-              key_name
+              {key_name,v}
             )
             seen[key_name] = true
           end
@@ -73,7 +73,7 @@ source.complete = function(self, request, callback)
         local content = vim.fn.json_decode(vim.list_slice(data,1,#data-1))
         local items = json_to_keys(content)
         for _,item in ipairs(items) do
-          table.insert(labels,#labels+1,{label=item,documentation=file})
+          table.insert(labels,#labels+1,{label=item[1],documentation=item[2] .. '\n' .. file})
         end
         -- print("the labels: ",vim.inspect(labels))
         callback{items=labels,isIncomplete=true}

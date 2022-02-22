@@ -270,6 +270,25 @@ local custom_plugins = {
       )
     end,
   },
+  { 
+    "nvim-treesitter/playground",
+    after = "nvim-treesitter",
+  },
+  {
+    "David-Kunz/treesitter-unit",
+    after = "nvim-treesitter",
+    config = function ()
+      require"treesitter-unit".enable_highlighting()
+      local map = require("core.utils").map
+      map("x","uu",":lua require'treesitter-unit'.select()<CR>",{noremap=true})
+      map("x","au",":lua require'treesitter-unit'.select(true)<CR>",{noremap=true})
+      map("o","uu","<Cmd>lua require'treesitter-unit'.select()<CR>",{noremap=true})
+      map("o","au","<Cmd>lua require'treesitter-unit'.select(true)<CR>",{noremap=true})
+    end
+  },
+  {
+    "dstein64/vim-startuptime",
+  },
   {
     "stevearc/dressing.nvim",
     event = "VimEnter",

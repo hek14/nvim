@@ -27,6 +27,7 @@ map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
 map("t", "<C-w>n", "<C-\\><C-n><C-w>j")
 map("t", "<C-w>e", "<C-\\><C-n><C-w>k")
 map("t", "<C-w>i", "<C-\\><C-n><C-w>l")
+map("t", "<S-Space>", "<Space>",{noremap=true})
 map("n", "<Up>", "5<C-w>+")
 map("n", "<Down>", "5<C-w>-")
 map("n", "<left>", "5<C-w><")
@@ -34,6 +35,9 @@ map("n", "<right>", "5<C-w>>")
 map("n", "<Esc>", ":lua Closing_float_window()<CR>:noh<CR>")
 map("n", "<leader>mc", "<cmd>Messages clear<CR>")
 map("n", "<leader>mm", "<cmd>Messages<CR>")
+
+map("i", "<C-n>", "<C-O>o",{noremap = true})
+map("i", "<C-e>", "<C-O>O",{noremap = true})
 
 vim.cmd [[
   cmap <C-a> <Home>
@@ -180,3 +184,4 @@ require("custom.autocmd")
 
 -- debug 
 map("n",',l',"<Cmd>lua Reload_module('contrib.treesitter.python')<cr>")
+map('i','<C-x>','<Cmd>lua require("contrib.treesitter.python").fast_signature()<CR>')

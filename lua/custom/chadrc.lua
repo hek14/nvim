@@ -23,7 +23,7 @@ M.options = {
 }
 
 M.ui = {
-  theme = "tomorrow-night",
+  theme = "doom-chad",
 }
 
 -- NvChad included plugin options & overrides
@@ -79,11 +79,11 @@ M.mappings = {
   },
   insert_nav = {
     beginning_of_line = "<C-a>",
-    end_of_line = "<C-e>",
-    backward = "<C-h>",
-    prev_line = "<C-n>",
-    next_line = "<C-e>",
-    forward = "<C-i>",
+    end_of_line = {},
+    backward = {},
+    prev_line = {},
+    next_line = {},
+    forward = {},
   },
   --better window movement
   window_nav = {

@@ -52,8 +52,9 @@ cmp.setup {
       ["<tab>"] = function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
-        elseif require'luasnip'.expand_or_jumpable() then
-          vim.fn.feedkeys(t("<Plug>luasnip-expand-or-jump"), "")
+        -- remove this: separate mappings for luasnip and nvim-cmp
+        -- elseif require'luasnip'.expand_or_jumpable() then
+        --   vim.fn.feedkeys(t("<Plug>luasnip-expand-or-jump"), "")
         elseif check_back_space() then
           vim.fn.feedkeys(t("<tab>"), "n")
         else
@@ -63,8 +64,8 @@ cmp.setup {
       ["<S-tab>"] = function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
-        elseif require'luasnip'.jumpable(-1) then
-          vim.fn.feedkeys(t("<Plug>luasnip-jump-prev"), "")
+        -- elseif require'luasnip'.jumpable(-1) then
+        --   vim.fn.feedkeys(t("<Plug>luasnip-jump-prev"), "")
         else
           fallback()
         end

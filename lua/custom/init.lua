@@ -183,5 +183,5 @@ require("custom.autocmd")
 
 
 -- debug 
-map("n",',l',"<Cmd>lua Reload_module('contrib.treesitter.python')<cr>")
-map('i','<C-x>','<Cmd>lua require("contrib.treesitter.python").fast_signature()<CR>')
+map("n",',l',"<Cmd>lua RELOAD('contrib.treesitter.python')<cr>")
+map('i','<C-x>','<Cmd>lua R("contrib.treesitter.python").fast_signature()<CR>')

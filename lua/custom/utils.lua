@@ -38,9 +38,13 @@ M.add_timer = function(fn)
   timedFn()
 end
 
-_G.Reload_module = function(module)
-  package.loaded[module] = nil
-  require(module)
+RELOAD = function(...)
+  return require("plenary.reload").reload_module(...)
+end
+
+R = function(name)
+  RELOAD(name)
+  return require(name)
 end
 
 function _G.stringSplit(inputstr, sep) 

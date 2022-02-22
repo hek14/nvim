@@ -37,6 +37,7 @@ M.plugins = {
     dashboard = true,
     lspsignature = true,
     feline = true,
+    alpha = true,
   },
  options = {
    lspconfig = {

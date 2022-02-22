@@ -91,7 +91,7 @@ local custom_plugins = {
     end,
   },
   {
-    "blackCauldron7/surround.nvim",
+    "hekq/surround.nvim.bak",
     event = "BufEnter",
     config = function()
       require("surround").setup({ mappings_style = "surround" })

@@ -178,6 +178,13 @@ vim.cmd [[
     echo "@".getcmdline()
     execute ":'<,'>normal @".nr2char(getchar())
   endfunction
+  hi def KK_init guibg=grey guifg=blue gui=italic
+  " " example of how to customize hightlight:
+  " " for GUI nvim(iTerm,kitty,etc.):
+  " hi Search gui=italic guibg=peru guifg=wheat
+  " " for terminal nvim:
+  " hi Search cterm=NONE ctermfg=grey ctermbg=blue
+
 ]]
 require("custom.autocmd")
 
@@ -185,3 +192,4 @@ require("custom.autocmd")
 -- debug 
 map("n",',l',"<Cmd>lua RELOAD('contrib.treesitter.python')<cr>")
 map('i','<C-x>','<Cmd>lua R("contrib.treesitter.python").fast_signature()<CR>')
+map('n',',x',':TSPlaygroundToggle<cr>')

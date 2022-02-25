@@ -14,6 +14,7 @@ ts_config.setup {
   highlight = {
     enable = true,
     use_languagetree = true,
+    custom_captures = {['init_args'] = 'KK_init'}, -- match name -> highlight group
   },
   indent = {
     enable = true

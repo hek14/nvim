@@ -37,8 +37,8 @@ function _G.Smart_goto_next_ref(index)
 end
 
 M.setup_lsp = function(attach, capabilities)
-    -- require('contrib.my_lsp_handler').setup()
     local lsp_installer = require "nvim-lsp-installer"
+    local root_dir = require"nvim-lsp-installer.settings".current.install_root_dir
     lsp_installer.on_server_ready(function(server)
         local opts = {
             capabilities = capabilities,
@@ -171,7 +171,18 @@ M.setup_lsp = function(attach, capabilities)
                 }
             }
         end
-        server:setup(opts)
+        if server.name == "sumneko_lua" then
+          local luadev = require("lua-dev").setup({
+            -- add any options here, or leave empty to use the default settings
+            lspconfig = {
+              cmd = {root_dir .. "/sumneko_lua/extension/server/bin/lua-language-server"},
+              on_attach = opts.on_attach
+            },
+          })
+          require('lspconfig').sumneko_lua.setup(luadev)
+        else
+          server:setup(opts)
+        end
         vim.cmd [[ do User LspAttachBuffers ]]
     end)
 end

@@ -381,6 +381,9 @@ local custom_plugins = {
     end,
     ft = { "markdown" },
   },
+  {
+    "folke/lua-dev.nvim",
+  }
 }
 
 local specific_plugins = {}

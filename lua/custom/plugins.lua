@@ -196,12 +196,10 @@ local custom_plugins = {
     "SmiteshP/nvim-gps",
     -- this plugin shows the code context in the statusline: check ~/.config/nvim/lua/plugins/configs/statusline.lua
     after = { "nvim-treesitter", "nvim-web-devicons" },
+    wants = { "nvim-treesitter" }, -- loader treesitter if necessary
     config = function()
-      if not packer_plugins["nvim-treesitter"].loaded then
-        print("treesitter not ready")
-        packer_plugins["nvim-treesitter"].loaded = true
-        require("packer").loader("nvim-treesitter")
-      end
+      -- nvim-treesitter should be loaded now
+      -- print('wants treesitter',packer_plugins["nvim-treesitter"].loaded) 
       require("nvim-gps").setup({
         disable_icons = false, -- Setting it to true will disable all icons
         icons = {

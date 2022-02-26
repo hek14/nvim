@@ -3,6 +3,7 @@ local custom_plugins = {
   {
     "RishabhRD/nvim-lsputils",
     disable = true,
+    -- deprecated: using my lsp handler and telescope.builtin.lsp
     requires = "RishabhRD/popfix",
     after = "nvim-lspconfig",
     config = require("custom.pluginConfs.lsputils").setup,
@@ -10,7 +11,8 @@ local custom_plugins = {
   {
     "jose-elias-alvarez/null-ls.nvim",
     -- providing extra formatting and linting
-    -- NullLsInfo to show what's now d
+    -- NullLsInfo to show what's now enabled
+    -- Remember: you should install formatters/linters in $PATH, null-ls will not do this for you.
     -- if other formatting method is enabled by the lspconfig(pyright for example), then you should turn that of in the on_attach function like below:
     -- function on_attach(client,bufnr)
     --    if client.name = "pyright" then
@@ -49,13 +51,13 @@ local custom_plugins = {
   {
     "tmhedberg/SimpylFold",
     disable = true,
+    -- using treesitter fold now
     config = function()
       vim.g.SimpylFold_docstring_preview = 1
     end,
   },
   {
     "mfussenegger/nvim-dap",
-    disable = false,
     after = "telescope.nvim",
     requires = {
       "nvim-telescope/telescope-dap.nvim",
@@ -215,7 +217,7 @@ local custom_plugins = {
   {
     "mbbill/undotree",
     cmd = "UndotreeToggle",
-    config = function()
+    setup = function()
       require("core.utils").map("n", "<C-x>u", ":UndotreeToggle | UndotreeFocus<CR>")
     end,
   },
@@ -225,6 +227,7 @@ local custom_plugins = {
   { "theHamsta/nvim-treesitter-pairs", after = "nvim-treesitter" },
   {
     "ThePrimeagen/refactoring.nvim",
+    disable = true, -- unstable and buggy
     after = "nvim-treesitter",
     requires = {
       { "nvim-lua/plenary.nvim" },
@@ -232,52 +235,15 @@ local custom_plugins = {
     },
     config = function()
       require("refactoring").setup({})
-      -- Remaps for each of the four debug operations currently offered by the plugin
-      vim.api.nvim_set_keymap(
-        "v",
-        "<Leader>re",
-        [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function')<CR>]],
-        {
-          noremap = true,
-          silent = true,
-          expr = false,
-        }
-      )
-      vim.api.nvim_set_keymap(
-        "v",
-        "<Leader>rf",
-        [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]],
-        {
-          noremap = true,
-          silent = true,
-          expr = false,
-        }
-      )
-      vim.api.nvim_set_keymap(
-        "v",
-        "<Leader>rv",
-        [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Variable')<CR>]],
-        {
-          noremap = true,
-          silent = true,
-          expr = false,
-        }
-      )
-      vim.api.nvim_set_keymap(
-        "v",
-        "<Leader>ri",
-        [[ <Esc><Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]],
-        {
-          noremap = true,
-          silent = true,
-          expr = false,
-        }
-      )
     end,
   },
   { 
     "nvim-treesitter/playground",
     after = "nvim-treesitter",
+    config = function ()
+      require('core.utils').map('n',',x',':TSPlaygroundToggle<cr>')
+      require('core.utils').map('n',',h',':TSHighlightCapturesUnderCursor<cr>')
+    end
   },
   {
     "David-Kunz/treesitter-unit",
@@ -304,6 +270,7 @@ local custom_plugins = {
   {
     "akinsho/toggleterm.nvim",
     disable = true,
+    -- use floaterm instead
     config = function()
       require("custom.pluginConfs.toggleterm")
     end,
@@ -355,11 +322,6 @@ local custom_plugins = {
   },
   { "nvim-telescope/telescope-file-browser.nvim" },
   { "tpope/vim-scriptease" },
-  {
-    disable = true, -- just  simple nui
-    "ray-x/guihua.lua",
-    run = "cd lua/fzy && make",
-  },
   { "MunifTanjim/nui.nvim" },
   { "danilamihailov/beacon.nvim" },
   {

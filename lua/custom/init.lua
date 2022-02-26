@@ -35,6 +35,7 @@ map("n", "<right>", "5<C-w>>")
 map("n", "<Esc>", ":lua Closing_float_window()<CR>:noh<CR>")
 map("n", "<leader>mc", "<cmd>Messages clear<CR>")
 map("n", "<leader>mm", "<cmd>Messages<CR>")
+map("n", ",t", "<Cmd>lua Source_curr_file()<cr>")
 
 map("i", "<C-n>", "<C-O>o",{noremap = true})
 map("i", "<C-e>", "<C-O>O",{noremap = true})
@@ -61,7 +62,6 @@ vim.cmd([[
   call Cabbrev('pud', 'PackerUpdate')
   call Cabbrev('pc', 'PackerCompile')
   call Cabbrev('ps', 'PackerSync')
-  call Cabbrev('so', 'lua Source_curr_file()<CR>')
   call Cabbrev('li', 'let i =1 \|')
   call Cabbrev('py', 'PYTHON')
   call Cabbrev('lg', 'Lazygit')
@@ -135,12 +135,31 @@ vim.cmd [[
 
 local lazy_timer = 50
 function LazyLoad()
-    local loader = require"packer".loader
-    _G.PLoader = loader
-    loader('nvim-cmp cmp-cmdline gitsigns.nvim telescope.nvim nvim-lspconfig')
+  local loader = require"packer".loader
+  _G.PLoader = loader
+  loader('nvim-cmp cmp-cmdline telescope.nvim') -- the vanilla 'require("nvim-cmp")' will not work here
+  vim.defer_fn(function ()
+    require("plugins") -- require the plugin config, although the command PackerCompile will require this
+  end,50)
+  -- method 1 of loading a packer configed package: dominated by packer(event,ft,module,key,command, etc. all lazy but automatically)
+  -- method 2 of loading a packer configed package: manually load the package using the packer.loader just like above
+  -- using the packer's loader instead of vanilla require, the config part of each package powered by packer.nvim will still work
 end
 vim.cmd([[autocmd User LoadLazyPlugin lua LazyLoad()]])
 vim.defer_fn(function() vim.cmd([[doautocmd User LoadLazyPlugin]]) end,lazy_timer)
+-- the LazyLoad function will be called after custom/init.lua and plugin/packer_compiled.lua (you can add print to check this) because of the defer_fn
+-- defer_fn target will wait until the end of current context(here: is the nvim init process)
+-- to further understand the defer_fn: it's a one-shot timer, and the target function is automatically schedule_wrapped
+-- vim.defer_fn(function ()
+--   vim.defer_fn(function ()
+--     print("in the inner defer_fn")
+--   end,0)
+--   print('testing defer_fn 1')
+--   print('testing defer_fn 2')
+--   print('ending the defer_fn')
+-- end,0)
+-- print("the main function")
+
 
 -- vim.cmd [[
 --   autocmd VimEnter lua require('custom.pluginConfs.cmp')
@@ -178,18 +197,16 @@ vim.cmd [[
     echo "@".getcmdline()
     execute ":'<,'>normal @".nr2char(getchar())
   endfunction
+  " " example of how to create a new hightlight:
   hi def KK_init guibg=grey guifg=blue gui=italic
-  " " example of how to customize hightlight:
+  " " example of how to set a existing hightlight:
   " " for GUI nvim(iTerm,kitty,etc.):
   " hi Search gui=italic guibg=peru guifg=wheat
   " " for terminal nvim:
   " hi Search cterm=NONE ctermfg=grey ctermbg=blue
-
+  " " def a highlight by linking
+  " hi def link Search Todo
 ]]
 require("custom.autocmd")
 
-
--- debug 
-map("n",',l',"<Cmd>lua RELOAD('contrib.treesitter.python')<cr>")
-map('i','<C-x>','<Cmd>lua R("contrib.treesitter.python").fast_signature()<CR>')
-map('n',',x',':TSPlaygroundToggle<cr>')
+map('i','<C-x><C-l>','<Cmd>lua R("contrib.treesitter.python").fast_signature()<CR>')

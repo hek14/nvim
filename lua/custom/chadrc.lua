@@ -23,7 +23,7 @@ M.options = {
 }
 
 M.ui = {
-  theme = "doom-chad",
+  theme = "monokai",
 }
 
 -- NvChad included plugin options & overrides

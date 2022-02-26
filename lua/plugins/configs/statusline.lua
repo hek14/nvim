@@ -124,12 +124,12 @@ default.inactive_file_name = {
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
    end,
    hl = {
-      fg = default.colors.white,
-      bg = default.colors.black,
+      fg = default.colors.blue,
+      bg = default.colors.grey,
    },
    right_sep = {
       str = default.statusline_style.right,
-      hl = { fg = default.colors.black, bg = default.colors.black },
+      hl = { fg = default.colors.grey, bg = default.colors.grey },
    },
 }
 

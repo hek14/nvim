@@ -346,6 +346,40 @@ local custom_plugins = {
     end,
     ft = { "markdown" },
   },
+  { 'michaelb/sniprun', run = 'bash ./install.sh'},
+  {
+    "folke/persistence.nvim",
+    event = "BufReadPre", -- this will only start session saving when an actual file was opened
+    module = "persistence",
+    setup = function ()
+      -- this mapping should be in the setup module, to that before the loading of whick-key, otherwise it will not work
+      local map = require('core.utils').map
+      map("n", "<space>qs", [[<cmd>lua require("persistence").load()<cr>]])
+      map("n", "<space>ql", [[<cmd>lua require("persistence").load({ last = true })<cr>]])
+      map("n", "<space>qd", [[<cmd>lua require("persistence").stop()<cr>]])
+    end,
+    config = function()
+      require("persistence").setup{
+        dir = vim.fn.expand(vim.fn.stdpath("data") .. "/sessions/"),
+        options = { "buffers", "curdir", "tabpages", "winsize" }
+      }
+    end,
+  },
+  {
+    "folke/which-key.nvim",
+    config = function()
+      require("which-key").setup {}
+    end
+  },
+  {
+    "folke/todo-comments.nvim",
+    requires = "nvim-lua/plenary.nvim",
+    config = function()
+      require("todo-comments").setup {}
+      -- how to use it? 
+      -- using TODO: (the last colon is necessary)
+    end
+  },
   {
     "folke/lua-dev.nvim",
   }

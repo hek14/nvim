@@ -119,22 +119,23 @@ ts_config.setup {
   },
 }
 
-function _G.ensure_ts_indent ()
-  if not packer_plugins["nvim-treesitter"].loaded then
-    print("treesitter not ready")
-    require"packer".loader("nvim-treesitter")
-    packer_plugins["nvim-treesitter"].loaded = true
-    vim.api.nvim_buf_call(0,function ()
-      vim.cmd('TSBufToggle indent')
-    end)
-  end
-
-end
-vim.cmd [[
-  augroup nvim-treesitter-kk
-    autocmd BufRead * lua vim.defer_fn(ensure_ts_indent,20)
-  augroup END
-]]
+-- treesitter seems to have no bug about the indentation
+-- function _G.ensure_ts_indent ()
+--   if not packer_plugins["nvim-treesitter"].loaded then
+--     print("treesitter not ready")
+--     require"packer".loader("nvim-treesitter")
+--     packer_plugins["nvim-treesitter"].loaded = true
+--     vim.api.nvim_buf_call(0,function ()
+--       vim.cmd('TSBufToggle indent')
+--     end)
+--   end
+--
+-- end
+-- vim.cmd [[
+--   augroup nvim-treesitter-kk
+--     autocmd BufRead * lua vim.defer_fn(ensure_ts_indent,20)
+--   augroup END
+-- ]]
 
 vim.cmd [[
   set foldmethod=expr

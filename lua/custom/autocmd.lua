@@ -35,4 +35,5 @@ vim.cmd [[
        \ endif
  autocmd BufWinEnter,BufEnter,WinEnter,WinNew * if &ft=="TelescopePrompt" | startinsert | endif
  autocmd FileType lua setlocal shiftwidth=2
+ autocmd FileType qf nnoremap <buffer> <C-p> <cmd>lua require('custom.utils').preview_qf()<CR>
 ]]

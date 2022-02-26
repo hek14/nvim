@@ -135,18 +135,22 @@ local custom_plugins = {
           xmap <leader>gs  <plug>(GrepperOperator)
       ]])
     end,
-  }, -- 2. setup better qf buffer
+  }, 
+  -- 2. setup better qf buffer
   {
     "kevinhwang91/nvim-bqf",
-    config = function()
-      -- need this to  with quickfix-reflector
-      vim.cmd([[
-        augroup nvim-bqf-kk
-          autocmd FileType qf lua vim.defer_fn(function() require('bqf').enable() end,50)
-          augroup END
-        ]])
-    end,
-  }, -- 3. editable qf (similar to emacs wgrep)
+    disable = true,
+    -- deprecated: using myself custom.utils.preview_qf()
+    -- config = function()
+    --   -- need this to  with quickfix-reflector
+    --   vim.cmd([[
+    --     augroup nvim-bqf-kk
+    --       autocmd FileType qf lua vim.defer_fn(function() require('bqf').enable() end,50)
+    --       augroup END
+    --     ]])
+    -- end,
+  }, 
+  -- 3. editable qf (similar to emacs wgrep)
   {
     "stefandtw/quickfix-reflector.vim",
     -- this plugin conflicts with the above nvim-bqf, it will ca nvim-bqf not working, there is two solutions:
@@ -167,6 +171,7 @@ local custom_plugins = {
   {
     "ronakg/quickr-preview.vim",
     disable = true,
+    -- deprecated: using myself custom.utils.preview_qf()
     config = function()
       vim.g.quickr_preview_keymaps = 0
       vim.cmd([[

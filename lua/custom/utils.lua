@@ -115,4 +115,28 @@ function M.get_relative_path(base_path, my_path)
   return data
 end
 
+M.preview_qf = function ()
+  local qflist = vim.fn.getqflist()
+  local curr = vim.api.nvim_win_get_cursor(0)
+  local item = qflist[curr[1]]
+  local bufnr = item.bufnr
+  local filename = "file:/" .. vim.api.nvim_buf_get_name(bufnr)
+  local line = item.lnum
+  local location = {
+    uri = filename,
+    range = {
+      ['start'] = {line = line-3},
+      ['end'] = {line = line+3},
+    }
+  }
+  -- vim.lsp.util.preview_location(location,{offset_x = 10, offset_y = -vim.api.nvim_win_get_height(0)-10, width = vim.fn.winwidth(0), border = "double"})
+  local offset_y = nil
+  local delta = curr[1] - vim.fn.line('w0')
+  offset_y = 10 + delta + 1
+  if delta > 4 then
+    offset_y = 10
+  end
+  vim.lsp.util.preview_location(location,{offset_x = 0, offset_y = -offset_y, width = vim.fn.winwidth(0), border = "double"})
+end
+
 return M

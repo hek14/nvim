@@ -348,6 +348,65 @@ local custom_plugins = {
   },
   { 'michaelb/sniprun', run = 'bash ./install.sh'},
   {
+    "rcarriga/vim-ultest", 
+    requires = {"vim-test/vim-test"},
+    run = function ()
+      local dependencies = {"pynvim","pytest"}
+      for _,dep in ipairs(dependencies) do
+        local result = vim.fn.system("pip list | grep -i " .. dep) 
+        local found = #result>0
+        if not found then
+          local Job = require'plenary.job'
+          Job:new({
+            command = 'pip',
+            args = { 'install','--user',dep},
+            cwd = vim.fn.getcwd(),
+            on_stderr = function ()
+              vim.schedule_wrap(function ()
+                print(string.format("error happened when installing %s, please install %s!"),dep,dep)
+                print("vim-ultest failed to setup")
+              end)
+            end,
+            on_exit = function(j, return_val)
+              vim.schedule_wrap(function()
+                if dep=="pytest" then
+                  vim.cmd[[UpdateRemotePlugins]]
+                end
+              end)
+            end,
+          }):sync() -- or start()
+        end
+      end
+    end,
+    config = function ()
+      require("ultest").setup{
+        builders = {
+          ['python#pytest'] = function(cmd)
+            -- The command can start with python command directly or an env manager
+            local non_modules = {'python', 'pipenv', 'poetry'}
+            -- Index of the python module to run the test.
+            local module_index = 1
+            if vim.tbl_contains(non_modules, cmd[1]) then
+              module_index = 3
+            end
+            local module = cmd[module_index]
+
+            -- Remaining elements are arguments to the module
+            local args = vim.list_slice(cmd, module_index + 1)
+            return {
+              dap = {
+                type = 'python',
+                request = 'launch',
+                module = module,
+                args = args
+              }
+            }
+          end
+        }
+      }
+    end
+  },
+  {
     "folke/persistence.nvim",
     event = "BufReadPre", -- this will only start session saving when an actual file was opened
     module = "persistence",
@@ -382,7 +441,7 @@ local custom_plugins = {
   },
   {
     "folke/lua-dev.nvim",
-  }
+  },
 }
 
 local specific_plugins = {}

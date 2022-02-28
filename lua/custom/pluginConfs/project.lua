@@ -16,7 +16,7 @@ M.setup = function ()
 
     -- All the patterns used to detect root dir, when **"pattern"** is in
     -- detection_methods
-    patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "main.py", "trainer*.py"},
+    patterns = { ".git", ".project", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "main.py", "trainer*.py"},
 
     -- Table of lsp clients to ignore by name
     -- eg: { "efm", ... }

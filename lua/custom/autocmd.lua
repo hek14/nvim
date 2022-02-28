@@ -14,7 +14,6 @@ vim.cmd [[
    silent! au BufEnter,BufWinEnter,WinEnter <buffer> if &ft !~? "\(UltestOutput\)" | startinsert! | endif
    silent! au BufLeave <buffer> stopinsert!
    if &ft !~? "\(UltestOutput\)" 
-     echomsg "not ultestoutput: " . filename()
      startinsert
    endif
  endfunction

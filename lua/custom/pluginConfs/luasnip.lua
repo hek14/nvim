@@ -40,7 +40,7 @@ ls.snippets = {
       t"torch.device(\"cpu\")"
     }),
     s("gpu",{
-      t"torch.device(\"gpu:",
+      t"torch.device(\"cuda:",
       i(1),
       t"\")",
       i(0)

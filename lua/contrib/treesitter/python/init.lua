@@ -25,6 +25,26 @@ local rep = require("luasnip.extras").rep
 
 local M = {}
 
+local get_args = function(argument_string)
+  local arguments = stringSplit(argument_string,',')
+  if arguments[1] == "self" then
+    arguments = vim.list_slice(arguments,2,#arguments)
+  end
+  for j = 1,#arguments do
+    if string.find(arguments[j],"\n") then
+      arguments[j] = string.gsub(arguments[j],"\n","")
+    end
+    if string.sub(arguments[j],1,1)==" "then
+      arguments[j] = string.gsub(arguments[j]," *(.*)","%1")
+    end
+    if string.find(arguments[j],"=") then
+      arguments[j] = string.gsub(arguments[j],"(.-) *= *(.-)","%1 = %2")
+    end
+  end
+  -- P('good arguments: ',arguments)
+  return arguments
+end
+
 local class_generic_query_string = [[
     (class_definition
       name: (identifier) @cls_name
@@ -58,6 +78,47 @@ function M.goto_python_main(buffer)
   else
     print("no main block found")
   end
+end
+
+M.fast_init_class = function ()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local node = M.go_up_to_class_node(cursor)
+  -------------------- first: __init__
+  local query = string.format(class_generic_query_string,"__init__")
+  local iter = my_ts.get_query_matches(bufnr,'python',query,node)
+  local counts = 0
+  local class_name = nil
+  local init_args = nil
+  for _,match,metadata in iter do
+    class_name = q.get_node_text(match[1],bufnr)
+    local params = q.get_node_text(match[3],bufnr)
+    local arguments = string.sub(params,2,#params-1)
+    init_args = get_args(arguments)
+    counts = counts + 1
+  end
+  for i,_ in ipairs(init_args) do
+    if string.find(init_args[i],"=") then
+      init_args[i] = string.gsub(init_args[i],"(.-) *=.+","%1")
+    end
+  end
+  local assignment_nodes = fmt([[
+{}
+{}
+  ]],{
+      d(1,function(_,_,_,user_args)
+        local nodes = {}
+        for i,arg in ipairs(user_args) do
+          print(string.format("arg %s: %s",i,arg))
+          table.insert(nodes,sn(i,fmt("self.{} = {}",{t(arg),t({arg,i<#user_args and "" or nil})})))
+        end
+        print("length of nodes: ",#nodes)
+        return sn(nil,nodes)
+      end,{},init_args),
+      i(0,"continue")
+    })
+  local assignment_shot = s("kk_assignment",assignment_nodes)
+  ls.snip_expand(assignment_shot)
 end
 
 M.get_node_for_cursor = function(cursor)
@@ -102,25 +163,6 @@ M.grep_signature = function(entry)
   return
 end
 
-local get_args = function(argument_string)
-  local arguments = stringSplit(argument_string,',')
-  if arguments[1] == "self" then
-    arguments = vim.list_slice(arguments,2,#arguments)
-  end
-  for j = 1,#arguments do
-    if string.find(arguments[j],"\n") then
-      arguments[j] = string.gsub(arguments[j],"\n","")
-    end
-    if string.sub(arguments[j],1,1)==" "then
-      arguments[j] = string.gsub(arguments[j]," *(.*)","%1")
-    end
-    if string.find(arguments[j],"=") then
-      arguments[j] = string.gsub(arguments[j],"(.-) *= *(.-)","%1 = %2")
-    end
-  end
-  -- P('good arguments: ',arguments)
-  return arguments
-end
 
 function M.expand_class_snippet(class_name,init_args,call_args)
   if not class_name then return end
@@ -178,7 +220,7 @@ def test_{}():
 {}
     output = {}({})
     print("output: ",{})
-test_{}
+test_{}()
       ]],{
         d(1,function (_, _, _, user_args)
           local nodes = {}
@@ -216,7 +258,7 @@ test_{}
         end, {}, call_args),
         i(3,"output.shape"),
         f(function(_,_,user_args)
-          return "test_" .. user_args
+          return user_args
         end,{},class_name)
       })
   end
@@ -230,11 +272,6 @@ end
 function M.grep_class_signature(entry)
   local node = M.get_unit_node({entry.lnum,entry.col})
   local bufnr = vim.api.nvim_get_current_buf()
-  -- print("node range: ",node:range())
-  local results = {}
-  -- results like this: 
-  -- class_name, init_args
-  -- call_args (maybe nil)
   -------------------- first: __init__
   local query = string.format(class_generic_query_string,"__init__")
   local iter = my_ts.get_query_matches(bufnr,'python',query,node)
@@ -249,10 +286,6 @@ function M.grep_class_signature(entry)
     init_args = get_args(arguments)
     counts = counts + 1
   end
-  -- if counts > 0 then
-  --   print(string.format("class name: %s, args: %s",class_name,vim.inspect(init_args)))
-  -- end
-
   -------------------- second: forward/call
   query = string.format(class_generic_query_string,"forward|__call__")
   iter = my_ts.get_query_matches(bufnr,'python',query,node)
@@ -275,15 +308,23 @@ function M.grep_function_signature()
 end
 
 function M.go_up_to_class_node(cursor)
+  local line = vim.api.nvim_buf_get_lines(0,cursor[1],cursor[1]+1,false)[1]
+  while string.match(line,"^%s*$") do
+    cursor[1] = cursor[1] - 1
+    if cursor[1] < 1 then
+      break
+    end
+    line = vim.api.nvim_buf_get_lines(0,cursor[1],cursor[1]+1,false)[1]
+  end
   local node = M.get_node_for_cursor(cursor)
-  if node == nil then
-    return node
+  if node:start() == 0 then
+    cursor[1] = cursor[1] - 1
+    node = M.get_node_for_cursor(cursor)
   end
   local parent = node:parent()
   local root = ts_utils.get_root_for_node(node)
   local counts = 0
   local found = false
-  local class_name = nil
   while (parent ~= nil and parent ~= root) do
     node = parent
     parent = node:parent()
@@ -294,6 +335,7 @@ function M.go_up_to_class_node(cursor)
     end
   end
   if found then
+    print("found class parent")
     return node
   else
     return nil

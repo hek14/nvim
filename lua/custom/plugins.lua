@@ -442,6 +442,10 @@ local custom_plugins = {
   {
     "folke/lua-dev.nvim",
   },
+  { 
+    'sindrets/diffview.nvim', 
+    requires = 'nvim-lua/plenary.nvim',
+  },
 }
 
 local specific_plugins = {}

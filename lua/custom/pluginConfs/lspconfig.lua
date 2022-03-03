@@ -176,7 +176,14 @@ M.setup_lsp = function(attach, capabilities)
             -- add any options here, or leave empty to use the default settings
             lspconfig = {
               cmd = {root_dir .. "/sumneko_lua/extension/server/bin/lua-language-server"},
-              on_attach = opts.on_attach
+              on_attach = opts.on_attach,
+              settings = {
+                Lua = {
+                  workspace = {
+                    checkThirdParty = false, -- THIS IS THE IMPORTANT LINE TO ADD: avoid the annoying "OpenResty"
+                  },
+                }
+              }
             },
           })
           require('lspconfig').sumneko_lua.setup(luadev)

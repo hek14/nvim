@@ -442,6 +442,26 @@ local custom_plugins = {
   {
     "folke/lua-dev.nvim",
   },
+  { 
+    'sindrets/diffview.nvim', 
+    requires = 'nvim-lua/plenary.nvim',
+  },
+  {
+    "nvim-pack/nvim-spectre",
+    requires = {'nvim-lua/plenary.nvim','kyazdani42/nvim-web-devicons'},
+    config = function ()
+      local map = require("core.utils").map
+      map("n","<leader>S","<cmd>lua require('spectre').open()<CR>")
+      map("n","<leader>sc","<cmd>lua require('spectre').open_file_search()<CR>")
+      map("n","<leader>sw","<cmd>lua require('spectre').open_visual({select_word=true})<CR>")
+      map("x","<leader>s","<cmd>lua require('spectre').open_visual()<CR>")
+    end
+  },
+  {
+    'brooth/far.vim',
+    disable = true,
+    -- nvim-spectre is better
+  }
 }
 
 local specific_plugins = {}

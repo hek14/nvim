@@ -211,3 +211,4 @@ require("custom.autocmd")
 
 map('i','<C-x><C-l>','<Cmd>lua R("contrib.treesitter.python").fast_signature()<CR>')
 map('i','<C-x><C-g>','<Cmd>lua R("contrib.treesitter.python").fast_init_class()<CR>')
+vim.cmd[[packadd cfilter]]

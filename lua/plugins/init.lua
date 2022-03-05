@@ -129,7 +129,7 @@ local plugins = {
       "rafamadriz/friendly-snippets",
       module = "cmp_nvim_lsp",
       disable = not plugin_settings.status.cmp,
-      event = "InsertCharPre",
+      event = "InsertEnter",
    },
 
    {

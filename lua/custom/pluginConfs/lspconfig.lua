@@ -140,7 +140,8 @@ M.setup_lsp = function(attach, capabilities)
                         autoSearchPaths = true,
                         diagnosticMode = "workspace",
                         useLibraryCodeForTypes = true,
-                        logLevel = "Error"
+                        logLevel = "Error",
+                        extraPaths = {"."},
                     }
                 }
             }

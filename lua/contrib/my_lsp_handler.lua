@@ -454,11 +454,15 @@ local function next_ref_handler(label, result, ctx, config)
 end
 
 M.location_handler = function(label, result, ctx, config)
+  if M.ctrl_c_pressed then
+    print("ok to show menu, but ctrl_c_pressed")
+    return true
+  end
   -- print("token M: ",vim.inspect(M.token))
   -- print("token H: ",vim.inspect(ctx.token))
   if not deep_equal(M.token,ctx.token) then
     -- print("outdated PIG call")
-    return -- only handler the newest request (supported by token comparison)
+    return true -- only handler the newest request (supported by token comparison)
   end
   M.request_func = {} -- reset the cancel function
   local ft = vim.api.nvim_buf_get_option(ctx.bufnr, 'ft')
@@ -593,6 +597,7 @@ M.cancel_request = function ()
   for k,v in pairs(_G.PIG_state) do
     _G.PIG_state[k] = "init"
   end
+  M.ctrl_c_pressed = true
   M.request_func = {} -- reset
   -- print("release the lock")
 end
@@ -605,6 +610,7 @@ end
 
 M.async_ref = function (fallback)
   if not PIG_in_progress() then
+    M.ctrl_c_pressed = false
     local ref_params = vim.lsp.util.make_position_params()
     ref_params.context = { includeDeclaration = true }
     local token = vim.api.nvim_win_get_cursor(0)
@@ -621,6 +627,7 @@ end
 
 M.async_def = function (fallback)
   if not PIG_in_progress() then
+    M.ctrl_c_pressed = false
     local ref_params = vim.lsp.util.make_position_params()
     ref_params.context = { includeDeclaration = false }
     local token = vim.api.nvim_win_get_cursor(0)
@@ -637,6 +644,7 @@ end
 
 M.async_typedef = function (fallback)
   if not PIG_in_progress() then
+    M.ctrl_c_pressed = false
     local ref_params = vim.lsp.util.make_position_params()
     ref_params.context = { includeDeclaration = false }
     local token = vim.api.nvim_win_get_cursor(0)
@@ -656,6 +664,7 @@ end
 
 M.async_declare = function (fallback)
   if not PIG_in_progress() then
+    M.ctrl_c_pressed = false
     local ref_params = vim.lsp.util.make_position_params()
     ref_params.context = { includeDeclaration = false }
     local token = vim.api.nvim_win_get_cursor(0)
@@ -672,6 +681,7 @@ end
 
 M.async_implement = function (fallback)
   if not PIG_in_progress() then
+    M.ctrl_c_pressed = false
     local ref_params = vim.lsp.util.make_position_params()
     ref_params.context = { includeDeclaration = false }
     local token = vim.api.nvim_win_get_cursor(0)
@@ -688,6 +698,7 @@ end
 
 M.next_lsp_reference = function (index,fallback)
   if not PIG_in_progress() then
+    M.ctrl_c_pressed = false
     local ref_params = vim.lsp.util.make_position_params()
     ref_params.context = { includeDeclaration = true }
     local token = vim.api.nvim_win_get_cursor(0)
@@ -711,6 +722,7 @@ M.rename = function(new_name)
   local function on_confirm(input)
     if not (input and #input > 0) then return end
     if not PIG_in_progress() then
+      M.ctrl_c_pressed = false
       local ref_params = vim.lsp.util.make_position_params()
       ref_params.context = { includeDeclaration = true }
       local rename_params = deepcopy(ref_params)

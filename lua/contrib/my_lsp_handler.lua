@@ -6,7 +6,28 @@ local last_results = {}     -- hold last location results
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
 
-_G.PIG_state = {}
+local M = {}
+-- serve as a lock
+_G.PIG_state = {
+  References = "init",
+  Definitions = "init",
+  TypeDefinitions = "init",
+  Declarations = "init",
+  Implementations = "init",
+  NextReference = "init",
+  Refactor = "init",
+}
+
+local function PIG_in_progress()
+  local in_progress = false
+  for k,v in pairs(_G.PIG_state) do
+    if v=="in_progress" then
+      in_progress = true
+      break
+    end
+  end
+  return in_progress
+end
 
 local popup_options = {
   relative = "cursor",
@@ -125,6 +146,20 @@ local function deepcopy(orig)
         copy = orig
     end
     return copy
+end
+
+deep_equal = function(t1,t2)
+  for i = 1,#t1 do
+    if type(t1[i]) == "table" then
+      if type(t2[i]) ~= "table" then return false end
+      if not deep_equal(t1[i],t2[i]) then
+        return false
+      end
+    else
+      if t1[i]~=t2[i] then return false end
+    end
+  end
+  return true
 end
 
 local node_to_item = function (node)
@@ -418,7 +453,14 @@ local function next_ref_handler(label, result, ctx, config)
   return true
 end
 
-local function location_handler(label, result, ctx, config)
+M.location_handler = function(label, result, ctx, config)
+  -- print("token M: ",vim.inspect(M.token))
+  -- print("token H: ",vim.inspect(ctx.token))
+  if not deep_equal(M.token,ctx.token) then
+    -- print("outdated PIG call")
+    return -- only handler the newest request (supported by token comparison)
+  end
+  M.request_func = {} -- reset the cancel function
   local ft = vim.api.nvim_buf_get_option(ctx.bufnr, 'ft')
   local locations = vim.tbl_islist(result) and result or {result}
   local sorted_locations = sort_locations(locations)
@@ -488,11 +530,12 @@ local function location_handler(label, result, ctx, config)
   return true
 end
 
-local function wrap_handler(handler)
+
+M.wrap_handler = function (handler)
   local wrapper = function(err, result, ctx, config)
-    PIG_state[handler.label] = true
+    PIG_state[handler.label] = "success"
     if err or (not result or vim.tbl_isempty(result)) then
-      PIG_state[handler.label] = false
+      PIG_state[handler.label] = "failure"
       if handler.fallback then
         handler.fallback()
       end
@@ -515,9 +558,10 @@ local function wrap_handler(handler)
       end
       ctx.rename_params = handler.rename_params
     end
+    ctx.token = handler.token
     local hdl_result = handler.target(handler.label, result, ctx, config)
     if not hdl_result then
-      PIG_state[handler.label] = false
+      PIG_state[handler.label] = "failure"
       if handler.fallback then
         handler.fallback()
       end
@@ -537,52 +581,125 @@ local function wrap_handler(handler)
 end
 
 local handlers = {
-  ['textDocument/definition'] = {label = 'Definitions', target = location_handler},
-  ['textDocument/references'] = {label = 'References', target = location_handler}
+  ['textDocument/definition'] = {label = 'Definitions', target = M.location_handler},
+  ['textDocument/references'] = {label = 'References', target = M.location_handler}
 }
 
-local M = {}
+M.request_func = {} -- 1: methods name, 2: cancel_handler
+M.cancel_request = function ()
+  if type(M.request_func[2]) ~= 'function' then return end
+  print('cancel PIG buf_request: ',M.request_func[1])
+  M.request_func[2]()
+  for k,v in pairs(_G.PIG_state) do
+    _G.PIG_state[k] = "init"
+  end
+  M.request_func = {} -- reset
+  -- print("release the lock")
+end
 
 M.setup_handler = function ()
   for k,v in pairs(handlers) do
-    vim.lsp.handlers[k] = wrap_handler(v)
+    vim.lsp.handlers[k] = M.wrap_handler(v)
   end
 end
 
 M.async_ref = function (fallback)
-  local ref_params = vim.lsp.util.make_position_params()
-  ref_params.context = { includeDeclaration = true }
-  vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'References', target = location_handler,fallback=fallback})
+  if not PIG_in_progress() then
+    local ref_params = vim.lsp.util.make_position_params()
+    ref_params.context = { includeDeclaration = true }
+    local token = vim.api.nvim_win_get_cursor(0)
+    local clock = os.clock()
+    M.token = {token[1],token[2],clock}
+    local _,result = vim.lsp.buf_request(0,'textDocument/references', ref_params, M.wrap_handler{label = 'References', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
+    M.request_func[1] = "References"
+    M.request_func[2] = result
+    _G.PIG_state.References="in_progress"
+  else
+    print("sorry PIG is running, wait!")
+  end
 end
 
 M.async_def = function (fallback)
-  local ref_params = vim.lsp.util.make_position_params()
-  ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/definition', ref_params, wrap_handler{label = 'Definitions', target = location_handler, fallback=fallback})
+  if not PIG_in_progress() then
+    local ref_params = vim.lsp.util.make_position_params()
+    ref_params.context = { includeDeclaration = false }
+    local token = vim.api.nvim_win_get_cursor(0)
+    local clock = os.clock()
+    M.token = {token[1],token[2],clock}
+    local _,result = vim.lsp.buf_request(0,'textDocument/definition', ref_params, M.wrap_handler{label = 'Definitions', target = M.location_handler, fallback=fallback,token={token[1],token[2],clock}})
+    M.request_func[1] = "Definitions"
+    M.request_func[2] = result
+    _G.PIG_state.Definitions="in_progress"
+  else
+    print("sorry PIG is running, wait!")
+  end
 end
 
 M.async_typedef = function (fallback)
-  local ref_params = vim.lsp.util.make_position_params()
-  ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/typeDefinition', ref_params, wrap_handler{label = 'TypeDefinitions', target = location_handler,fallback=fallback})
+  if not PIG_in_progress() then
+    local ref_params = vim.lsp.util.make_position_params()
+    ref_params.context = { includeDeclaration = false }
+    local token = vim.api.nvim_win_get_cursor(0)
+    local clock = os.clock()
+    M.token = {token[1],token[2],clock}
+    local token = vim.api.nvim_win_get_cursor(0)
+    local clock = os.clock()
+    M.token = {token[1],token[2],clock}
+    local _,result = vim.lsp.buf_request(0,'textDocument/typeDefinition', ref_params, M.wrap_handler{label = 'TypeDefinitions', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
+    M.request_func[1] = "TypeDefinitions"
+    M.request_func[2] = result
+    _G.PIG_state.TypeDefinitions="in_progress"
+  else
+    print("sorry PIG is running, wait!")
+  end
 end
 
 M.async_declare = function (fallback)
-  local ref_params = vim.lsp.util.make_position_params()
-  ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/declaration', ref_params, wrap_handler{label = 'Declarations', target = location_handler,fallback=fallback})
+  if not PIG_in_progress() then
+    local ref_params = vim.lsp.util.make_position_params()
+    ref_params.context = { includeDeclaration = false }
+    local token = vim.api.nvim_win_get_cursor(0)
+    local clock = os.clock()
+    M.token = {token[1],token[2],clock}
+    local _,result = vim.lsp.buf_request(0,'textDocument/declaration', ref_params, M.wrap_handler{label = 'Declarations', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
+    M.request_func[1] = "Declarations"
+    M.request_func[2] = result
+    _G.PIG_state.Declarations="in_progress"
+  else
+    print("sorry PIG is running, wait!")
+  end
 end
 
 M.async_implement = function (fallback)
-  local ref_params = vim.lsp.util.make_position_params()
-  ref_params.context = { includeDeclaration = false }
-  vim.lsp.buf_request(0,'textDocument/implementation', ref_params, wrap_handler{label = 'Implementations', target = location_handler,fallback=fallback})
+  if not PIG_in_progress() then
+    local ref_params = vim.lsp.util.make_position_params()
+    ref_params.context = { includeDeclaration = false }
+    local token = vim.api.nvim_win_get_cursor(0)
+    local clock = os.clock()
+    M.token = {token[1],token[2],clock}
+    local _,result = vim.lsp.buf_request(0,'textDocument/implementation', ref_params, M.wrap_handler{label = 'Implementations', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
+    M.request_func[1] = "Implementations"
+    M.request_func[2] = result
+    _G.PIG_state.Implementations="in_progress"
+  else
+    print("sorry PIG is running, wait!")
+  end
 end
 
 M.next_lsp_reference = function (index,fallback)
-  local ref_params = vim.lsp.util.make_position_params()
-  ref_params.context = { includeDeclaration = true }
-  vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'NextReference', target = next_ref_handler, fallback=fallback, index=index})
+  if not PIG_in_progress() then
+    local ref_params = vim.lsp.util.make_position_params()
+    ref_params.context = { includeDeclaration = true }
+    local token = vim.api.nvim_win_get_cursor(0)
+    local clock = os.clock()
+    M.token = {token[1],token[2],clock}
+    local _,result = vim.lsp.buf_request(0,'textDocument/references', ref_params, M.wrap_handler{label = 'NextReference', target = next_ref_handler, fallback=fallback, index=index,token={token[1],token[2],clock}})
+    M.request_func[1] = "NextReference"
+    M.request_func[2] = result
+    _G.PIG_state.NextReference="in_progress"
+  else
+    print("sorry PIG is running, wait!")
+  end
 end
 
 M.rename = function(new_name)
@@ -593,11 +710,21 @@ M.rename = function(new_name)
   ---@private
   local function on_confirm(input)
     if not (input and #input > 0) then return end
-    local ref_params = vim.lsp.util.make_position_params()
-    ref_params.context = { includeDeclaration = true }
-    local rename_params = deepcopy(ref_params)
-    rename_params.newName = input
-    vim.lsp.buf_request(0,'textDocument/references', ref_params, wrap_handler{label = 'Refactor', target = location_handler, new_name = input, rename_params = rename_params})
+    if not PIG_in_progress() then
+      local ref_params = vim.lsp.util.make_position_params()
+      ref_params.context = { includeDeclaration = true }
+      local rename_params = deepcopy(ref_params)
+      rename_params.newName = input
+      local token = vim.api.nvim_win_get_cursor(0)
+      local clock = os.clock()
+      M.token = {token[1],token[2],clock}
+      local _,result = vim.lsp.buf_request(0,'textDocument/references', ref_params, M.wrap_handler{label = 'Refactor', target = M.location_handler, new_name = input, rename_params = rename_params, token={token[1],token[2],clock}})
+      M.request_func[1] = "Refactor"
+      M.request_func[2] = result
+      _G.PIG_state.Refactor="in_progress"
+    else
+      print("sorry PIG is running, wait!")
+    end
   end
 
   ---@private
@@ -624,5 +751,16 @@ M.rename = function(new_name)
   end
   vim.lsp.buf_request(0,'textDocument/prepareRename', vim.lsp.util.make_position_params(), prepare_rename)
 end
+
+local _q = function (key)
+  return vim.api.nvim_replace_termcodes(key, true, false, true)
+end
+
+M.my_ctrl_c = function ()
+  M.cancel_request()
+  vim.api.nvim_feedkeys(_q("<C-c>"),'n',true)
+end
+
+require("core.utils").map("n","<C-c>","<Cmd>lua require('contrib.my_lsp_handler').my_ctrl_c()<CR>")
 
 return M

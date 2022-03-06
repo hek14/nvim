@@ -34,6 +34,18 @@ ls.snippets = {
     s("date",{
       f(date,{})
     }),
+    s("sep", {
+      f(function ()
+        local raw = vim.fn.split(vim.o.commentstring,'%s')[1]
+        print(string.sub(raw,#raw,#raw)==" ")
+        if string.sub(raw,#raw,#raw)~=" " then
+          raw = raw .. " "
+        end
+        return raw
+      end,{}),
+      t("========== "),
+      i(0,"NOTE")
+    })
   },
   python = {
     s("cpu",{

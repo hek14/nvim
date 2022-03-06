@@ -5,8 +5,14 @@ source.is_available = function()
   return true
 end
 
-function source:get_trigger_characters()
-  return { "." }
+-- ========== remove trigger character
+-- function source:get_trigger_characters()
+--   return { "." }
+-- end
+
+-- ========== NOTE: need to set keyword_pattern to empty, then cmp_config_yaml will complete the whole lists in callback()
+function source:get_keyword_pattern()
+  return ""
 end
 
 source.new = function()
@@ -23,6 +29,8 @@ end
 
 source.complete = function(self, request, callback)
   local q = string.sub(request.context.cursor_before_line, request.offset)
+  local line_before_current = request.context.cursor_before_line
+  local line_after_current = request.context.cursor_after_line
   local pattern = request.option.pattern or "[\\w_-]+"
   local additional_arguments = request.option.additional_arguments or ""
   local context_before = request.option.context_before or 1
@@ -73,9 +81,22 @@ source.complete = function(self, request, callback)
         local content = vim.fn.json_decode(vim.list_slice(data,1,#data-1))
         local items = json_to_keys(content)
         for _,item in ipairs(items) do
-          table.insert(labels,#labels+1,{label=item[1],documentation=item[2] .. '\n' .. file})
+          -- print("context before: ",line_before_current)
+          local mua = item[1]
+          if string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"['\"]") then
+            mua = item[1]
+          elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"[%d%a]") then
+            mua = "['" .. item[1] .. "']"
+          elseif string.sub(line_before_current, #line_before_current, #line_before_current)=="[" then
+            print('after: ',line_after_current)
+            if string.sub(line_after_current,1,1)=="]" then
+              mua = "'" .. item[1] .. "'"
+            else
+              mua = "'" .. item[1] .. "']"
+            end
+          end
+          table.insert(labels,#labels+1,{label=mua,documentation=item[2] .. '\n' .. file})
         end
-        -- print("the labels: ",vim.inspect(labels))
         callback{items=labels,isIncomplete=true}
       end
     end

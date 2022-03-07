@@ -5,14 +5,22 @@ source.is_available = function()
   return true
 end
 
--- ========== remove trigger character
+-- ========== NOTE: only works for automatical completion, not used for manual trigger
 -- function source:get_trigger_characters()
 --   return { "." }
 -- end
 
--- ========== NOTE: need to set keyword_pattern to empty, then cmp_config_yaml will complete the whole lists in callback()
-function source:get_keyword_pattern()
-  return ""
+-- ========== NOTE: used for filtering items interactively
+-- function source:get_keyword_pattern()
+--    return ""
+-- end
+
+function source:get_debug_name()
+  return 'cmp_mine'
+end
+
+function source:resolve(completion_item,callback)
+  callback(completion_item)
 end
 
 source.new = function()
@@ -28,6 +36,11 @@ source.new = function()
 end
 
 source.complete = function(self, request, callback)
+  -- NOTE: request: {context=xxx,completion_context=xxx,offset=xxx} 
+  -- print("debug context info: ")
+  -- print("offset: ",request.offset)
+  -- print("context: ",vim.inspect(request.context))
+  -- print("completion context: ",vim.inspect(request.completion_context))
   local q = string.sub(request.context.cursor_before_line, request.offset)
   local line_before_current = request.context.cursor_before_line
   local line_after_current = request.context.cursor_after_line
@@ -88,7 +101,6 @@ source.complete = function(self, request, callback)
           elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"[%d%a]") then
             mua = "['" .. item[1] .. "']"
           elseif string.sub(line_before_current, #line_before_current, #line_before_current)=="[" then
-            print('after: ',line_after_current)
             if string.sub(line_after_current,1,1)=="]" then
               mua = "'" .. item[1] .. "'"
             else

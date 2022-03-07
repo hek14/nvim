@@ -192,6 +192,8 @@ vim.cmd [[
 ]]
 
 vim.cmd [[
+  " goodies: select the last pasted text
+  nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
   xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
   function! ExecuteMacroOverVisualRange()
     echo "@".getcmdline()

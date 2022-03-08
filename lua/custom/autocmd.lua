@@ -1,32 +1,52 @@
-vim.cmd [[
- au BufRead * set foldlevel=99
- autocmd BufRead *.py nmap <buffer> gm <Cmd>lua require('contrib.treesitter.python').goto_python_main()<cr>
- " autocmd BufWinEnter * if &buftype =~? '\(terminal\|prompt\|nofile\)' echom 'hello'
- function! TerminalOptions()
-   silent! nnoremap <buffer> <C-g> :call Toggle_start_insert_terminal()<CR> 
-   silent! inoremap <buffer> <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
-   silent! xnoremap <buffer> <C-g> <cmd>call Toggle_start_insert_terminal()<CR>
-   silent! nnoremap <buffer> cc a<C-u>
-   silent! inoremap <buffer> <silent> <C-w>n <Esc><C-w>j
-   silent! inoremap <buffer> <silent> <C-w>e <Esc><C-w>k
-   silent! inoremap <buffer> <silent> <C-w>i <Esc><C-w>l
-   silent! tnoremap <buffer> <silent> Q <C-\><C-n>:q<CR>
-   silent! au BufEnter,BufWinEnter,WinEnter <buffer> if &ft !~? "\(UltestOutput\)" | startinsert! | endif
-   silent! au BufLeave <buffer> stopinsert!
-   if &ft !~? "\(UltestOutput\)" 
-     startinsert
-   endif
- endfunction
- au TermOpen * call TerminalOptions()
- autocmd BufWinEnter,BufEnter,WinEnter * if &ft=='qf' | nnoremap <buffer> <silent> q :q<CR> | endif
- " Return to last edit position when opening files (You want this!)
- autocmd BufReadPost *
-       \ if line("'\"") > 0 && line("'\"") <= line("$") |
-       \   exe "normal! g`\"" |
-       \ endif
- autocmd BufWinEnter,BufEnter,WinEnter,WinNew * if &ft=="TelescopePrompt" | startinsert | endif
- autocmd FileType lua setlocal shiftwidth=2
- autocmd User PackerComplete lua require("notify")("Packer Sucessful")
- autocmd User PackerCompileDone lua require("notify")("Packer Sucessful")
- autocmd FileType qf nnoremap <buffer> <C-p> <cmd>lua require('custom.utils').preview_qf()<CR>
-]]
+-- VimEnter event: just like ~/.config/nvim/after/plugin
+local map = require('core.utils').map
+local function setup_term()
+  map('n','cc', 'a<C-u>',{buffer=true})
+  map('i','<C-w>h','<Esc><C-w>h',{buffer=true})
+  map('i','<C-w>n','<Esc><C-w>j',{buffer=true})
+  map('i','<C-w>e','<Esc><C-w>k',{buffer=true})
+  map('i','<C-w>i','<Esc><C-w>l',{buffer=true})
+  map('t','Q',[[<C-\><C-n>:q<CR>]],{buffer=true})
+end
+local match = function(str,pattern)
+  return string.len(vim.fn.matchstr(str,pattern))>0
+end
+local group = vim.api.nvim_create_augroup("KK",{clear=true})
+
+vim.api.nvim_create_autocmd("BufRead",{command="set foldlevel=99",group=group})
+vim.api.nvim_create_autocmd("FileType",{command="setlocal shiftwidth=2",group=group,pattern="lua"})
+
+vim.api.nvim_create_autocmd("BufRead",{callback=function ()
+  map("n","gm","<Cmd>lua require('contrib.treesitter.python').goto_python_main()<CR>",{buffer=true})
+end, group=group, pattern="*.py"})
+
+vim.api.nvim_create_autocmd("FileType",{callback=function ()
+  map("n",'q',":q<CR>",{buffer=true})
+  map('n','<C-p>',"<cmd>lua require('custom.utils').preview_qf()<CR>",{buffer=true})
+end,group=group,pattern="qf"})
+
+vim.api.nvim_create_autocmd({"BufWinEnter","BufEnter","WinEnter"},{callback=function ()
+  if match(vim.o.ft,[[\(terminal\|floaterm\)]]) then
+    setup_term()
+    vim.cmd [[startinsert]]
+    vim.api.nvim_create_autocmd("BufLeave",{callback=function ()
+      vim.cmd [[stopinsert]]
+    end,buffer=0,group=group})
+  end
+end,group=group})
+
+vim.api.nvim_create_autocmd("BufReadPost",{callback=function ()
+  if vim.fn.line("'\"")>0 and vim.fn.line("'\"")<=vim.fn.line("$") then
+    vim.cmd [[ exe "normal! g`\"" ]]
+  end
+end,group=group,desc="Return to last edit position when opening files (You want this!)"})
+
+vim.api.nvim_create_autocmd("User",{callback=function ()
+  require("notify")('Packer Sucessful')
+end,pattern={"PackerComplete","PackerCompileDone"},group=group})
+
+vim.api.nvim_create_autocmd("BufNew",{callback=function ()
+  if match(vim.o.buftype,[[prompt]]) then
+    vim.cmd [[ startinsert ]]
+  end
+end,group=group})

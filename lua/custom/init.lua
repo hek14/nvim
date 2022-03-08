@@ -134,10 +134,11 @@ vim.cmd [[
 ]]
 
 local lazy_timer = 50
-function LazyLoad()
+local function LazyLoad() -- not necessary to use global function for nvim_create_autocmd
   local loader = require"packer".loader
   _G.PLoader = loader
   loader('nvim-cmp cmp-cmdline telescope.nvim') -- the vanilla 'require("nvim-cmp")' will not work here
+  require("luasnip/loaders/from_vscode").load()
   vim.defer_fn(function ()
     require("plugins") -- require the plugin config, although the command PackerCompile will require this
   end,50)
@@ -145,8 +146,9 @@ function LazyLoad()
   -- method 2 of loading a packer configed package: manually load the package using the packer.loader just like above
   -- using the packer's loader instead of vanilla require, the config part of each package powered by packer.nvim will still work
 end
-vim.cmd([[autocmd User LoadLazyPlugin lua LazyLoad()]])
-vim.defer_fn(function() vim.cmd([[doautocmd User LoadLazyPlugin]]) end,lazy_timer)
+local group = vim.api.nvim_create_augroup("kk_LazyLoad",{clear=true})
+vim.api.nvim_create_autocmd("User",{pattern="LazyLoad",callback=LazyLoad,group=group}) -- NOTE: autocmd User xxx, xxx is the pattern
+vim.defer_fn(function() vim.cmd([[doautocmd User LazyLoad]]) end,lazy_timer)
 -- the LazyLoad function will be called after custom/init.lua and plugin/packer_compiled.lua (you can add print to check this) because of the defer_fn
 -- defer_fn target will wait until the end of current context(here: is the nvim init process)
 -- to further understand the defer_fn: it's a one-shot timer, and the target function is automatically schedule_wrapped
@@ -160,10 +162,6 @@ vim.defer_fn(function() vim.cmd([[doautocmd User LoadLazyPlugin]]) end,lazy_time
 -- end,0)
 -- print("the main function")
 
-
--- vim.cmd [[
---   autocmd VimEnter lua require('custom.pluginConfs.cmp')
--- ]]
 vim.cmd [[set viminfo+=:2000]]
 vim.cmd [[
   xnoremap ul g_o^

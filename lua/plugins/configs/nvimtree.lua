@@ -68,6 +68,11 @@ local default = {
       enable = false,
       ignore = false,
    },
+   actions = {
+      open_file = {
+         resize_window = true,
+      },
+   },
 }
 
 local M = {}

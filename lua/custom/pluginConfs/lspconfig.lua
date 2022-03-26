@@ -10,6 +10,14 @@ vim.diagnostic.config {
     update_in_insert = false
 }
 
+
+vim.cmd([[
+  autocmd ColorScheme * |
+  hi default LspReferenceRead cterm=bold gui=Bold ctermbg=yellow guifg=yellow guibg=purple4 |
+  hi default LspReferenceText cterm=bold gui=Bold ctermbg=red guifg=SlateBlue guibg=MidnightBlue |
+  hi default LspReferenceWrite cterm=bold gui=Bold,Italic ctermbg=red guifg=DarkSlateBlue guibg=MistyRose
+]])
+
 function _G.Smart_goto_definition()
     local bufnr = vim.fn.bufnr()
     vim.cmd [[normal! m`]]
@@ -90,6 +98,8 @@ M.setup_lsp = function(attach, capabilities)
                                "<cmd>lua require('telescope.builtin').diagnostics({bufnr=0})<CR>",
                                map_opts)
             end
+            buf_set_keymap("n", "<leader>,", "<cmd>lua vim.lsp.buf.document_highlight()<CR>",map_opts)
+            buf_set_keymap("n", "<leader>.", "<cmd>lua vim.lsp.buf.clear_references()<CR>",map_opts)
             buf_set_keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>",
                            map_opts)
             buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",

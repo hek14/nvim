@@ -199,6 +199,7 @@ vim.cmd [[
   endfunction
   " " example of how to create a new hightlight:
   hi def KK_init guibg=grey guifg=blue gui=italic
+  highlight TSDefinitionUsage guibg=#444444 " NOTE: highlight used in treesitter-refactor
   " " example of how to set a existing hightlight:
   " " for GUI nvim(iTerm,kitty,etc.):
   " hi Search gui=italic guibg=peru guifg=wheat

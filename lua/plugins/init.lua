@@ -188,7 +188,7 @@ local plugins = {
    {
       disable = not plugin_settings.status.alpha,
       "goolord/alpha-nvim",
-      config = override_req("alpha", "plugins.configs.alpha"),
+      config = override_req("alpha", "plugins.configs.alpha", "setup"),
    },
 
    {

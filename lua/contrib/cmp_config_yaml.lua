@@ -114,7 +114,7 @@ source.complete = function(self, request, callback)
     end
     if event == "exit" then  -- called when the job is forced to jobstop()
       callback{items=labels,isIncomplete=false}
-      print("job exited")
+      print(string.format("job exited, found %s items",#labels))
     end
   end
   self.timer:stop()
@@ -132,7 +132,7 @@ source.complete = function(self, request, callback)
         print("you should install fdfind")
       end
       vim.fn.jobstop(self.running_job_id)
-      self.running_job_id = vim.fn.jobstart("while read var; do echo \"file: $var\" ; yq e -M -o=json $var ; done <<(fd yaml)", {
+      self.running_job_id = vim.fn.jobstart("while read var; do echo \"file: $var\" ; yq e -M -o=json $var ; done <<(fd --no-ignore --max-depth 1 yaml)", {
         on_stderr = on_event,
         on_stdout = on_event,
         on_exit = on_event,

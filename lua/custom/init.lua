@@ -21,6 +21,7 @@ end
 local map = require('core.utils').map
 map("n", "<space>", "<Nop>", {noremap = true, silent = true})
 map("n", "<leader>cd", "<cmd>lua Smart_current_dir()<cr>", {silent = false}) -- example to delete the buffer
+map("n", "<F1>", "<Tab>", {noremap=true}) -- because I set <Ctrl-I> to send the same escape bytes as <Home>, so <Tab>/<Ctrl-I> can be used with this keymap
 map("x", ">", ">gv", {silent = false, noremap = true})
 map("x", "<", "<gv", {silent = false, noremap = true})
 map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")

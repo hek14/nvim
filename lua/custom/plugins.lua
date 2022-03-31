@@ -434,7 +434,16 @@ local custom_plugins = {
     "folke/todo-comments.nvim",
     requires = "nvim-lua/plenary.nvim",
     config = function()
-      require("todo-comments").setup {}
+      require("todo-comments").setup {
+        keywords = {
+          FIX = {
+            icon = " ", -- icon used for the sign, and in search results
+            color = "error", -- can be a hex color, or a named color (see below)
+            alt = { "FIXME", "BUG", "FIXIT", "ISSUE", "MAYBE" }, -- a set of other keywords that all map to this FIX keywords
+            signs = true, -- configure signs for some keywords individually
+          },
+        }
+      }
       -- how to use it? 
       -- using TODO: (the last colon is necessary)
     end
@@ -461,6 +470,14 @@ local custom_plugins = {
     'brooth/far.vim',
     disable = true,
     -- nvim-spectre is better
+  },
+  {
+    't9md/vim-choosewin',
+    event = "VimEnter",
+    config = function ()
+      vim.g.choosewin_overlay_enable = 1
+      require('core.utils').map('n','-','<Plug>(choosewin)', {noremap=False})
+    end
   }
 }
 

@@ -37,7 +37,7 @@ vim.api.nvim_create_autocmd("FileType",{callback=function ()
 end,group=group,pattern="qf"})
 
 vim.api.nvim_create_autocmd({"BufWinEnter","BufEnter","WinEnter"},{callback=function ()
-  if match(vim.o.ft,[[\(terminal\|floaterm\)]]) then
+  if match(vim.o.ft,[[\(terminal\|floaterm\|nvimgdb\)]]) then
     setup_term()
     vim.cmd [[startinsert]]
     vim.api.nvim_create_autocmd("BufLeave",{callback=function ()

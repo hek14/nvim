@@ -45,6 +45,11 @@ ls.snippets = {
       end,{}),
       t("========== "),
       i(0,"NOTE")
+    }),
+    s("pwd",{
+      f(function ()
+        return vim.loop.cwd()
+      end,{}),
     })
   },
   python = {
@@ -56,6 +61,9 @@ ls.snippets = {
       i(1),
       t"\")",
       i(0)
+    }),
+    s("ignore",{
+      t"# type: ignore",
     }),
   }
 }

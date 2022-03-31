@@ -188,7 +188,7 @@ M.map = function(mode, keys, command, opt)
             end
          else
             if valid_modes[sub_mode] and lhs and rhs then
-               if vim.fn.has("nvim-0.7") then
+               if vim.fn.has("nvim-0.7")>0 then
                  vim.keymap.set(sub_mode, lhs, rhs, sub_options)
                else
                  vim.api.nvim_set_keymap(sub_mode, lhs, rhs, sub_options)

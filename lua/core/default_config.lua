@@ -46,7 +46,11 @@ M.options = {
       },
       window = {
          vsplit_ratio = 0.5,
-         split_ratio = 0.3,
+         split_ratio = 0.4,
+      },
+      location = {
+         horizontal = "rightbelow",
+         vertical = "rightbelow",
       },
    },
 }
@@ -156,7 +160,7 @@ M.mappings = {
    misc = {
       cheatsheet = "<leader>ch",
       close_buffer = "<leader>x",
-      cp_whole_file = "<C-y>", -- copy all contents of current buffer
+      cp_whole_file = "<C-c>", -- copy all contents of current buffer
       lineNR_toggle = "<leader>n", -- toggle line number
       lineNR_rel_toggle = "<leader>rn",
       update_nvchad = "<leader>uu",
@@ -196,10 +200,15 @@ M.mappings = {
       -- show & recover hidden terminal buffers in a telescope picker
       pick_term = "<leader>W",
 
-      -- spawn terminals
+      -- spawn a single terminal and toggle it
+      -- this just works like toggleterm kinda
       new_horizontal = "<leader>h",
       new_vertical = "<leader>v",
-      new_window = "<leader>w",
+
+      -- spawn new terminals
+      spawn_horizontal = "<leader>H",
+      spawn_vertical = "<leader>V",
+      spawn_window = "<leader>w",
    },
 }
 

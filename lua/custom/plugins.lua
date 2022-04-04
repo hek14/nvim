@@ -346,7 +346,14 @@ local custom_plugins = {
     end,
     ft = { "markdown" },
   },
-  { 'michaelb/sniprun', run = 'bash ./install.sh'},
+  { 'michaelb/sniprun', 
+    -- replace it with codi.nvim
+    disable = true,
+    run = 'bash ./install.sh'
+  },
+  {
+    "metakirby5/codi.vim",
+  },
   {
     "rcarriga/vim-ultest", 
     requires = {"vim-test/vim-test"},

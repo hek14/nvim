@@ -485,6 +485,22 @@ local custom_plugins = {
       vim.g.choosewin_overlay_enable = 1
       require('core.utils').map('n','-','<Plug>(choosewin)', {noremap=False})
     end
+  },
+  { 
+    'alexghergh/nvim-tmux-navigation', 
+    config = function()
+      require'nvim-tmux-navigation'.setup {
+        disable_when_zoomed = true, -- defaults to false
+        keybindings = {
+          left = "<C-LEFT>",
+          down = "<C-DOWN>",
+          up = "<C-UP>",
+          right = "<C-RIGHT>",
+          last_active = "<C-\\>",
+          next = "<C-Space>",
+        }
+      }
+    end
   }
 }
 

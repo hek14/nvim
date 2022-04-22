@@ -102,3 +102,9 @@ dap.listeners.before.event_exited["dapui_config"] = function()
   --   vim.api.nvim_buf_delete(vim.g.dap_repl_buffer,{force=true})
   -- end,0)
 end
+dap.listeners.before.disconnect["dapui_config"] = function()
+  dapui.close()
+  -- vim.defer_fn(function() 
+  --   vim.api.nvim_buf_delete(vim.g.dap_repl_buffer,{force=true})
+  -- end,0)
+end

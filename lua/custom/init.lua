@@ -43,6 +43,12 @@ map("i", "<C-e>", "<C-O>O",{noremap = true})
 
 map("n",'<leader>fs','<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>')
 -- if you want to grep only in opened buffers: lua require('telescope.builtin').live_grep({grep_open_files=true})
+map("n", "N","mzJ`z")
+map("n", "k","nzzzv")
+map("n", "K","Nzzzv")
+-- swap line up and down
+map("n", "<leader>j", "<Esc>:m .+1<CR>==")
+map("n", "<leader>k", "<Esc>:m .-2<CR>==")
 
 vim.cmd [[
   cmap <C-a> <Home>

@@ -260,7 +260,7 @@ M.mappings.plugins = {
       git_commits = "<leader>cm",
       git_status = "<leader>gt",
       help_tags = "<leader>fh",
-      live_grep = "<leader>fw",
+      live_grep = {},
       oldfiles = "<leader>fo",
       themes = "<leader>th", -- NvChad theme picker
    },

@@ -73,6 +73,7 @@ cmp.setup {
     },
    sources = {
       { name = "nvim_lsp" },
+      { name = "mine_config_yaml", trigger_characters = { '.' } },
       { name = "luasnip" },
       { name = "buffer" },
       { name = "nvim_lua" },

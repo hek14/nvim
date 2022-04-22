@@ -41,6 +41,9 @@ map("n", ",t", "<Cmd>lua Source_curr_file()<cr>")
 map("i", "<C-n>", "<C-O>o",{noremap = true})
 map("i", "<C-e>", "<C-O>O",{noremap = true})
 
+map("n",'<leader>fs','<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>')
+-- if you want to grep only in opened buffers: lua require('telescope.builtin').live_grep({grep_open_files=true})
+
 vim.cmd [[
   cmap <C-a> <Home>
   cmap <C-e> <End>

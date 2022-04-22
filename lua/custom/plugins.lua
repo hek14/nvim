@@ -289,6 +289,12 @@ local custom_plugins = {
     module = "harpoon"
   },
   {
+    'nvim-telescope/telescope-live-grep-raw.nvim',
+    config = function()
+      require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_raw.live_grep_raw()<CR>')
+    end
+  },
+  {
     "AckslD/nvim-neoclip.lua",
     -- after = 'telescope.nvim', -- do not lazy load telescope extensions, will ca bugs: module not found
     config = function()

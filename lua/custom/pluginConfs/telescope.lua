@@ -29,8 +29,25 @@ local default = {
     },
     defaults = {
         vimgrep_arguments = {
-            "rg", "--color=never", "--no-heading", "--with-filename",
-            "--line-number", "--column", "--smart-case"
+            "rg", 
+            "--color=never", 
+            "--no-heading", 
+            "--with-filename",
+            "--line-number", 
+            "--column", 
+            "--smart-case",
+            "--no-ignore",
+            "--ignore-file=" .. vim.env["HOME"] .. "/.rg_ignore"
+        },
+        file_ignore_patterns = {
+            ".git",
+            "__pycache__",
+            "%.log",
+            "%.npz",
+            "%.npy",
+            "%.pkl",
+            "%.png",
+            "%.jpg",
         },
         -- mappings = {
         --   i = {

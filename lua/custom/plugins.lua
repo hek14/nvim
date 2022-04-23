@@ -193,6 +193,18 @@ local custom_plugins = {
     end,
   },
   {
+    'VonHeikemen/searchbox.nvim',
+    requires = {
+      {'MunifTanjim/nui.nvim'}
+    },
+    config = function ()
+      require("core.utils").map('n','/',":lua require('searchbox').incsearch()<CR>")
+      require("core.utils").map('x','/',"<Esc>:lua require('searchbox').incsearch({visual_mode = true})<CR>")
+      require("core.utils").map('n','?',":lua require('searchbox').incsearch({reverse=true})<CR>")
+      require("core.utils").map('x','?',"<Esc>:lua require('searchbox').incsearch({visual_mode = true,reverse = true})<CR>")
+    end
+  },
+  {
     "SmiteshP/nvim-gps",
     -- this plugin shows the code context in the statusline: check ~/.config/nvim/lua/plugins/configs/statusline.lua
     after = { "nvim-treesitter", "nvim-web-devicons" },
@@ -287,6 +299,12 @@ local custom_plugins = {
   {
     'ThePrimeagen/harpoon',
     module = "harpoon"
+  },
+  {
+    'nvim-telescope/telescope-live-grep-raw.nvim',
+    config = function()
+      require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_raw.live_grep_raw()<CR>')
+    end
   },
   {
     "AckslD/nvim-neoclip.lua",
@@ -483,7 +501,7 @@ local custom_plugins = {
     event = "VimEnter",
     config = function ()
       vim.g.choosewin_overlay_enable = 1
-      require('core.utils').map('n','-','<Plug>(choosewin)', {noremap=False})
+      require('core.utils').map('n','-','<Plug>(choosewin)', {noremap=false})
     end
   },
   { 

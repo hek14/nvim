@@ -524,16 +524,25 @@ M.location_handler = function(label, result, ctx, config)
     _goto_next_loc_in_menu(1)
   end)
   vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft) -- set the highlight for ft
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]]",":lua _goto_next_loc_in_menu(1)<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[[",":lua _goto_next_loc_in_menu(-1)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]r",":lua _goto_next_loc_in_menu(1)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[r",":lua _goto_next_loc_in_menu(-1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]f",":lua _goto_next_file_in_menu(1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[f",":lua _goto_next_file_in_menu(-1)<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>q",":lua dump_qflist()<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":silent lua PIG_menu.menu_props.on_close()<CR>:silent sp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_node.loc,vim.lsp.get_client_by_id(PIG_node.ctx.client_id).offset_encoding)<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":silent lua PIG_menu.menu_props.on_close()<CR>:silent vsp<CR>:silent lua vim.lsp.util.jump_to_location(PIG_node.loc,vim.lsp.get_client_by_id(PIG_node.ctx.client_id).offset_encoding)<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":lua require('contrib.my_lsp_handler').open_split('h')<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":lua require('contrib.my_lsp_handler').open_split('v')<CR>",{noremap=true})
   return true
 end
 
+M.open_split = function(direction)
+  PIG_menu.menu_props.on_close()
+  if direction=="h" then
+    vim.cmd [[split]]
+  else
+    vim.cmd [[vsplit]]
+  end
+  vim.lsp.util.jump_to_location(PIG_node.loc,vim.lsp.get_client_by_id(PIG_node.ctx.client_id).offset_encoding)
+end
 
 M.wrap_handler = function (handler)
   local wrapper = function(err, result, ctx, config)

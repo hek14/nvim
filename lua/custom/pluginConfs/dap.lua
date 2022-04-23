@@ -77,10 +77,14 @@ dap.listeners.after.event_initialized["dapui_config"] = function()
         target = win
         vim.g.dap_repl_buffer = vim.api.nvim_win_get_buf(win)
       end
-      vim.api.nvim_buf_set_keymap(0,"i","<C-w>e","<Esc><C-w>k<CR>",{noremap=true,silent=true})
-      vim.api.nvim_buf_set_keymap(0,"i","<C-w>n","<Esc><C-w>j<CR>",{noremap=true,silent=true})
-      vim.api.nvim_buf_set_keymap(0,"i","<C-w>i","<Esc><C-w>l<CR>",{noremap=true,silent=true})
       vim.api.nvim_buf_set_keymap(0,"i","<C-w>h","<Esc><C-w>h<CR>",{noremap=true,silent=true})
+      vim.api.nvim_buf_set_keymap(0,"i","<C-w>n","<Esc><C-w>j<CR>",{noremap=true,silent=true})
+      vim.api.nvim_buf_set_keymap(0,"i","<C-w>e","<Esc><C-w>k<CR>",{noremap=true,silent=true})
+      vim.api.nvim_buf_set_keymap(0,"i","<C-w>i","<Esc><C-w>l<CR>",{noremap=true,silent=true})
+      vim.api.nvim_buf_set_keymap(0,"i","<C-LEFT>","<Esc><C-w>h<CR>",{noremap=true,silent=true})
+      vim.api.nvim_buf_set_keymap(0,"i","<C-DOWN>","<Esc><C-w>j<CR>",{noremap=true,silent=true})
+      vim.api.nvim_buf_set_keymap(0,"i","<C-UP>","<Esc><C-w>k<CR>",{noremap=true,silent=true})
+      vim.api.nvim_buf_set_keymap(0,"i","<C-RIGHT>","<Esc><C-w>l<CR>",{noremap=true,silent=true})
     end)
   end
 

@@ -29,7 +29,7 @@ local function copy(args)
   return args[1]
 end
 
-ls.snippets = {
+local custom_snippets = {
   all = {
     s("date",{
       f(date,{})
@@ -37,7 +37,6 @@ ls.snippets = {
     s("sep", {
       f(function ()
         local raw = vim.fn.split(vim.o.commentstring,'%s')[1]
-        print(string.sub(raw,#raw,#raw)==" ")
         if string.sub(raw,#raw,#raw)~=" " then
           raw = raw .. " "
         end
@@ -50,6 +49,16 @@ ls.snippets = {
       f(function ()
         return vim.loop.cwd()
       end,{}),
+    }),
+    s("ignore",{
+      f(function ()
+        local raw = vim.fn.split(vim.o.commentstring,'%s')[1]
+        if string.sub(raw,#raw,#raw)~=" " then
+          raw = raw .. " "
+        end
+        return raw
+      end,{}),
+      t("type: ignore")
     })
   },
   python = {
@@ -61,12 +70,13 @@ ls.snippets = {
       i(1),
       t"\")",
       i(0)
-    }),
-    s("ignore",{
-      t"# type: ignore",
-    }),
+    })
   }
 }
+
+for k,v in pairs(custom_snippets) do
+  ls.add_snippets(tostring(k),v)
+end
 
 -- <c-j> is my expansion key
 -- this will expand the current item or jump to the next item within the snippet.

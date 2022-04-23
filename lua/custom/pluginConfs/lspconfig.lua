@@ -6,10 +6,58 @@ vim.diagnostic.config {
     virtual_text = false,
     signs = true,
     underline = false,
-    signs = true,
     update_in_insert = false
 }
 
+-- NOTE: refer to https://github.com/lucasvianav/nvim/blob/8f763b85e2da9ebd4656bf732cbdd7410cc0e4e4/lua/v/utils/lsp.lua#L98-L123
+local filter_diagnostics = function(diagnostics)
+    if not diagnostics then
+        return {}
+    end
+
+    -- find the "worst" diagnostic per line
+    local most_severe = {}
+    for _, cur in pairs(diagnostics) do
+        local max = most_severe[cur.lnum]
+
+        -- higher severity has lower value (`:h diagnostic-severity`)
+        if not max or cur.severity < max.severity then
+            most_severe[cur.lnum] = cur
+        end
+    end
+
+    -- return list of diagnostics
+    return vim.tbl_values(most_severe)
+end
+
+-- NOTE: refer to https://github.com/lucasvianav/nvim/blob/8f763b85e2da9ebd4656bf732cbdd7410cc0e4e4/lua/v/settings/handlers.lua#L18-L48
+---custom namespace
+local ns = vim.api.nvim_create_namespace('severe-diagnostics')
+
+---reference to the original handler
+local orig_signs_handler = vim.diagnostic.handlers.signs
+
+---Overriden diagnostics signs helper to only show the single most relevant sign
+---@see `:h diagnostic-handlers`
+vim.diagnostic.handlers.signs = {
+    show = function(_, bufnr, _, opts)
+        -- get all diagnostics from the whole buffer rather
+        -- than just the diagnostics passed to the handler
+        opts = opts or {}
+        opts.severity_limit = "Error"
+        local diagnostics = vim.diagnostic.get(bufnr)
+
+        local filtered_diagnostics = filter_diagnostics(diagnostics)
+
+        -- pass the filtered diagnostics (with the
+        -- custom namespace) to the original handler
+        orig_signs_handler.show(ns, bufnr, filtered_diagnostics, opts)
+    end,
+
+    hide = function(_, bufnr)
+        orig_signs_handler.hide(ns, bufnr)
+    end,
+}
 
 vim.cmd([[
   autocmd ColorScheme * |
@@ -42,6 +90,33 @@ function _G.Smart_goto_next_ref(index)
             require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
         end
     end)
+end
+
+-- NOTE: refer to https://github.com/lucasvianav/nvim
+function _G.show_documentation()
+    if vim.tbl_contains({ 'vim', 'help', 'lua' }, vim.o.filetype) then
+        local has_docs = pcall(vim.api.nvim_command, 'help ' .. vim.fn.expand('<cword>'))
+
+        if not has_docs then
+            vim.lsp.buf.hover()
+        end
+    else
+        vim.lsp.buf.hover()
+    end
+end
+
+local are_diagnostics_visible = true
+
+---Toggle vim.diagnostics (visibility only).
+---@return nil
+local toggle_diagnostics_visibility = function()
+    if are_diagnostics_visible then
+        vim.diagnostic.hide()
+        are_diagnostics_visible = false
+    else
+        vim.diagnostic.show()
+        are_diagnostics_visible = true
+    end
 end
 
 M.setup_lsp = function(attach, capabilities)
@@ -127,7 +202,7 @@ M.setup_lsp = function(attach, capabilities)
                            "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
                            map_opts)
             buf_set_keymap("n", "K", "N", map_opts)
-            buf_set_keymap("n", "E", "<cmd>lua vim.lsp.buf.hover()<CR>",
+            buf_set_keymap("n", "E", "<cmd>lua show_documentation<CR>",
                            map_opts)
             buf_set_keymap("n", "<leader>fm",
                            "<cmd>lua vim.lsp.buf.formatting()<CR>", map_opts)
@@ -146,12 +221,13 @@ M.setup_lsp = function(attach, capabilities)
             opts.settings = {
                 python = {
                     analysis = {
+                        extraPaths = { '.', './*', './**/*', './**/**/*' },
+                        useImportHeuristic = true,
                         autoImportCompletions = false,
                         autoSearchPaths = true,
                         diagnosticMode = "workspace",
                         useLibraryCodeForTypes = true,
                         logLevel = "Error",
-                        extraPaths = {"."},
                     }
                 }
             }

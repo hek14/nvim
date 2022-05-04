@@ -187,8 +187,8 @@ M.setup_lsp = function(attach, capabilities)
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
             buf_set_keymap("n", "<C-k>",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
-            buf_set_keymap("i", "<C-k>",
-                           "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
+            -- buf_set_keymap("i", "<C-k>",
+            --                "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
             buf_set_keymap("n", "<leader>rn",
                            "<cmd>lua require('contrib.my_lsp_handler').rename()<CR>",
                            map_opts)
@@ -202,7 +202,7 @@ M.setup_lsp = function(attach, capabilities)
                            "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
                            map_opts)
             buf_set_keymap("n", "K", "N", map_opts)
-            buf_set_keymap("n", "E", "<cmd>lua show_documentation<CR>",
+            buf_set_keymap("n", "E", "<cmd>lua show_documentation()<CR>",
                            map_opts)
             buf_set_keymap("n", "<leader>fm",
                            "<cmd>lua vim.lsp.buf.formatting()<CR>", map_opts)

@@ -194,14 +194,15 @@ local custom_plugins = {
   },
   {
     'VonHeikemen/searchbox.nvim',
+    disable = true, -- NOTE: can't resume previous/next search history
     requires = {
       {'MunifTanjim/nui.nvim'}
     },
     config = function ()
-      require("core.utils").map('n','/',":lua require('searchbox').incsearch()<CR>")
-      require("core.utils").map('x','/',"<Esc>:lua require('searchbox').incsearch({visual_mode = true})<CR>")
-      require("core.utils").map('n','?',":lua require('searchbox').incsearch({reverse=true})<CR>")
-      require("core.utils").map('x','?',"<Esc>:lua require('searchbox').incsearch({visual_mode = true,reverse = true})<CR>")
+      require("core.utils").map('n','/',":lua require('searchbox').match_all()<CR>")
+      require("core.utils").map('x','/',"<Esc>:lua require('searchbox').match_all({visual_mode = true})<CR>")
+      require("core.utils").map('n','?',":lua require('searchbox').match_all({reverse=true})<CR>")
+      require("core.utils").map('x','?',"<Esc>:lua require('searchbox').match_all({visual_mode = true,reverse = true})<CR>")
     end
   },
   {
@@ -237,7 +238,7 @@ local custom_plugins = {
   { "theHamsta/nvim-treesitter-pairs", after = "nvim-treesitter" },
   {
     "ThePrimeagen/refactoring.nvim",
-    disable = true, -- unstable and buggy
+    -- disable = true, -- unstable and buggy
     after = "nvim-treesitter",
     requires = {
       { "nvim-lua/plenary.nvim" },
@@ -245,6 +246,14 @@ local custom_plugins = {
     },
     config = function()
       require("refactoring").setup({})
+      local map = require("core.utils").map
+      map("v", "<leader>re", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
+      map("v", "<leader>rf", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
+      map("v", "<leader>rv", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Variable')<CR>]], {noremap = true, silent = true, expr = false})
+      map("v", "<leader>ri", [[ <Esc><Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
+      map("n", "<leader>ri", [[ <Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
+      map("n", "<leader>rb", [[ <Cmd>lua require('refactoring').refactor('Extract Block')<CR>]], {noremap = true, silent = true, expr = false})
+      map("n", "<leader>rbf", [[ <Cmd>lua require('refactoring').refactor('Extract Block To File')<CR>]], {noremap = true, silent = true, expr = false})
     end,
   },
   { 
@@ -371,6 +380,16 @@ local custom_plugins = {
   },
   {
     "metakirby5/codi.vim",
+    setup = function()
+      vim.cmd[[
+             let g:codi#interpreters = {
+             \ 'python': {
+             \ 'bin': 'python',
+             \ 'prompt': '^\(>>>\|\.\.\.\) ',
+             \ },
+             \ }
+      ]]
+    end
   },
   {
     "rcarriga/vim-ultest", 

@@ -224,6 +224,7 @@ local plugins = {
 
    {
       "nvim-telescope/telescope.nvim",
+      commit = 'b7ae91c82b33f8f347fa060208adb3da80ae9260',
       module = "telescope",
       cmd = "Telescope",
       config = override_req("telescope", "plugins.configs.telescope", "setup"),

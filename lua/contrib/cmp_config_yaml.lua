@@ -99,7 +99,7 @@ source.complete = function(self, request, callback)
         local ok,content = pcall(vim.fn.json_decode,data)
         if not ok then 
           if string.match(content,"Vim:E474") then
-            print("hello")
+            print("hello, E474 error")
           end
           return
         end

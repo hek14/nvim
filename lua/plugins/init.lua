@@ -26,6 +26,7 @@ local plugins = {
 
    {
       "NvChad/nvim-base16.lua",
+      commit = "dbd746da1b1ab43faf8aad2ba5ad0be3d43eba86",
       after = "packer.nvim",
       config = function()
          require("colors").init()

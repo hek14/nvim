@@ -49,6 +49,7 @@ map("n", "K","Nzzzv")
 -- swap line up and down
 map("n", "<leader>j", "<Esc>:m .+1<CR>==")
 map("n", "<leader>k", "<Esc>:m .-2<CR>==")
+map("n",'<leader>tv', ":lua require('custom.utils')<CR> | :lua my_hack()<CR>")
 
 vim.cmd [[
   cmap <C-a> <Home>

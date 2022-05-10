@@ -35,7 +35,7 @@ M.plugins = {
   status = {
     vim_matchup = false,
     dashboard = true,
-    lspsignature = true,
+    lspsignature = false, -- replace with hrsh7th/cmp-nvim-lsp-signature-help
     feline = true,
     alpha = true,
   },

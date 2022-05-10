@@ -12,3 +12,4 @@ lua/contrib/navigator.lua
 lua/contrib/nvim-lspfuzzy
 lua/contrib/cmp-rg
 lua/contrib/goto-preview
+scratch

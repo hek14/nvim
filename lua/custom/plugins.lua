@@ -122,6 +122,9 @@ local custom_plugins = {
   {
     "lukas-reineke/cmp-rg",
   },
+  {
+    "hrsh7th/cmp-nvim-lsp-signature-help"
+  },
   -- 1. populate the quickfix
   {
     "mhinz/vim-grepper",

@@ -229,6 +229,15 @@ local custom_plugins = {
     end,
   },
   {
+    "haringsrob/nvim_context_vt", -- another context plugin
+    disable = true,
+    after = "nvim-treesitter",
+    event = "BufRead",
+    config = function()
+      require("custom.pluginConfs.nvim_context_vt")
+    end
+  },
+  {
     "mbbill/undotree",
     cmd = "UndotreeToggle",
     setup = function()

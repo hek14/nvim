@@ -50,6 +50,11 @@ map("n", "K","Nzzzv")
 map("n", "<leader>j", "<Esc>:m .+1<CR>==")
 map("n", "<leader>k", "<Esc>:m .-2<CR>==")
 map("n",'<leader>tv', ":lua require('custom.utils')<CR> | :lua my_hack()<CR>")
+map("n", "<leader>sw", function ()
+  local cword = vim.fn.expand("<cword>")
+  local cmd = string.format([[:<C-u>%%s/\<%s\>//g<Left><Left>]],cword)
+  return cmd
+end,{expr=true})
 
 vim.cmd [[
   cmap <C-a> <Home>

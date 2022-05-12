@@ -19,9 +19,9 @@ local plugins = {
 
    {
       "NvChad/extensions",
-      config = function ()
-         vim.schedule_wrap(require("nvchad.terminal").init())
-      end
+      -- config = function ()
+      --    vim.schedule_wrap(require("nvchad.terminal").init())
+      -- end
    },
 
    {

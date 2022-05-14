@@ -8,9 +8,9 @@ local source = {}
 --   return true
 -- end
 
--- function source:get_keyword_pattern()
---    return ""
--- end
+function source:get_keyword_pattern()
+   return "[%[.\"\']"
+end
 
 -- function source:get_debug_name()
 --   return 'cmp_mine'
@@ -107,17 +107,21 @@ source.complete = function(self, request, callback)
         for _,item in ipairs(items) do
           local mua = item[1]
           local value = item[2]
-          -- if string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"['\"]") then
-          --   mua = item[1]
+          if string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"\"") then
+            mua = "\"" .. item[1]
+          elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"\'") then
+            mua = "\'" .. item[1]
+          elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),".") then
+            mua = "." .. item[1]
           -- elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"[%d%a]") then
           --   mua = "['" .. item[1] .. "']"
           -- elseif string.sub(line_before_current, #line_before_current, #line_before_current)=="[" then
           --   if string.sub(line_after_current,1,1)=="]" then
-          --     mua = "'" .. item[1] .. "'"
+          --     mua = "[" .. item[1]
           --   else
-          --     mua = "'" .. item[1] .. "']"
+          --     mua = "[" .. item[1] .. "]"
           --   end
-          -- end
+          end
           if #labels < self.max_items then
             table.insert(labels,#labels+1,{label=mua,documentation="value: " .. tostring(value) .. '\nfile: ' .. file,file=file,depth=depth})
           end

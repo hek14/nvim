@@ -1,3 +1,4 @@
+vim.cmd[[packadd cfilter]]
 local custom_plugins = {
   { "williamboman/nvim-lsp-installer" },
   {
@@ -7,6 +8,18 @@ local custom_plugins = {
     requires = "RishabhRD/popfix",
     after = "nvim-lspconfig",
     config = require("custom.pluginConfs.lsputils").setup,
+  },
+  {
+    "RRethy/vim-illuminate", 
+    event = "BufRead"
+  },
+  {
+    "rrethy/vim-hexokinase",
+    cond = function()
+      return vim.fn.executable('go')==1
+    end,
+    run = "make hexokinase",
+    event = "BufRead"
   },
   {
     "jose-elias-alvarez/null-ls.nvim",
@@ -245,7 +258,10 @@ local custom_plugins = {
     end,
   },
   { "nvim-treesitter/nvim-treesitter-textobjects", after = "nvim-treesitter" },
-  { "nvim-treesitter/nvim-treesitter-refactor", after = "nvim-treesitter" },
+  { "nvim-treesitter/nvim-treesitter-refactor",
+    disable = true, -- disabled, now in favour of RRethy/vim-illuminate
+    after = "nvim-treesitter" 
+  }, 
   { "p00f/nvim-ts-rainbow", after = "nvim-treesitter" },
   { "theHamsta/nvim-treesitter-pairs", after = "nvim-treesitter" },
   {

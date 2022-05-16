@@ -53,19 +53,19 @@ ts_config.setup {
                                -- E.g. whether to delete the angle bracket or whole tag in  <pair> </pair>
     }
   },
-  refactor = {
-    highlight_definitions = { enable = true },
-    highlight_current_scope = { enable = true },
-    smart_rename = {
-      enable = true,
-      keymaps = {
-        smart_rename = "<leader>R",
-      },
-    },
-    navigation = {
-      enable = true,
-    },
-  },
+  -- refactor = {
+  --   highlight_definitions = { enable = true },
+  --   highlight_current_scope = { enable = true },
+  --   smart_rename = {
+  --     enable = true,
+  --     keymaps = {
+  --       smart_rename = "<leader>R",
+  --     },
+  --   },
+  --   navigation = {
+  --     enable = true,
+  --   },
+  -- },
   textobjects = {
     select = {
       enable = true,

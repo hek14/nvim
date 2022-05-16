@@ -1,3 +1,5 @@
+-- TODO: refer to following dotfiles: 
+-- https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
 local lhs = "neilukj"
 local rhs = "jkluine"
 local modes = {"n", "x", "o"}
@@ -229,4 +231,3 @@ require("custom.autocmd")
 
 map('i','<C-x><C-l>','<Cmd>lua R("contrib.treesitter.python").fast_signature()<CR>')
 map('i','<C-x><C-g>','<Cmd>lua R("contrib.treesitter.python").fast_init_class()<CR>')
-vim.cmd[[packadd cfilter]]

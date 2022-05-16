@@ -61,9 +61,15 @@ vim.diagnostic.handlers.signs = {
 
 vim.cmd([[
   autocmd ColorScheme * |
-  hi default LspReferenceRead cterm=bold gui=Bold ctermbg=yellow guifg=yellow guibg=purple4 |
-  hi default LspReferenceText cterm=bold gui=Bold ctermbg=red guifg=SlateBlue guibg=MidnightBlue |
-  hi default LspReferenceWrite cterm=bold gui=Bold,Italic ctermbg=red guifg=DarkSlateBlue guibg=MistyRose
+  " hi def link LspReferenceText CursorLine |
+  " hi def link LspReferenceWrite CursorLine |
+  " hi def link LspReferenceRead CursorLine
+  " hi default LspReferenceRead cterm=bold gui=Bold ctermbg=yellow guifg=yellow guibg=purple4 |
+  " hi default LspReferenceText cterm=bold gui=Bold ctermbg=red guifg=SlateBlue guibg=MidnightBlue |
+  " hi default LspReferenceWrite cterm=bold gui=Bold,Italic ctermbg=red guifg=DarkSlateBlue guibg=MistyRose
+  hi default LspReferenceRead guibg=#52504F
+  hi default LspReferenceText guibg=#52504F
+  hi default LspReferenceWrite guibg=#52504F
 ]])
 
 function _G.Smart_goto_definition()
@@ -131,6 +137,11 @@ M.setup_lsp = function(attach, capabilities)
 
         opts.on_attach = function(client, bufnr)
             print("Lsp catches this buffer!")
+            local ok,illuminate = pcall(require,'illuminate')
+            if ok then
+              require 'illuminate'.on_attach(client)
+            end
+
             local function buf_set_keymap(...)
                 vim.api.nvim_buf_set_keymap(bufnr, ...)
             end
@@ -179,10 +190,13 @@ M.setup_lsp = function(attach, capabilities)
                            map_opts)
             buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",
                            map_opts)
-            buf_set_keymap("n", "[r", "<cmd>lua Smart_goto_next_ref(-1)<CR>",
-                           map_opts)
-            buf_set_keymap("n", "]r", "<cmd>lua Smart_goto_next_ref(1)<CR>",
-                           map_opts)
+            -- buf_set_keymap("n", "[r", "<cmd>lua Smart_goto_next_ref(-1)<CR>",
+            --                map_opts)
+            -- buf_set_keymap("n", "]r", "<cmd>lua Smart_goto_next_ref(1)<CR>",
+            --                map_opts)
+            buf_set_keymap('n', ']r', '<cmd>lua require"illuminate".next_reference{wrap=true}<cr>', {noremap=true})
+            buf_set_keymap('n', '[r', '<cmd>lua require"illuminate".next_reference{reverse=true,wrap=true}<cr>', {noremap=true})
+
             buf_set_keymap("n", "gs",
                            "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
             buf_set_keymap("n", "<C-k>",

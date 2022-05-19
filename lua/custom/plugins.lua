@@ -376,7 +376,10 @@ local custom_plugins = {
   { "nvim-telescope/telescope-file-browser.nvim" },
   { "tpope/vim-scriptease" },
   { "MunifTanjim/nui.nvim" },
-  { "danilamihailov/beacon.nvim" },
+  { 
+    "danilamihailov/beacon.nvim",
+    disable = true, -- disabled because of buggy on OSX
+  },
   {
     "rcarriga/nvim-notify",
     config = function()

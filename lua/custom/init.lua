@@ -1,5 +1,12 @@
--- TODO: refer to following dotfiles: 
--- https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
+-- TODO: 
+-- 1. refer to following dotfiles: 
+  -- 1.1 https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
+-- 2. refer to useful plugins
+  -- 2.1 interact with tmux: https://github.com/preservim/vimux 
+  -- 2.2 task system and run script, show output:
+    -- 2.2.1 https://github.com/skywind3000/asynctasks.vim#installation
+    -- 2.2.2 https://github.com/skywind3000/asyncrun.vim#extra-runners 
+-- 3. themes: https://alpha2phi.medium.com/12-neovim-themes-with-tree-sitter-support-8be320b683a4
 local lhs = "neilukj"
 local rhs = "jkluine"
 local modes = {"n", "x", "o"}
@@ -57,6 +64,9 @@ map("n", "<leader>sw", function ()
   local cmd = string.format([[:<C-u>%%s/\<%s\>//g<Left><Left>]],cword)
   return cmd
 end,{expr=true})
+
+map("s","A","<Esc>A")
+map("s","U","<Esc>i")
 
 vim.cmd [[
   cmap <C-a> <Home>

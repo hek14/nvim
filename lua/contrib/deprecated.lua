@@ -1,3 +1,4 @@
+local lprint = require("core.utils").log
 function Buf_attach()
   -- reset keymaps
   vim.defer_fn(function ()
@@ -21,7 +22,7 @@ function Buf_attach()
     local ok,_ = pcall(vim.api.nvim_command,cmd_str)
     ok_all = ok_all and ok
   end,250) -- 250 should be enough for buffer local plugins to load
-  -- require("custom.utils").timer(function ()
+  -- require("core.utils").repeat_timer(function ()
     --   local bufnr = vim.api.nvim_get_current_buf()
     --   if vim.api.nvim_buf_is_valid(bufnr) then
     --     local ok,timer = pcall(vim.api.nvim_buf_get_var,bufnr,'timer')

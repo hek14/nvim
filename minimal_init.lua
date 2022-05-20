@@ -18,7 +18,7 @@ end
 vim.o.ignorecase = true
 vim.o.number = true
 vim.cmd [[
-set expandtab ts=2 sw=2 ai
+set expandtab ts=4 sw=4 ai
 autocmd FileType python set expandtab ts=4 sw=4 ai
 ]]
 

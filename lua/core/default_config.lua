@@ -3,11 +3,16 @@
 
 local M = {}
 
-M.options = {
-   -- custom = {}
-   -- general nvim/vim options , check :h optionname to know more about an option
+local os_name = vim.loop.os_uname().sysname
+_G.is_mac = os_name == 'Darwin'
+_G.is_linux = os_name == 'Linux'
+_G.is_windows = os_name == 'Windows'
+_G.diagnostic_choice = "telescope" -- telescope or Trouble
 
-   clipboard = "unnamedplus",
+local clippy_found = vim.fn.executable("clippy")==1
+
+M.options = {
+   clipboard = clippy_found and "unnamedplus" or "",
    cmdheight = 1,
    ruler = false,
    hidden = true,
@@ -27,19 +32,6 @@ M.options = {
    undofile = true,
    fillchars = { eob = " " },
    shadafile = vim.opt.shadafile,
-
-   -- NvChad options
-   nvChad = {
-      copy_cut = true, -- copy cut text ( x key ), visual and normal mode
-      copy_del = true, -- copy deleted text ( dd key ), visual and normal mode
-      insert_nav = true, -- navigation in insertmode
-      window_nav = true,
-      terminal_numbers = false,
-
-      -- updater
-      update_url = "https://github.com/NvChad/NvChad",
-      update_branch = "main",
-   },
    terminal = {
       behavior = {
          close_on_exit = true,
@@ -67,12 +59,8 @@ M.options = {
 
 M.ui = {
    hl_override = "", -- path of your file that contains highlights
-   colors = "", -- path of your file that contains colors
    italic_comments = false,
    theme = "onedark", -- default theme
-
-   -- Change terminal bg to nvim theme's bg color so it'll match well
-   -- For Ex : if you have onedark set in nvchad, set onedark's bg color on your terminal
    transparency = false,
 }
 
@@ -104,16 +92,17 @@ M.plugins = {
 
    -- enable/disable plugins (false for disable)
    status = {
+      vim_matchup = false,
+      dashboard = true,
+      lspsignature = false, -- replace with hrsh7th/cmp-nvim-lsp-signature-help
+      feline = true,
+      alpha = true,
       blankline = true, -- indentline stuff
       bufferline = true, -- manage and preview opened buffers
       colorizer = false, -- color RGB, HEX, CSS, NAME color codes
       comment = true, -- easily (un)comment code, language aware
-      alpha = false, -- dashboard
       better_escape = true, -- map to <ESC> with no lag
-      feline = true, -- statusline
       gitsigns = true,
-      lspsignature = true, -- lsp enhancements
-      vim_matchup = true, -- improved matchit
       cmp = true,
       nvimtree = true,
       autopairs = true,
@@ -127,7 +116,7 @@ M.plugins = {
          lazy_load = true,
       },
       lspconfig = {
-         setup_lspconf = "", -- path of file containing setups of different lsps
+         setup_lspconf = "custom.pluginConfs.lspconfig", -- path of file containing setups of different lsps
       },
       nvimtree = {
          -- packerCompile required after changing lazy_load
@@ -153,9 +142,6 @@ M.plugins = {
       },
       esc_insertmode_timeout = 300,
    },
-   default_plugin_config_replace = {},
-   default_plugin_remove = {},
-   install = nil,
 }
 
 -- Don't use a single keymap twice
@@ -172,7 +158,6 @@ M.mappings = {
       cp_whole_file = "<C-c>", -- copy all contents of current buffer
       lineNR_toggle = "<leader>n", -- toggle line number
       lineNR_rel_toggle = "<leader>rn",
-      update_nvchad = "<leader>uu",
       new_buffer = "<S-t>",
       new_tab = "<C-t>b",
       save_file = "<C-s>", -- save file using :w
@@ -181,20 +166,20 @@ M.mappings = {
    -- navigation in insert mode, only if enabled in options
 
    insert_nav = {
-      backward = "<C-h>",
-      end_of_line = "<C-e>",
-      forward = "<C-l>",
-      next_line = "<C-j>",
-      prev_line = "<C-k>",
+      forward = "<C-f>",
+      backward = "<C-b>",
+      next_line = "<C-n>",
+      prev_line = "<C-p>",
       beginning_of_line = "<C-a>",
+      end_of_line = "<C-e>",
    },
 
    -- better window movement
    window_nav = {
       moveLeft = "<C-h>",
-      moveRight = "<C-l>",
-      moveUp = "<C-k>",
-      moveDown = "<C-j>",
+      moveDown = "<C-n>",
+      moveRight = "<C-i>",
+      moveUp = "<C-e>",
    },
 
    -- terminal related mappings
@@ -202,12 +187,12 @@ M.mappings = {
       -- multiple mappings can be given for esc_termmode, esc_hide_termmode
 
       -- get out of terminal mode
-      esc_termmode = { "jk" },
+      esc_termmode = { "jj" },
 
       -- get out of terminal mode and hide it
-      esc_hide_termmode = { "JK" },
+      esc_hide_termmode = { "J" },
       -- show & recover hidden terminal buffers in a telescope picker
-      pick_term = "<leader>W",
+      pick_term = "<leader>T",
 
       -- spawn a single terminal and toggle it
       -- this just works like toggleterm kinda
@@ -226,8 +211,8 @@ M.mappings = {
 -- To disable a mapping, equate the variable to "" or false or nil in chadrc
 M.mappings.plugins = {
    bufferline = {
-      next_buffer = "<TAB>",
-      prev_buffer = "<S-Tab>",
+      next_buffer = {"<TAB>","]b"},
+      prev_buffer = {"<S-Tab>","[b"},
    },
    comment = {
       toggle = "<leader>/",
@@ -272,7 +257,6 @@ M.mappings.plugins = {
       help_tags = "<leader>fh",
       live_grep = {},
       oldfiles = "<leader>fo",
-      themes = "<leader>th", -- NvChad theme picker
    },
 }
 

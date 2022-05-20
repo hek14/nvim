@@ -5,6 +5,19 @@ local options = require("core.utils").load_config().options
 
 opt.title = true
 opt.clipboard = options.clipboard
+g.clipboard = {
+  name = 'ClippyRemoteClipboard',
+  copy = {
+    ['+'] = 'clippy set',
+    ['*'] = 'clippy set',
+  },
+  paste= {
+    ['+'] = 'clippy get',
+    ['*'] = 'clippy get',
+  },
+  cache_enabled= 0,
+}
+
 opt.cmdheight = options.cmdheight
 opt.cul = true -- cursor line
 
@@ -61,3 +74,5 @@ vim.schedule(function()
    vim.opt.shadafile = require("core.utils").load_config().options.shadafile
    vim.cmd [[ silent! rsh ]]
 end)
+
+vim.cmd [[set viminfo+=:2000]]

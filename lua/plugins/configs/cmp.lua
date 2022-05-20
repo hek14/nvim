@@ -6,7 +6,18 @@ end
 
 vim.opt.completeopt = "menuone,noselect"
 
-local default = {
+local t = function(str)
+  return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
+local check_back_space = function()
+  local col = vim.fn.col '.' - 1
+  return col == 0 or vim.fn.getline('.'):sub(col, col):match '%s' ~= nil
+end
+
+local mine_config_yaml = require("contrib.cmp_config_yaml")
+cmp.register_source("mine_config_yaml", mine_config_yaml.new())
+
+cmp.setup {
    snippet = {
       expand = function(args)
          require("luasnip").lsp_expand(args.body)
@@ -21,6 +32,7 @@ local default = {
             nvim_lsp = "[LSP]",
             nvim_lua = "[Lua]",
             buffer = "[BUF]",
+            mine_config_yaml = "[Config]"
          })[entry.source.name]
 
          return vim_item
@@ -37,40 +49,47 @@ local default = {
          behavior = cmp.ConfirmBehavior.Replace,
          select = true,
       },
-      ["<Tab>"] = cmp.mapping(function(fallback)
-         if cmp.visible() then
-            cmp.select_next_item()
-         elseif require("luasnip").expand_or_jumpable() then
-            vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-expand-or-jump", true, true, true), "")
-         else
-            fallback()
-         end
-      end, { "i", "s" }),
-      ["<S-Tab>"] = cmp.mapping(function(fallback)
-         if cmp.visible() then
-            cmp.select_prev_item()
-         elseif require("luasnip").jumpable(-1) then
-            vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Plug>luasnip-jump-prev", true, true, true), "")
-         else
-            fallback()
-         end
-      end, { "i", "s" }),
-   },
+      ["<tab>"] = function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        -- remove this: separate mappings for luasnip and nvim-cmp
+        -- elseif require'luasnip'.expand_or_jumpable() then
+        --   vim.fn.feedkeys(t("<Plug>luasnip-expand-or-jump"), "")
+        elseif check_back_space() then
+          vim.fn.feedkeys(t("<tab>"), "n")
+        else
+          fallback()
+        end
+      end,
+      ["<S-tab>"] = function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        -- elseif require'luasnip'.jumpable(-1) then
+        --   vim.fn.feedkeys(t("<Plug>luasnip-jump-prev"), "")
+        else
+          fallback()
+        end
+      end
+    },
    sources = {
       { name = "nvim_lsp" },
+      { name = 'nvim_lsp_signature_help' },
+      { name = "mine_config_yaml", trigger_characters = { '.' } },
       { name = "luasnip" },
       { name = "buffer" },
       { name = "nvim_lua" },
       { name = "path" },
+      { name = "latex_symbols"}
    },
 }
 
-local M = {}
-M.setup = function(override_flag)
-   if override_flag then
-      default = require("core.utils").tbl_override_req("nvim_cmp", default)
-   end
-   cmp.setup(default)
+local cmp_rg_complete = function()
+  cmp.complete({
+    config = {
+      sources = {
+        { name = "rg" }, -- should install the cmp-rg
+      }
+    }
+  })
 end
-
-return M
+vim.keymap.set('i','<C-g>',cmp_rg_complete,{noremap=true,silent=true})

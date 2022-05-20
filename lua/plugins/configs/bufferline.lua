@@ -1,13 +1,13 @@
+local map = require("core/utils").map
+
 local present, bufferline = pcall(require, "bufferline")
 if not present then
    return
 end
 
-local default = {
-   colors = require("colors").get(),
-}
-default = {
+bufferline.setup {
    options = {
+      numbers = "ordinal",
       offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
       buffer_close_icon = "",
       modified_icon = "",
@@ -24,7 +24,7 @@ default = {
       show_buffer_close_icons = true,
       separator_style = "thin",
       always_show_bufferline = true,
-      diagnostics = false,
+      diagnostics = false, -- "or nvim_lsp"
       custom_filter = function(buf_number)
          -- Func to filter out our managed/persistent split terms
          local present_type, type = pcall(function()
@@ -36,113 +36,22 @@ default = {
                return false
             elseif type == "hori" then
                return false
+            else
+               return true
             end
+         else
             return true
          end
-
-         return true
       end,
-   },
-
-   highlights = {
-      background = {
-         guifg = default.colors.grey_fg,
-         guibg = default.colors.black2,
-      },
-
-      -- buffers
-      buffer_selected = {
-         guifg = default.colors.white,
-         guibg = default.colors.black,
-         gui = "bold",
-      },
-      buffer_visible = {
-         guifg = default.colors.light_grey,
-         guibg = default.colors.black2,
-      },
-
-      -- for diagnostics = "nvim_lsp"
-      error = {
-         guifg = default.colors.light_grey,
-         guibg = default.colors.black2,
-      },
-      error_diagnostic = {
-         guifg = default.colors.light_grey,
-         guibg = default.colors.black2,
-      },
-
-      -- close buttons
-      close_button = {
-         guifg = default.colors.light_grey,
-         guibg = default.colors.black2,
-      },
-      close_button_visible = {
-         guifg = default.colors.light_grey,
-         guibg = default.colors.black2,
-      },
-      close_button_selected = {
-         guifg = default.colors.red,
-         guibg = default.colors.black,
-      },
-      fill = {
-         guifg = default.colors.grey_fg,
-         guibg = default.colors.black2,
-      },
-      indicator_selected = {
-         guifg = default.colors.black,
-         guibg = default.colors.black,
-      },
-
-      -- modified
-      modified = {
-         guifg = default.colors.red,
-         guibg = default.colors.black2,
-      },
-      modified_visible = {
-         guifg = default.colors.red,
-         guibg = default.colors.black2,
-      },
-      modified_selected = {
-         guifg = default.colors.green,
-         guibg = default.colors.black,
-      },
-
-      -- separators
-      separator = {
-         guifg = default.colors.black2,
-         guibg = default.colors.black2,
-      },
-      separator_visible = {
-         guifg = default.colors.black2,
-         guibg = default.colors.black2,
-      },
-      separator_selected = {
-         guifg = default.colors.black2,
-         guibg = default.colors.black2,
-      },
-
-      -- tabs
-      tab = {
-         guifg = default.colors.light_grey,
-         guibg = default.colors.one_bg3,
-      },
-      tab_selected = {
-         guifg = default.colors.black2,
-         guibg = default.colors.nord_blue,
-      },
-      tab_close = {
-         guifg = default.colors.red,
-         guibg = default.colors.black,
-      },
    },
 }
 
-local M = {}
-M.setup = function(override_flag)
-   if override_flag then
-      default = require("core.utils").tbl_override_req("bufferline", default)
-   end
-   bufferline.setup(default)
-end
-
-return M
+map('n','<leader>1','<Cmd>BufferLineGoToBuffer 1<CR>')
+map('n','<leader>2','<Cmd>BufferLineGoToBuffer 2<CR>')
+map('n','<leader>3','<Cmd>BufferLineGoToBuffer 3<CR>')
+map('n','<leader>4','<Cmd>BufferLineGoToBuffer 4<CR>')
+map('n','<leader>5','<Cmd>BufferLineGoToBuffer 5<CR>')
+map('n','<leader>6','<Cmd>BufferLineGoToBuffer 6<CR>')
+map('n','<leader>7','<Cmd>BufferLineGoToBuffer 7<CR>')
+map('n','<leader>8','<Cmd>BufferLineGoToBuffer 8<CR>')
+map('n','<leader>9','<Cmd>BufferLineGoToBuffer 9<CR>')

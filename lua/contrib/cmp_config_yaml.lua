@@ -58,7 +58,7 @@ source.complete = function(self, request, callback)
       local node, root = stack[#stack][1], stack[#stack][2]
       stack[#stack] = nil
       if type(node)~="table" then
-        require("custom.utils").lprint(("type node: %s: root: %s"):format(node,root))
+        require('core.utils').log(("type node: %s: root: %s"):format(node,root))
       end
       for k, v in pairs(node) do
         local key_name = root ~= "" and string.format("%s.%s", root, k) or string.format("%s", k)
@@ -94,7 +94,6 @@ source.complete = function(self, request, callback)
         data = vim.tbl_filter(function (e)
           return e~=""
         end, data)
-        -- require("custom.utils").lprint("data: " .. tostring(og_length) .. " vs " .. tostring(#data))
         -- local content = vim.fn.json_decode(vim.list_slice(data,1,#data-1)) -- no need to slice beccause of tbl_filter
         local ok,content = pcall(vim.fn.json_decode,data)
         if not ok then 

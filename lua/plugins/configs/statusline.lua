@@ -4,7 +4,6 @@ if not present then
 end
 
 local default = {
-   colors = require("colors").get(),
    lsp = require "feline.providers.lsp",
    lsp_severity = vim.diagnostic.severity,
    config = require("core.utils").load_config().plugins.options.statusline,
@@ -66,17 +65,8 @@ default.components = {
 default.main_icon = {
    provider = default.statusline_style.main_icon,
 
-   hl = {
-      fg = default.colors.statusline_bg,
-      bg = default.colors.nord_blue,
-   },
-
    right_sep = {
       str = default.statusline_style.right,
-      hl = {
-         fg = default.colors.nord_blue,
-         bg = default.colors.lightbg,
-      },
    },
 }
 
@@ -97,14 +87,8 @@ default.file_name = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
    end,
-   hl = {
-      fg = default.colors.white,
-      bg = default.colors.lightbg,
-   },
-
    right_sep = {
       str = default.statusline_style.right,
-      hl = { fg = default.colors.lightbg, bg = default.colors.lightbg2 },
    },
 }
 
@@ -123,13 +107,8 @@ default.inactive_file_name = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
    end,
-   hl = {
-      fg = default.colors.blue,
-      bg = default.colors.grey,
-   },
    right_sep = {
       str = default.statusline_style.right,
-      hl = { fg = default.colors.grey, bg = default.colors.grey },
    },
 }
 
@@ -143,44 +122,24 @@ default.dir_name = {
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 80
    end,
 
-   hl = {
-      fg = default.colors.grey_fg2,
-      bg = default.colors.lightbg2,
-   },
    right_sep = {
       str = default.statusline_style.right,
-      hi = {
-         fg = default.colors.lightbg2,
-         bg = default.colors.statusline_bg,
-      },
    },
 }
 
 default.diff = {
    add = {
       provider = "git_diff_added",
-      hl = {
-         fg = default.colors.grey_fg2,
-         bg = default.colors.statusline_bg,
-      },
       icon = " ",
    },
 
    change = {
       provider = "git_diff_changed",
-      hl = {
-         fg = default.colors.grey_fg2,
-         bg = default.colors.statusline_bg,
-      },
       icon = "  ",
    },
 
    remove = {
       provider = "git_diff_removed",
-      hl = {
-         fg = default.colors.grey_fg2,
-         bg = default.colors.statusline_bg,
-      },
       icon = "  ",
    },
 }
@@ -190,10 +149,6 @@ default.git_branch = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
    end,
-   hl = {
-      fg = default.colors.grey_fg2,
-      bg = default.colors.statusline_bg,
-   },
    icon = "  ",
 }
 
@@ -203,8 +158,6 @@ default.diagnostic = {
       enabled = function()
          return default.lsp.diagnostics_exist(default.lsp_severity.ERROR)
       end,
-
-      hl = { fg = default.colors.red },
       icon = "  ",
    },
 
@@ -213,7 +166,6 @@ default.diagnostic = {
       enabled = function()
          return default.lsp.diagnostics_exist(default.lsp_severity.WARN)
       end,
-      hl = { fg = default.colors.yellow },
       icon = "  ",
    },
 
@@ -222,7 +174,6 @@ default.diagnostic = {
       enabled = function()
          return default.lsp.diagnostics_exist(default.lsp_severity.HINT)
       end,
-      hl = { fg = default.colors.grey_fg2 },
       icon = "  ",
    },
 
@@ -231,14 +182,13 @@ default.diagnostic = {
       enabled = function()
          return default.lsp.diagnostics_exist(default.lsp_severity.INFO)
       end,
-      hl = { fg = default.colors.green },
       icon = "  ",
    },
 }
 
 local ok, gps = pcall(require,"nvim-gps")
 if ok then
-  gps_code_context = { -- should not use local gps_code_context: wrong namescope for later usage
+  local gps_code_context = { -- should not use local gps_code_context: wrong namescope for later usage
     provider = function()
       local gps = require("nvim-gps")
       return string.format(" ctx: %s",gps.get_location())
@@ -249,6 +199,7 @@ if ok then
     end
   }
 else
+  local gps_code_context = nil
   print("gps not available")
 end
 
@@ -288,7 +239,6 @@ default.lsp_progress = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 80
    end,
-   hl = { fg = default.colors.green },
 }
 
 default.lsp_icon = {
@@ -302,73 +252,25 @@ default.lsp_icon = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
    end,
-   hl = { fg = default.colors.grey_fg2, bg = default.colors.statusline_bg },
 }
-
-default.mode_colors = {
-   ["n"] = { "NORMAL", default.colors.red },
-   ["no"] = { "N-PENDING", default.colors.red },
-   ["i"] = { "INSERT", default.colors.dark_purple },
-   ["ic"] = { "INSERT", default.colors.dark_purple },
-   ["t"] = { "TERMINAL", default.colors.green },
-   ["v"] = { "VISUAL", default.colors.cyan },
-   ["V"] = { "V-LINE", default.colors.cyan },
-   [""] = { "V-BLOCK", default.colors.cyan },
-   ["R"] = { "REPLACE", default.colors.orange },
-   ["Rv"] = { "V-REPLACE", default.colors.orange },
-   ["s"] = { "SELECT", default.colors.nord_blue },
-   ["S"] = { "S-LINE", default.colors.nord_blue },
-   [""] = { "S-BLOCK", default.colors.nord_blue },
-   ["c"] = { "COMMAND", default.colors.pink },
-   ["cv"] = { "COMMAND", default.colors.pink },
-   ["ce"] = { "COMMAND", default.colors.pink },
-   ["r"] = { "PROMPT", default.colors.teal },
-   ["rm"] = { "MORE", default.colors.teal },
-   ["r?"] = { "CONFIRM", default.colors.teal },
-   ["!"] = { "SHELL", default.colors.green },
-}
-
-default.chad_mode_hl = function()
-   return {
-      fg = default.mode_colors[vim.fn.mode()][2],
-      bg = default.colors.one_bg,
-   }
-end
 
 default.empty_space = {
    provider = " " .. default.statusline_style.left,
-   hl = {
-      fg = default.colors.one_bg2,
-      bg = default.colors.statusline_bg,
-   },
 }
 
 -- this matches the vi mode color
 default.empty_spaceColored = {
    provider = default.statusline_style.left,
-   hl = function()
-      return {
-         fg = default.mode_colors[vim.fn.mode()][2],
-         bg = default.colors.one_bg2,
-      }
-   end,
 }
 
 default.mode_icon = {
    provider = default.statusline_style.vi_mode_icon,
-   hl = function()
-      return {
-         fg = default.colors.statusline_bg,
-         bg = default.mode_colors[vim.fn.mode()][2],
-      }
-   end,
 }
 
 default.empty_space2 = {
    provider = function()
-      return " " .. default.mode_colors[vim.fn.mode()][1] .. " "
+      return "  "
    end,
-   hl = default.chad_mode_hl,
 }
 
 default.separator_right = {
@@ -376,10 +278,6 @@ default.separator_right = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 90
    end,
-   hl = {
-      fg = default.colors.grey,
-      bg = default.colors.one_bg,
-   },
 }
 
 default.separator_right2 = {
@@ -387,10 +285,6 @@ default.separator_right2 = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 90
    end,
-   hl = {
-      fg = default.colors.green,
-      bg = default.colors.grey,
-   },
 }
 
 default.position_icon = {
@@ -398,10 +292,6 @@ default.position_icon = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 90
    end,
-   hl = {
-      fg = default.colors.black,
-      bg = default.colors.green,
-   },
 }
 
 default.current_line = {
@@ -421,11 +311,6 @@ default.current_line = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 90
    end,
-
-   hl = {
-      fg = default.colors.green,
-      bg = default.colors.one_bg,
-   },
 }
 
 local function add_table(a, b)
@@ -453,7 +338,9 @@ M.setup = function(override_flag)
    add_table(default.left, default.diagnostic.warning)
    add_table(default.left, default.diagnostic.hint)
    add_table(default.left, default.diagnostic.info)
-   add_table(default.left, gps_code_context)
+   if gps_code_context then
+      add_table(default.left, gps_code_context)
+   end
 
    add_table(default.middle, default.lsp_progress)
 
@@ -476,10 +363,6 @@ M.setup = function(override_flag)
    default.components.inactive[1] = {default.inactive_file_name}
 
    feline.setup {
-      theme = {
-         bg = default.colors.statusline_bg,
-         fg = default.colors.fg,
-      },
       components = default.components,
    }
 end

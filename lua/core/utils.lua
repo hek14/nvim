@@ -19,6 +19,7 @@ M.close_buffer = function(force)
   force = force or not vim.bo.buflisted or vim.bo.buftype == "nofile"
 
   -- if not force, change to prev buf and then close current
+  -- local close_cmd = force and ":bd!" or ":e #| bd" .. vim.fn.bufnr()
   local close_cmd = force and ":bd!" or ":bp | bd" .. vim.fn.bufnr()
   vim.cmd(close_cmd)
 end

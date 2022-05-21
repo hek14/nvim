@@ -380,6 +380,10 @@ local plugins = {
   -- 1. populate the quickfix
   {
     "mhinz/vim-grepper",
+    opt = true,
+    setup = function ()
+      require("core.utils").packer_lazy_load "vim-grepper"
+    end,
     config = function()
       vim.g.grepper =
         {
@@ -761,6 +765,7 @@ local plugins = {
   },
   { 
     'sindrets/diffview.nvim', 
+    cmd = 'DiffviewOpen',
     requires = 'nvim-lua/plenary.nvim',
   },
   {

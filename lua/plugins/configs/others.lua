@@ -140,9 +140,10 @@ M.lsp_handlers = function()
     " hi default LspReferenceRead cterm=bold gui=Bold ctermbg=yellow guifg=yellow guibg=purple4 |
     " hi default LspReferenceText cterm=bold gui=Bold ctermbg=red guifg=SlateBlue guibg=MidnightBlue |
     " hi default LspReferenceWrite cterm=bold gui=Bold,Italic ctermbg=red guifg=DarkSlateBlue guibg=MistyRose
-    hi default LspReferenceRead guibg=#52504F
-    hi default LspReferenceText guibg=#52504F
-    hi default LspReferenceWrite guibg=#52504F
+    hi default LspReferenceRead ctermbg=237 guibg=#343d46
+    hi default LspReferenceText ctermbg=237 guibg=#343d46
+    hi default LspReferenceWrite ctermbg=237 guibg=#343d46
+    hi clear CursorLine
     ]])
 
   vim.diagnostic.config {

@@ -79,7 +79,7 @@ M.plugins = {
       "netrwPlugin",
       "netrwSettings",
       "netrwFileHandlers",
-      "matchit",
+      -- "matchit",
       "tar",
       "tarPlugin",
       "rrhelper",
@@ -153,7 +153,6 @@ M.mappings = {
    -- custom = {}, -- custom user mappings
 
    misc = {
-      cheatsheet = "<leader>ch",
       close_buffer = "<leader>x",
       cp_whole_file = "<C-c>", -- copy all contents of current buffer
       lineNR_toggle = "<leader>n", -- toggle line number

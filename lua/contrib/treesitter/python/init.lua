@@ -1,3 +1,5 @@
+-- what is userdata: they are C values stored in lua
+-- how to inspect userdata: vim.pretty_print(getmetatable(object))
 -- telescope
 local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"

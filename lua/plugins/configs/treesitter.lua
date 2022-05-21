@@ -97,7 +97,7 @@ ts_config.setup {
       set_jumps = true, -- whether to set jumps in the jumplist
       goto_next_start = {
         ["]f"] = "@function.outer",
-        ["]]"] = "@class.outer",
+        ["]c"] = "@class.outer",
         ["]a"] = "@parameter.inner",
       },
       goto_next_end = {
@@ -107,7 +107,7 @@ ts_config.setup {
       },
       goto_previous_start = {
         ["[f"] = "@function.outer",
-        ["[["] = "@class.outer",
+        ["[c"] = "@class.outer",
         ["[a"] = "@parameter.inner",
       },
       goto_previous_end = {

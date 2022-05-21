@@ -186,12 +186,20 @@ default.diagnostic = {
    },
 }
 
+local gps_code_context = nil
 local ok, gps = pcall(require,"nvim-gps")
 if ok then
-  local gps_code_context = { -- should not use local gps_code_context: wrong namescope for later usage
+  gps_code_context = { -- should not use local gps_code_context: wrong namescope for later usage
     provider = function()
-      local gps = require("nvim-gps")
-      return string.format(" ctx: %s",gps.get_location())
+       local status_ok, gps_location = pcall(gps.get_location, {})
+       if not status_ok then
+         return ""
+       end
+       if gps_location == "error" then
+         return ""
+       else
+         return " " .. gps_location
+       end
     end,
     enabled = function()
       local gps = require("nvim-gps")
@@ -199,7 +207,6 @@ if ok then
     end
   }
 else
-  local gps_code_context = nil
   print("gps not available")
 end
 

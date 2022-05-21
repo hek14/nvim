@@ -85,6 +85,8 @@ M.general = function()
     map("n", wnav.moveRight, "<C-w>l")
     map("n", wnav.moveUp, "<C-w>k")
     map("n", wnav.moveDown, "<C-w>j")
+
+    map("n", '[g', "<Cmd>lua require('contrib.gps_hack').gps_context_parent()<CR>", {silent=false})
   end
 
   local function required_mappings()
@@ -273,7 +275,7 @@ M.telescope = function()
   local m = plugin_maps.telescope
 
   map("n", m.buffers, ":Telescope buffers <CR>")
-  map("n", m.find_files, "<Cmd>Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files prompt_prefix=🔍<CR>")
+  map("n", m.find_files, "<Cmd>Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>")
   map("n", m.find_hiddenfiles, ":Telescope find_files follow=true no_ignore=true hidden=true <CR>")
   map("n", m.git_commits, ":Telescope git_commits <CR>")
   map("n", m.git_status, ":Telescope git_status <CR>")

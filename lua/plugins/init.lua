@@ -807,6 +807,19 @@ local plugins = {
         }
       }
     end
+  },
+  {
+    'ldelossa/litee.nvim',
+    disable = true, -- feel slow
+    requires = {
+      {'ldelossa/litee-calltree.nvim',disable = true},
+      {'ldelossa/litee-symboltree.nvim',disable = true},
+    },
+    config = function()
+      require('litee.lib').setup({})
+      require('litee.calltree').setup({})
+      require('litee.symboltree').setup({})
+    end
   }
 }
 

@@ -183,6 +183,14 @@ lsp_installer.on_server_ready(function(server)
     buf_set_keymap("n", "<leader>]r",
       "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",
       map_opts)
+    buf_set_keymap('n', 'gi',
+      "<cmd>lua vim.lsp.buf.incoming_calls()<CR>",
+      map_opts
+    )
+    buf_set_keymap('n', 'go',
+      "<cmd>lua vim.lsp.buf.outgoing_calls()<CR>",
+      map_opts
+    )
     if vim.tbl_contains({"pyright", "sumneko_lua"}, client.name) then
       client.resolved_capabilities.document_formatting = false
     end

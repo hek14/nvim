@@ -63,6 +63,10 @@ M.gps_context_parent = function(level_up)
   end
 
   local target = data[#data-level_up+1]
+  if target == nil then
+    print("no parent target")
+    return
+  end
   vim.cmd("normal! m'")
   print(string.format("jump to %s: %s", target.type, target.text))
   vim.api.nvim_win_set_cursor(0,target.range)

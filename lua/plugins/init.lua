@@ -240,7 +240,8 @@ local plugins = {
 
   {
     "nvim-telescope/telescope.nvim",
-    module = "telescope",
+    -- module = "telescope", -- NOTE: don't use `module` and `cmd` at the same time: cause bug in Mac OS
+    opt = true,
     cmd = "Telescope",
     config = "require('plugins.configs.telescope')",
     setup = function()

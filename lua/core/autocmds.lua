@@ -91,3 +91,33 @@ au("BufNew",{callback=function ()
     vim.cmd [[ startinsert ]]
   end
 end,})
+
+
+local any_client_attached = function ()
+  local bufnr = vim.fn.bufnr()
+  local clients = vim.lsp.get_active_clients()
+  local attached = {}
+  for i,client in ipairs(clients) do
+    if vim.lsp.buf_is_attached(bufnr,client.id) then
+      table.insert(attached,{id=client.id,name=client.name})
+    end
+  end
+  return attached
+end
+
+_G.any_client_attached = any_client_attached
+au("FileType",{pattern='lua',callback=function()
+  if vim.bo.buflisted then
+    vim.defer_fn(function()
+      local attached_clients = any_client_attached()
+      if #attached_clients == 0 or (#attached_clients==1 and attached_clients[1].name=='null-ls') then
+        vim.cmd [[echohl WarningMsg]]
+        vim.cmd [[echo 'Manually start lsp']]
+        vim.cmd [[echohl None]]
+        vim.defer_fn(function()
+          vim.cmd [[LspStart]]
+        end,0)
+      end
+    end,50)
+  end
+end})

@@ -51,6 +51,22 @@ M.load_config = function()
   return conf
 end
 
+M.deep_equal = function(t1,t2)
+    for i = 1,#t1 do
+    if type(t1[i]) == "table" then
+      if type(t2[i]) ~= "table" then return false end
+      if not deep_equal(t1[i],t2[i]) then
+        return false
+        end
+    else
+      if t1[i]~=t2[i] then return false end
+    end
+  end
+    return true
+end
+
+_G.deep_equal = M.deep_equal
+
 M.map = function(mode, keys, command, opt)
   local options = { noremap = true, silent = true }
   if opt then

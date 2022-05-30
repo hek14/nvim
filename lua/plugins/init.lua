@@ -792,6 +792,9 @@ local plugins = {
       require('core.utils').map('n','-','<Plug>(choosewin)', {noremap=false})
     end
   },
+  {
+    "djoshea/vim-autoread"
+  },
   { 
     'alexghergh/nvim-tmux-navigation', 
     config = function()

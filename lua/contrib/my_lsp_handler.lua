@@ -8,7 +8,7 @@ local event = require("nui.utils.autocmd").event
 
 local M = {}
 -- serve as a lock
-_G.PIG_state = {
+local PIG_state = {
   References = "init",
   Definitions = "init",
   TypeDefinitions = "init",
@@ -18,9 +18,16 @@ _G.PIG_state = {
   Refactor = "init",
 }
 
+local PIG_menu = nil
+local PIG_node = nil
+local pig_ns = vim.api.nvim_create_namespace("pig")
+local rename_lines = {}
+local ref_lines = {}
+local file_lines = {}
+
 local function PIG_in_progress()
   local in_progress = false
-  for k,v in pairs(_G.PIG_state) do
+  for k,v in pairs(PIG_state) do
     if v=="in_progress" then
       in_progress = true
       break
@@ -90,6 +97,7 @@ local group_by_uri = function(locations)
   end
   return groups
 end
+--[=====[ TODO:
 -- location and item looks like below:
 -- "location" {
 --   originSelectionRange = {
@@ -131,7 +139,7 @@ end
 --   lnum = 91,
 --   text = "  local menus = {}"
 -- }
---
+----]=====]
 
 local function deepcopy(orig)
     local orig_type = type(orig)
@@ -148,19 +156,6 @@ local function deepcopy(orig)
     return copy
 end
 
-deep_equal = function(t1,t2)
-  for i = 1,#t1 do
-    if type(t1[i]) == "table" then
-      if type(t2[i]) ~= "table" then return false end
-      if not deep_equal(t1[i],t2[i]) then
-        return false
-      end
-    else
-      if t1[i]~=t2[i] then return false end
-    end
-  end
-  return true
-end
 
 local node_to_item = function (node)
   local uri = (node.loc.uri or node.loc.targetUri)  
@@ -172,10 +167,10 @@ local node_to_item = function (node)
   return {filename=filename,lnum=lnum,col=col,text=text}
 end
 
-function _G.dump_qflist()
-  _G.PIG_menu.menu_props.on_close() 
+local function dump_qflist()
+  PIG_menu.menu_props.on_close() 
   vim.fn.setqflist({},'r')
-  local nodes = _G.PIG_menu._tree:get_nodes()
+  local nodes = PIG_menu._tree:get_nodes()
   local items = {}
   for i,node in ipairs(nodes) do
     if node.is_ref then
@@ -192,9 +187,10 @@ local function prepare_new_text(line,loc,new_name)
   local end_char = range['end'].character
   local old_name = string.sub(line, start_char, end_char)
   local left = string.sub(line,1,start_char-1)
-  local mid = new_name
+  local mid = new_name .. old_name
   local right = string.sub(line,end_char+1,#line)
-  return require('nui.text')(left .. mid .. right, "Comment")
+  -- return require('nui.text')(left .. mid .. right, "htmlStrike")
+  return left .. mid .. right, {start_col=start_char-1+#new_name,end_col=end_char+#new_name}
 end
 
 local Inc_loc = function(loc,index)
@@ -239,6 +235,7 @@ local Inc_loc = function(loc,index)
 end
 
 local make_menu = function(groups,ctx)
+  rename_lines = {}
   -- groups: seperated by files
   local menus = {}
   local ctx_lines = 2 -- lines of context
@@ -246,14 +243,15 @@ local make_menu = function(groups,ctx)
   local location_id = 0
   for i,group in ipairs(groups) do
     local file_name = fn.fnamemodify(vim.uri_to_fname(group[1]),':~:.')
-    table.insert(menus,Menu.separator(file_name,{text_align = "left"}))
+    table.insert(menus,Menu.separator('-- ' .. file_name,{text_align = "left"}))
     total_lines = total_lines + 1
+    table.insert(file_lines,{line=total_lines-1,start_col=0,end_col=-1})
     for j = 2, #group do
       local loc = group[j]
       local item = lsp.util.locations_to_items({loc},vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)[1]
       local range = loc.range or loc.targetSelectionRange
       location_id = location_id + 1
-      table.insert(menus,Menu.separator("location " .. location_id, {text_align = "left"}))
+      table.insert(menus,Menu.separator("-- location " .. location_id, {text_align = "left"}))
       total_lines = total_lines + 1
       for k = -ctx_lines,ctx_lines do
         ---- NOTE: any lines in the same context block refer to the same location
@@ -264,13 +262,19 @@ local make_menu = function(groups,ctx)
         local ctx_item = lsp.util.locations_to_items({ctx_loc},vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)[1]
         total_lines = total_lines + 1
         if ctx.new_name and k==0 then
-          local new_line = prepare_new_text(ctx_item.text,loc,ctx.new_name)
-          -- NOTE: total_lines-k means: always point to the true ref line, not the ctx line
-          table.insert(menus,Menu.item(ctx_item.text, {new_name=ctx.new_name,loc=loc,ctx=ctx,item=item,is_ref=true,line=total_lines-k,col=range.start.character}))
-          total_lines = total_lines + 1
-          table.insert(menus,Menu.item(new_line, {PIG_skip=true,loc=loc,ctx=ctx,item=item,is_ref=false,line=total_lines-k,col=range.start.character}))
+          -- local new_line = prepare_new_text(ctx_item.text,loc,ctx.new_name)
+          -- -- NOTE: total_lines-k means: always point to the true ref line, not the ctx line
+          -- table.insert(menus,Menu.item(ctx_item.text, {new_name=ctx.new_name,loc=loc,ctx=ctx,item=item,is_ref=true,line=total_lines-k,col=range.start.character}))
+          -- total_lines = total_lines + 1
+          -- table.insert(menus,Menu.item(new_line, {PIG_skip=true,loc=loc,ctx=ctx,item=item,is_ref=false,line=total_lines-k,col=range.start.character}))
+          local new_text,_rename_location = prepare_new_text(ctx_item.text,loc,ctx.new_name)
+          table.insert(menus,Menu.item(new_text, {new_name=ctx.new_name,loc=loc,ctx=ctx,item=item,is_ref=(k==0),line=total_lines-k,col=range.start.character}))
+          table.insert(rename_lines,vim.tbl_deep_extend('force',_rename_location,{line=total_lines-1}))
         else
           table.insert(menus,Menu.item(ctx_item.text, {loc=loc,ctx=ctx,item=item,is_ref=(k==0),line=total_lines-k,col=range.start.character}))
+        end
+        if k==0 then
+          table.insert(ref_lines,{line=total_lines-1,start_col=0,end_col=-1})
         end
       end
     end
@@ -283,8 +287,8 @@ local function builtin_preview_handler(label, result, ctx, config)
   vim.lsp.util.preview_location(locations[1])
 end
 
-function _G._goto_next_loc_in_menu(index)
-  local nodes = _G.PIG_menu._tree:get_nodes()
+local function _goto_next_loc_in_menu(index)
+  local nodes = PIG_menu._tree:get_nodes()
   local length = #nodes
   local current_line = vim.api.nvim_win_get_cursor(0)[1]
   local current_col = vim.api.nvim_win_get_cursor(0)[2]
@@ -346,14 +350,14 @@ function _G._goto_next_loc_in_menu(index)
   return result
 end
 
-function _G._goto_next_file_in_menu(index)
-  local nodes = _G.PIG_menu._tree:get_nodes()
+local function _goto_next_file_in_menu(index)
+  local nodes = PIG_menu._tree:get_nodes()
   local length = #nodes
   local current_line = vim.api.nvim_win_get_cursor(0)[1]
-  local current_node = _G.PIG_menu._tree:get_node(current_line)
+  local current_node = PIG_menu._tree:get_node(current_line)
   while not current_node.loc do
     current_line = current_line + 1
-    current_node = _G.PIG_menu._tree:get_node(current_line)
+    current_node = PIG_menu._tree:get_node(current_line)
   end
   local current_uri = current_node.loc.uri or current_node.loc.targetUri
 
@@ -473,15 +477,15 @@ M.location_handler = function(label, result, ctx, config)
   if not ok then
     return false
   end
-  if _G.PIG_menu then
-    _G.PIG_menu = nil
+  if PIG_menu then
+    PIG_menu = nil
   end
   local menu = Menu(
     popup_options,
     {
       lines = menus,
       min_width = 40,
-      max_width = 80,
+      max_width = vim.fn.winwidth(0),
       keymap = {
         focus_next = { "n", "<Down>", "<Tab>" },
         focus_prev = { "e", "<Up>", "<S-Tab>" },
@@ -497,14 +501,15 @@ M.location_handler = function(label, result, ctx, config)
       end,
       on_close = function()
         print("PIG CLOSED")
+        vim.api.nvim_buf_clear_namespace(0,pig_ns,0,-1)
       end,
       on_change = function(node,menu)
-        _G.PIG_node = node
+        PIG_node = node
       end,
       on_submit = function(item)
         if label == "Refactor" then
-          -- _G.PIG_menu:unmount() -- focus on the original buffer
-          local params = _G.PIG_menu.rename_params
+          -- PIG_menu:unmount() -- focus on the original buffer
+          local params = PIG_menu.rename_params
           vim.lsp.buf_request(0,'textDocument/rename', params)
         else
           local loc = item.loc
@@ -519,18 +524,38 @@ M.location_handler = function(label, result, ctx, config)
   )
   menu.rename_params = ctx.rename_params
   menu:mount() -- call the render here
-  _G.PIG_menu = menu
+  PIG_menu = menu
   vim.api.nvim_buf_call(menu.bufnr,function ()
     _goto_next_loc_in_menu(1)
   end)
   vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft) -- set the highlight for ft
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]r",":lua _goto_next_loc_in_menu(1)<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[r",":lua _goto_next_loc_in_menu(-1)<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]f",":lua _goto_next_file_in_menu(1)<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[f",":lua _goto_next_file_in_menu(-1)<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>q",":lua dump_qflist()<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]r","",{noremap=true,callback=function ()
+    _goto_next_loc_in_menu(1)
+  end})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[r","",{noremap=true,callback=function ()
+    _goto_next_loc_in_menu(-1)
+  end})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]f","",{noremap=true, callback=function ()
+    _goto_next_file_in_menu(1)
+  end})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","[f","",{noremap=true,callback=function ()
+    _goto_next_file_in_menu(-1)
+  end})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>q","",{noremap=true,callback=dump_qflist})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":lua require('contrib.my_lsp_handler').open_split('h')<CR>",{noremap=true})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":lua require('contrib.my_lsp_handler').open_split('v')<CR>",{noremap=true})
+
+  for _, loc in ipairs(rename_lines) do
+    vim.api.nvim_buf_add_highlight(menu.bufnr,pig_ns,"Error",loc.line,loc.start_col,loc.end_col)
+  end
+
+  for _, loc in ipairs(file_lines) do
+    vim.api.nvim_buf_add_highlight(menu.bufnr,pig_ns,"htmlBold",loc.line,loc.start_col,loc.end_col)
+  end
+
+  for _, loc in ipairs(ref_lines) do
+    vim.api.nvim_buf_add_highlight(menu.bufnr,pig_ns,"Visual",loc.line,loc.start_col,loc.end_col)
+  end
   return true
 end
 
@@ -603,8 +628,8 @@ M.cancel_request = function ()
   if type(M.request_func[2]) ~= 'function' then return end
   print('cancel PIG buf_request: ',M.request_func[1])
   M.request_func[2]()
-  for k,v in pairs(_G.PIG_state) do
-    _G.PIG_state[k] = "init"
+  for k,v in pairs(PIG_state) do
+    PIG_state[k] = "init"
   end
   M.ctrl_c_pressed = true
   M.request_func = {} -- reset
@@ -628,7 +653,7 @@ M.async_ref = function (fallback)
     local _,result = vim.lsp.buf_request(0,'textDocument/references', ref_params, M.wrap_handler{label = 'References', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
     M.request_func[1] = "References"
     M.request_func[2] = result
-    _G.PIG_state.References="in_progress"
+    PIG_state.References="in_progress"
   else
     print("sorry PIG is running, wait!")
   end
@@ -645,7 +670,7 @@ M.async_def = function (fallback)
     local _,result = vim.lsp.buf_request(0,'textDocument/definition', ref_params, M.wrap_handler{label = 'Definitions', target = M.location_handler, fallback=fallback,token={token[1],token[2],clock}})
     M.request_func[1] = "Definitions"
     M.request_func[2] = result
-    _G.PIG_state.Definitions="in_progress"
+    PIG_state.Definitions="in_progress"
   else
     print("sorry PIG is running, wait!")
   end
@@ -665,7 +690,7 @@ M.async_typedef = function (fallback)
     local _,result = vim.lsp.buf_request(0,'textDocument/typeDefinition', ref_params, M.wrap_handler{label = 'TypeDefinitions', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
     M.request_func[1] = "TypeDefinitions"
     M.request_func[2] = result
-    _G.PIG_state.TypeDefinitions="in_progress"
+    PIG_state.TypeDefinitions="in_progress"
   else
     print("sorry PIG is running, wait!")
   end
@@ -682,7 +707,7 @@ M.async_declare = function (fallback)
     local _,result = vim.lsp.buf_request(0,'textDocument/declaration', ref_params, M.wrap_handler{label = 'Declarations', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
     M.request_func[1] = "Declarations"
     M.request_func[2] = result
-    _G.PIG_state.Declarations="in_progress"
+    PIG_state.Declarations="in_progress"
   else
     print("sorry PIG is running, wait!")
   end
@@ -699,7 +724,7 @@ M.async_implement = function (fallback)
     local _,result = vim.lsp.buf_request(0,'textDocument/implementation', ref_params, M.wrap_handler{label = 'Implementations', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
     M.request_func[1] = "Implementations"
     M.request_func[2] = result
-    _G.PIG_state.Implementations="in_progress"
+    PIG_state.Implementations="in_progress"
   else
     print("sorry PIG is running, wait!")
   end
@@ -716,7 +741,7 @@ M.next_lsp_reference = function (index,fallback)
     local _,result = vim.lsp.buf_request(0,'textDocument/references', ref_params, M.wrap_handler{label = 'NextReference', target = next_ref_handler, fallback=fallback, index=index,token={token[1],token[2],clock}})
     M.request_func[1] = "NextReference"
     M.request_func[2] = result
-    _G.PIG_state.NextReference="in_progress"
+    PIG_state.NextReference="in_progress"
   else
     print("sorry PIG is running, wait!")
   end
@@ -742,7 +767,7 @@ M.rename = function(new_name)
       local _,result = vim.lsp.buf_request(0,'textDocument/references', ref_params, M.wrap_handler{label = 'Refactor', target = M.location_handler, new_name = input, rename_params = rename_params, token={token[1],token[2],clock}})
       M.request_func[1] = "Refactor"
       M.request_func[2] = result
-      _G.PIG_state.Refactor="in_progress"
+      PIG_state.Refactor="in_progress"
     else
       print("sorry PIG is running, wait!")
     end

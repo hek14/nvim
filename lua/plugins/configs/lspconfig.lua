@@ -191,6 +191,7 @@ lsp_installer.on_server_ready(function(server)
       "<cmd>lua vim.lsp.buf.outgoing_calls()<CR>",
       map_opts
     )
+    require('contrib.my_document_highlight').on_attach(bufnr)
     if vim.tbl_contains({"pyright", "sumneko_lua"}, client.name) then
       client.resolved_capabilities.document_formatting = false
     end

@@ -824,6 +824,20 @@ local plugins = {
       require('litee.calltree').setup({})
       require('litee.symboltree').setup({})
     end
+  },
+  {
+    "ghillb/cybu.nvim",
+    branch = "main",
+    requires = { "kyazdani42/nvim-web-devicons" }, --optional
+    config = function()
+      local ok, cybu = pcall(require, "cybu")
+      if not ok then
+        return
+      end
+      cybu.setup()
+      vim.keymap.set("n", "<leader>n", "<Plug>(CybuNext)")
+      vim.keymap.set("n", "<leader>e", "<Plug>(CybuPrev)")
+    end,
   }
 }
 

@@ -511,6 +511,11 @@ M.location_handler = function(label, result, ctx, config)
           -- PIG_menu:unmount() -- focus on the original buffer
           local params = PIG_menu.rename_params
           vim.lsp.buf_request(0,'textDocument/rename', params)
+          if params.highlight ~= nil then
+            vim.defer_fn(function()
+              require("contrib.my_document_highlight").kk_highlight()
+            end,20)
+          end
         else
           local loc = item.loc
           if loc then
@@ -747,7 +752,7 @@ M.next_lsp_reference = function (index,fallback)
   end
 end
 
-M.rename = function(new_name)
+M.rename = function(new_name,highlight)
   local opts = {
     prompt = "New Name: "
   }
@@ -761,6 +766,7 @@ M.rename = function(new_name)
       ref_params.context = { includeDeclaration = true }
       local rename_params = deepcopy(ref_params)
       rename_params.newName = input
+      rename_params.highlight = highlight
       local token = vim.api.nvim_win_get_cursor(0)
       local clock = os.clock()
       M.token = {token[1],token[2],clock}

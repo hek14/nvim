@@ -3,6 +3,7 @@
 1.1 https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
 1.2 https://github.com/lucasvianav/nvim: nice hacking about lspconfig handlers
 1.3 https://github.com/leaxoy/v
+1.4 https://github.com/glepnir/nvim.git
 2. refer to useful plugins
 2.1 interact with tmux: https://github.com/preservim/vimux
 2.2 task system and run script, show output:

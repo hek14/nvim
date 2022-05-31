@@ -22,7 +22,7 @@ ts_config.setup {
   incremental_selection = {
     enable = true,
     keymaps = {
-      init_selection = "<leader>n",
+      init_selection = "<leader>vn",
       node_incremental = "gnn",
       scope_incremental = "gne",
       node_decremental = "gee",

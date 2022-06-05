@@ -121,3 +121,11 @@ au("FileType",{pattern='lua',callback=function()
     end,50)
   end
 end})
+
+-- disable syntax in large file
+au("FileType",{callback=function ()
+  if vim.fn.wordcount()['bytes'] > 2048000 then
+    print("syntax off")
+    vim.cmd("setlocal syntax=off")
+  end
+end})

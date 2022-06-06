@@ -61,6 +61,15 @@ M.general = function()
 
     -- use ESC to turn off search highlighting
     map_wrapper("n", "<Esc>", ":noh <CR>")
+    map_wrapper("i", "<C-q>",function ()
+      if vim.g.cmp_enabled then
+        require("cmp").close()
+        vim.g.cmp_enabled = false
+      else
+        require('cmp').complete()
+        vim.g.cmp_enabled = true
+      end
+    end)
   end
 
   local function optional_mappings()

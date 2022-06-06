@@ -340,7 +340,7 @@ local plugins = {
     cmd = { "TZAtaraxis", "TZMinimalist", "TZFocus" },
     setup = function()
       require("core.utils").map("n", "gq", "<cmd>TZFocus<CR>")
-      require("core.utils").map("i", "<C-q>", "<cmd>TZFocus<CR>")
+      -- require("core.utils").map("i", "<C-q>", "<cmd>TZFocus<CR>")
     end,
   },
   {

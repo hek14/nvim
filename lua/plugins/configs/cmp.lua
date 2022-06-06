@@ -17,7 +17,12 @@ end
 local mine_config_yaml = require("contrib.cmp_config_yaml")
 cmp.register_source("mine_config_yaml", mine_config_yaml.new())
 
+vim.g.cmp_enabled = true
 cmp.setup {
+  -- NOTE: guide to toggle cmp completion, now you can add a imap to toggle this option, refer to core/mappings.lua
+   enabled = function()
+     return vim.g.cmp_enabled
+   end,
    snippet = {
       expand = function(args)
          require("luasnip").lsp_expand(args.body)

@@ -194,7 +194,7 @@ local function my_buf_highlight_references(bufnr, references, offset_encoding, c
       vim.cmd [[echohl None]]
     end
   end
-  -- print(fmt("kk_highlight: %s references",#references))
+  print(fmt("kk_highlight: %s references",#references))
 end
 
 local function point_in_range(point, range)

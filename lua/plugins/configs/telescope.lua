@@ -103,7 +103,7 @@ local M = {}
 telescope.setup(default)
 
 local extensions = {
-    "bookmarks", "neoclip", "projects", "zoxide", "file_browser"
+    "bookmarks", "neoclip", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args"
 }
 for _, ext in ipairs(extensions) do telescope.load_extension(ext) end
 

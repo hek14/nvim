@@ -115,3 +115,4 @@ local cmp_rg_complete = function()
   })
 end
 vim.keymap.set('i','<C-g>',cmp_rg_complete,{noremap=true,silent=true})
+vim.cmd('hi CmpFloatBorder guifg=red')

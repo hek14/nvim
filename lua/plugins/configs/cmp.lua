@@ -17,11 +17,28 @@ end
 local mine_config_yaml = require("contrib.cmp_config_yaml")
 cmp.register_source("mine_config_yaml", mine_config_yaml.new())
 
+local disable_cmp_file_types = {"dap-repl"}
 vim.g.cmp_enabled = true
 cmp.setup {
   -- NOTE: guide to toggle cmp completion, now you can add a imap to toggle this option, refer to core/mappings.lua
    enabled = function()
-     return vim.g.cmp_enabled
+    if vim.tbl_contains(disable_cmp_file_types,vim.bo.filetype) then
+      return false
+    end
+
+    -- NOTE: this is from https://github.com/hrsh7th/nvim-cmp/blob/93cf84f7deb2bdb640ffbb1d2f8d6d412a7aa558/lua/cmp/config/default.lua
+    if vim.api.nvim_buf_get_option(0, 'buftype') == 'prompt' then
+      return false
+    end
+    if vim.fn.reg_recording() ~= '' then
+      return false
+    end
+    if vim.fn.reg_executing() ~= '' then
+      return false
+    end
+    -- END
+
+    return vim.g.cmp_enabled
    end,
    snippet = {
       expand = function(args)

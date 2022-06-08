@@ -291,6 +291,7 @@ M.telescope = function()
   map("n", m.help_tags, ":Telescope help_tags <CR>")
   map("n", m.oldfiles, ":Telescope oldfiles <CR>")
   map("n", m.themes, ":Telescope themes <CR>")
+  map("n", m.dotfiles, ":Telescope dotfiles <CR>")
 end
 
 return M

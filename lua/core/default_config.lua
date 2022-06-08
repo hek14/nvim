@@ -256,6 +256,7 @@ M.mappings.plugins = {
       help_tags = "<leader>fh",
       live_grep = {},
       oldfiles = "<leader>fo",
+      dotfiles = "<leader>fd"
    },
 }
 

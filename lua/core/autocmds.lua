@@ -25,9 +25,10 @@ au("Filetype",{
   pattern="python",
   command=[[ setlocal expandtab tabstop=4 shiftwidth=4 softtabstop=4 ]]
 })
--- File extension specific tabbing
-vim.cmd [[ autocmd Filetype python setlocal expandtab tabstop=4 shiftwidth=4 softtabstop=4 ]]
-vim.cmd [[ autocmd Filetype python setlocal expandtab tabstop=4 shiftwidth=4 softtabstop=4 ]]
+au("FileType",{
+  pattern="lua",
+  command="setlocal shiftwidth=2"
+})
 
 -- VimEnter event: just like ~/.config/nvim/after/plugin
 -- group: set {clear = true} will make sure that the autocmds will be hooked only once.
@@ -45,8 +46,7 @@ local match = function(str,pattern)
 end
 
 au("BufRead",{command="set foldlevel=99",})
-au("FileType",{command="setlocal shiftwidth=2",pattern="lua"})
-au("BufRead",{callback=function ()
+au("BufEnter",{callback=function ()
   map("n","gm","<Cmd>lua require('contrib.treesitter.python').goto_python_main()<CR>",{buffer=true})
 end,pattern="*.py"})
 
@@ -71,7 +71,7 @@ au({"BufWinEnter","BufEnter","WinEnter"},{callback=function ()
     vim.cmd [[startinsert]]
     au("BufLeave",{callback=function ()
       vim.cmd [[stopinsert]]
-    end,buffer=0,})
+    end,buffer=vim.fn.bufnr(),})
   end
 end,})
 
@@ -86,12 +86,12 @@ au("User",{callback=function ()
 end,pattern={"PackerComplete","PackerCompileDone"},})
 
 au("BufNew",{callback=function ()
-  if match(vim.o.buftype,[[prompt]]) then
-    print("bufnew prompt")
-    vim.cmd [[ startinsert ]]
+  if vim.bo.ft~='TelescopePrompt' then --NOTE: telescope already do this
+    if match(vim.bo.buftype,[[prompt]]) and vim.api.nvim_get_mode()['mode']~='i' then
+      vim.cmd [[ startinsert ]]
+    end
   end
 end,})
-
 
 local any_client_attached = function ()
   local bufnr = vim.fn.bufnr()

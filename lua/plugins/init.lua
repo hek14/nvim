@@ -576,9 +576,10 @@ local plugins = {
     module = "harpoon"
   },
   {
-    'nvim-telescope/telescope-live-grep-raw.nvim',
+    'nvim-telescope/telescope-live-grep-args.nvim',
     config = function()
-      require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_raw.live_grep_raw()<CR>')
+      require("telescope").load_extension("live_grep_args")
+      require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>')
     end
   },
   {

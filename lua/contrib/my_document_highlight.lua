@@ -5,6 +5,8 @@ local fmt = string.format
 
 -- ========== state
 local M = {}
+local references = {}
+local timers = {}
 local reference_mark_group = {}
 local last_clear_range = {}
 local last_highlight_range = {}
@@ -18,15 +20,14 @@ local colors = {
   "#d65d0e",
   "#458588",
 }
+-- ========== state end
+
 for i,color in ipairs(colors) do
   vim.cmd (fmt('highlight kk_highlight_%s guibg=%s guifg=#FDFEFE',i,color))
 end
 local color_index = 0
-
-local references = {}
-local timers = {}
 local offset_encoding = "utf-16"
--- ========== state end
+
 
 local function get_lines(bufnr, rows)
   rows = type(rows) == 'table' and rows or { rows }
@@ -143,16 +144,26 @@ local function get_line_byte_from_position(bufnr, position, offset_encoding)
   return col
 end
 
+local function point_in_range(point, range)
+    if point.row == range['start']['line'] and point.col < range['start']['character'] then
+        return false
+    end
+    if point.row == range['end']['line'] and point.col > range['end']['character'] then
+        return false
+    end
+    return point.row >= range['start']['line'] and point.row <= range['end']['line']
+end
+
 local function my_buf_highlight_references(bufnr, references, offset_encoding, compare)
-  if reference_mark_group[bufnr] == nil then
-    reference_mark_group[bufnr] = {}
-  else -- need to check whether ns is already added to current references
-    M.kk_clear_highlight()
-  end
+  M.kk_clear_highlight()
   local ns = vim.api.nvim_create_namespace('')
   local color_used = fmt('kk_highlight_%s',math.fmod(color_index,#colors) + 1)
   color_index = color_index + 1
   reference_mark_group[bufnr][ns] = {}
+
+  local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
+  crow = crow - 1 -- reference ranges are (0,0)-indexed for (row,col)
+
   -- NOTE: reference_mark_group: bufnr -> namespace -> references
   for _, reference in ipairs(references) do
     local start_line, start_char = reference['range']['start']['line'], reference['range']['start']['character']
@@ -182,30 +193,22 @@ local function my_buf_highlight_references(bufnr, references, offset_encoding, c
     local start_mark = vim.api.nvim_buf_set_extmark(bufnr,ns,start_line,start_idx,{})
     local end_mark = vim.api.nvim_buf_set_extmark(bufnr,ns,end_line,end_idx,{})
     table.insert(reference_mark_group[bufnr][ns],{['start']=start_mark,['end']=end_mark})
-  end
-  last_highlight_range[bufnr] = vim.deepcopy(reference_mark_group[bufnr][ns])
-  if compare then
-    vim.pretty_print("compare: ",vim.inspect(last_clear_range[vim.fn.bufnr()]),vim.inspect(last_highlight_range[vim.fn.bufnr()]))
-    if vim.deep_equal(last_clear_range[vim.fn.bufnr()],last_highlight_range[vim.fn.bufnr()]) then
-      print("equal")
-    else
-      vim.cmd [[echohl WarningMsg]]
-      vim.cmd [[echo 'you should rename the symbol under cursor']]
-      vim.cmd [[echohl None]]
+    if point_in_range({row=crow,col=ccol}, reference.range) then
+      -- maintain a namespace and a start_mark and a end_mark (it's only once for each buffer, and created/deleted in this code block)
+      if last_highlight_range[bufnr] ~= nil then
+        vim.api.nvim_buf_del_extmark(bufnr,last_highlight_range[bufnr]['ns'],last_highlight_range[bufnr]['start'])
+        vim.api.nvim_buf_del_extmark(bufnr,last_highlight_range[bufnr]['ns'],last_highlight_range[bufnr]['end'])
+        vim.api.nvim_buf_clear_namespace(bufnr,last_highlight_range[bufnr]['ns'],0,-1)
+      end
+      local tmp_ns = vim.api.nvim_create_namespace('last_highlight_ns')
+      local tmp_start = vim.api.nvim_buf_set_extmark(bufnr,tmp_ns,start_line,start_idx,{})
+      local tmp_end = vim.api.nvim_buf_set_extmark(bufnr,tmp_ns,end_line,end_idx,{})
+      last_highlight_range[bufnr] = {['ns']=tmp_ns,['start']=tmp_start,['end']=tmp_end}
     end
   end
   print(fmt("kk_highlight: %s references",#references))
 end
 
-local function point_in_range(point, range)
-    if point.row == range['start']['line'] and point.col < range['start']['character'] then
-        return false
-    end
-    if point.row == range['end']['line'] and point.col > range['end']['character'] then
-        return false
-    end
-    return point.row >= range['start']['line'] and point.row <= range['end']['line']
-end
 
 local function cursor_in_references(bufnr)
   -- do not highlight outdated references
@@ -318,15 +321,32 @@ function M.kk_clear_highlight()
     return false
   end
 
+  -- NOTE: following logic only triggered manually or by autocmd
   local found_ns,found_mark,ns_marks = M.check_if_any_ns_exists()
-  vim.pretty_print(fmt("found_ns: %s, found_mark: %s",found_ns,vim.inspect(found_mark)))
   if found_ns then
+    local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,found_ns,found_mark['start'],{})
+    local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,found_ns,found_mark['end'],{})
+
+    -- create temporary ns and mark
+    if last_clear_range[bufnr] ~= nil then
+      vim.api.nvim_buf_del_extmark(bufnr,last_clear_range[bufnr]['ns'],last_clear_range[bufnr]['start'])
+      vim.api.nvim_buf_del_extmark(bufnr,last_clear_range[bufnr]['ns'],last_clear_range[bufnr]['end'])
+      vim.api.nvim_buf_clear_namespace(bufnr,last_clear_range[bufnr]['ns'],0,-1)
+    end
+    local tmp_ns = vim.api.nvim_create_namespace('tmp')
+    local tmp_start = vim.api.nvim_buf_set_extmark(bufnr,tmp_ns,_start[1],_start[2],{})
+    local tmp_end = vim.api.nvim_buf_set_extmark(bufnr,tmp_ns,_end[1],_end[2],{})
+    last_clear_range[bufnr] = vim.deepcopy({['start']=tmp_start,['end']=tmp_end,['ns']=tmp_ns})
+    -- END
+
+    -- clear the highlighting 
     vim.api.nvim_buf_clear_namespace(bufnr, found_ns, 0, -1)
+    -- clear the extmarks
     for i,mark in ipairs(ns_marks) do
       vim.api.nvim_buf_del_extmark(bufnr,found_ns,mark['start'])
       vim.api.nvim_buf_del_extmark(bufnr,found_ns,mark['end'])
     end
-    last_clear_range[bufnr] = vim.deepcopy(reference_mark_group[bufnr][found_ns])
+    -- clear references to extmarks
     reference_mark_group[bufnr][found_ns] = nil
     return true
   else
@@ -335,6 +355,12 @@ function M.kk_clear_highlight()
 end
 
 M.on_attach = function(_bufnr,create_autocmd)
+  -- init 
+  if reference_mark_group[_bufnr] == nil then
+    reference_mark_group[_bufnr] = {}
+  end
+  -- init END
+
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>,',"",{callback=function ()
     clear_by_autocmd[vim.fn.bufnr()] = false
     M.kk_highlight() -- will call M.kk_clear_highlight also
@@ -345,11 +371,38 @@ M.on_attach = function(_bufnr,create_autocmd)
   end})
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>i',"",{callback=function()
-    vim.pretty_print('ns number: ',#vim.tbl_keys(reference_mark_group[vim.fn.bufnr()]))
-    -- print("attention:! last_clear_range")
-    -- vim.pretty_print(last_clear_range[vim.fn.bufnr()])
-    -- print("attention:! last_highlight_range")
-    -- vim.pretty_print(last_highlight_range[vim.fn.bufnr()])
+    local bufnr = vim.fn.bufnr()
+    vim.pretty_print('inspect ns number: ',#vim.tbl_keys(reference_mark_group[bufnr]))
+    if last_clear_range[bufnr]~=nil then
+      local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear_range[bufnr]['ns'],last_clear_range[bufnr]['start'],{})
+      local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear_range[bufnr]['ns'],last_clear_range[bufnr]['end'],{})
+      local _range = {
+        ['start'] = {
+          line = _start[1],
+          character = _start[2]
+        },
+        ['end'] = {
+          line = _end[1],
+          character = _end[2]
+        }
+      }
+      vim.pretty_print('inspect last_clear_range: ',_range)
+    end
+    if last_highlight_range[bufnr]~=nil then
+      _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_highlight_range[bufnr]['ns'],last_highlight_range[bufnr]['start'],{})
+      _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_highlight_range[bufnr]['ns'],last_highlight_range[bufnr]['end'],{})
+      _range = {
+        ['start'] = {
+          line = _start[1],
+          character = _start[2]
+        },
+        ['end'] = {
+          line = _end[1],
+          character = _end[2]
+        }
+      }
+      vim.pretty_print('inspect last_highlight_range: ',_range)
+    end
   end})
 
   local group = vim.api.nvim_create_augroup('kk_highlight',{clear=true})
@@ -361,26 +414,38 @@ M.on_attach = function(_bufnr,create_autocmd)
   end,group=group})
 
   vim.api.nvim_create_autocmd('BufDelete',{callback=function ()
-    if reference_mark_group[vim.fn.bufnr()] then
-      reference_mark_group[vim.fn.bufnr()] = nil
-    end
-    if clear_by_autocmd[vim.fn.bufnr()] then
-      clear_by_autocmd[vim.fn.bufnr()] = nil
-    end
-    if last_highlight_range[vim.fn.bufnr()] then
-      last_highlight_range[vim.fn.bufnr()]= {}
-    end
-    if last_clear_range[vim.fn.bufnr()] then
-      last_clear_range[vim.fn.bufnr()]= {}
-    end
+    local bufnr = vim.fn.bufnr()
+    reference_mark_group[bufnr] = nil
+    clear_by_autocmd[bufnr] = nil
+    last_highlight_range[bufnr]= nil
+    last_clear_range[bufnr]= nil
+    references[bufnr] = nil
+    timers[bufnr] = nil
   end})
 
   vim.api.nvim_create_autocmd({'InsertLeave'},{callback=function ()
-    if clear_by_autocmd[vim.fn.bufnr()] then
-      M.kk_highlight(true)
-      clear_by_autocmd[vim.fn.bufnr()] = false
-      print("set_highlight_by_autocmd")
+    local bufnr = vim.fn.bufnr()
+    if clear_by_autocmd[bufnr] then
+      local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
+      crow = crow - 1
+      local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear_range[bufnr]['ns'],last_clear_range[bufnr]['start'],{})
+      local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear_range[bufnr]['ns'],last_clear_range[bufnr]['end'],{})
+      local _range = {
+        ['start'] = {
+          line = _start[1],
+          character = _start[2]
+        },
+        ['end'] = {
+          line = _end[1],
+          character = _end[2]
+        }
+      }
+      if point_in_range({row=crow,col=ccol},_range) then
+        M.kk_highlight(true)
+        print("set_highlight_by_autocmd")
+      end
     end
+    clear_by_autocmd[bufnr] = false
   end,group=group})
 end
 return M

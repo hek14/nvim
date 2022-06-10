@@ -314,10 +314,17 @@ function M.kk_clear_highlight()
   end
 
   if vim.v.count1 > 1 then
+    local number = 0
     for ns,marks in pairs(mark_group) do
       vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
       reference_mark_group[bufnr][ns] = nil
+      for _,mark in ipairs(marks) do
+        vim.api.nvim_buf_del_extmark(bufnr,ns,mark['start'])
+        vim.api.nvim_buf_del_extmark(bufnr,ns,mark['end'])
+      end
+      number = number + 1
     end
+    print(fmt("kk_clear_highlight: %s %s",number,number>1 and "symbols" or "symbol"))
     return false
   end
 

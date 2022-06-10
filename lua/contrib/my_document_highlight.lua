@@ -19,11 +19,17 @@ local colors = {
   "#1F6C4A",
   "#d65d0e",
   "#458588",
+  '#aeee00',
+  '#ff0000',
+  '#0000ff',
+  '#b88823',
+  '#ffa724',
+  '#ff2c4b'
 }
 -- ========== state end
 
-for i,color in ipairs(colors) do
-  vim.cmd (fmt('highlight kk_highlight_%s guibg=%s guifg=#FDFEFE',i,color))
+for i, color in ipairs(colors) do
+  vim.cmd (fmt('highlight! def kk_highlight_%s guibg=%s guifg=black',i,color))
 end
 local color_index = 0
 local offset_encoding = "utf-16"
@@ -206,7 +212,7 @@ local function my_buf_highlight_references(bufnr, references, offset_encoding, c
       last_highlight_range[bufnr] = {['ns']=tmp_ns,['start']=tmp_start,['end']=tmp_end}
     end
   end
-  print(fmt("kk_highlight: %s references",#references))
+  print(fmt("kk_highlight: %s %s",#references,#references>1 and "references" or "reference"))
 end
 
 
@@ -249,7 +255,7 @@ local function handle_document_highlight(result, bufnr, compare)
     if cursor_in_references(bufnr) then
       my_buf_highlight_references(bufnr, result, offset_encoding, compare)
     end
-    end, vim.g.Illuminate_delay or 17)
+    end, 17)
   table.sort(result, function(a, b)
     return before_by_start(a.range, b.range)
   end)
@@ -349,10 +355,13 @@ function M.kk_clear_highlight()
     -- clear the highlighting 
     vim.api.nvim_buf_clear_namespace(bufnr, found_ns, 0, -1)
     -- clear the extmarks
+    local number = 0
     for i,mark in ipairs(ns_marks) do
       vim.api.nvim_buf_del_extmark(bufnr,found_ns,mark['start'])
       vim.api.nvim_buf_del_extmark(bufnr,found_ns,mark['end'])
+      number = number + 1
     end
+    print(fmt("kk_clear_highlight: %s %s",number,number>1 and "references" or "reference"))
     -- clear references to extmarks
     reference_mark_group[bufnr][found_ns] = nil
     return true

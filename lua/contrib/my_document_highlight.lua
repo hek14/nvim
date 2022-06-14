@@ -388,7 +388,7 @@ M.on_attach = function(_bufnr,create_autocmd)
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>i',"",{callback=function()
     local bufnr = vim.fn.bufnr()
-    vim.pretty_print('inspect ns number: ',#vim.tbl_keys(reference_mark_group[bufnr]))
+    vim.pretty_print('inspect ns number: ',vim.tbl_keys(reference_mark_group[bufnr]))
     if last_clear_range[bufnr]~=nil then
       local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear_range[bufnr]['ns'],last_clear_range[bufnr]['start'],{})
       local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear_range[bufnr]['ns'],last_clear_range[bufnr]['end'],{})

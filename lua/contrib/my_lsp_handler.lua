@@ -511,11 +511,12 @@ M.location_handler = function(label, result, ctx, config)
           -- PIG_menu:unmount() -- focus on the original buffer
           local params = PIG_menu.rename_params
           vim.lsp.buf_request(0,'textDocument/rename', params)
-          if params.highlight ~= nil then
-            vim.defer_fn(function()
-              require("contrib.my_document_highlight").kk_highlight()
-            end,20)
-          end
+          require("contrib.my_document_highlight").kk_clear_highlight()
+          -- if params.highlight ~= nil then
+          --   vim.defer_fn(function()
+          --     require("contrib.my_document_highlight").kk_highlight()
+          --   end,20)
+          -- end
         else
           local loc = item.loc
           if loc then

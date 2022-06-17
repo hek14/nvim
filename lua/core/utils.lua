@@ -428,6 +428,7 @@ function _G.my_hack_undo_redo()
         TimeTravel(old_time)
       end)
       print(info)
+      -- can also use `:windo diffthis`
       vim.cmd(string.format('diffthis | vsp | b %d | diffthis',time_travel.tmp_buffer))
     end,
   })
@@ -504,7 +505,6 @@ M.closing_float_window = function()
         local config = vim.api.nvim_win_get_config(win)
         if config.relative ~= "" then
             vim.api.nvim_win_close(win, false)
-            print('Closing window', win)
         end
     end
 end
@@ -518,6 +518,27 @@ M.my_print = function (...)
 
     print(table.concat(objects, '\n'))
     return ...
+end
+
+M.range_search = function(pattern)
+  local mode = vim.fn.mode()
+  local _start,_end= nil,nil
+  if mode=="n" then
+    _start = tonumber(vim.fn.input("Search start: ",1))
+    _end = tonumber(vim.fn.input("Search end: ",vim.fn.line('$')))
+  else
+    ------ method 1
+    -- vim.fn.feedkeys([[\<esc>]],'n') -- exit the visual mode, then the visual range got recorded
+    -- vim.cmd [[execute "normal! gv\<Esc>"]]
+    ------ method 2
+    vim.cmd [[execute "normal! \<esc>"]]
+    _start = vim.fn.getpos("'<")[2]
+    _end = vim.fn.getpos("'>")[2]
+  end
+  if pattern == nil then
+    pattern = vim.fn.input('Search pattern: ',vim.fn.expand('<cword>'))
+  end
+  vim.cmd(string.format([[/\%%>%sl\%%<%sl%s]],_start-1,_end+1,pattern))
 end
 
 vim.cmd [[

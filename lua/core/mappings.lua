@@ -96,6 +96,8 @@ M.general = function()
     map("n", wnav.moveDown, "<C-w>j")
 
     map("n", '[g', "<Cmd>lua require('contrib.gps_hack').gps_context_parent()<CR>", {silent=false})
+    map("n", ',s',require('core.utils').range_search)
+    map("x", ',s',require('core.utils').range_search)
   end
 
   local function required_mappings()

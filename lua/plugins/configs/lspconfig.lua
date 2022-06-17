@@ -85,6 +85,10 @@ capabilities.textDocument.completion.completionItem.resolveSupport = {
   },
 }
 
+-- avoid annoying multiple clients offset_encodings detected warning
+-- refer to: https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428#issuecomment-997226723
+capabilities.offsetEncoding = { "utf-16" }
+
 local lsp_installer = require "nvim-lsp-installer"
 local root_dir = require"nvim-lsp-installer.settings".current.install_root_dir
 lsp_installer.on_server_ready(function(server)

@@ -1,5 +1,5 @@
 local util = require'lspconfig'.util
-local trouble_present, trouble = pcall(require, 'trouble')
+local trouble_present = pcall(require, 'trouble')
 
 local M = {}
 require("plugins.configs.others").lsp_handlers()
@@ -55,19 +55,6 @@ function M.toggle_diagnostics_visibility()
   end
 end
 
-function M.on_attach(client, bufnr)
-  local function buf_set_option(...)
-    vim.api.nvim_buf_set_option(bufnr, ...)
-  end
-
-  client.resolved_capabilities.document_formatting = false
-  client.resolved_capabilities.document_range_formatting = false
-  -- Enable completion triggered by <c-x><c-o>
-  buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
-
-  require("core.mappings").lspconfig()
-end
-
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.documentationFormat = { "markdown", "plaintext" }
 capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -91,7 +78,7 @@ capabilities.offsetEncoding = { "utf-16" }
 
 local lsp_installer = require "nvim-lsp-installer"
 local root_dir = require"nvim-lsp-installer.settings".current.install_root_dir
-lsp_installer.on_server_ready(function(server)
+local on_server_ready = function(server)
   local opts = {
     capabilities = capabilities,
     flags = {debounce_text_changes = 150},
@@ -99,6 +86,15 @@ lsp_installer.on_server_ready(function(server)
   }
 
   opts.on_attach = function(client, bufnr)
+    local function buf_set_option(...)
+      vim.api.nvim_buf_set_option(bufnr, ...)
+    end
+
+    client.resolved_capabilities.document_formatting = false
+    client.resolved_capabilities.document_range_formatting = false
+    -- Enable completion triggered by <c-x><c-o>
+    buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
+
     print("Lsp catches this buffer!")
     local ok,illuminate = pcall(require,'illuminate')
     if ok then
@@ -201,7 +197,7 @@ lsp_installer.on_server_ready(function(server)
     end
   end
 
-  if server.name == "pyright" then
+  if server == "pyright" then
     opts.settings = {
       python = {
         analysis = {
@@ -223,7 +219,7 @@ lsp_installer.on_server_ready(function(server)
     end
   end
 
-  if server.name == 'texlab' then
+  if server == 'texlab' then
     opts.settings = {
       texlab = {
         build = {
@@ -242,12 +238,13 @@ lsp_installer.on_server_ready(function(server)
       }
     }
   end
-  if server.name == "sumneko_lua" then
+  if server == "sumneko_lua" then
     local luadev = require("lua-dev").setup({
       -- add any options here, or leave empty to use the default settings
       lspconfig = {
         cmd = {root_dir .. "/sumneko_lua/extension/server/bin/lua-language-server"},
         on_attach = opts.on_attach,
+        capabilities = opts.capabilities,
         settings = {
           Lua = {
             workspace = {
@@ -259,8 +256,12 @@ lsp_installer.on_server_ready(function(server)
     })
     require('lspconfig').sumneko_lua.setup(luadev)
   else
-    server:setup(opts)
+    require('lspconfig')[server].setup(opts)
   end
   vim.cmd [[ do User LspAttachBuffers ]]
-end)
+end
+
+for _,server in ipairs(require'nvim-lsp-installer.servers'.get_installed_server_names()) do
+  on_server_ready(server)
+end
 return M

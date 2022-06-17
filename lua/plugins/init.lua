@@ -86,15 +86,7 @@ local plugins = {
 
   {
     "neovim/nvim-lspconfig",
-    module = "lspconfig",
-    opt = true,
-    setup = function()
-      require("core.utils").packer_lazy_load "nvim-lspconfig"
-      -- reload the current file so lsp actually starts for it
-      vim.defer_fn(function()
-        vim.cmd 'if &ft == "packer" | echo "" | else | silent! e %'
-      end, 0)
-    end,
+    after = "nvim-lsp-installer",
     config = "require('plugins.configs.lspconfig')",
   },
 
@@ -107,7 +99,16 @@ local plugins = {
     end
   },
 
-  { "williamboman/nvim-lsp-installer" },
+  { 
+    "williamboman/nvim-lsp-installer" ,
+    opt = true,
+    setup = function ()
+      require("core.utils").packer_lazy_load "nvim-lsp-installer"
+    end,
+    config = function ()
+      require("nvim-lsp-installer").setup {}
+    end
+  },
   {
     "RishabhRD/nvim-lsputils",
     disable = true,

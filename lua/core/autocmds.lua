@@ -124,7 +124,7 @@ end})
 
 -- disable syntax in large file
 au("FileType",{callback=function ()
-  if vim.fn.wordcount()['bytes'] > 2048000 then
+  if vim.fn.wordcount()['bytes'] > 2048000 or vim.fn.line('$') > 5000 then
     print("syntax off")
     vim.cmd("setlocal syntax=off")
   end

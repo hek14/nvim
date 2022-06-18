@@ -17,6 +17,7 @@
     -o $(python -c 'import cv2, os; print(os.path.dirname(cv2.__file__))')/cv2.pyi
   ```
 5. :help fillchars to change fold/endOfBuffer appearance
+6. one tip for inspecting options and variables: instead of using message buffer, just create a new buffer, and normal mode: `:put =bufnr()`, `put =@"` or insert mode: `CTRL_R=bufnr()`
 ----]=====]
 
 local present, impatient = pcall(require, "impatient")

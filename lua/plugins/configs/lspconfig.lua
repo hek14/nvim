@@ -2,7 +2,107 @@ local util = require'lspconfig'.util
 local trouble_present = pcall(require, 'trouble')
 
 local M = {}
-require("plugins.configs.others").lsp_handlers()
+local function lspSymbol(name, icon)
+  local hl = "DiagnosticSign" .. name
+  vim.fn.sign_define(hl, { text = icon, numhl = hl, texthl = hl })
+end
+
+lspSymbol("Error", "")
+lspSymbol("Info", "")
+lspSymbol("Hint", "")
+lspSymbol("Warn", "")
+
+vim.cmd([[
+    autocmd ColorScheme * |
+    " hi def link LspReferenceText CursorLine |
+    " hi def link LspReferenceWrite CursorLine |
+    " hi def link LspReferenceRead CursorLine
+    " hi default LspReferenceRead cterm=bold gui=Bold ctermbg=yellow guifg=yellow guibg=purple4 |
+    " hi default LspReferenceText cterm=bold gui=Bold ctermbg=red guifg=SlateBlue guibg=MidnightBlue |
+    " hi default LspReferenceWrite cterm=bold gui=Bold,Italic ctermbg=red guifg=DarkSlateBlue guibg=MistyRose
+    hi default LspReferenceRead ctermbg=237 guibg=#343d46
+    hi default LspReferenceText ctermbg=237 guibg=#343d46
+    hi default LspReferenceWrite ctermbg=237 guibg=#343d46
+    hi clear CursorLine
+    ]])
+
+vim.diagnostic.config {
+  -- virtual_text = {
+  --    prefix = "",
+  -- },
+  virtual_text = false,
+  signs = true,
+  underline = false,
+  update_in_insert = false,
+}
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+  border = "single",
+})
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+  border = "single",
+})
+
+-- NOTE: refer to https://github.com/lucasvianav/nvim/blob/8f763b85e2da9ebd4656bf732cbdd7410cc0e4e4/lua/v/utils/lsp.lua#L98-L123
+local filter_diagnostics = function(diagnostics)
+  if not diagnostics then
+    return {}
+  end
+
+  -- find the "worst" diagnostic per line
+  local most_severe = {}
+  for _, cur in pairs(diagnostics) do
+    local max = most_severe[cur.lnum]
+
+    -- higher severity has lower value (`:h diagnostic-severity`)
+    if not max or cur.severity < max.severity then
+      most_severe[cur.lnum] = cur
+    end
+  end
+
+  -- return list of diagnostics
+  return vim.tbl_values(most_severe)
+end
+
+-- NOTE: refer to https://github.com/lucasvianav/nvim/blob/8f763b85e2da9ebd4656bf732cbdd7410cc0e4e4/lua/v/settings/handlers.lua#L18-L48
+---custom namespace
+local ns = vim.api.nvim_create_namespace('severe-diagnostics')
+
+---reference to the original handler
+local orig_signs_handler = vim.diagnostic.handlers.signs
+
+---Overriden diagnostics signs helper to only show the single most relevant sign
+---@see `:h diagnostic-handlers`
+vim.diagnostic.handlers.signs = {
+  show = function(_, bufnr, _, opts)
+    -- get all diagnostics from the whole buffer rather
+    -- than just the diagnostics passed to the handler
+    opts = opts or {}
+    opts.severity_limit = "Error"
+    local diagnostics = vim.diagnostic.get(bufnr)
+
+    local filtered_diagnostics = filter_diagnostics(diagnostics)
+
+    -- pass the filtered diagnostics (with the
+    -- custom namespace) to the original handler
+    orig_signs_handler.show(ns, bufnr, filtered_diagnostics, opts)
+  end,
+
+  hide = function(_, bufnr)
+    orig_signs_handler.hide(ns, bufnr)
+  end,
+}
+-- suppress error messages from lang servers
+vim.notify = function(msg, log_level)
+  if msg:match "exit code" then
+    return
+  end
+  if log_level == vim.log.levels.ERROR then
+    vim.api.nvim_err_writeln(msg)
+  else
+    vim.api.nvim_echo({ { msg } }, true, {})
+  end
+end
 
 function M.Smart_goto_definition()
   local bufnr = vim.fn.bufnr()

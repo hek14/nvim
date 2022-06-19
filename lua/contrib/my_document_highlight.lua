@@ -32,7 +32,7 @@ for i, color in ipairs(colors) do
   vim.cmd (fmt('highlight! def kk_highlight_%s guibg=%s guifg=black',i,color))
 end
 local color_index = 0
-local offset_encoding = "utf-16"
+local hl_offset_encoding = "utf-16"
 
 
 local function get_lines(bufnr, rows)
@@ -160,18 +160,23 @@ local function point_in_range(point, range)
     return point.row >= range['start']['line'] and point.row <= range['end']['line']
 end
 
-local function my_buf_highlight_references(bufnr, references, offset_encoding, compare)
+local function my_buf_highlight_references(bufnr, _references, offset_encoding, compare)
   M.kk_clear_highlight()
   local ns = vim.api.nvim_create_namespace('')
   local color_used = fmt('kk_highlight_%s',math.fmod(color_index,#colors) + 1)
   color_index = color_index + 1
+  if reference_mark_group[bufnr] == nil then
+    print('bad, no attach')
+    reference_mark_group[bufnr] = {}
+  end
+
   reference_mark_group[bufnr][ns] = {}
 
   local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
   crow = crow - 1 -- reference ranges are (0,0)-indexed for (row,col)
 
   -- NOTE: reference_mark_group: bufnr -> namespace -> references
-  for _, reference in ipairs(references) do
+  for _, reference in ipairs(_references) do
     local start_line, start_char = reference['range']['start']['line'], reference['range']['start']['character']
     local end_line, end_char = reference['range']['end']['line'], reference['range']['end']['character']
 
@@ -212,7 +217,7 @@ local function my_buf_highlight_references(bufnr, references, offset_encoding, c
       last_highlight_range[bufnr] = {['ns']=tmp_ns,['start']=tmp_start,['end']=tmp_end}
     end
   end
-  print(fmt("kk_highlight: %s %s",#references,#references>1 and "references" or "reference"))
+  print(fmt("kk_highlight: %s %s",#_references,#_references>1 and "references" or "reference"))
 end
 
 
@@ -253,7 +258,7 @@ local function handle_document_highlight(result, bufnr, compare)
   end
   timers[bufnr] = vim.defer_fn(function()
     if cursor_in_references(bufnr) then
-      my_buf_highlight_references(bufnr, result, offset_encoding, compare)
+      my_buf_highlight_references(bufnr, result, hl_offset_encoding, compare)
     end
     end, 17)
   table.sort(result, function(a, b)
@@ -264,7 +269,7 @@ end
 
 -- main test
 function M.kk_highlight(compare)
-  local highlight_params = vim.tbl_deep_extend("force",vim.lsp.util.make_position_params(),{offset_encoding=offset_encoding})
+  local highlight_params = vim.tbl_deep_extend("force",vim.lsp.util.make_position_params(),{offset_encoding=hl_offset_encoding})
   vim.lsp.buf_request(vim.fn.bufnr(), 'textDocument/documentHighlight', highlight_params, function(...)
     if vim.fn.has('nvim-0.5.1') == 1 then
       handle_document_highlight(select(2, ...), select(3, ...).bufnr, compare)
@@ -352,7 +357,7 @@ function M.kk_clear_highlight()
     last_clear_range[bufnr] = vim.deepcopy({['start']=tmp_start,['end']=tmp_end,['ns']=tmp_ns})
     -- END
 
-    -- clear the highlighting 
+    -- clear the highlighting
     vim.api.nvim_buf_clear_namespace(bufnr, found_ns, 0, -1)
     -- clear the extmarks
     local number = 0
@@ -371,7 +376,7 @@ function M.kk_clear_highlight()
 end
 
 M.on_attach = function(_bufnr,create_autocmd)
-  -- init 
+  -- init
   if reference_mark_group[_bufnr] == nil then
     reference_mark_group[_bufnr] = {}
   end
@@ -405,9 +410,9 @@ M.on_attach = function(_bufnr,create_autocmd)
       vim.pretty_print('inspect last_clear_range: ',_range)
     end
     if last_highlight_range[bufnr]~=nil then
-      _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_highlight_range[bufnr]['ns'],last_highlight_range[bufnr]['start'],{})
-      _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_highlight_range[bufnr]['ns'],last_highlight_range[bufnr]['end'],{})
-      _range = {
+      local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_highlight_range[bufnr]['ns'],last_highlight_range[bufnr]['start'],{})
+      local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_highlight_range[bufnr]['ns'],last_highlight_range[bufnr]['end'],{})
+      local _range = {
         ['start'] = {
           line = _start[1],
           character = _start[2]

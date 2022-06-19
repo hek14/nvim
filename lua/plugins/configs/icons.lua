@@ -3,7 +3,7 @@ if not present then
    return
 end
 
-default = {
+local default = {
    override = {
       c = {
          icon = "",

@@ -25,10 +25,14 @@ M.close_buffer = function(force)
 end
 
 -- hide statusline
--- tables fetched from load_config function
 M.hide_statusline = function()
-  local hidden = require("core.utils").load_config().plugins.options.statusline.hidden
-  local shown = require("core.utils").load_config().plugins.options.statusline.shown
+  local hidden = {
+    "help",
+    "NvimTree",
+    "terminal",
+    "alpha",
+  }
+  local shown = {}
   local api = vim.api
   local buftype = api.nvim_buf_get_option(0, "ft")
 
@@ -44,11 +48,6 @@ M.hide_statusline = function()
   end
 
   api.nvim_set_option("laststatus", 2)
-end
-
-M.load_config = function()
-  local conf = require "core.default_config"
-  return conf
 end
 
 M.deep_equal = function(t1,t2)
@@ -310,15 +309,15 @@ function M.get_relative_path(base_path, my_path)
 end
 -- ==========
 
-function _G.stringSplit(inputstr, sep) 
-  sep=sep or '%s' 
-  local t={}  
-  for field,s in string.gmatch(inputstr, "([^"..sep.."]*)("..sep.."?)") do 
-    table.insert(t,field)  
-    if s=="" then 
-      return t 
-    end 
-  end 
+function _G.stringSplit(inputstr, sep)
+  sep=sep or '%s'
+  local t={}
+  for field,s in string.gmatch(inputstr, "([^"..sep.."]*)("..sep.."?)") do
+    table.insert(t,field)
+    if s=="" then
+      return t
+    end
+  end
 end
 
 M.preview_qf = function ()
@@ -351,7 +350,7 @@ function _G.TimeTravel(args)
   args = vim.tbl_extend('force',default,args)
   local old_time = os.time(args)
   local now = os.time()
-  local difference_seconds = os.difftime(now, old_time) 
+  local difference_seconds = os.difftime(now, old_time)
   local difference_minutes = math.floor(difference_seconds / (60)) -- seconds in a day
   if difference_seconds > 0 then
     vim.cmd(string.format("earlier %ds",difference_seconds))

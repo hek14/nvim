@@ -1,6 +1,5 @@
 vim.cmd[[packadd cfilter]]
-local plugin_settings = require("core.utils").load_config().plugins
-local present, packer = pcall(require, plugin_settings.options.packer.init_file)
+local present, packer = pcall(require, "plugins.packerInit")
 
 if not present then
   return false
@@ -16,7 +15,7 @@ local plugins = {
   {
     "wbthomason/packer.nvim",
     -- NOTE: should not use this if you want to use packer functionality in shell with `--headless`
-    -- event = "VimEnter", 
+    -- event = "VimEnter",
   },
 
   {
@@ -28,7 +27,6 @@ local plugins = {
 
   {
     "feline-nvim/feline.nvim",
-    disable = not plugin_settings.status.feline,
     after = {"nvim-web-devicons","nvim-treesitter","nvim-gps"},
     config = function ()
       require"plugins.configs.statusline".setup()
@@ -38,27 +36,45 @@ local plugins = {
   {
     "akinsho/bufferline.nvim",
     branch = "main",
-    disable = not plugin_settings.status.bufferline,
     after = "nvim-web-devicons",
     config = "require('plugins.configs.bufferline')",
     setup = function()
-      require("core.mappings").bufferline()
+      local map = require("core.utils").map
+      map("n", {"<TAB>","]b"}, ":BufferLineCycleNext <CR>")
+      map("n", {"<S-Tab>","[b"}, ":BufferLineCyclePrev <CR>")
     end,
   },
 
   {
     "lukas-reineke/indent-blankline.nvim",
-    disable = not plugin_settings.status.blankline,
     event = "BufRead",
     config = function ()
-      require("plugins.configs.others").blankline()
+      local default = {
+        indentLine_enabled = 1,
+        char = "▏",
+        filetype_exclude = {
+          "help",
+          "terminal",
+          "alpha",
+          "packer",
+          "lspinfo",
+          "TelescopePrompt",
+          "TelescopeResults",
+          "lsp-installer",
+          "",
+        },
+        buftype_exclude = { "terminal" },
+        show_trailing_blankline_indent = false,
+        show_first_indent_level = false,
+      }
+      require("indent_blankline").setup(default)
     end
   },
 
   {
     "mhartington/oceanic-next",
     config = function ()
-      vim.cmd[[ syntax enable ]] 
+      vim.cmd[[ syntax enable ]]
       vim.cmd[[ colorscheme OceanicNext ]]
     end
   },
@@ -74,7 +90,6 @@ local plugins = {
   -- git stuff
   {
     "lewis6991/gitsigns.nvim",
-    disable = not plugin_settings.status.gitsigns,
     opt = true,
     config = "require('plugins.configs.gitsigns')",
     setup = function()
@@ -92,14 +107,34 @@ local plugins = {
 
   {
     "ray-x/lsp_signature.nvim",
-    disable = not plugin_settings.status.lspsignature,
+    disable = true,
     after = "nvim-lspconfig",
     config = function ()
-      require("plugins.configs.others").signature()
+      local present, lspsignature = pcall(require, "lsp_signature")
+      if present then
+        local default = {
+          bind = true,
+          doc_lines = 0,
+          floating_window = true,
+          fix_pos = true,
+          hint_enable = true,
+          hint_prefix = " ",
+          hint_scheme = "String",
+          hi_parameter = "Search",
+          max_height = 22,
+          max_width = 120, -- max_width of signature floating_window, line will be wrapped if exceed max_width
+          handler_opts = {
+            border = "single", -- double, single, shadow, none
+          },
+          zindex = 200, -- by default it will be on top of all floating windows, set to 50 send it to bottom
+          padding = "", -- character to pad on left and right of signature can be ' ', or '|'  etc
+        }
+        lspsignature.setup(default)
+      end
     end
   },
 
-  { 
+  {
     "williamboman/nvim-lsp-installer" ,
     opt = true,
     setup = function ()
@@ -122,7 +157,7 @@ local plugins = {
 
   {
     "andymass/vim-matchup",
-    disable = not plugin_settings.status.vim_matchup,
+    disable = true,
     opt = true,
     setup = function()
       vim.g.matchup_text_obj_enabled = 0
@@ -133,10 +168,13 @@ local plugins = {
 
   {
     "max397574/better-escape.nvim",
-    disable = not plugin_settings.status.better_escape,
     event = "InsertCharPre",
     config = function ()
-      require"plugins.configs.others".better_escape()
+      local default = {
+        mapping = {'jj','kk'},
+        timeout = 300,
+      }
+      require("better_escape").setup(default)
     end
   },
 
@@ -145,7 +183,6 @@ local plugins = {
   {
     "rafamadriz/friendly-snippets",
     module = "cmp_nvim_lsp",
-    disable = not plugin_settings.status.cmp,
     event = "InsertEnter",
   },
 
@@ -157,7 +194,6 @@ local plugins = {
 
   {
     "L3MON4D3/LuaSnip",
-    disable = not plugin_settings.status.cmp,
     wants = "friendly-snippets",
     after = "nvim-cmp",
     config = "require('plugins.configs.luasnip')"
@@ -165,46 +201,47 @@ local plugins = {
 
   {
     "saadparwaiz1/cmp_luasnip",
-    disable = not plugin_settings.status.cmp,
-    after = plugin_settings.options.cmp.lazy_load and "LuaSnip",
+    after = "LuaSnip",
   },
 
   {
     "hrsh7th/cmp-nvim-lua",
-    disable = not plugin_settings.status.cmp,
     after = "cmp_luasnip",
   },
 
   {
     "hrsh7th/cmp-nvim-lsp",
-    disable = not plugin_settings.status.cmp,
     after = "cmp-nvim-lua",
   },
 
   {
     "hrsh7th/cmp-buffer",
-    disable = not plugin_settings.status.cmp,
     after = "cmp-nvim-lsp",
   },
 
   {
     "hrsh7th/cmp-path",
-    disable = not plugin_settings.status.cmp,
     after = "cmp-buffer",
   },
 
   -- misc plugins
   {
     "windwp/nvim-autopairs",
-    disable = not plugin_settings.status.autopairs,
-    after = plugin_settings.options.autopairs.loadAfter,
+    after = "nvim-cmp",
     config = function ()
-      require"plugins.configs.others".autopairs()
+      local present1, autopairs = pcall(require, "nvim-autopairs")
+      local present2, cmp_autopairs = pcall(require, "nvim-autopairs.completion.cmp")
+
+      if present1 and present2 then
+        local default = { fast_wrap = {} }
+        autopairs.setup(default)
+        local cmp = require "cmp"
+        cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+      end
     end
   },
 
   {
-    disable = not plugin_settings.status.alpha,
     "goolord/alpha-nvim",
     config = function ()
       require"plugins.configs.alpha".setup()
@@ -213,29 +250,35 @@ local plugins = {
 
   {
     "numToStr/Comment.nvim",
-    disable = not plugin_settings.status.comment,
     module = "Comment",
     keys = { "gcc" },
     config = function ()
-      require"plugins.configs.others".comment()
+      local present, nvim_comment = pcall(require, "Comment")
+      if present then
+        local default = {}
+        nvim_comment.setup(default)
+      end
     end,
     setup = function()
-      require("core.mappings").comment()
+      local map = require("core.utils").map
+      map("n", "<leader>/", ":lua require('Comment.api').toggle_current_linewise()<CR>")
+      map("v", "<leader>/", ":lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>")
     end,
   },
 
   -- file managing , picker etc
   {
     "kyazdani42/nvim-tree.lua",
-    disable = not plugin_settings.status.nvimtree,
     -- only set "after" if lazy load is disabled and vice versa for "cmd"
-    after = not plugin_settings.options.nvimtree.lazy_load and "nvim-web-devicons",
-    cmd = plugin_settings.options.nvimtree.lazy_load and { "NvimTreeToggle", "NvimTreeFocus" },
+    after = "nvim-web-devicons",
+    cmd = { "NvimTreeToggle", "NvimTreeFocus" },
     config = function ()
       require"plugins.configs.nvimtree".setup()
     end,
     setup = function()
-      require("core.mappings").nvimtree()
+      local map = require("core.utils").map
+      map("n", "<leader>et", ":NvimTreeToggle <CR>")
+      map("n", "<leader>ef", ":NvimTreeFocus <CR>")
     end,
   },
 
@@ -246,12 +289,26 @@ local plugins = {
     cmd = "Telescope",
     config = "require('plugins.configs.telescope')",
     setup = function()
-      require("core.mappings").telescope()
+      local map = require("core.utils").map
+      map("n", "<leader>fb", ":Telescope buffers <CR>")
+      map("n", "<leader>ff", ":Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>")
+      map("n", "<leader>fa", ":Telescope find_files follow=true no_ignore=true hidden=true <CR>")
+      map("n", "<leader>fg", ":Telescope git_commits <CR>")
+      map("n", "<leader>gs", ":Telescope git_status <CR>")
+      map("n", "<leader>fh", ":Telescope help_tags <CR>")
+      map("n", "<leader>fo", ":Telescope oldfiles <CR>")
+      map("n", "<leader>tm", ":Telescope themes <CR>")
+      map("n", "<leader>fd", ":Telescope dotfiles <CR>")
+      map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
+      map("n",'<leader>fs','<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>')
+      -- if you want to grep only in opened buffers: lua require('telescope.builtin').live_grep({grep_open_files=true})
+      -- pick a hidden term
+      map("n", "<leader>T", ":Telescope terms <CR>")
     end,
   },
 
   {
-    "RRethy/vim-illuminate", 
+    "RRethy/vim-illuminate",
     event = "BufRead"
   },
   {
@@ -392,13 +449,14 @@ local plugins = {
           tools = { "rg", "grep" },
           searchreg = 1,
           next_tool = "<leader>gw",
-        }, vim.cmd([[
+        }
+      vim.cmd([[
           nnoremap <leader>gw :Grepper<cr>
           nmap <leader>gs  <plug>(GrepperOperator)
           xmap <leader>gs  <plug>(GrepperOperator)
       ]])
     end,
-  }, 
+  },
   -- 2. setup better qf buffer
   {
     "kevinhwang91/nvim-bqf",
@@ -412,7 +470,7 @@ local plugins = {
     --       augroup END
     --     ]])
     -- end,
-  }, 
+  },
   -- 3. editable qf (similar to emacs wgrep)
   {
     "stefandtw/quickfix-reflector.vim",
@@ -473,7 +531,7 @@ local plugins = {
     wants = { "nvim-treesitter" }, -- loader treesitter if necessary
     config = function()
       -- nvim-treesitter should be loaded now
-      -- print('wants treesitter',packer_plugins["nvim-treesitter"].loaded) 
+      -- print('wants treesitter',packer_plugins["nvim-treesitter"].loaded)
       require("nvim-gps").setup({
         disable_icons = false, -- Setting it to true will disable all icons
         icons = {
@@ -503,8 +561,8 @@ local plugins = {
   },
   { "nvim-treesitter/nvim-treesitter-textobjects", after = "nvim-treesitter" },
   { "nvim-treesitter/nvim-treesitter-refactor",
-    after = "nvim-treesitter" 
-  }, 
+    after = "nvim-treesitter"
+  },
   { "p00f/nvim-ts-rainbow", after = "nvim-treesitter" },
   { "theHamsta/nvim-treesitter-pairs", after = "nvim-treesitter" },
   {
@@ -527,7 +585,7 @@ local plugins = {
       map("n", "<leader>rbf", [[ <Cmd>lua require('refactoring').refactor('Extract Block To File')<CR>]], {noremap = true, silent = true, expr = false})
     end,
   },
-  { 
+  {
     "nvim-treesitter/playground",
     after = "nvim-treesitter",
     config = function ()
@@ -615,7 +673,7 @@ local plugins = {
   { "nvim-telescope/telescope-file-browser.nvim" },
   { "tpope/vim-scriptease" },
   { "MunifTanjim/nui.nvim" },
-  { 
+  {
     "danilamihailov/beacon.nvim",
     disable = true, -- disabled because of buggy on OSX
   },
@@ -643,7 +701,7 @@ local plugins = {
     end,
     ft = { "markdown" },
   },
-  { 'michaelb/sniprun', 
+  { 'michaelb/sniprun',
     -- replace it with codi.nvim
     disable = true,
     run = 'bash ./install.sh'
@@ -662,12 +720,12 @@ local plugins = {
     end
   },
   {
-    "rcarriga/vim-ultest", 
+    "rcarriga/vim-ultest",
     requires = {"vim-test/vim-test"},
     run = function ()
       local dependencies = {"pynvim","pytest"}
       for _,dep in ipairs(dependencies) do
-        local result = vim.fn.system("pip list | grep -i " .. dep) 
+        local result = vim.fn.system("pip list | grep -i " .. dep)
         local found = #result>0
         if not found then
           local Job = require'plenary.job'
@@ -758,15 +816,15 @@ local plugins = {
           },
         }
       }
-      -- how to use it? 
+      -- how to use it?
       -- using TODO: (the last colon is necessary)
     end
   },
   {
     "folke/lua-dev.nvim",
   },
-  { 
-    'sindrets/diffview.nvim', 
+  {
+    'sindrets/diffview.nvim',
     cmd = 'DiffviewOpen',
     requires = 'nvim-lua/plenary.nvim',
   },
@@ -795,10 +853,11 @@ local plugins = {
     end
   },
   {
-    "djoshea/vim-autoread"
+    "djoshea/vim-autoread",
+    disable = true,
   },
-  { 
-    'alexghergh/nvim-tmux-navigation', 
+  {
+    'alexghergh/nvim-tmux-navigation',
     config = function()
       require'nvim-tmux-navigation'.setup {
         disable_when_zoomed = true, -- defaults to false

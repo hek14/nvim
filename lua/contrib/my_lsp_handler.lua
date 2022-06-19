@@ -158,7 +158,7 @@ end
 
 
 local node_to_item = function (node)
-  local uri = (node.loc.uri or node.loc.targetUri)  
+  local uri = (node.loc.uri or node.loc.targetUri)
   local filename = string.gsub(uri,"file://","")
   local range = node.loc.range or node.loc.targetSelectionRange
   local lnum = range.start.line+1
@@ -168,7 +168,7 @@ local node_to_item = function (node)
 end
 
 local function dump_qflist()
-  PIG_menu.menu_props.on_close() 
+  PIG_menu.menu_props.on_close()
   vim.fn.setqflist({},'r')
   local nodes = PIG_menu._tree:get_nodes()
   local items = {}
@@ -407,14 +407,14 @@ local function _goto_next_file_in_menu(index)
 end
 
 local filter_locations_by_uri = function(locations,pattern)
-  local results = {} 
+  local results = {}
   for _,loc in ipairs(locations) do
     local uri = loc.uri or loc.targetUri
     local matched = vim.api.nvim_eval(string.format([['%s' =~ '%s']],uri,pattern))
     if matched==1 then
       table.insert(results,loc)
     end
-  end 
+  end
   return results
 end
 
@@ -426,9 +426,9 @@ local function next_ref_handler(label, result, ctx, config)
   local current_file = "file://" .. vim.api.nvim_buf_get_name(ctx.bufnr or 0)
   local filtered_locations = filter_locations_by_uri(sorted_locations,current_file) -- only search the next_ref in current file
   local current_loc = nil
-  local index = ctx.index 
+  local index = ctx.index
   if not index or index==0 then
-    return 
+    return
   end
   for i,loc in ipairs(filtered_locations) do
     local _start = loc.range.start
@@ -437,7 +437,7 @@ local function next_ref_handler(label, result, ctx, config)
     _start.character <= current_col and
     _end.line+1 >= current_line and
     _end.character >= current_col
-    if condition then 
+    if condition then
       current_loc = i
       break
     end
@@ -493,7 +493,7 @@ M.location_handler = function(label, result, ctx, config)
         submit = { "<CR>", "<Space>" },
       },
       should_skip_item = function(item)
-        if item._type == "separator" then 
+        if item._type == "separator" then
           return true
         else
           return item.PIG_skip

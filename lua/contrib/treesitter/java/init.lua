@@ -9,7 +9,7 @@ local M = {}
 -- current file
 --]]
 function M.get_test_methods(buffer)
-    buffer = buffer or API.nvim_get_current_buf()
+    buffer = buffer or vim.api.nvim_get_current_buf()
 
     local query = [[
       (
@@ -46,7 +46,7 @@ end
 -- current file
 --]]
 function M.get_methods(buffer)
-    buffer = buffer or API.nvim_get_current_buf()
+    buffer = buffer or vim.api.nvim_get_current_buf()
 
     local query = [[
       (class_declaration

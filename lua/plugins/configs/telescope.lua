@@ -29,12 +29,12 @@ local default = {
     },
     defaults = {
         vimgrep_arguments = {
-            "rg", 
-            "--color=never", 
-            "--no-heading", 
+            "rg",
+            "--color=never",
+            "--no-heading",
             "--with-filename",
-            "--line-number", 
-            "--column", 
+            "--line-number",
+            "--column",
             "--smart-case",
             "--no-ignore",
             "--ignore-file=" .. vim.env["HOME"] .. "/.rg_ignore"
@@ -48,6 +48,7 @@ local default = {
             "%.pkl",
             "%.png",
             "%.jpg",
+            "node_modules"
         },
         -- mappings = {
         --   i = {
@@ -76,7 +77,6 @@ local default = {
             preview_cutoff = 120
         },
         file_sorter = require("telescope.sorters").get_fuzzy_file,
-        file_ignore_patterns = {"node_modules"},
         generic_sorter = require("telescope.sorters").get_generic_fuzzy_sorter,
         path_display = {"truncate"},
         winblend = 0,

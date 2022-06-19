@@ -1,7 +1,7 @@
 local profiler = {}
 
 profiler.new = function(self)
-  object = {}
+  local object = {}
   setmetatable(object,self)
   self.__index = self
   return object

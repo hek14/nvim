@@ -34,7 +34,7 @@ source.new = function()
 end
 
 source.complete = function(self, request, callback)
-  -- NOTE: request: {context=xxx,completion_context=xxx,offset=xxx} 
+  -- NOTE: request: {context=xxx,completion_context=xxx,offset=xxx}
   local q = string.sub(request.context.cursor_before_line, request.offset)
   local line_before_current = request.context.cursor_before_line
   local line_after_current = request.context.cursor_after_line
@@ -80,23 +80,24 @@ source.complete = function(self, request, callback)
   end
 
   local function on_event(job_id, data, event)
+    local depth = 0
     if event == "stdout" then
       -- print("on_event: stdout, ",vim.inspect(data))
       if #data == 1 and data[1] == "" then
         return
       end
-      if string.sub(data[1],1,5)=="file:" then 
+      if string.sub(data[1],1,5)=="file:" then
         file = string.sub(data[1],6,#data[1])
-        path_elements = _G.stringSplit(file,"/")
+        local path_elements = _G.stringSplit(file,"/")
         depth = #path_elements
-      else 
-        og_length = #data
+      else
+        local og_length = #data
         data = vim.tbl_filter(function (e)
           return e~=""
         end, data)
         -- local content = vim.fn.json_decode(vim.list_slice(data,1,#data-1)) -- no need to slice beccause of tbl_filter
         local ok,content = pcall(vim.fn.json_decode,data)
-        if not ok then 
+        if not ok then
           if string.match(content,"Vim:E474") then
             print("hello, E474 error")
           end
@@ -142,7 +143,7 @@ source.complete = function(self, request, callback)
       -- FIX: sort doesn't work
       -- table.sort(labels,function(k1,k2)
       --   if k1.depth~=k2.depth then
-      --     return k1.depth < k2.depth 
+      --     return k1.depth < k2.depth
       --   elseif k1.file~=k2.file then
       --     return k1.file < k2.file
       --   else
@@ -159,7 +160,7 @@ source.complete = function(self, request, callback)
     vim.schedule_wrap(function()
       local curr_dir = vim.fn.getcwd()
       local git_dir = string.gsub(vim.fn.system("git rev-parse --show-toplevel"),"%s+","")
-      if not string.match(git_dir,"^fatal") then 
+      if not string.match(git_dir,"^fatal") then
         curr_dir = git_dir
       end
       if curr_dir == vim.env["HOME"] then

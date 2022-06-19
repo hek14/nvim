@@ -11,7 +11,7 @@
 2.2.2 https://github.com/skywind3000/asyncrun.vim#extra-runners
 3. themes: https://alpha2phi.medium.com/12-neovim-themes-with-tree-sitter-support-8be320b683a4
 4. for pyright completion stubs: https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs
-4.1 how to use it for cv2 module completion: 
+4.1 how to use it for cv2 module completion:
   ```shell
   curl -sSL https://raw.githubusercontent.com/bschnurr/python-type-stubs/add-opencv/cv2/__init__.pyi \
     -o $(python -c 'import cv2, os; print(os.path.dirname(cv2.__file__))')/cv2.pyi

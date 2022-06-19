@@ -34,7 +34,7 @@ function M.goto_adjacent_usage(delta)
   if delta < 0 then
     opt.forward = false
   end
-  bufnr = api.nvim_get_current_buf()
+  local bufnr = api.nvim_get_current_buf()
   local node_at_point = ts_utils.get_node_at_cursor()
   if not node_at_point then
     goto_adjent_reference_fallback(opt)

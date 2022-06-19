@@ -1,4 +1,4 @@
-local map = require("core/utils").map
+local map = require("core.utils").map
 
 local present, bufferline = pcall(require, "bufferline")
 if not present then

@@ -6,7 +6,21 @@ end
 local default = {
    lsp = require "feline.providers.lsp",
    lsp_severity = vim.diagnostic.severity,
-   config = require("core.utils").load_config().plugins.options.statusline,
+   config = {
+    hide_disable = false,
+    -- hide, show on specific filetypes
+    hidden = {
+      "help",
+      "NvimTree",
+      "terminal",
+      "alpha",
+    },
+    shown = {},
+
+    -- truncate statusline on small screens
+    shortline = true,
+    style = "default", -- default, round , slant , block , arrow
+  },
 }
 
 default.icon_styles = {

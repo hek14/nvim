@@ -1,6 +1,5 @@
 local present, luasnip = pcall(require, "luasnip")
 local map = require("core.utils").map
-local chadrc_config = require'core.utils'.load_config()
 if not present then
   print("luasnip not present")
   return 
@@ -10,7 +9,6 @@ luasnip.config.set_config {
   updateevents = "TextChanged,TextChangedI",
 }
 
-require("luasnip/loaders/from_vscode").load { paths = chadrc_config.plugins.options.luasnip.snippet_path }
 require("luasnip/loaders/from_vscode").load()
 
 local ls = require("luasnip")

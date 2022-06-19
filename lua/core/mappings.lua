@@ -1,11 +1,6 @@
 local utils = require "core.utils"
 
-local config = utils.load_config()
 local map_wrapper = utils.map
-
-local maps = config.mappings
-local plugin_maps = maps.plugins
-local terminal_options = config.options.terminal
 
 local cmd = vim.cmd
 
@@ -46,22 +41,20 @@ M.general = function()
     end
   end
 
-  local function non_config_mappings()
+  local function others()
     -- Don't copy the replaced text after pasting in visual mode
-    map_wrapper("v", "p", "p:let @+=@0<CR>")
+    map("v", "p", "p:let @+=@0<CR>")
 
     -- Allow moving the cursor through wrapped lines with j, k, <Up> and <Down>
     -- http://www.reddit.com/r/vim/comments/2k4cbr/problem_with_gj_and_gk/
     -- empty mode is same as using :map
     -- also don't use g[j|k] when in operator pending mode, so it doesn't alter d, y or c behaviour
-    map_wrapper({ "n", "x", "o" }, "j", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
-    map_wrapper({ "n", "x", "o" }, "k", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
-    map_wrapper("", "<Down>", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
-    map_wrapper("", "<Up>", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
+    map({ "n", "x", "o" }, "j", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
+    map({ "n", "x", "o" }, "k", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
+    map("", "<Down>", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
+    map("", "<Up>", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
 
-    -- use ESC to turn off search highlighting
-    map_wrapper("n", "<Esc>", ":noh <CR>")
-    map_wrapper("i", "<C-q>",function ()
+    map("i", "<C-q>",function ()
       if vim.g.cmp_enabled then
         require("cmp").close()
         vim.g.cmp_enabled = false
@@ -70,9 +63,6 @@ M.general = function()
         vim.g.cmp_enabled = true
       end
     end)
-  end
-
-  local function optional_mappings()
     -- don't yank text on cut ( x )
     -- map_wrapper({ "n", "v" }, "x", '"_x')
 
@@ -80,27 +70,17 @@ M.general = function()
     -- map_wrapper({ "n", "v" }, "d", '"_d')
 
     -- navigation within insert mode
-    local inav = maps.insert_nav
-    map("i", inav.backward, "<Left>")
-    map("i", inav.end_of_line, "<End>")
-    map("i", inav.forward, "<Right>")
-    map("i", inav.next_line, "<Down>")
-    map("i", inav.prev_line, "<Up>")
-    map("i", inav.beginning_of_line, "<ESC>^i")
-
-    -- easier navigation between windows
-    local wnav = maps.window_nav
-    map("n", wnav.moveLeft, "<C-w>h")
-    map("n", wnav.moveRight, "<C-w>l")
-    map("n", wnav.moveUp, "<C-w>k")
-    map("n", wnav.moveDown, "<C-w>j")
+    map("i", "<C-b>", "<Left>")
+    map("i", "<C-f>", "<Right>")
+    map("i", "<C-a>", "<ESC>^i")
+    map("i", "<C-e>", "<End>")
+    map("i", "<C-n>", "<Down>")
+    map("i", "<C-p>", "<Up>")
 
     map("n", '[g', "<Cmd>lua require('contrib.gps_hack').gps_context_parent()<CR>", {silent=false})
     map("n", ',s',require('core.utils').range_search)
     map("x", ',s',require('core.utils').range_search)
-  end
 
-  local function required_mappings()
     map("n", "<leadr>ts", [[ :keeppatterns<Bar>:%s/\s\+$//e<CR> ]] )
     cmd [[ command DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]
     map("n", "<space>", "<Nop>", {noremap = true, silent = true})
@@ -108,7 +88,6 @@ M.general = function()
     map("n", "<F1>", "<Tab>", {noremap=true}) -- because I set <Ctrl-I> to send the same escape bytes as <Home>, so <Tab>/<Ctrl-I> can be used with this keymap
     map("x", ">", ">gv", {silent = false, noremap = true})
     map("x", "<", "<gv", {silent = false, noremap = true})
-    map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
     map("t", "<C-w>n", "<C-\\><C-n><C-w>j")
     map("t", "<C-w>e", "<C-\\><C-n><C-w>k")
     map("t", "<C-w>i", "<C-\\><C-n><C-w>l")
@@ -122,11 +101,9 @@ M.general = function()
     map("n", "<leader>mm", "<cmd>Messages<CR>")
     map("n", ",t", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
 
-    map("i", "<C-n>", "<C-O>o",{noremap = true})
-    map("i", "<C-e>", "<C-O>O",{noremap = true})
+    -- map("i", "<C-n>", "<C-O>o",{noremap = true})
+    -- map("i", "<C-e>", "<C-O>O",{noremap = true})
 
-    map("n",'<leader>fs','<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>')
-    -- if you want to grep only in opened buffers: lua require('telescope.builtin').live_grep({grep_open_files=true})
     map("n", "N","mzJ`z")
     map("n", "k","nzzzv")
     map("n", "K","Nzzzv")
@@ -136,38 +113,28 @@ M.general = function()
     map("n",'<leader>tv', ":lua require('core.utils')<CR> | :lua my_hack_undo_redo()<CR>")
     map("n", "<leader>sw", function ()
       local cword = vim.fn.expand("<cword>")
-      local cmd = string.format([[:<C-u>%%s/\<%s\>//g<Left><Left>]],cword)
-      return cmd
+      local cmd_str = string.format([[:<C-u>%%s/\<%s\>//g<Left><Left>]],cword)
+      return cmd_str
     end,{expr=true})
 
     map("s","A","<Esc>A")
     map("s","U","<Esc>i")
 
-    map("n", maps.misc.close_buffer, ":lua require('core.utils').close_buffer() <CR>") -- close  buffer
-    map("n", maps.misc.cp_whole_file, ":%y+ <CR>") -- copy whole file content
-    map("n", maps.misc.new_buffer, ":enew <CR>") -- new buffer
-    map("n", maps.misc.new_tab, ":tabnew <CR>") -- new tabs
-    map("n", maps.misc.lineNR_toggle, ":set nu! <CR>")
-    map("n", maps.misc.lineNR_rel_toggle, ":set rnu! <CR>") -- relative line numbers
-    map("n", maps.misc.save_file, ":w <CR>") -- ctrl + s to save file
+    map("n", '<leader>x', ":lua require('core.utils').close_buffer() <CR>") -- close  buffer
+    map("n", "<M-c>", ":%y+ <CR>") -- copy whole file content
+    map("n", "<S-t>", ":enew <CR>") -- new buffer
+    map("n", "<C-t>b", ":tabnew <CR>") -- new tabs
+    map("n", "<leader>n", ":set nu! <CR>")
+    map("n", "<leader>rn", ":set rnu! <CR>") -- relative line numbers
+    map("n", "<C-s>", ":w <CR>") -- ctrl + s to save file
 
     -- terminal mappings --
-    local term_maps = maps.terminal
     -- get out of terminal mode
-    map("t", term_maps.esc_termmode, "<C-\\><C-n>")
-    -- pick a hidden term
-    map("n", term_maps.pick_term, ":Telescope terms <CR>")
-    -- Open terminals
-    -- TODO this opens on top of an existing vert/hori term, fixme
+    map("t", "jj" , "<C-\\><C-n>")
     -- spawns terminals
-    map(
-      "n",
-      term_maps.spawn_horizontal,
-      ":execute 15 .. 'new +terminal' | let b:term_type = 'hori' | startinsert <CR>"
-    )
-    map("n", term_maps.spawn_vertical, ":execute 'vnew +terminal' | let b:term_type = 'vert' | startinsert <CR>")
-    map("n", term_maps.spawn_window, ":execute 'terminal' | let b:term_type = 'wind' | startinsert <CR>")
-
+    map("n", "<leader>th",":execute 15 .. 'new +terminal' | let b:term_type = 'hori' | startinsert <CR>")
+    map("n", "<leader>tv", ":execute 'vnew +terminal' | let b:term_type = 'vert' | startinsert <CR>")
+    map("n", "<leader>tw", ":execute 'terminal' | let b:term_type = 'wind' | startinsert <CR>")
     -- terminal mappings end --
 
     map("c", '<C-a>','<Home>')
@@ -233,44 +200,8 @@ M.general = function()
     cmd "silent! command PackerUpdate lua require 'plugins' require('packer').update()"
   end
 
-  non_config_mappings()
-  optional_mappings()
-  required_mappings()
+  others()
   colemak()
-end
-
--- below are all plugin related mappings
-
-M.bufferline = function()
-  local m = plugin_maps.bufferline
-
-  map("n", m.next_buffer, ":BufferLineCycleNext <CR>")
-  map("n", m.prev_buffer, ":BufferLineCyclePrev <CR>")
-end
-
-M.comment = function()
-  local m = plugin_maps.comment.toggle
-  map("n", m, ":lua require('Comment.api').toggle_current_linewise()<CR>")
-  map("v", m, ":lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>")
-end
-
-M.nvimtree = function()
-  map("n", plugin_maps.nvimtree.toggle, ":NvimTreeToggle <CR>")
-  map("n", plugin_maps.nvimtree.focus, ":NvimTreeFocus <CR>")
-end
-
-M.telescope = function()
-  local m = plugin_maps.telescope
-
-  map("n", m.buffers, ":Telescope buffers <CR>")
-  map("n", m.find_files, "<Cmd>Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>")
-  map("n", m.find_hiddenfiles, ":Telescope find_files follow=true no_ignore=true hidden=true <CR>")
-  map("n", m.git_commits, ":Telescope git_commits <CR>")
-  map("n", m.git_status, ":Telescope git_status <CR>")
-  map("n", m.help_tags, ":Telescope help_tags <CR>")
-  map("n", m.oldfiles, ":Telescope oldfiles <CR>")
-  map("n", m.themes, ":Telescope themes <CR>")
-  map("n", m.dotfiles, ":Telescope dotfiles <CR>")
 end
 
 return M

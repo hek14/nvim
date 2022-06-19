@@ -3,23 +3,24 @@ function Buf_attach()
   -- reset keymaps
   vim.defer_fn(function ()
     local cmd_str = [[xunmap <buffer> ih]] -- NOTES: xunmap ih will not work in this case!!! buffer local keymaps should unmap using <buffer> too
+    local ok_all = true
     lprint(cmd_str)
     local ok,_ = pcall(vim.api.nvim_command,cmd_str)
     ok_all = ok_all and ok
 
-    local cmd_str = [[ounmap <buffer> ih]]
+    cmd_str = [[ounmap <buffer> ih]]
     lprint(cmd_str)
-    local ok,_ = pcall(vim.api.nvim_command,cmd_str)
+    ok,_ = pcall(vim.api.nvim_command,cmd_str)
     ok_all = ok_all and ok
 
-    local cmd_str = [[xunmap i%]]
+    cmd_str = [[xunmap i%]]
     lprint(cmd_str)
-    local ok,_ = pcall(vim.api.nvim_command,cmd_str)
+    ok,_ = pcall(vim.api.nvim_command,cmd_str)
     ok_all = ok_all and ok
 
-    local cmd_str = [[ounmap i%]]
+    cmd_str = [[ounmap i%]]
     lprint(cmd_str)
-    local ok,_ = pcall(vim.api.nvim_command,cmd_str)
+    ok,_ = pcall(vim.api.nvim_command,cmd_str)
     ok_all = ok_all and ok
   end,250) -- 250 should be enough for buffer local plugins to load
   -- require("core.utils").repeat_timer(function ()

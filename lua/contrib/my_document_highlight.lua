@@ -29,7 +29,8 @@ local colors = {
 -- ========== state end
 
 for i, color in ipairs(colors) do
-  vim.cmd (fmt('highlight! def kk_highlight_%s guibg=%s guifg=black',i,color))
+  vim.cmd (fmt('highlight! def kk_highlight_%s_write gui=italic,bold guibg=%s guifg=black',i,color))
+  vim.cmd (fmt('highlight! def kk_highlight_%s_read guibg=%s guifg=black',i,color))
 end
 local color_index = 0
 local hl_offset_encoding = "utf-16"
@@ -163,7 +164,8 @@ end
 local function my_buf_highlight_references(bufnr, _references, offset_encoding, compare)
   M.kk_clear_highlight()
   local ns = vim.api.nvim_create_namespace('')
-  local color_used = fmt('kk_highlight_%s',math.fmod(color_index,#colors) + 1)
+  local color_used_write = fmt('kk_highlight_%s_write',math.fmod(color_index,#colors) + 1)
+  local color_used_read = fmt('kk_highlight_%s_read',math.fmod(color_index,#colors) + 1)
   color_index = color_index + 1
   if reference_mark_group[bufnr] == nil then
     print('bad, no attach')
@@ -188,11 +190,11 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding, 
     local end_idx = get_line_byte_from_position(bufnr, { line = start_line, character = end_char }, offset_encoding)
 
     local document_highlight_kind = {
-      [protocol.DocumentHighlightKind.Text] = color_used, --'LspReferenceText',
-      [protocol.DocumentHighlightKind.Read] = color_used, --'LspReferenceRead',
-      [protocol.DocumentHighlightKind.Write] = color_used, --'LspReferenceWrite',
+      [protocol.DocumentHighlightKind.Text] = color_used_read, --'LspReferenceText',
+      [protocol.DocumentHighlightKind.Read] = color_used_read, --'LspReferenceRead',
+      [protocol.DocumentHighlightKind.Write] = color_used_write, --'LspReferenceWrite',
     }
-    local kind = protocol.DocumentHighlightKind.Text
+    local kind = reference['kind'] or protocol.DocumentHighlightKind.Text
     highlight.range(
       bufnr,
       ns,

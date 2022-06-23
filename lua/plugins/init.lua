@@ -185,6 +185,8 @@ local plugins = {
   {
     "rafamadriz/friendly-snippets",
     module = "cmp_nvim_lsp",
+    -- NOTE: can use regex pattern now
+    -- module_pattern = {'cmp_nvim_lsp.*'}
     event = "InsertEnter",
   },
 
@@ -287,6 +289,8 @@ local plugins = {
   {
     "nvim-telescope/telescope.nvim",
     -- module = "telescope", -- NOTE: don't use `module` and `cmd` at the same time: cause bug in Mac OS
+    -- module_pattern = {'telescope.*'}
+
     opt = true,
     cmd = "Telescope",
     config = "require('plugins.configs.telescope')",

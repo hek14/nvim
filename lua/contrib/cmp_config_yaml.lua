@@ -1,25 +1,6 @@
 local cmp = require "cmp"
 local source = {}
 
--- function source:get_trigger_characters()
---   return { "." }
-
--- function source:is_available()
---   return true
--- end
-
-function source:get_keyword_pattern()
-   return "[%[.\"\']"
-end
-
--- function source:get_debug_name()
---   return 'cmp_mine'
--- end
-
--- function source:resolve(completion_item,callback)
---   callback(completion_item)
--- end
-
 source.new = function()
   local json_decode = vim.fn.json_decode
   if vim.fn.has "nvim-0.6" == 1 then
@@ -33,22 +14,30 @@ source.new = function()
   }, { __index = source })
 end
 
+-- source.get_trigger_characters = function()
+--   return { "." }
+-- end
+
+-- source.get_keyword_pattern = function()
+    -- return "[%[.\"\']+"
+    -- return [[\%(\k\|\.\)\+]]
+-- end
+
 source.complete = function(self, request, callback)
   -- NOTE: request: {context=xxx,completion_context=xxx,offset=xxx}
-  local q = string.sub(request.context.cursor_before_line, request.offset)
+  local input = string.sub(request.context.cursor_before_line, request.offset - 1)
+  local prefix = string.sub(request.context.cursor_before_line, 1, request.offset - 1)
   local line_before_current = request.context.cursor_before_line
   local line_after_current = request.context.cursor_after_line
-  local pattern = request.option.pattern or "[\\w_-]+"
-  local additional_arguments = request.option.additional_arguments or ""
-  local context_before = request.option.context_before or 1
-  local context_after = request.option.context_after or 3
-  local quote = "'"
-  if vim.o.shell == "cmd.exe" then
-    quote = '"'
-  end
   local file = nil
   local labels = {}
   local seen = {}
+
+  local condition = vim.endswith(input, '.')
+  if condition==false then
+    callback({isIncomplete = true})
+    return
+  end
 
   local function json_to_keys(json) -- json is the root of a dict(converted by json)
     local stack = { { json, "" } }
@@ -80,6 +69,7 @@ source.complete = function(self, request, callback)
   end
 
   local function on_event(job_id, data, event)
+    -- NOTE: callback function (goback to handle results)
     local depth = 0
     if event == "stdout" then
       -- print("on_event: stdout, ",vim.inspect(data))
@@ -123,7 +113,26 @@ source.complete = function(self, request, callback)
           --   end
           end
           if #labels < self.max_items then
-            table.insert(labels,#labels+1,{label=mua,documentation="value: " .. tostring(value) .. '\nfile: ' .. file,file=file,depth=depth})
+            table.insert(labels,#labels+1,{
+              label=file .. ': ' .. mua, -- the text shown in menu
+              filterText = file .. ' ' .. mua, -- the text used in filtering
+              documentation="value: " .. tostring(value) .. '\nfile: ' .. file,
+              file=file, -- custom meta info
+              depth=depth, -- custom meta info
+              textEdit = {
+                newText = mua,
+                range = {
+                  start = {
+                    line = request.context.cursor.row - 1,
+                    character = request.context.cursor.col - 1 - #input,
+                  },
+                  ['end'] = {
+                    line = request.context.cursor.row - 1,
+                    character = request.context.cursor.col - 1,
+                  },
+                },
+              },
+            })
           end
         end
         -- FIX: sort doesn't work

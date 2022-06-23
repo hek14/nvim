@@ -7,7 +7,7 @@ local function LazyLoad() -- not necessary to use global function for nvim_creat
   require("luasnip/loaders/from_vscode").load()
   vim.defer_fn(function ()
     -- require the plugin config, although the command PackerCompile will require this
-    require("plugins") 
+    require("plugins")
   end,50)
   -- method 1 of loading a packer configed package: dominated by packer(event,ft,module,key,command, etc. all lazy but automatically)
   -- method 2 of loading a packer configed package: manually load the package using the packer.loader just like above

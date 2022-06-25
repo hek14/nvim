@@ -108,15 +108,15 @@ M.fast_init_class = function ()
 {}
 {}
   ]],{
-      d(1,function(_,_,_,user_args)
+      d(1,function(_,_,_,user_args_1)
         local nodes = {}
-        for i,arg in ipairs(user_args) do
+        for i,arg in ipairs(user_args_1) do
           print(string.format("arg %s: %s",i,arg))
-          table.insert(nodes,sn(i,fmt("self.{} = {}",{t(arg),t({arg,i<#user_args and "" or nil})})))
+          table.insert(nodes,sn(i,fmt("self.{} = {}",{t(arg),t({arg,i<#user_args_1 and "" or nil})})))
         end
         print("length of nodes: ",#nodes)
         return sn(nil,nodes)
-      end,{},init_args),
+      end,{},{user_args={init_args}}),
       i(0,"continue")
     })
   local assignment_shot = s("kk_assignment",assignment_nodes)
@@ -160,9 +160,8 @@ M.grep_signature = function(entry)
     M.grep_class_signature(entry)
   end
   if entry.kind == "Function" then
-    M.grep_function_signature(entry)
+    M.grep_function_signature()
   end
-  return
 end
 
 
@@ -177,10 +176,11 @@ def test_{}():
 
 ]],{
       sn(1,t{class_name}),
-      d(2,function (_, _, _, user_args)
+      d(2,function (_, _, _, user_args_1)
+        vim.pretty_print("user_args_1: ",user_args_1)
         local nodes = {}
-        for kk,arg in ipairs(user_args) do
-          if kk < #user_args then 
+        for kk,arg in ipairs(user_args_1) do
+          if kk < #user_args_1 then 
             if not string.find(arg,'=') then
               table.insert(nodes,sn(kk,fmt("{} = {}{}",{t("    " .. arg),i(1,"arg" .. kk),t{" ",""}})))
             else
@@ -195,12 +195,12 @@ def test_{}():
           end
         end
         return sn(nil,nodes)
-      end,{},init_args),
+      end,{},{user_args = {init_args}}),
       rep(1),
       rep(1),
-      f(function(_, _, user_args)
+      f(function(_, _, user_args_1)
         local args = {}
-        for j,arg in ipairs(user_args) do
+        for j,arg in ipairs(user_args_1) do
           if arg:find("=") then
             local to_sub = string.gsub(arg,"(.-) *=.+","%1")
             table.insert(args,to_sub)
@@ -209,7 +209,7 @@ def test_{}():
           end
         end
         return table.concat(args,",")
-      end, {}, init_args),
+      end, {}, {user_args = {init_args}}),
       -- NOTE: example of using sibling nodes:
       -- f(function(args, _, _)
       --   return '*' .. args[1][1] .. "_init()"
@@ -224,10 +224,10 @@ def test_{}():
     print("output: ",{})
 test_{}()
       ]],{
-        d(1,function (_, _, _, user_args)
+        d(1,function (_, _, _, user_args_1)
           local nodes = {}
-          for kk,arg in ipairs(user_args) do
-            if kk < #user_args then 
+          for kk,arg in ipairs(user_args_1) do
+            if kk < #user_args_1 then 
               if not string.find(arg,'=') then
                 table.insert(nodes,sn(kk,fmt("{} = {}{}",{t("    " .. arg),i(1,"arg" .. kk),t{" ",""}})))
               else
@@ -242,13 +242,13 @@ test_{}()
             end
           end
           return sn(nil,nodes)
-        end,{},call_args),
-        f(function(_, _, user_args)
-          return 'obj_' .. user_args
-        end,{},class_name),
-        f(function(_, _, user_args)
+        end,{},{user_args={call_args}}),
+        f(function(_, _, user_args_1)
+          return 'obj_' .. user_args_1
+        end,{},{user_args={class_name}}),
+        f(function(_, _, user_args_1)
           local args = {} 
-          for j,arg in ipairs(user_args) do
+          for j,arg in ipairs(user_args_1) do
             if arg:find("=") then
               local to_sub = string.gsub(arg,"(.-) *=.+","%1")
               table.insert(args,to_sub)
@@ -257,11 +257,11 @@ test_{}()
             end
           end
           return table.concat(args,",") 
-        end, {}, call_args),
+        end, {}, {user_args={call_args}}),
         i(3,"output.shape"),
-        f(function(_,_,user_args)
-          return user_args
-        end,{},class_name)
+        f(function(_,_,user_args_1)
+          return user_args_1
+        end,{},{user_args={class_name}})
       })
   end
   local combine_shots = s("kk_specical",{

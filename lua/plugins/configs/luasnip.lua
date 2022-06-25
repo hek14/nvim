@@ -1,3 +1,4 @@
+-- NOTE:refer to https://www.youtube.com/watch?v=ub0REXjhpmk
 local present, luasnip = pcall(require, "luasnip")
 local map = require("core.utils").map
 if not present then

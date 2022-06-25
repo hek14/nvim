@@ -9,6 +9,8 @@
 2.2 task system and run script, show output:
 2.2.1 https://github.com/skywind3000/asynctasks.vim#installation
 2.2.2 https://github.com/skywind3000/asyncrun.vim#extra-runners
+2.3 https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
+2.4 https://github.com/ziontee113/syntax-tree-surfer: navigater/swap based on syntax tree(powered by treesitter)
 3. themes: https://alpha2phi.medium.com/12-neovim-themes-with-tree-sitter-support-8be320b683a4
 4. for pyright completion stubs: https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs
 4.1 how to use it for cv2 module completion:

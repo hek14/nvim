@@ -121,6 +121,21 @@ function M.Smart_goto_definition()
   end)
 end
 
+function M.definition_in_split()
+  if vim.fn.winnr('$')<4 then
+    if vim.fn.winwidth(0) < 120 then
+      vim.cmd[[split]]
+    else
+      vim.cmd[[vsplit]]
+    end
+  end
+  if package.loaded['lspconfig']~=nil then
+    vim.lsp.buf.definition() -- built-in lsp
+  else
+    vim.cmd [[exe "normal \<Plug>(coc-definition)"]] -- or coc
+  end
+end
+
 function M.Smart_goto_next_ref(index)
   local bufnr = vim.fn.bufnr()
   vim.cmd [[normal! m`]]

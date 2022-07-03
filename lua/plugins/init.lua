@@ -173,7 +173,7 @@ local plugins = {
     event = "InsertCharPre",
     config = function ()
       local default = {
-        mapping = {'jj','kk'},
+        mapping = {'jk'},
         timeout = 300,
       }
       require("better_escape").setup(default)
@@ -754,6 +754,21 @@ local plugins = {
           }),
         },
       })
+    end
+  },
+  {
+    "skywind3000/asynctasks.vim",
+    cmd = 'AsyncTask',
+    requires = { 
+      { "skywind3000/asyncrun.vim", 
+        cmd = 'AsyncRun',
+        setup = function ()
+          local ft_map = require("core.autocmds").ft_map
+          ft_map('python','n',',t','<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>')
+        end
+      }},
+    setup = function ()
+      vim.g.asyncrun_open = 6
     end
   },
   {

@@ -1,3 +1,5 @@
+local M = {}
+local map = require("core.utils").map
 local group = vim.api.nvim_create_augroup("KK",{clear=true})
 local au = function(event,opt)
   local merged_opts = vim.tbl_extend('force',{group=group},opt or {})
@@ -129,3 +131,13 @@ au("FileType",{callback=function ()
     vim.cmd("setlocal syntax=off")
   end
 end})
+
+M.ft_map = function(ft,mode,lhs,rhs,opts)
+  au('FileType',{callback=function ()
+    local merged_opts = vim.tbl_extend('force',{buffer=true},opt or {})
+    map(mode,lhs,rhs,merged_opts)
+  end,
+    pattern=ft})
+end
+
+return M

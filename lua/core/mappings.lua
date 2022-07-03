@@ -1,3 +1,5 @@
+local ft_map = require("core.autocmds").ft_map
+
 local utils = require "core.utils"
 
 local map_wrapper = utils.map
@@ -99,7 +101,7 @@ M.general = function()
     map("n", "<Esc>", [[:noh <Bar> :lua require('core.utils').closing_float_window()<CR>]])
     map("n", "<leader>mc", "<cmd>Messages clear<CR>")
     map("n", "<leader>mm", "<cmd>Messages<CR>")
-    map("n", ",t", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
+    ft_map({'lua','vim'}, "n", ",t", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
 
     -- map("i", "<C-n>", "<C-O>o",{noremap = true})
     -- map("i", "<C-e>", "<C-O>O",{noremap = true})
@@ -179,17 +181,6 @@ M.general = function()
         echo "@".getcmdline()
         execute ":'<,'>normal @".nr2char(getchar())
         endfunction
-        " " example of how to create a new hightlight:
-        hi def KK_init guibg=grey guifg=blue gui=italic
-        highlight TSDefinitionUsage guibg=#444444 " NOTE: highlight used in treesitter-refactor
-        highlight Visual guibg=#6c6c6c
-        " " example of how to set a existing hightlight:
-        " " for GUI nvim(iTerm,kitty,etc.):
-        " hi Search gui=italic guibg=peru guifg=wheat
-        " " for terminal nvim:
-        " hi Search cterm=NONE ctermfg=grey ctermbg=blue
-        " " def a highlight by linking
-        " hi def link Search Todo
         ]])
     -- Add Packer commands because we are not loading it at startup
     cmd "silent! command PackerClean lua require 'plugins' require('packer').clean()"

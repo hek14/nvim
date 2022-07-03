@@ -14,7 +14,6 @@ ts_config.setup {
   highlight = {
     enable = true,
     use_languagetree = true,
-    custom_captures = {['init_args'] = 'KK_init'}, -- match name -> highlight group
   },
   indent = {
     enable = true
@@ -117,6 +116,20 @@ ts_config.setup {
       },
     },
   },
+}
+vim.cmd[[
+highlight def KK_init guibg=grey guifg=blue gui=italic
+highlight def TSDefinitionUsage guibg=#444444 " NOTE: highlight used in treesitter-refactor
+highlight def Visual guibg=#6c6c6c
+" " for GUI nvim(iTerm,kitty,etc.):
+" highlight Search gui=italic guibg=peru guifg=wheat
+" " for terminal nvim:
+" highlight Search cterm=NONE ctermfg=grey ctermbg=blue
+" " def a highlight by linking
+" highlight def link Search Todo
+]]
+require"nvim-treesitter.highlight".set_custom_captures {
+  ["init_func"] = "KK_init",
 }
 
 -- treesitter seems to have no bug about the indentation

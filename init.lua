@@ -5,6 +5,7 @@
 1.3 https://github.com/leaxoy/v
 1.4 https://github.com/glepnir/nvim.git
 1.5 https://github.com/ziontee113/nvim-config -- nice youtube vlog
+1.6 https://github.com/s1n7ax/dotnvim: Power of LuaSnip with TreeSitter in Neovim
 2. refer to useful plugins
 2.1 interact with tmux: https://github.com/preservim/vimux
 2.2 task system and run script, show output:

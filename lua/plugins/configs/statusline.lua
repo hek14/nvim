@@ -3,6 +3,39 @@ if not present then
    return
 end
 
+local vi_mode_utils = require 'feline.providers.vi_mode'
+
+local colors = {
+  bg = '#282c34',
+  fg = '#abb2bf',
+  yellow = '#e0af68',
+  cyan = '#56b6c2',
+  darkblue = '#081633',
+  green = '#98c379',
+  orange = '#d19a66',
+  violet = '#a9a1e1',
+  magenta = '#c678dd',
+  blue = '#61afef',
+  red = '#e86671'
+}
+
+local vi_mode_colors = {
+  NORMAL = colors.green,
+  INSERT = colors.red,
+  VISUAL = colors.magenta,
+  OP = colors.green,
+  BLOCK = colors.blue,
+  REPLACE = colors.violet,
+  ['V-REPLACE'] = colors.violet,
+  ENTER = colors.cyan,
+  MORE = colors.cyan,
+  SELECT = colors.orange,
+  COMMAND = colors.green,
+  SHELL = colors.green,
+  TERM = colors.green,
+  NONE = colors.yellow
+}
+
 local default = {
    lsp = require "feline.providers.lsp",
    lsp_severity = vim.diagnostic.severity,
@@ -82,6 +115,8 @@ default.main_icon = {
    right_sep = {
       str = default.statusline_style.right,
    },
+
+   hl = {fg = colors.magenta}
 }
 
 default.file_name = {
@@ -100,6 +135,13 @@ default.file_name = {
    end,
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
+   end,
+   hl = function()
+      local val = {
+        name = vi_mode_utils.get_mode_highlight_name(),
+        fg = vi_mode_utils.get_mode_color(),
+      }
+      return val
    end,
    right_sep = {
       str = default.statusline_style.right,
@@ -139,22 +181,27 @@ default.dir_name = {
    right_sep = {
       str = default.statusline_style.right,
    },
+
+   hl = {fg = colors.blue}
 }
 
 default.diff = {
    add = {
       provider = "git_diff_added",
       icon = " ",
+      hl = {fg = colors.green}
    },
 
    change = {
       provider = "git_diff_changed",
       icon = "  ",
+      hl = {fg = colors.orange}
    },
 
    remove = {
       provider = "git_diff_removed",
       icon = "  ",
+      hl = {fg = colors.red}
    },
 }
 
@@ -164,6 +211,10 @@ default.git_branch = {
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
    end,
    icon = "  ",
+   hl = {
+      fg = colors.violet,
+      style = 'bold'
+   },
 }
 
 default.diagnostic = {
@@ -173,6 +224,7 @@ default.diagnostic = {
          return default.lsp.diagnostics_exist(default.lsp_severity.ERROR)
       end,
       icon = "  ",
+      hl = {fg = colors.red}
    },
 
    warning = {
@@ -181,6 +233,7 @@ default.diagnostic = {
          return default.lsp.diagnostics_exist(default.lsp_severity.WARN)
       end,
       icon = "  ",
+      hl = {fg = colors.yellow}
    },
 
    hint = {
@@ -189,6 +242,7 @@ default.diagnostic = {
          return default.lsp.diagnostics_exist(default.lsp_severity.HINT)
       end,
       icon = "  ",
+      hl = {fg = colors.violet}
    },
 
    info = {
@@ -197,6 +251,7 @@ default.diagnostic = {
          return default.lsp.diagnostics_exist(default.lsp_severity.INFO)
       end,
       icon = "  ",
+      hl = {fg = colors.darkblue}
    },
 }
 
@@ -218,10 +273,23 @@ if ok then
     enabled = function()
       local gps = require("nvim-gps")
       return gps.is_available()
-    end
+    end,
+    hl = {fg = colors.magenta}
   }
-else
-  print("gps not available")
+end
+
+local navic_code_context = nil
+local ok,navic = pcall(require,'nvim-navic')
+if ok then
+  navic_code_context = {
+    provider = function()
+      return " " .. navic.get_location()
+    end,
+    enabled = function()
+      return navic.is_available()
+    end,
+    hl = {fg = colors.magenta}
+  }
 end
 
 
@@ -260,12 +328,13 @@ default.lsp_progress = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 80
    end,
+   hl = {fg = colors.magenta}
 }
 
 default.lsp_icon = {
    provider = function()
       if next(vim.lsp.buf_get_clients()) ~= nil then
-         return "  LSP"
+         return " LSP"
       else
          return ""
       end
@@ -273,6 +342,10 @@ default.lsp_icon = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 70
    end,
+   hl = {
+      fg = colors.blue,
+      style = 'bold'
+   },
 }
 
 default.empty_space = {
@@ -299,6 +372,7 @@ default.separator_right = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 90
    end,
+   hl = {fg = colors.green}
 }
 
 default.separator_right2 = {
@@ -306,6 +380,7 @@ default.separator_right2 = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 90
    end,
+   hl = {fg = colors.green}
 }
 
 default.position_icon = {
@@ -332,6 +407,11 @@ default.current_line = {
    enabled = default.shortline or function(winid)
       return vim.api.nvim_win_get_width(tonumber(winid) or 0) > 90
    end,
+
+   hl = {
+      fg = colors.cyan,
+      style = 'bold'
+   }
 }
 
 local function add_table(a, b)
@@ -361,6 +441,8 @@ M.setup = function(override_flag)
    add_table(default.left, default.diagnostic.info)
    if gps_code_context then
       add_table(default.left, gps_code_context)
+   elseif navic_code_context then
+      add_table(default.left, navic_code_context)
    end
 
    add_table(default.middle, default.lsp_progress)
@@ -368,12 +450,12 @@ M.setup = function(override_flag)
    -- right
    add_table(default.right, default.lsp_icon)
    add_table(default.right, default.git_branch)
-   add_table(default.right, default.empty_space)
-   add_table(default.right, default.empty_spaceColored)
-   add_table(default.right, default.mode_icon)
+   -- add_table(default.right, default.empty_space)
+   -- add_table(default.right, default.empty_spaceColored)
+   -- add_table(default.right, default.mode_icon)
    add_table(default.right, default.empty_space2)
-   add_table(default.right, default.separator_right)
-   add_table(default.right, default.separator_right2)
+   -- add_table(default.right, default.separator_right)
+   -- add_table(default.right, default.separator_right2)
    add_table(default.right, default.position_icon)
    add_table(default.right, default.current_line)
 

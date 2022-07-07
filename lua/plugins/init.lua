@@ -27,7 +27,7 @@ local plugins = {
 
   {
     "feline-nvim/feline.nvim",
-    after = {"nvim-web-devicons","nvim-treesitter","nvim-gps"},
+    after = {"nvim-web-devicons","nvim-treesitter","nvim-navic"},
     config = function ()
       require"plugins.configs.statusline".setup()
     end
@@ -101,7 +101,7 @@ local plugins = {
 
   {
     "neovim/nvim-lspconfig",
-    after = "nvim-lsp-installer",
+    after = {"nvim-lsp-installer","nvim-navic"},
     config = "require('plugins.configs.lspconfig')",
   },
 
@@ -532,6 +532,7 @@ local plugins = {
   },
   {
     "SmiteshP/nvim-gps",
+    disable = true, -- disable, in favour of SmiteshP/nvim-navic now
     -- this plugin shows the code context in the statusline: check ~/.config/nvim/lua/plugins/configs/statusline.lua
     after = { "nvim-treesitter", "nvim-web-devicons" },
     wants = { "nvim-treesitter" }, -- loader treesitter if necessary
@@ -548,7 +549,15 @@ local plugins = {
           ["tag-name"] = "炙", -- Tags (example: html tags)
         },
       })
+      require('core.utils').map("n", '[g', "<Cmd>lua require('contrib.gps_hack').gps_context_parent()<CR>", {silent=false})
     end,
+  },
+  {
+    'hek14/nvim-navic', -- NOTE: after changing a repo to local, should 'PackerSync'
+    after = { "nvim-treesitter", "nvim-web-devicons" },
+    config = function ()
+      require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
+    end
   },
   {
     "haringsrob/nvim_context_vt", -- another context plugin

@@ -79,7 +79,6 @@ M.general = function()
     map("i", "<C-n>", "<Down>")
     map("i", "<C-p>", "<Up>")
 
-    map("n", '[g', "<Cmd>lua require('contrib.gps_hack').gps_context_parent()<CR>", {silent=false})
     map("n", ',s',require('core.utils').range_search)
     map("x", ',s',require('core.utils').range_search)
 

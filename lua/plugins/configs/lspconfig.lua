@@ -1,5 +1,7 @@
 local util = require'lspconfig'.util
 local trouble_present = pcall(require, 'trouble')
+local navic_present,navic = require("nvim-navic")
+local illuminate_present,illuminate = pcall(require,'illuminate')
 
 local M = {}
 local function lspSymbol(name, icon)
@@ -214,9 +216,12 @@ local on_server_ready = function(server)
     buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 
     print("Lsp catches this buffer!")
-    local ok,illuminate = pcall(require,'illuminate')
-    if ok then
+    if illuminate_present then
       require 'illuminate'.on_attach(client)
+    end
+
+    if navic_present then
+      require("nvim-navic").attach(client, bufnr)
     end
 
     local function buf_set_keymap(...)

@@ -9,7 +9,8 @@ ts_config.setup {
     "lua",
     "vim",
     "python",
-    "latex"
+    "latex",
+    "comment"
   },
   highlight = {
     enable = true,

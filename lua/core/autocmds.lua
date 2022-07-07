@@ -124,6 +124,17 @@ au("FileType",{pattern='lua',callback=function()
   end
 end})
 
+
+-- PackerCompile when lua configs modified
+-- vim.cmd([[
+--   augroup packer_user_config
+--     autocmd!
+--     autocmd BufWritePost plugins.lua source <afile> | PackerCompile
+--     autocmd User PackerCompileDone LspStop
+--   augroup end
+-- ]])
+
+
 -- disable syntax in large file
 au("FileType",{callback=function ()
   if vim.fn.wordcount()['bytes'] > 2048000 or vim.fn.line('$') > 5000 then

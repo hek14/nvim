@@ -39,7 +39,7 @@ packer.init {
    },
    auto_clean = true,
    compile_on_sync = true,
-   max_jobs = 4
+   max_jobs = 16,
 }
 
 return packer

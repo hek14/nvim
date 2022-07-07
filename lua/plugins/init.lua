@@ -781,6 +781,9 @@ local plugins = {
     end
   },
   {
+    "preservim/vimux",
+  },
+  {
     "folke/persistence.nvim",
     event = "BufReadPre", -- this will only start session saving when an actual file was opened
     module = "persistence",
@@ -938,8 +941,53 @@ end
 
 plugins = vim.list_extend(plugins,specific_plugins)
 
+local local_plugins = {
+  ["hek14"] = true,
+}
+local function get_name(pkg)
+  local parts = vim.split(pkg, "/")
+  return parts[#parts], parts[1]
+end
+
+local function has_local(local_pkg)
+  return vim.loop.fs_stat(vim.fn.expand(local_pkg)) ~= nil
+end
+
+local function process_local_plugins(spec)
+  if type(spec) == "string" then
+    local name, owner = get_name(spec)
+    local local_pkg = "~/github/" .. name
+
+    if local_plugins[name] or local_plugins[owner] or local_plugins[owner .. "/" .. name] then
+      if has_local(local_pkg) then
+        print('use local package: ',local_pkg)
+        return local_pkg
+      else
+        vim.notify("Local package " .. name .. " not found", vim.log.levels.ERROR, { title = 'Packer Starup' })
+      end
+    end
+    return spec
+  else
+    for i, s in ipairs(spec) do
+      spec[i] = process_local_plugins(s)
+    end
+  end
+  if spec.requires then
+    spec.requires = process_local_plugins(spec.requires)
+  end
+  return spec
+end
+
+local function wrap(use)
+  return function(spec)
+    spec = process_local_plugins(spec)
+    use(spec)
+  end
+end
+
 return packer.startup(function(use)
+  local wrapped_use = wrap(use)
   for _, v in pairs(plugins) do
-    use(v)
+    wrapped_use(v)
   end
 end)

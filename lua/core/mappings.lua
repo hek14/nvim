@@ -144,6 +144,11 @@ M.general = function()
     map("c", '<C-b>','<Left>')
     map("c", '<C-p>','<Up>')
     map("c", '<C-n>','<Down>')
+    map("c", '<C-t>','<C-f>')
+    -- ft_map("python",'n','<leader>p',[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]])
+    vim.cmd [[
+      nnoremap <leader>p :lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>
+    ]]
 
     map("x", "ul", "g_o^")
     map("o", "ul", ":normal vul<CR>")

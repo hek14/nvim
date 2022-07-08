@@ -96,7 +96,7 @@ cmp.setup {
    sources = {
       { name = "nvim_lsp" },
       { name = 'nvim_lsp_signature_help' },
-      { name = "mine_config_yaml", trigger_characters = { '.' } },
+      -- { name = "mine_config_yaml", trigger_characters = { '.' } }, -- manually trigger
       { name = "luasnip" },
       { name = "buffer" },
       { name = "nvim_lua" },
@@ -115,4 +115,17 @@ local cmp_rg_complete = function()
   })
 end
 vim.keymap.set('i','<C-g>',cmp_rg_complete,{noremap=true,silent=true})
+
+
+local cmp_config = function()
+  cmp.complete({
+    config = {
+      sources = {
+        { name = "mine_config_yaml" }, -- should install the cmp-rg
+      }
+    }
+  })
+end
+vim.keymap.set('i','<C-c>',cmp_config,{noremap=true,silent=true})
+
 vim.cmd('hi CmpFloatBorder guifg=red')

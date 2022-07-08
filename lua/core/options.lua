@@ -65,7 +65,7 @@ opt.updatetime = 200
 opt.whichwrap:append "<>[]hl"
 
 -- indent: needed by ufo
-opt.foldcolumn = '1'
+-- opt.foldcolumn = '1'
 opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
 opt.foldlevelstart = -1
 opt.foldenable = true

@@ -236,8 +236,8 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
           vim.api.nvim_buf_del_extmark(bufnr,found_ns,mark['end'])
         end
         reference_mark_group[bufnr][found_ns] = nil
-        checked = true
       end
+      checked = true -- check one reference is enough
     end
     highlight.range(
       bufnr,
@@ -252,14 +252,6 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
     table.insert(reference_mark_group[bufnr][ns],{['start']=start_mark,['end']=end_mark})
     if point_in_range({row=crow,col=ccol}, reference.range) then
       -- maintain a namespace and a start_mark and a end_mark (it's only once for each buffer, and created/deleted in this code block)
-      if last_highlight[bufnr] ~= nil then
-        vim.api.nvim_buf_del_extmark(bufnr,last_highlight[bufnr]['ns'],last_highlight[bufnr]['start'])
-        vim.api.nvim_buf_del_extmark(bufnr,last_highlight[bufnr]['ns'],last_highlight[bufnr]['end'])
-        vim.api.nvim_buf_clear_namespace(bufnr,last_highlight[bufnr]['ns'],0,-1)
-      end
-      -- local tmp_ns = vim.api.nvim_create_namespace('last_highlight_ns')
-      -- local tmp_start = vim.api.nvim_buf_set_extmark(bufnr,tmp_ns,start_line,start_idx,{})
-      -- local tmp_end = vim.api.nvim_buf_set_extmark(bufnr,tmp_ns,end_line,end_idx,{})
       local symbol_name = vim.api.nvim_buf_get_text(bufnr,start_line,start_idx,end_line,end_idx,{})[1]
       last_highlight[bufnr] = {['ns']=ns,['start']=start_mark,['end']=end_mark,['name']=symbol_name}
     end
@@ -370,7 +362,7 @@ function M.kk_clear_highlight()
     local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,found_ns,found_mark['start'],{})
     local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,found_ns,found_mark['end'],{})
 
-    -- create temporary ns and mark
+    -- NOTE: create/clone temporary ns and mark for later usage, use the ns and mark in reference_mark_group will not work because the ns is already cleared!
     if last_clear[bufnr] ~= nil then
       -- only maintain one mark for each buffer in last_clear_range
       vim.api.nvim_buf_del_extmark(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['start'])
@@ -466,7 +458,7 @@ M.on_attach = function(_bufnr,create_autocmd)
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>i',"",{callback=function()
     local bufnr = vim.fn.bufnr()
-    vim.pretty_print('inspect ns number: ',vim.tbl_keys(reference_mark_group[bufnr]))
+    vim.pretty_print('inspect reference_mark_group: ',reference_mark_group[bufnr])
     if last_clear[bufnr]~=nil then
       local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['start'],{})
       local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['end'],{})

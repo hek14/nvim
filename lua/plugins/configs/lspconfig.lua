@@ -2,6 +2,7 @@ local util = require'lspconfig'.util
 local trouble_present = pcall(require, 'trouble')
 local navic_present,navic = require("nvim-navic")
 local illuminate_present,illuminate = pcall(require,'illuminate')
+local ufo_present,ufo = pcall(require,'ufo')
 
 local M = {}
 local function lspSymbol(name, icon)
@@ -144,9 +145,11 @@ function M.Smart_goto_next_ref(index)
   require('contrib.my_lsp_handler').next_lsp_reference(index, function()
     print('using fallback')
     if index > 0 then
-      require'nvim-treesitter-refactor.navigation'.goto_next_usage()
+      require"illuminate".next_reference{wrap=true}
+      -- require'nvim-treesitter-refactor.navigation'.goto_next_usage()
     else
-      require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
+      require"illuminate".next_reference{reverse=true,wrap=true}
+      -- require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
     end
   end)
 end
@@ -192,6 +195,14 @@ capabilities.textDocument.completion.completionItem.resolveSupport = {
     "additionalTextEdits",
   },
 }
+
+-- ufo
+if ufo_present then
+  capabilities.textDocument.foldingRange = {
+    dynamicRegistration = false,
+    lineFoldingOnly = true
+  }
+end
 
 -- avoid annoying multiple clients offset_encodings detected warning
 -- refer to: https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428#issuecomment-997226723
@@ -270,12 +281,10 @@ local on_server_ready = function(server)
       map_opts)
     buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",
       map_opts)
-    -- buf_set_keymap("n", "[r", "<cmd>lua require('plugins.configs.lspconfig').Smart_goto_next_ref(-1)<CR>",
-    --                map_opts)
-    -- buf_set_keymap("n", "]r", "<cmd>lua require('plugins.configs.lspconfig').Smart_goto_next_ref(1)<CR>",
-    --                map_opts)
-    buf_set_keymap('n', ']r', '<cmd>lua require"illuminate".next_reference{wrap=true}<cr>', {noremap=true})
-    buf_set_keymap('n', '[r', '<cmd>lua require"illuminate".next_reference{reverse=true,wrap=true}<cr>', {noremap=true})
+    buf_set_keymap("n", "[r", "<cmd>lua require('plugins.configs.lspconfig').Smart_goto_next_ref(-1)<CR>",
+                   map_opts)
+    buf_set_keymap("n", "]r", "<cmd>lua require('plugins.configs.lspconfig').Smart_goto_next_ref(1)<CR>",
+                   map_opts)
 
     buf_set_keymap("n", "gs",
       "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
@@ -380,6 +389,9 @@ local on_server_ready = function(server)
     require('lspconfig').sumneko_lua.setup(luadev)
   else
     require('lspconfig')[server].setup(opts)
+  end
+  if ufo_present then
+    require('ufo').setup()
   end
   vim.cmd [[ do User LspAttachBuffers ]]
 end

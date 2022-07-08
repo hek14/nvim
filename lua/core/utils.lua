@@ -540,6 +540,20 @@ M.range_search = function(pattern)
   vim.cmd(string.format([[/\%%>%sl\%%<%sl%s]],_start-1,_end+1,pattern))
 end
 
+M.grep_last_search = function()
+  -- search the last buffer search word in CWD
+  local register = vim.fn.getreg('/'):gsub('\\<', ''):gsub('\\>', '')
+
+  if register and register ~= '' then
+    require('telescope.builtin').grep_string({
+      path_display = { 'shorten' },
+      search = register,
+    })
+  else
+    require('telescope.builtin').live_grep()
+  end
+end
+
 vim.cmd [[
   function! Inc(...)
     let result = g:i

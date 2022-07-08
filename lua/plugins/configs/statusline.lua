@@ -445,7 +445,7 @@ M.setup = function(override_flag)
       add_table(default.left, navic_code_context)
    end
 
-   add_table(default.middle, default.lsp_progress)
+   -- add_table(default.middle, default.lsp_progress) -- use fidget.nvim instead
 
    -- right
    add_table(default.right, default.lsp_icon)

@@ -106,6 +106,26 @@ local plugins = {
   },
 
   {
+    'j-hui/fidget.nvim', -- show lsp progress
+    config = function() require('fidget').setup {
+      text = {
+        -- spinner = 'line',
+        spinner = 'dots',
+        -- character shown when all tasks are complete
+        done = "Done", -- f0e1e: 󰸞  (mdi-check-bold)
+        commenced = "Started",    -- message shown when task starts
+        completed = "Completed",  -- message shown when task completes
+      },
+      window = {
+        blend = 0,  -- &winblend for the window
+      },
+      fmt = {
+        stack_upwards = true,  -- list of tasks grows upwards
+      }
+    } end
+  },
+
+  {
     "ray-x/lsp_signature.nvim",
     disable = true,
     after = "nvim-lspconfig",
@@ -310,6 +330,7 @@ local plugins = {
       -- if you want to grep only in opened buffers: lua require('telescope.builtin').live_grep({grep_open_files=true})
       -- pick a hidden term
       map("n", "<leader>T", ":Telescope terms <CR>")
+      map("n", "<leader>f/", ":lua require('core.utils').grep_last_search()<CR>")
     end,
   },
 
@@ -618,6 +639,16 @@ local plugins = {
       map("x","au",":lua require'treesitter-unit'.select(true)<CR>",{noremap=true})
       map("o","uu","<Cmd>lua require'treesitter-unit'.select()<CR>",{noremap=true})
       map("o","au","<Cmd>lua require'treesitter-unit'.select(true)<CR>",{noremap=true})
+    end
+  },
+  {
+    'kevinhwang91/nvim-ufo',
+    event = 'BufEnter',
+    requires = 'kevinhwang91/promise-async',
+    config = function ()
+      local map = require("core.utils").map
+      map('n', 'zR', require('ufo').openAllFolds)
+      map('n', 'zM', require('ufo').closeAllFolds)
     end
   },
   {

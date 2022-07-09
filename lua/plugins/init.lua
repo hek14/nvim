@@ -47,6 +47,7 @@ local plugins = {
 
   {
     "lukas-reineke/indent-blankline.nvim",
+    disable = true,
     event = "BufRead",
     config = function ()
       local default = {
@@ -86,7 +87,71 @@ local plugins = {
     config = "require('plugins.configs.treesitter')",
     run = ":TSUpdate",
   },
-
+  { 
+    "nvim-treesitter/nvim-treesitter-textobjects", 
+    after = "nvim-treesitter"
+  },
+  { "nvim-treesitter/nvim-treesitter-refactor",
+    after = "nvim-treesitter"
+  },
+  { 
+    "p00f/nvim-ts-rainbow",
+    after = "nvim-treesitter"
+  },
+  { 
+    "theHamsta/nvim-treesitter-pairs",
+    after = "nvim-treesitter"
+  },
+  {
+    "ThePrimeagen/refactoring.nvim",
+    -- disable = true, -- unstable and buggy
+    after = "nvim-treesitter",
+    requires = {
+      { "nvim-lua/plenary.nvim" },
+      { "nvim-treesitter/nvim-treesitter" },
+    },
+    config = function()
+      require("refactoring").setup({})
+      local map = require("core.utils").map
+      map("v", "<leader>re", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
+      map("v", "<leader>rf", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
+      map("v", "<leader>rv", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Variable')<CR>]], {noremap = true, silent = true, expr = false})
+      map("v", "<leader>ri", [[ <Esc><Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
+      map("n", "<leader>ri", [[ <Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
+      map("n", "<leader>rb", [[ <Cmd>lua require('refactoring').refactor('Extract Block')<CR>]], {noremap = true, silent = true, expr = false})
+      map("n", "<leader>rbf", [[ <Cmd>lua require('refactoring').refactor('Extract Block To File')<CR>]], {noremap = true, silent = true, expr = false})
+    end,
+  },
+  {
+    "nvim-treesitter/playground",
+    after = "nvim-treesitter",
+    config = function ()
+      require('core.utils').map('n',',x',':TSPlaygroundToggle<cr>')
+      require('core.utils').map('n',',h',':TSHighlightCapturesUnderCursor<cr>')
+    end
+  },
+  {
+    "David-Kunz/treesitter-unit",
+    after = "nvim-treesitter",
+    config = function ()
+      require"treesitter-unit".enable_highlighting()
+      local map = require("core.utils").map
+      map("x","uu",":lua require'treesitter-unit'.select()<CR>",{noremap=true})
+      map("x","au",":lua require'treesitter-unit'.select(true)<CR>",{noremap=true})
+      map("o","uu","<Cmd>lua require'treesitter-unit'.select()<CR>",{noremap=true})
+      map("o","au","<Cmd>lua require'treesitter-unit'.select(true)<CR>",{noremap=true})
+    end
+  },
+  {
+    'kevinhwang91/nvim-ufo',
+    event = 'BufEnter',
+    requires = 'kevinhwang91/promise-async',
+    config = function ()
+      local map = require("core.utils").map
+      map('n', 'zR', require('ufo').openAllFolds)
+      map('n', 'zM', require('ufo').closeAllFolds)
+    end
+  },
   -- git stuff
   {
     "lewis6991/gitsigns.nvim",
@@ -176,7 +241,96 @@ local plugins = {
       require("plugins.configs.lsputil").setup()
     end
   },
+  {
+    "jose-elias-alvarez/null-ls.nvim",
+    -- providing extra formatting and linting
+    -- NullLsInfo to show what's now enabled
+    -- Remember: you should install formatters/linters in $PATH, null-ls will not do this for you.
+    -- if other formatting method is enabled by the lspconfig(pyright for example), then you should turn that of in the on_attach function like below:
+    -- function on_attach(client,bufnr)
+    --    if client.name = "pyright" then
+    --         client.resolved_capabilities.document_formatting = false
+    --    end
+    -- end
+    after = "nvim-lspconfig",
+    config = function()
+      local formatting = require("null-ls").builtins.formatting
+      local diagnostics = require("null-ls").builtins.diagnostics
+      local code_actions = require("null-ls").builtins.code_actions
+      require("null-ls").setup({
+        sources = {
+          formatting.lua_format.with({ extra_args = {"--indent-width=4"}}),
+          formatting.black.with({ extra_args = {"--fast" }}),
+          code_actions.gitsigns,
+        },
 
+        -- format on save
+        -- on_attach = function(client)
+        --   if client.resolved_capabilities.document_formatting then
+        --       vim.cmd "autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()"
+        --   end
+        -- end
+      })
+    end,
+  },
+  {
+    "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",
+    after = "nvim-lspconfig",
+    config = function()
+      vim.cmd([[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]])
+    end,
+  },
+  {
+    "SmiteshP/nvim-gps",
+    disable = true, -- disable, in favour of SmiteshP/nvim-navic now
+    -- this plugin shows the code context in the statusline: check ~/.config/nvim/lua/plugins/configs/statusline.lua
+    after = { "nvim-treesitter", "nvim-web-devicons" },
+    wants = { "nvim-treesitter" }, -- loader treesitter if necessary
+    config = function()
+      -- nvim-treesitter should be loaded now
+      -- print('wants treesitter',packer_plugins["nvim-treesitter"].loaded)
+      require("nvim-gps").setup({
+        disable_icons = false, -- Setting it to true will disable all icons
+        icons = {
+          ["class-name"] = " ", -- Classes and class-like objects
+          ["function-name"] = " ", -- Functions
+          ["method-name"] = " ", -- Methods (functions inside class-like objects)
+          ["container-name"] = " ", -- Containers (example: lua tables)
+          ["tag-name"] = "炙", -- Tags (example: html tags)
+        },
+      })
+      require('core.utils').map("n", '[g', "<Cmd>lua require('contrib.gps_hack').gps_context_parent()<CR>", {silent=false})
+    end,
+  },
+  {
+    'hek14/nvim-navic', -- NOTE: after changing a repo to local, should 'PackerSync'
+    after = { "nvim-treesitter", "nvim-web-devicons" },
+    config = function ()
+      require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
+    end
+  },
+  {
+    "haringsrob/nvim_context_vt", -- another context plugin
+    disable = true,
+    after = "nvim-treesitter",
+    event = "BufRead",
+    config = "plugins.configs.nvim_context_vt"
+  },
+
+  {
+    "folke/trouble.nvim",
+    requires = "kyazdani42/nvim-web-devicons",
+    config = function()
+      require("trouble").setup({})
+    end,
+  },
+  {
+    "RRethy/vim-illuminate",
+    config = function ()
+      vim.g.Illuminate_delay = 17
+    end,
+    event = "BufRead"
+  },
   {
     "andymass/vim-matchup",
     disable = true,
@@ -248,6 +402,27 @@ local plugins = {
     after = "cmp-buffer",
   },
 
+  {
+    "hrsh7th/cmp-cmdline",
+    after = "cmp-nvim-lua",
+    config = function()
+      local cmp = require("cmp")
+      cmp.setup.cmdline("/", { sources = { { name = "buffer" } } })
+
+      --  cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+      cmp.setup.cmdline(":", {
+        sources = cmp.config.sources({ { name = "path" } }, { { name = "cmdline" } }),
+      })
+    end,
+  }, -- enhance grep and quickfix list
+  {
+    "lukas-reineke/cmp-rg",
+    after = "cmp-nvim-lua"
+  },
+  {
+    "hrsh7th/cmp-nvim-lsp-signature-help",
+    after = "cmp-nvim-lua"
+  },
   -- misc plugins
   {
     "windwp/nvim-autopairs",
@@ -333,13 +508,54 @@ local plugins = {
       map("n", "<leader>f/", ":lua require('core.utils').grep_last_search()<CR>")
     end,
   },
-
   {
-    "RRethy/vim-illuminate",
-    event = "BufRead"
+    -- after = 'telescope.nvim', -- do not lazy load telescope extensions, will ca bugs: module not found
+    "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
   },
   {
+    'ThePrimeagen/harpoon',
+    module = "harpoon"
+  },
+  {
+    'nvim-telescope/telescope-live-grep-args.nvim',
+    config = function()
+      require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>')
+    end
+  },
+  {
+    "AckslD/nvim-neoclip.lua",
+    -- after = 'telescope.nvim', -- do not lazy load telescope extensions, will ca bugs: module not found
+    config = function()
+      require("neoclip").setup()
+      vim.cmd([[inoremap <C-p> <cmd>Telescope neoclip<CR>]])
+    end,
+  },
+  {
+    "tversteeg/registers.nvim"
+  },
+  {
+    "jvgrootveld/telescope-zoxide",
+    setup = function()
+      require("core.utils").map("n", "<leader>z", ":Telescope zoxide list<CR>")
+    end,
+    config = function()
+      require("telescope._extensions.zoxide.config").setup({
+        mappings = {
+          ["<C-b>"] = {
+            keepinsert = true,
+            action = function(selection)
+              require("telescope").extensions.file_browser.file_browser({ cwd = selection.path })
+              -- vim.cmd('Telescope file_browser path=' .. selection.path)
+            end,
+          },
+        },
+      })
+    end,
+  },
+  { "nvim-telescope/telescope-file-browser.nvim" },
+  {
     "rrethy/vim-hexokinase",
+    disable = true, -- NOTE: slow
     cond = function()
       return vim.fn.executable('go')==1
     end,
@@ -347,45 +563,9 @@ local plugins = {
     event = "BufRead"
   },
   {
-    "jose-elias-alvarez/null-ls.nvim",
-    -- providing extra formatting and linting
-    -- NullLsInfo to show what's now enabled
-    -- Remember: you should install formatters/linters in $PATH, null-ls will not do this for you.
-    -- if other formatting method is enabled by the lspconfig(pyright for example), then you should turn that of in the on_attach function like below:
-    -- function on_attach(client,bufnr)
-    --    if client.name = "pyright" then
-    --         client.resolved_capabilities.document_formatting = false
-    --    end
-    -- end
-    after = "nvim-lspconfig",
-    config = function()
-      local formatting = require("null-ls").builtins.formatting
-      local diagnostics = require("null-ls").builtins.diagnostics
-      local code_actions = require("null-ls").builtins.code_actions
-      require("null-ls").setup({
-        sources = {
-          formatting.lua_format.with({ extra_args = {"--indent-width=4"}}),
-          formatting.black.with({ extra_args = {"--fast" }}),
-          code_actions.gitsigns,
-        },
-
-        -- format on save
-        -- on_attach = function(client)
-        --   if client.resolved_capabilities.document_formatting then
-        --       vim.cmd "autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()"
-        --   end
-        -- end
-      })
-    end,
+    "ahmedkhalf/project.nvim",
+    config = require("plugins.configs.project").setup
   },
-  {
-    "folke/trouble.nvim",
-    requires = "kyazdani42/nvim-web-devicons",
-    config = function()
-      require("trouble").setup({})
-    end,
-  },
-  { "ahmedkhalf/project.nvim", config = require("plugins.configs.project").setup },
   {
     "tmhedberg/SimpylFold",
     disable = true,
@@ -441,27 +621,6 @@ local plugins = {
     config = function()
       require("lightspeed").setup({})
     end,
-  },
-  {
-    "hrsh7th/cmp-cmdline",
-    after = "cmp-nvim-lua",
-    config = function()
-      local cmp = require("cmp")
-      cmp.setup.cmdline("/", { sources = { { name = "buffer" } } })
-
-      --  cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-      cmp.setup.cmdline(":", {
-        sources = cmp.config.sources({ { name = "path" } }, { { name = "cmdline" } }),
-      })
-    end,
-  }, -- enhance grep and quickfix list
-  {
-    "lukas-reineke/cmp-rg",
-    after = "cmp-nvim-lua"
-  },
-  {
-    "hrsh7th/cmp-nvim-lsp-signature-help",
-    after = "cmp-nvim-lua"
   },
   -- 1. populate the quickfix
   {
@@ -532,13 +691,6 @@ local plugins = {
     end,
   },
   {
-    "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",
-    after = "nvim-lspconfig",
-    config = function()
-      vim.cmd([[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]])
-    end,
-  },
-  {
     'VonHeikemen/searchbox.nvim',
     disable = true, -- NOTE: can't resume previous/next search history
     requires = {
@@ -552,104 +704,11 @@ local plugins = {
     end
   },
   {
-    "SmiteshP/nvim-gps",
-    disable = true, -- disable, in favour of SmiteshP/nvim-navic now
-    -- this plugin shows the code context in the statusline: check ~/.config/nvim/lua/plugins/configs/statusline.lua
-    after = { "nvim-treesitter", "nvim-web-devicons" },
-    wants = { "nvim-treesitter" }, -- loader treesitter if necessary
-    config = function()
-      -- nvim-treesitter should be loaded now
-      -- print('wants treesitter',packer_plugins["nvim-treesitter"].loaded)
-      require("nvim-gps").setup({
-        disable_icons = false, -- Setting it to true will disable all icons
-        icons = {
-          ["class-name"] = " ", -- Classes and class-like objects
-          ["function-name"] = " ", -- Functions
-          ["method-name"] = " ", -- Methods (functions inside class-like objects)
-          ["container-name"] = " ", -- Containers (example: lua tables)
-          ["tag-name"] = "炙", -- Tags (example: html tags)
-        },
-      })
-      require('core.utils').map("n", '[g', "<Cmd>lua require('contrib.gps_hack').gps_context_parent()<CR>", {silent=false})
-    end,
-  },
-  {
-    'hek14/nvim-navic', -- NOTE: after changing a repo to local, should 'PackerSync'
-    after = { "nvim-treesitter", "nvim-web-devicons" },
-    config = function ()
-      require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
-    end
-  },
-  {
-    "haringsrob/nvim_context_vt", -- another context plugin
-    disable = true,
-    after = "nvim-treesitter",
-    event = "BufRead",
-    config = "plugins.configs.nvim_context_vt"
-  },
-
-  {
     "mbbill/undotree",
     cmd = "UndotreeToggle",
     setup = function()
       require("core.utils").map("n", "<C-x>u", ":UndotreeToggle | UndotreeFocus<CR>")
     end,
-  },
-  { "nvim-treesitter/nvim-treesitter-textobjects", after = "nvim-treesitter" },
-  { "nvim-treesitter/nvim-treesitter-refactor",
-    after = "nvim-treesitter"
-  },
-  { "p00f/nvim-ts-rainbow", after = "nvim-treesitter" },
-  { "theHamsta/nvim-treesitter-pairs", after = "nvim-treesitter" },
-  {
-    "ThePrimeagen/refactoring.nvim",
-    -- disable = true, -- unstable and buggy
-    after = "nvim-treesitter",
-    requires = {
-      { "nvim-lua/plenary.nvim" },
-      { "nvim-treesitter/nvim-treesitter" },
-    },
-    config = function()
-      require("refactoring").setup({})
-      local map = require("core.utils").map
-      map("v", "<leader>re", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function')<CR>]], {noremap = true, silent = true, expr = false})
-      map("v", "<leader>rf", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]], {noremap = true, silent = true, expr = false})
-      map("v", "<leader>rv", [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Variable')<CR>]], {noremap = true, silent = true, expr = false})
-      map("v", "<leader>ri", [[ <Esc><Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
-      map("n", "<leader>ri", [[ <Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]], {noremap = true, silent = true, expr = false})
-      map("n", "<leader>rb", [[ <Cmd>lua require('refactoring').refactor('Extract Block')<CR>]], {noremap = true, silent = true, expr = false})
-      map("n", "<leader>rbf", [[ <Cmd>lua require('refactoring').refactor('Extract Block To File')<CR>]], {noremap = true, silent = true, expr = false})
-    end,
-  },
-  {
-    "nvim-treesitter/playground",
-    after = "nvim-treesitter",
-    config = function ()
-      require('core.utils').map('n',',x',':TSPlaygroundToggle<cr>')
-      require('core.utils').map('n',',h',':TSHighlightCapturesUnderCursor<cr>')
-    end
-  },
-  {
-    "David-Kunz/treesitter-unit",
-    after = "nvim-treesitter",
-    config = function ()
-      require"treesitter-unit".enable_highlighting()
-      local map = require("core.utils").map
-      map("x","uu",":lua require'treesitter-unit'.select()<CR>",{noremap=true})
-      map("x","au",":lua require'treesitter-unit'.select(true)<CR>",{noremap=true})
-      map("o","uu","<Cmd>lua require'treesitter-unit'.select()<CR>",{noremap=true})
-      map("o","au","<Cmd>lua require'treesitter-unit'.select(true)<CR>",{noremap=true})
-    end
-  },
-  {
-    'kevinhwang91/nvim-ufo',
-    event = 'BufEnter',
-    requires = 'kevinhwang91/promise-async',
-    config = function ()
-      local map = require("core.utils").map
-      map('n', 'zR', require('ufo').openAllFolds)
-      map('n', 'zM', require('ufo').closeAllFolds)
-    end
   },
   {
     "dstein64/vim-startuptime",
@@ -672,51 +731,6 @@ local plugins = {
     opt = false,
     config = "require('plugins.configs.floaterm')"
   },
-  {
-    -- after = 'telescope.nvim', -- do not lazy load telescope extensions, will ca bugs: module not found
-    "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
-  },
-  {
-    'ThePrimeagen/harpoon',
-    module = "harpoon"
-  },
-  {
-    'nvim-telescope/telescope-live-grep-args.nvim',
-    config = function()
-      require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>')
-    end
-  },
-  {
-    "AckslD/nvim-neoclip.lua",
-    -- after = 'telescope.nvim', -- do not lazy load telescope extensions, will ca bugs: module not found
-    config = function()
-      require("neoclip").setup()
-      vim.cmd([[inoremap <C-p> <cmd>Telescope neoclip<CR>]])
-    end,
-  },
-  {
-    "tversteeg/registers.nvim"
-  },
-  {
-    "jvgrootveld/telescope-zoxide",
-    setup = function()
-      require("core.utils").map("n", "<leader>z", ":Telescope zoxide list<CR>")
-    end,
-    config = function()
-      require("telescope._extensions.zoxide.config").setup({
-        mappings = {
-          ["<C-b>"] = {
-            keepinsert = true,
-            action = function(selection)
-              require("telescope").extensions.file_browser.file_browser({ cwd = selection.path })
-              -- vim.cmd('Telescope file_browser path=' .. selection.path)
-            end,
-          },
-        },
-      })
-    end,
-  },
-  { "nvim-telescope/telescope-file-browser.nvim" },
   { "tpope/vim-scriptease" },
   { "MunifTanjim/nui.nvim" },
   {
@@ -812,9 +826,6 @@ local plugins = {
     end
   },
   {
-    "preservim/vimux",
-  },
-  {
     "folke/persistence.nvim",
     event = "BufReadPre", -- this will only start session saving when an actual file was opened
     module = "persistence",
@@ -898,6 +909,9 @@ local plugins = {
   {
     "djoshea/vim-autoread",
     disable = true,
+  },
+  {
+    "preservim/vimux",
   },
   {
     'alexghergh/nvim-tmux-navigation',

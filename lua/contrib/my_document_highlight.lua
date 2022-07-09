@@ -2,6 +2,7 @@ local uv = vim.loop
 local protocol = require('vim.lsp.protocol')
 local highlight = require('vim.highlight')
 local fmt = string.format
+local log = require('core.utils').log
 
 -- ========== state
 local M = {}
@@ -11,6 +12,7 @@ local reference_mark_group = {}
 local last_clear = {}
 local last_highlight = {}
 local clear_by_autocmd = {}
+local profile_time = {}
 local colors = {
   "#C70039",
   "#a89984",
@@ -37,6 +39,15 @@ local hl_offset_encoding = "utf-16"
 
 
 ---- ========== utils function
+local function profile_start(bufnr)
+  profile_time[bufnr] = os.clock()
+end
+
+local function profile_end(bufnr,name)
+  log(fmt("Profile %s: %s",name,os.clock()-profile_time[bufnr]))
+  profile_time[bufnr] = os.clock()
+end
+
 local function get_lines(bufnr, rows)
   rows = type(rows) == 'table' and rows or { rows }
 
@@ -204,8 +215,6 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
   local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
   crow = crow - 1 -- reference ranges are (0,0)-indexed for (row,col)
 
-
-
   -- NOTE: reference_mark_group: bufnr -> namespace -> references
   local checked = false
   for _, reference in ipairs(_references) do
@@ -236,9 +245,11 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
           vim.api.nvim_buf_del_extmark(bufnr,found_ns,mark['end'])
         end
         reference_mark_group[bufnr][found_ns] = nil
+        checked = true
       end
-      checked = true -- check one reference is enough
     end
+    profile_end(bufnr,'request->handle')
+
     highlight.range(
       bufnr,
       ns,
@@ -247,6 +258,8 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
       { end_line, end_idx },
       { priority = vim.highlight.priorities.user + 2 }
     )
+    profile_end(bufnr,'highlight')
+
     local start_mark = vim.api.nvim_buf_set_extmark(bufnr,ns,start_line,start_idx,{})
     local end_mark = vim.api.nvim_buf_set_extmark(bufnr,ns,end_line,end_idx,{})
     table.insert(reference_mark_group[bufnr][ns],{['start']=start_mark,['end']=end_mark})
@@ -255,11 +268,12 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
       local symbol_name = vim.api.nvim_buf_get_text(bufnr,start_line,start_idx,end_line,end_idx,{})[1]
       last_highlight[bufnr] = {['ns']=ns,['start']=start_mark,['end']=end_mark,['name']=symbol_name}
     end
+    profile_end(bufnr,"extmark")
   end
   print(fmt("kk_highlight: %s %s",#_references,#_references>1 and "references" or "reference"))
 end
 
-local function handle_document_highlight(result, bufnr)
+local function async_handle_document_highlight(result, bufnr)
   if not bufnr then return end
   local btimer = timers[bufnr]
   if btimer then
@@ -279,17 +293,20 @@ local function handle_document_highlight(result, bufnr)
   curr_references[bufnr] = result
 end
 
--- main test
-function M.kk_highlight()
-  local highlight_params = vim.tbl_deep_extend("force",vim.lsp.util.make_position_params(),{offset_encoding=hl_offset_encoding})
-  vim.lsp.buf_request(vim.fn.bufnr(), 'textDocument/documentHighlight', highlight_params, function(...)
-    if vim.fn.has('nvim-0.5.1') == 1 then
-      handle_document_highlight(select(2, ...), select(3, ...).bufnr)
-    else
-      handle_document_highlight(select(3, ...), select(5, ...))
-    end
+local function handle_document_highlight(result, bufnr)
+  if not bufnr then return end
+  if type(result) ~= 'table' then
+    return
+  end
+  table.sort(result, function(a, b)
+    return before_by_start(a.range, b.range)
   end)
+  curr_references[bufnr] = result
+  if cursor_in_references(bufnr) then
+    my_buf_highlight_references(bufnr, result, hl_offset_encoding)
 end
+end
+-- main test
 
 function M.check_if_any_ns_exists(position)
   local bufnr = vim.fn.bufnr()
@@ -333,6 +350,18 @@ function M.check_if_any_ns_exists(position)
   return nil,nil,nil
 end
 
+function M.kk_highlight()
+  local highlight_params = vim.tbl_deep_extend("force",vim.lsp.util.make_position_params(),{offset_encoding=hl_offset_encoding})
+  profile_start(vim.fn.bufnr())
+  vim.lsp.buf_request(vim.fn.bufnr(), 'textDocument/documentHighlight', highlight_params, function(...)
+    if vim.fn.has('nvim-0.5.1') == 1 then
+      handle_document_highlight(select(2, ...), select(3, ...).bufnr)
+    else
+      handle_document_highlight(select(3, ...), select(5, ...))
+    end
+  end)
+end
+
 function M.kk_clear_highlight()
   local bufnr = vim.fn.bufnr()
   local mark_group = reference_mark_group[bufnr]
@@ -358,13 +387,12 @@ function M.kk_clear_highlight()
 
   -- NOTE: following logic only triggered manually or by autocmd
   local found_ns,found_mark,ns_marks = M.check_if_any_ns_exists()
-  if found_ns then
+  if found_ns~=nil then
     local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,found_ns,found_mark['start'],{})
     local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,found_ns,found_mark['end'],{})
 
     -- NOTE: create/clone temporary ns and mark for later usage, use the ns and mark in reference_mark_group will not work because the ns is already cleared!
     if last_clear[bufnr] ~= nil then
-      -- only maintain one mark for each buffer in last_clear_range
       vim.api.nvim_buf_del_extmark(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['start'])
       vim.api.nvim_buf_del_extmark(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['end'])
       vim.api.nvim_buf_clear_namespace(bufnr,last_clear[bufnr]['ns'],0,-1)
@@ -400,8 +428,10 @@ function M.next_highlight(direction)
   crow = crow - 1
   if last_highlight[buffer] == nil then return end
   local last_ns = last_highlight[buffer]['ns']
-  if last_ns == nil then return end
-  vim.pretty_print("bufnr: ",buffer,' ns: ',last_ns, ' mark_group: ',reference_mark_group[buffer])
+  if last_ns == nil or reference_mark_group[buffer][last_ns] == nil then
+    print('The highlight has been cleared')
+    return
+  end
   local locations = {}
   local to_jump = nil
   for _,mark in ipairs(reference_mark_group[buffer][last_ns]) do

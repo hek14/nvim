@@ -79,8 +79,8 @@ M.general = function()
     map("i", "<C-n>", "<Down>")
     map("i", "<C-p>", "<Up>")
 
-    map("n", ',s',require('core.utils').range_search)
-    map("x", ',s',require('core.utils').range_search)
+    map("n", ',s',require('core.utils').ScopeSearch)
+    map("x", ',s',require('core.utils').ScopeSearch)
 
     map("n", "<leadr>ts", [[ :keeppatterns<Bar>:%s/\s\+$//e<CR> ]] )
     cmd [[ command DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]

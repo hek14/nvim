@@ -519,25 +519,81 @@ M.my_print = function (...)
     return ...
 end
 
-M.range_search = function(pattern)
+M.range_search = function(pattern,_start,_end)
   local mode = vim.fn.mode()
-  local _start,_end= nil,nil
-  if mode=="n" then
-    _start = tonumber(vim.fn.input("Search start: ",1))
-    _end = tonumber(vim.fn.input("Search end: ",vim.fn.line('$')))
-  else
-    ------ method 1
-    -- vim.fn.feedkeys([[\<esc>]],'n') -- exit the visual mode, then the visual range got recorded
-    -- vim.cmd [[execute "normal! gv\<Esc>"]]
-    ------ method 2
-    vim.cmd [[execute "normal! \<esc>"]]
-    _start = vim.fn.getpos("'<")[2]
-    _end = vim.fn.getpos("'>")[2]
+  if _start==nil and _end==nil then
+    if mode=="n" then
+      _start = tonumber(vim.fn.input("Search start: ",1))
+      _end = tonumber(vim.fn.input("Search end: ",vim.fn.line('$')))
+    else -- visual mode
+      ------ method 1
+      -- vim.fn.feedkeys([[\<esc>]],'n') -- exit the visual mode, then the visual range got recorded
+      -- vim.cmd [[execute "normal! gv\<Esc>"]]
+      ------ method 2
+      vim.cmd [[execute "normal! \<esc>"]]
+      _start = vim.fn.getpos("'<")[2]
+      _end = vim.fn.getpos("'>")[2]
+    end
   end
   if pattern == nil then
     pattern = vim.fn.input('Search pattern: ',vim.fn.expand('<cword>'))
   end
-  vim.cmd(string.format([[/\%%>%sl\%%<%sl%s]],_start-1,_end+1,pattern))
+  pcall(function ()
+    vim.cmd(string.format([[/\%%>%sl\%%<%sl%s]],_start-1,_end+1,pattern))
+  end)
+end
+
+
+local lsp_num_to_str = {
+  [1]  = "File",
+  [2]  = "Module",
+  [3]  = "Namespace",
+  [4]  = "Package",
+  [5]  = "Class",
+  [6]  = "Method",
+  [7]  = "Property",
+  [8]  = "Field",
+  [9]  = "Constructor",
+  [10] = "Enum",
+  [11] = "Interface",
+  [12] = "Function",
+  [13] = "Variable",
+  [14] = "Constant",
+  [15] = "String",
+  [16] = "Number",
+  [17] = "Boolean",
+  [18] = "Array",
+  [19] = "Object",
+  [20] = "Key",
+  [21] = "Null",
+  [22] = "EnumMember",
+  [23] = "Struct",
+  [24] = "Event",
+  [25] = "Operator",
+  [26] = "TypeParameter",
+}
+
+M.ScopeSearch = function()
+  local data = require("nvim-navic").get_data()
+  local index = #data - vim.v.count1 + 1
+  local node = data[index]
+  while node~=nil do
+    if vim.tbl_contains({'Module','Class','Method','Function'},lsp_num_to_str[node.kind]) then
+      vim.pretty_print(node.name)
+      break
+    else
+      index = index - 1
+      node = data[index]
+    end
+  end
+  if node==nil then
+    print('No Scope Found')
+    M.range_search()
+  else
+    local scope = node.scope
+    -- vim.cmd(string.format(':%s | normal! V%sj',scope.start.line,scope['end'].line-scope.start.line))
+    M.range_search(nil,scope.start.line,scope['end'].line)
+  end
 end
 
 M.grep_last_search = function()

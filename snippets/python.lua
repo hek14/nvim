@@ -92,5 +92,21 @@ return {
   ]],{
     i(1,"yaw"),
     f(line_replace,{1},{user_args = {{pat='yaw',sub='roll'}}}),
+  })),
+  s("init",fmt([[
+  def __init__(self,{})
+      super({},self).__init__({})
+  ]],{
+    i(1),
+    d(2,function(args, parent, old_state, initial_text)
+      local class_name = require("contrib.treesitter.python").get_class_name()
+      print('cls name: ',class_name)
+      if class_name==nil then
+        return sn(nil,{i(1,'class_name')})
+      else
+        return sn(nil,{t(class_name)})
+      end
+    end,{},{user_args = {}}),
+    rep(1)
   }))
 }

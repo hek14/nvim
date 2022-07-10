@@ -9,9 +9,9 @@ local action_state = require "telescope.actions.state"
 
 -- treesitter
 local my_ts = require('contrib.treesitter')
-local q = require('vim.treesitter.query')
 local ts_utils = require("nvim-treesitter.ts_utils")
-
+local ts_locals = require("nvim-treesitter.locals")
+local get_node_text = vim.treesitter.get_node_text
 -- luasnip
 local ls = require("luasnip")
 local s = ls.snippet
@@ -93,8 +93,8 @@ M.fast_init_class = function ()
   local class_name = nil
   local init_args = nil
   for _,match,metadata in iter do
-    class_name = q.get_node_text(match[1],bufnr)
-    local params = q.get_node_text(match[3],bufnr)
+    class_name = get_node_text(match[1],bufnr)
+    local params = get_node_text(match[3],bufnr)
     local arguments = string.sub(params,2,#params-1)
     init_args = get_args(arguments)
     counts = counts + 1
@@ -271,6 +271,37 @@ test_{}()
   ls.snip_expand(combine_shots)
 end
 
+vim.treesitter.set_query(
+  "python",
+  "class_name",
+  [[ 
+    (class_definition
+      name: (identifier) @class_name)
+  ]]
+)
+
+M.get_class_name = function()
+  local cursor_node = ts_utils.get_node_at_cursor()
+  local scope = ts_locals.get_scope_tree(cursor_node, 0)
+  local class_node
+  for _, v in ipairs(scope) do
+    if v:type() == "class_definition" then
+      class_node = v
+      break
+    end
+  end
+  local query = vim.treesitter.get_query("python", "class_name")
+  if class_node==nil then
+    return nil
+  else
+    local class_name = nil
+    for _, node in query:iter_captures(class_node, 0) do
+      class_name = get_node_text(node,0)
+    end
+    return class_name
+  end
+end
+
 function M.grep_class_signature(entry)
   local node = M.get_unit_node({entry.lnum,entry.col})
   local bufnr = vim.api.nvim_get_current_buf()
@@ -282,8 +313,8 @@ function M.grep_class_signature(entry)
   local init_args = nil
   local call_args = nil
   for _,match,metadata in iter do
-    class_name = q.get_node_text(match[1],bufnr)
-    local params = q.get_node_text(match[3],bufnr)
+    class_name = get_node_text(match[1],bufnr)
+    local params = get_node_text(match[3],bufnr)
     local arguments = string.sub(params,2,#params-1)
     init_args = get_args(arguments)
     counts = counts + 1
@@ -293,7 +324,7 @@ function M.grep_class_signature(entry)
   iter = my_ts.get_query_matches(bufnr,'python',query,node)
   counts = 0
   for _,match,metadata in iter do
-    local params = q.get_node_text(match[3],bufnr)
+    local params = get_node_text(match[3],bufnr)
     local arguments = string.sub(params,2,#params-1)
     call_args = get_args(arguments)
     counts = counts + 1
@@ -306,7 +337,7 @@ function M.grep_class_signature(entry)
 end
 
 function M.grep_function_signature()
-  return
+  return "Not Implemented"
 end
 
 function M.go_up_to_class_node(cursor)

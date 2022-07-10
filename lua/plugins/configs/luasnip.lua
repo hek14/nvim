@@ -14,9 +14,6 @@ end
 luasnip.config.setup {
   history = true,
   updateevents = "TextChanged,TextChangedI",
-  snip_env = {
-    line_breaker = line_breaker -- global utils function to be used in ~/.config/nvim/snippets
-  }
 }
 
 require("luasnip/loaders/from_vscode").load()

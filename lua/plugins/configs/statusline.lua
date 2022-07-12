@@ -166,6 +166,7 @@ default.inactive_file_name = {
    right_sep = {
       str = default.statusline_style.right,
    },
+   hl = {bg = colors.blue}
 }
 
 default.dir_name = {

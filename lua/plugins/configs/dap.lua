@@ -35,6 +35,39 @@ map('n', '<leader>dr', ':lua require"dap".repl.toggle({},"10 split")<CR>')
 map('n', '<leader>di', ':lua require"dap.ui.widgets".hover()<CR>')
 map('n', '<leader>d?', ':lua local widgets=require"dap.ui.widgets";widgets.centered_float(widgets.scopes)<CR>')
 
+local function focus_hover()
+  local found = nil
+  for win=1,vim.fn.winnr("$") do
+    local winid = vim.fn.win_getid(win)
+    local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(winid))
+    local config = vim.api.nvim_win_get_config(winid)
+    if config['focusable'] and config["relative"] ~= ""then
+    --  and bufname=='DAP Hover'
+      found = win
+      break
+    end
+  end
+  return found
+end
+
+vim.keymap.set('n',',e',function ()
+  local found_hover = focus_hover()
+  if found_hover~=nil then
+    return string.format([[:<C-u>%s wincmd w<CR>]],found_hover)
+  else
+    return [[:<C-u>lua require('dapui').eval("")<Left><Left>]]
+  end
+end,{expr=true})
+
+vim.keymap.set('x',',e',function ()
+  local found_hover = focus_hover()
+  if found_hover~=nil then
+    return string.format([[:<C-u>%s wincmd w<CR>]],found_hover)
+  else
+    return [[:<C-u>lua require('dapui').eval()<CR>]]
+  end
+end,{expr=true})
+
 -- nvim-telescope/telescope-dap.nvim
 require('telescope').load_extension('dap')
 map('n', '<leader>dc', ':Telescope dap commands<CR>')
@@ -64,8 +97,21 @@ require("dapui").setup({
     remove = "d",
     edit = "<C-e>",
     repl = "r",
-  }})
+  },
+  layouts = {
+    {
+      elements = {
+        "breakpoints",
+        "watches",
+        "repl",
+      },
+      size = 0.25, -- 25% of total lines
+      position = "bottom",
+    },
+  },
+})
 local dapui = require("dapui")
+-- this is similar to Emacs hook/ad-advice
 dap.listeners.after.event_initialized["dapui_config"] = function()
   dapui.open()
   local wins = vim.api.nvim_list_wins()
@@ -87,29 +133,29 @@ dap.listeners.after.event_initialized["dapui_config"] = function()
       vim.api.nvim_buf_set_keymap(0,"i","<C-RIGHT>","<Esc><C-w>l<CR>",{noremap=true,silent=true})
     end)
   end
-
   if target then
     vim.api.nvim_set_current_win(target)
   else
     print("no dap-repl win opened, check nvim-dap docs")
   end
 end
+local wipe_out_repl = function()
+  vim.defer_fn(function()
+    pcall(function()
+      vim.cmd(string.format(":bwipe! %s",vim.g.dap_repl_buffer))
+    end)
+  end,0)
+end
 dap.listeners.before.event_terminated["dapui_config"] = function()
   dapui.close()
-  -- vim.defer_fn(function() 
-  --   vim.api.nvim_buf_delete(vim.g.dap_repl_buffer,{force=true})
-  -- end,0)
+  wipe_out_repl()
 end
 dap.listeners.before.event_exited["dapui_config"] = function()
   dapui.close()
-  -- vim.defer_fn(function() 
-  --   vim.api.nvim_buf_delete(vim.g.dap_repl_buffer,{force=true})
-  -- end,0)
+  wipe_out_repl()
 end
 dap.listeners.before.disconnect["dapui_config"] = function()
   dapui.close()
-  -- vim.defer_fn(function() 
-  --   vim.api.nvim_buf_delete(vim.g.dap_repl_buffer,{force=true})
-  -- end,0)
+  wipe_out_repl()
 end
 require('plugins.configs.dap_breakpoint_storage')

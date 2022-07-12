@@ -112,7 +112,8 @@ M.general = function()
     map("n", "<leader>j", "<Esc>:m .+1<CR>==")
     map("n", "<leader>k", "<Esc>:m .-2<CR>==")
     map("n",'<leader>tv', ":lua require('core.utils')<CR> | :lua my_hack_undo_redo()<CR>")
-    map("n", "<leader>sw", function ()
+    -- NOTE: a good example of a senmantic mapping that need some evaluation
+    vim.keymap.set("n", "<leader>sw", function ()
       local cword = vim.fn.expand("<cword>")
       local cmd_str = string.format([[:<C-u>%%s/\<%s\>//g<Left><Left>]],cword)
       return cmd_str
@@ -146,9 +147,8 @@ M.general = function()
     map("c", '<C-n>','<Down>')
     map("c", '<C-t>','<C-f>')
     -- ft_map("python",'n','<leader>p',[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]])
-    vim.cmd [[
-      nnoremap <leader>p :lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>
-    ]]
+    -- BUG: why does my utils.map doesn't work
+    vim.keymap.set("n","<leader>p",[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]],{noremap=true})
 
     map("x", "ul", "g_o^")
     map("o", "ul", ":normal vul<CR>")

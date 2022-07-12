@@ -5,10 +5,10 @@ local function LazyLoad() -- not necessary to use global function for nvim_creat
   _G.PLoader = loader
   loader('nvim-cmp cmp-cmdline telescope.nvim') -- the vanilla 'require("nvim-cmp")' will not work here
   require("luasnip/loaders/from_vscode").load()
-  vim.defer_fn(function ()
-    -- require the plugin config, although the command PackerCompile will require this
-    require("plugins")
-  end,50)
+  -- require the plugin config, although the command PackerCompile will require this
+  -- vim.defer_fn(function ()
+  --   require("plugins")
+  -- end,50)
   -- method 1 of loading a packer configed package: dominated by packer(event,ft,module,key,command, etc. all lazy but automatically)
   -- method 2 of loading a packer configed package: manually load the package using the packer.loader just like above
   -- using the packer's loader instead of vanilla require, the config part of each package powered by packer.nvim will still work

@@ -20,7 +20,7 @@
   ```
 5. :help fillchars to change fold/endOfBuffer appearance
 6. one tip for inspecting options and variables: instead of using message buffer, just create a new buffer, and normal mode: `:put =bufnr()`, `put =@"` or insert mode: `CTRL_R=bufnr()`
-7. really useful keymap fix for neovim in kitty/alacritty: 
+7. really useful keymap fix for neovim in kitty/alacritty:
 7.1 video: https://www.youtube.com/watch?v=lHBD6pdJ-Ng
 7.2 config files: https://github.com/ziontee113/yt-tutorials/tree/nvim_key_combos_in_alacritty_and_kitty
 7.3 http://www.leonerd.org.uk/hacks/fixterms/

@@ -34,7 +34,6 @@ au("FileType",{
 
 -- VimEnter event: just like ~/.config/nvim/after/plugin
 -- group: set {clear = true} will make sure that the autocmds will be hooked only once.
-local map = require('core.utils').map
 local function setup_term()
   map('n','cc', 'a<C-u>',{buffer=true})
   map('i','<C-w>h','<Esc><C-w>h',{buffer=true})
@@ -145,7 +144,7 @@ end})
 
 M.ft_map = function(ft,mode,lhs,rhs,opts)
   au('FileType',{callback=function ()
-    local merged_opts = vim.tbl_extend('force',{buffer=true},opt or {})
+    local merged_opts = vim.tbl_extend('force',{buffer=true},opts or {})
     map(mode,lhs,rhs,merged_opts)
   end,
     pattern=ft})

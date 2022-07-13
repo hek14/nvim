@@ -55,7 +55,7 @@ vim.keymap.set('n',',e',function ()
   if found_hover~=nil then
     return string.format([[:<C-u>%s wincmd w<CR>]],found_hover)
   else
-    return [[:<C-u>lua require('dapui').eval("")<Left><Left>]]
+    return [[:<C-u>lua require('dapui').eval()<Left>]]
   end
 end,{expr=true})
 

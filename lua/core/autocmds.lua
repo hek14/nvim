@@ -96,12 +96,16 @@ end,})
 
 local any_client_attached = function ()
   local bufnr = vim.fn.bufnr()
-  local clients = vim.lsp.get_active_clients()
+  -- local clients = vim.lsp.get_active_clients()
+  -- local attached = {}
+  -- for i,client in ipairs(clients) do
+  --   if vim.lsp.buf_is_attached(bufnr,client.id) then
+  --     table.insert(attached,{id=client.id,name=client.name})
+  --   end
+  -- end
   local attached = {}
-  for i,client in ipairs(clients) do
-    if vim.lsp.buf_is_attached(bufnr,client.id) then
-      table.insert(attached,{id=client.id,name=client.name})
-    end
+  for i,client in ipairs(vim.lsp.buf_get_clients(bufnr)) do
+    table.insert(attached,{id=client.id,name=client.name})
   end
   return attached
 end

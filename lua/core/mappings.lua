@@ -161,6 +161,7 @@ M.general = function()
 
     map('i','<C-x><C-l>','<Cmd>lua require("contrib.treesitter.python").fast_signature()<CR>')
     map('i','<C-x><C-g>','<Cmd>lua require("contrib.treesitter.python").fast_init_class()<CR>')
+    map('n','<leader>dt','<Cmd>lua require("contrib.my_diagnostic").toggle_line_diagnostic()<CR>')
 
     vim.cmd([[
         function! Cabbrev(key, value) abort

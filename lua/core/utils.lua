@@ -248,6 +248,7 @@ M.reload_plugin = function(plugins)
   return status
 end
 
+_G.R = M.reload_plugin
 
 -- ========== dir staff
 

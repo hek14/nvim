@@ -282,12 +282,12 @@ local on_server_ready = function(server)
     buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",
       map_opts)
     -- buf_set_keymap("n", "[r", "<cmd>lua require('plugins.configs.lspconfig').Smart_goto_next_ref(-1)<CR>",map_opts)
-    -- buf_set_keymap("n", "[r", "lua require'illuminate'.next_reference{wrap=true}",map_opts)
-    buf_set_keymap("n", "[r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_previous_usage()<CR>",map_opts)
+    buf_set_keymap("n", "[r", "<cmd>lua require'illuminate'.next_reference{reverse=true,wrap=true}<CR>",map_opts)
+    -- buf_set_keymap("n", "[r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_previous_usage()<CR>",map_opts)
 
     -- buf_set_keymap("n", "]r", "<cmd>lua require('plugins.configs.lspconfig').Smart_goto_next_ref(1)<CR>",map_opts)
-    -- buf_set_keymap("n", "]r", "<cmd>lua require'illuminate'.next_reference{reverse=true,wrap=true}",map_opts)
-    buf_set_keymap("n", "]r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",map_opts)
+    buf_set_keymap("n", "]r", "<cmd>lua require'illuminate'.next_reference{wrap=true}<CR>",map_opts)
+    -- buf_set_keymap("n", "]r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",map_opts)
 
     buf_set_keymap("n", "gs",
       "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)

@@ -309,7 +309,7 @@ end
 -- main test
 
 function M.check_if_any_ns_exists(position)
-  local bufnr = vim.fn.bufnr()
+  local bufnr = vim.api.nvim_get_current_buf()
   local mark_group = reference_mark_group[bufnr]
   if mark_group == nil then return nil,nil,nil end
 
@@ -352,8 +352,8 @@ end
 
 function M.kk_highlight()
   local highlight_params = vim.tbl_deep_extend("force",vim.lsp.util.make_position_params(),{offset_encoding=hl_offset_encoding})
-  profile_start(vim.fn.bufnr())
-  vim.lsp.buf_request(vim.fn.bufnr(), 'textDocument/documentHighlight', highlight_params, function(...)
+  profile_start(vim.api.nvim_get_current_buf())
+  vim.lsp.buf_request(vim.api.nvim_get_current_buf(), 'textDocument/documentHighlight', highlight_params, function(...)
     if vim.fn.has('nvim-0.5.1') == 1 then
       handle_document_highlight(select(2, ...), select(3, ...).bufnr)
     else
@@ -363,7 +363,7 @@ function M.kk_highlight()
 end
 
 function M.kk_clear_highlight()
-  local bufnr = vim.fn.bufnr()
+  local bufnr = vim.api.nvim_get_current_buf()
   local mark_group = reference_mark_group[bufnr]
 
   if mark_group == nil then
@@ -423,7 +423,7 @@ function M.kk_clear_highlight()
 end
 
 function M.next_highlight(direction)
-  local buffer = vim.fn.bufnr()
+  local buffer = vim.api.nvim_get_current_buf()
   local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
   crow = crow - 1
   if last_highlight[buffer] == nil then return end
@@ -470,7 +470,7 @@ function M.next_highlight(direction)
   end
 end
 
-M.on_attach = function(_bufnr,create_autocmd)
+M.on_attach = function(_bufnr)
   -- init
   if reference_mark_group[_bufnr] == nil then
     reference_mark_group[_bufnr] = {}
@@ -478,20 +478,19 @@ M.on_attach = function(_bufnr,create_autocmd)
   -- init END
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>,',"",{callback=function ()
-    clear_by_autocmd[vim.fn.bufnr()] = false
+    clear_by_autocmd[vim.api.nvim_get_current_buf()] = false
     M.kk_highlight() -- will call M.kk_clear_highlight also
   end})
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>.',"",{callback=function ()
-    clear_by_autocmd[vim.fn.bufnr()] = false
+    clear_by_autocmd[vim.api.nvim_get_current_buf()] = false
     M.kk_clear_highlight()
   end})
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>i',"",{callback=function()
-    local bufnr = vim.fn.bufnr()
-    vim.pretty_print('inspect reference_mark_group: ',reference_mark_group[bufnr])
-    if last_clear[bufnr]~=nil then
-      local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['start'],{})
-      local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['end'],{})
+    vim.pretty_print('inspect reference_mark_group: ',reference_mark_group[_bufnr])
+    if last_clear[_bufnr]~=nil then
+      local _start = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_clear[_bufnr]['ns'],last_clear[_bufnr]['start'],{})
+      local _end = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_clear[_bufnr]['ns'],last_clear[_bufnr]['end'],{})
       local _range = {
         ['start'] = {
           line = _start[1],
@@ -502,12 +501,12 @@ M.on_attach = function(_bufnr,create_autocmd)
           character = _end[2]
         }
       }
-      last_clear[bufnr]['range'] = _range
-      vim.pretty_print('inspect last_clear: ',last_clear[bufnr])
+      last_clear[_bufnr]['range'] = _range
+      vim.pretty_print('inspect last_clear: ',last_clear[_bufnr])
     end
-    if last_highlight[bufnr]~=nil then
-      local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_highlight[bufnr]['ns'],last_highlight[bufnr]['start'],{})
-      local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_highlight[bufnr]['ns'],last_highlight[bufnr]['end'],{})
+    if last_highlight[_bufnr]~=nil then
+      local _start = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_highlight[_bufnr]['ns'],last_highlight[_bufnr]['start'],{})
+      local _end = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_highlight[_bufnr]['ns'],last_highlight[_bufnr]['end'],{})
       local _range = {
         ['start'] = {
           line = _start[1],
@@ -518,8 +517,8 @@ M.on_attach = function(_bufnr,create_autocmd)
           character = _end[2]
         }
       }
-      last_highlight[bufnr]['range'] = _range
-      vim.pretty_print('inspect last_highlight: ',last_highlight[bufnr])
+      last_highlight[_bufnr]['range'] = _range
+      vim.pretty_print('inspect last_highlight: ',last_highlight[_bufnr])
     end
   end})
 
@@ -534,27 +533,25 @@ M.on_attach = function(_bufnr,create_autocmd)
   vim.api.nvim_create_autocmd({'InsertEnter','TextChanged'},{callback=function ()
     local result = M.kk_clear_highlight()
     if result then
-      clear_by_autocmd[vim.fn.bufnr()] = true
+      clear_by_autocmd[_bufnr] = true
     end
-  end,group=group})
+  end,group=group,buffer=_bufnr})
 
   vim.api.nvim_create_autocmd('BufDelete',{callback=function ()
-    local bufnr = vim.fn.bufnr()
-    reference_mark_group[bufnr] = nil
-    clear_by_autocmd[bufnr] = nil
-    last_highlight[bufnr]= nil
-    last_clear[bufnr]= nil
-    curr_references[bufnr] = nil
-    timers[bufnr] = nil
-  end})
+    reference_mark_group[_bufnr] = nil
+    clear_by_autocmd[_bufnr] = nil
+    last_highlight[_bufnr]= nil
+    last_clear[_bufnr]= nil
+    curr_references[_bufnr] = nil
+    timers[_bufnr] = nil
+  end,group=group,buffer=_bufnr})
 
   vim.api.nvim_create_autocmd({'InsertLeave'},{callback=function ()
-    local bufnr = vim.fn.bufnr()
-    if clear_by_autocmd[bufnr] then
+    if clear_by_autocmd[_bufnr] then
       local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
       crow = crow - 1
-      local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['start'],{})
-      local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,last_clear[bufnr]['ns'],last_clear[bufnr]['end'],{})
+      local _start = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_clear[_bufnr]['ns'],last_clear[_bufnr]['start'],{})
+      local _end = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_clear[_bufnr]['ns'],last_clear[_bufnr]['end'],{})
       local _range = {
         ['start'] = {
           line = _start[1],
@@ -567,16 +564,16 @@ M.on_attach = function(_bufnr,create_autocmd)
       }
       local cword = vim.fn.expand('<cword>')
       if point_in_range({row=crow,col=ccol},_range) then
-        if cword==last_clear[bufnr]['name'] then
+        if cword==last_clear[_bufnr]['name'] then
           M.kk_highlight()
           print("set_highlight_by_autocmd")
         else
-          local msg = fmt("You need rename %s to %s",last_clear[bufnr]['name'],cword)
+          local msg = fmt("You need rename %s to %s",last_clear[_bufnr]['name'],cword)
           vim.notify('WRN: ' .. msg, vim.lsp.log_levels.WARN)
         end
       end
     end
-    clear_by_autocmd[bufnr] = false
-  end,group=group})
+    clear_by_autocmd[_bufnr] = false
+  end,group=group,buffer=_bufnr})
 end
 return M

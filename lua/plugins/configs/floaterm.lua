@@ -2,10 +2,10 @@ local map = require('core.utils').map
 vim.cmd[[command! PYTHON FloatermNew python]]
 vim.cmd[[command! Lazygit FloatermNew --height=0.8 --width=0.8 lazygit]]
 map("n", "<leader>ts", "<cmd>FloatermNew --wintype=split --height=0.3 <CR>")
-vim.g.floaterm_keymap_new = "<C-n>"
+vim.g.floaterm_keymap_new = "<leader>tn"
 vim.g.floaterm_keymap_toggle = "<leader>tt"
-vim.g.floaterm_keymap_next = "<leader>tn"
-vim.g.floaterm_keymap_prev = "<leader>tp"
+vim.g.floaterm_keymap_next = ",n"
+vim.g.floaterm_keymap_prev = ",p"
 vim.g.floaterm_keymap_kill = "<leader>tk"
 vim.g.floaterm_autoinsert = true
 vim.cmd([[

@@ -29,19 +29,27 @@ vim.cmd([[
     hi clear CursorLine
     ]])
 
-vim.diagnostic.config {
+-- NOTE: this does't work: still get diagnostics in insert mode
+-- vim.diagnostic.config {
+--   virtual_text = false,
+--   signs = true,
+--   underline = false,
+--   update_in_insert = false,
+--   severity_sort = true,
+-- }
+
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+vim.lsp.diagnostic.on_publish_diagnostics,
+{
   virtual_text = {
-    prefix = "",
     severity = {
       min = vim.diagnostic.severity.ERROR
     },
   },
-  -- virtual_text = false,
   signs = true,
-  underline = false,
   update_in_insert = false,
-  severity_sort = true,
-}
+  underline = false,
+})
 
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
   border = "single",
@@ -327,6 +335,7 @@ local on_server_ready = function(server)
       map_opts
     )
     require('contrib.my_document_highlight').on_attach(bufnr)
+    -- require('contrib.show_diagnostic_in_message').on_attach(bufnr)
     if vim.tbl_contains({"pyright", "sumneko_lua"}, client.name) then
       client.resolved_capabilities.document_formatting = false
     end

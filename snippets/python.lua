@@ -94,7 +94,7 @@ return {
     f(line_replace,{1},{user_args = {{pat='yaw',sub='roll'}}}),
   })),
   s("init",fmt([[
-  def __init__(self,{})
+  def __init__(self,{}):
       super({},self).__init__({})
   ]],{
     i(1),

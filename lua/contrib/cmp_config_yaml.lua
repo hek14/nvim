@@ -1,4 +1,6 @@
 local cmp = require "cmp"
+local fmt = string.format
+local debug = false
 local source = {}
 
 source.new = function()
@@ -6,12 +8,16 @@ source.new = function()
   if vim.fn.has "nvim-0.6" == 1 then
     json_decode = vim.json.decode
   end
-  return setmetatable({
+  local t = setmetatable({
     running_job_id = 0,
     max_items = 100,
     timer = vim.loop.new_timer(),
     json_decode = json_decode,
   }, { __index = source })
+  if debug then
+    t.debug_buffer = vim.api.nvim_create_buf(true,true)
+  end
+  return t
 end
 
 -- source.get_trigger_characters = function()
@@ -70,95 +76,83 @@ source.complete = function(self, request, callback)
 
   local function on_event(job_id, data, event)
     -- NOTE: callback function (goback to handle results)
-    local depth = 0
-    if event == "stdout" then
-      -- print("on_event: stdout, ",vim.inspect(data))
-      if #data == 1 and data[1] == "" then
-        return
-      end
-      if string.sub(data[1],1,5)=="file:" then
-        file = string.sub(data[1],6,#data[1])
-        local path_elements = _G.stringSplit(file,"/")
-        depth = #path_elements
-      else
-        local og_length = #data
-        data = vim.tbl_filter(function (e)
-          return e~=""
-        end, data)
-        -- local content = vim.fn.json_decode(vim.list_slice(data,1,#data-1)) -- no need to slice beccause of tbl_filter
-        local ok,content = pcall(vim.fn.json_decode,data)
-        if not ok then
-          if string.match(content,"Vim:E474") then
-            print("hello, E474 error")
-          end
+      local depth = 0
+      if event == "stdout" then
+        if #data==0 then
+          print('no yaml config found')
           return
         end
-        local items = json_to_keys(content)
-        for _,item in ipairs(items) do
-          local mua = item[1]
-          local value = item[2]
-          if string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"\"") then
-            mua = "\"" .. item[1]
-          elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"\'") then
-            mua = "\'" .. item[1]
-          elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),".") then
-            mua = "." .. item[1]
-          -- elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"[%d%a]") then
-          --   mua = "['" .. item[1] .. "']"
-          -- elseif string.sub(line_before_current, #line_before_current, #line_before_current)=="[" then
-          --   if string.sub(line_after_current,1,1)=="]" then
-          --     mua = "[" .. item[1]
-          --   else
-          --     mua = "[" .. item[1] .. "]"
-          --   end
-          end
-          if #labels < self.max_items then
-            table.insert(labels,#labels+1,{
-              label=file .. ': ' .. mua, -- the text shown in menu
-              filterText = file .. ' ' .. mua, -- the text used in filtering
-              documentation="value: " .. tostring(value) .. '\nfile: ' .. file,
-              file=file, -- custom meta info
-              depth=depth, -- custom meta info
-              textEdit = {
-                newText = mua,
-                range = {
-                  start = {
-                    line = request.context.cursor.row - 1,
-                    character = request.context.cursor.col - 1 - #input,
-                  },
-                  ['end'] = {
-                    line = request.context.cursor.row - 1,
-                    character = request.context.cursor.col - 1,
+        local one_json = {}
+        local file = nil
+        for _k,line in ipairs(data) do
+          if _k==#data or string.sub(line,2,6)=="FILE:" then
+            -- ========== one json done
+            if #one_json>0 then
+              one_json = vim.tbl_filter(function (e)
+                return e~="" and e~=nil
+              end, one_json)
+              if debug then
+                vim.api.nvim_buf_set_lines(self.debug_buffer,-1,-1,false,one_json)
+              end
+              local ok,content = pcall(vim.fn.json_decode,one_json)
+              if not ok then
+                vim.pretty_print("ERROR: " .. content)
+                return
+              end
+              local items = json_to_keys(content)
+              for _,item in ipairs(items) do
+                local mua = item[1]
+                local value = item[2]
+                if string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"\"") then
+                  mua = "\"" .. item[1]
+                elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),"\'") then
+                  mua = "\'" .. item[1]
+                elseif string.match(string.sub(line_before_current, #line_before_current, #line_before_current),".") then
+                  mua = "." .. item[1]
+                end
+                table.insert(labels,#labels+1,{
+                  label=file .. ': ' .. mua, -- the text shown in menu
+                  filterText = file .. ' ' .. mua, -- the text used in filtering
+                  documentation="value: " .. tostring(value) .. '\nFILE: ' .. file,
+                  file=file, -- custom meta info
+                  depth=depth, -- custom meta info
+                  textEdit = {
+                    newText = mua,
+                    range = {
+                      start = {
+                        line = request.context.cursor.row - 1,
+                        character = request.context.cursor.col - 1 - #input,
+                      },
+                      ['end'] = {
+                      line = request.context.cursor.row - 1,
+                      character = request.context.cursor.col - 1,
+                    },
                   },
                 },
-              },
-            })
+              })
+            end
+            callback{items=labels,isIncomplete=true}
           end
+          one_json = {}
+          file = string.gsub(line,'"FILE:','')
+          file = string.gsub(file,'"$','')
+          depth = #_G.stringSplit(file,"/")
+        else
+          table.insert(one_json,#one_json+1,line)
         end
-        -- FIX: sort doesn't work
-        -- table.sort(labels,function(k1,k2)
-        --   if k1.depth~=k2.depth then
-        --     return k1.depth < k2.depth
-        --   elseif k1.file~=k2.file then
-        --     return k1.file < k2.file
-        --   else
-        --     return k1.label< k2.label
-        --   end
-        -- end)
-        callback{items=labels,isIncomplete=true}
       end
     end
     if event == "exit" then  -- called when the job is forced to jobstop()
-      -- FIX: sort doesn't work
-      -- table.sort(labels,function(k1,k2)
-      --   if k1.depth~=k2.depth then
-      --     return k1.depth < k2.depth
-      --   elseif k1.file~=k2.file then
-      --     return k1.file < k2.file
-      --   else
-      --     return k1.label< k2.label
-      --   end
-      -- end)
+        -- FIX: sort doesn't work
+        -- table.sort(labels,function(k1,k2)
+          --   if k1.depth~=k2.depth then
+          --     return k1.depth < k2.depth
+          --   elseif k1.file~=k2.file then
+          --     return k1.file < k2.file
+          --   else
+          --     return k1.label< k2.label
+          --   end
+          -- end)
       callback{items=labels,isIncomplete=false}
       print(string.format("job exited, found %s items",#labels))
     end
@@ -182,10 +176,11 @@ source.complete = function(self, request, callback)
         print("you should install fdfind")
       end
       vim.fn.jobstop(self.running_job_id)
-      self.running_job_id = vim.fn.jobstart("while read var; do echo \"file: $var\" ; yq e -M -o=json $var ; done <<(fd --no-ignore --max-depth 3 yaml | sort)", {
+      self.running_job_id = vim.fn.jobstart([[while read var; do echo \"FILE: $var\" ; yq e -M -o=json $var ; done <<(fd --no-ignore --max-depth 3 '\.yaml' | sort)]], {
         on_stderr = on_event,
         on_stdout = on_event,
         on_exit = on_event,
+        stdout_buffered = true,
         cwd = request.option.cwd or curr_dir,
       })
     end

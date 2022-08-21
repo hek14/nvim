@@ -13,6 +13,7 @@
 2.3 https://github.com/simrat39/symbols-outline.nvim: lsp symbols
 2.4 https://github.com/jbyuki/one-small-step-for-vimkind: debug nvim instance itself!!!
 2.5 https://github.com/williamboman/mason.nvim: a all-in-one lsp-installer and dap-installer
+2.6 https://github.com/stevearc/overseer.nvim: yet another task manager
 3. themes: https://alpha2phi.medium.com/12-neovim-themes-with-tree-sitter-support-8be320b683a4
 4. for pyright completion stubs: https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs
 4.1 how to use it for cv2 module completion:

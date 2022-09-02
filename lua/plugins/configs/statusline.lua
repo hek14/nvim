@@ -293,6 +293,20 @@ if ok then
   }
 end
 
+local illuminate_references_context = nil
+local ok,illuminate = pcall(require, 'illuminate')
+if ok then
+  illuminate_references_context = {
+    provider = function()
+      return "   references: " .. vim.g.curr_references_number
+    end,
+    enabled = function()
+      return vim.g.curr_references_number ~= nil
+    end,
+    hl = {fg = colors.magenta}
+  }
+end
+
 
 default.lsp_progress = {
    provider = function()
@@ -444,6 +458,10 @@ M.setup = function(override_flag)
       add_table(default.left, gps_code_context)
    elseif navic_code_context then
       add_table(default.left, navic_code_context)
+   end
+
+   if illuminate_references_context then
+     add_table(default.left, illuminate_references_context)
    end
 
    -- add_table(default.middle, default.lsp_progress) -- use fidget.nvim instead

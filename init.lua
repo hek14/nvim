@@ -31,8 +31,11 @@
 8. NOTE: `:verbose map m` don't work in normal case for mappings defined in lua, you should start nvim using `nvim -V1`
 9. `vim.loop`: https://teukka.tech/posts/2020-01-07-vimloop/
 10. TODO: PLEASE learn this: `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
-----]=====]
 
+- HOT TODO:
+1. refer to https://github.com/glepnir/nvim/blob/main/lua/core/pack.lua
+----]=====]
+debug_rc = true
 local present, impatient = pcall(require, "impatient")
 
 if present then
@@ -55,4 +58,4 @@ for _, module in ipairs(modules) do
 end
 
 require('core.mappings').general() -- load the mappings at the end of config to ensure it taking effects
-require("core.lazy")
+-- require("core.lazy")

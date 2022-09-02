@@ -220,6 +220,7 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
   for _, reference in ipairs(_references) do
     local start_line, start_char = reference['range']['start']['line'], reference['range']['start']['character']
     local end_line, end_char = reference['range']['end']['line'], reference['range']['end']['character']
+    print(fmt('highlight: %s, %s',start_line,start_char))
 
     local start_idx = get_line_byte_from_position(
       bufnr,
@@ -351,15 +352,21 @@ function M.check_if_any_ns_exists(position)
 end
 
 function M.kk_highlight()
-  local highlight_params = vim.tbl_deep_extend("force",vim.lsp.util.make_position_params(),{offset_encoding=hl_offset_encoding})
   profile_start(vim.api.nvim_get_current_buf())
-  vim.lsp.buf_request(vim.api.nvim_get_current_buf(), 'textDocument/documentHighlight', highlight_params, function(...)
-    if vim.fn.has('nvim-0.5.1') == 1 then
-      handle_document_highlight(select(2, ...), select(3, ...).bufnr)
-    else
-      handle_document_highlight(select(3, ...), select(5, ...))
-    end
-  end)
+  if #vim.g.curr_references > 0 then
+    print("using cached references:->>")
+    handle_document_highlight(vim.g.curr_references,vim.api.nvim_get_current_buf())
+  else
+    print("send request by myself")
+    local highlight_params = vim.tbl_deep_extend("force",vim.lsp.util.make_position_params(),{offset_encoding=hl_offset_encoding})
+    vim.lsp.buf_request(vim.api.nvim_get_current_buf(), 'textDocument/documentHighlight', highlight_params, function(...)
+      if vim.fn.has('nvim-0.5.1') == 1 then
+        handle_document_highlight(select(2, ...), select(3, ...).bufnr)
+      else
+        handle_document_highlight(select(3, ...), select(5, ...))
+      end
+    end)
+  end
 end
 
 function M.kk_clear_highlight()

@@ -10,7 +10,7 @@ local plugins = {
 
   { "lewis6991/impatient.nvim" },
 
-  { "nathom/filetype.nvim" },
+  -- { "nathom/filetype.nvim" },
 
   {
     "wbthomason/packer.nvim",
@@ -75,7 +75,6 @@ local plugins = {
   {
     "mhartington/oceanic-next",
     config = function ()
-      vim.cmd[[ syntax enable ]]
       vim.cmd[[ colorscheme OceanicNext ]]
     end
   },
@@ -155,18 +154,15 @@ local plugins = {
   -- git stuff
   {
     "lewis6991/gitsigns.nvim",
-    opt = true,
+    event = 'BufRead',
     config = "require('plugins.configs.gitsigns')",
-    setup = function()
-      require("core.utils").packer_lazy_load "gitsigns.nvim"
-    end,
   },
 
   -- lsp stuff
 
   {
     "neovim/nvim-lspconfig",
-    after = {"nvim-lsp-installer","nvim-navic"},
+    after = {"nvim-navic"},
     config = "require('plugins.configs.lspconfig')",
   },
 
@@ -220,11 +216,9 @@ local plugins = {
   },
 
   {
-    "williamboman/nvim-lsp-installer" ,
-    opt = true,
-    setup = function ()
-      require("core.utils").packer_lazy_load "nvim-lsp-installer"
-    end,
+    "williamboman/nvim-lsp-installer",
+    module = "nvim-lsp-installer",
+    cmd = {'LspInstall','LspUninstall','LspInstallInfo','LspUninstallAll'},
     config = function ()
       require("nvim-lsp-installer").setup {
         ensure_installed = {'pyright','sumneko_lua'}
@@ -325,7 +319,7 @@ local plugins = {
     end,
   },
   {
-    "RRethy/vim-illuminate",
+    "hek14/vim-illuminate",
     config = function ()
       vim.g.Illuminate_delay = 17
     end,
@@ -334,11 +328,10 @@ local plugins = {
   {
     "andymass/vim-matchup",
     disable = true,
-    opt = true,
+    event = 'BufRead',
     setup = function()
       vim.g.matchup_text_obj_enabled = 0
       vim.g.matchup_surround_enabled = 1
-      require("core.utils").packer_lazy_load "vim-matchup"
     end,
   },
 
@@ -485,9 +478,7 @@ local plugins = {
     "nvim-telescope/telescope.nvim",
     -- module = "telescope", -- NOTE: don't use `module` and `cmd` at the same time: cause bug in Mac OS
     -- module_pattern = {'telescope.*'}
-
-    opt = true,
-    cmd = "Telescope",
+    opt = false, -- just load it once startup, this is core plugins
     config = "require('plugins.configs.telescope')",
     setup = function()
       local map = require("core.utils").map
@@ -625,10 +616,7 @@ local plugins = {
   -- 1. populate the quickfix
   {
     "mhinz/vim-grepper",
-    opt = true,
-    setup = function ()
-      require("core.utils").packer_lazy_load "vim-grepper"
-    end,
+    opt = false,
     config = function()
       vim.g.grepper =
         {

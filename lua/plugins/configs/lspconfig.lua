@@ -411,4 +411,7 @@ end
 for _,server in ipairs(require'nvim-lsp-installer.servers'.get_installed_server_names()) do
   on_server_ready(server)
 end
+if debug_rc then
+  print("lspconfig config loaded")
+end
 return M

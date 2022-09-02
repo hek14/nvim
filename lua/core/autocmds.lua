@@ -31,6 +31,10 @@ au("FileType",{
   pattern="lua",
   command="setlocal shiftwidth=2"
 })
+-- au("FileType",{
+--   pattern='txt',
+--   command= 'if expand("%:t")=="pose.txt" | set ro | endif'
+-- })
 
 -- VimEnter event: just like ~/.config/nvim/after/plugin
 -- group: set {clear = true} will make sure that the autocmds will be hooked only once.
@@ -111,21 +115,21 @@ local any_client_attached = function ()
 end
 
 _G.any_client_attached = any_client_attached
-au("FileType",{pattern='lua',callback=function()
-  if vim.bo.buflisted then
-    vim.defer_fn(function()
-      local attached_clients = any_client_attached()
-      if #attached_clients == 0 or (#attached_clients==1 and attached_clients[1].name=='null-ls') then
-        vim.cmd [[echohl WarningMsg]]
-        vim.cmd [[echo 'Manually start lsp']]
-        vim.cmd [[echohl None]]
-        vim.defer_fn(function()
-          vim.cmd [[LspStart]]
-        end,0)
-      end
-    end,50)
-  end
-end})
+-- au("FileType",{pattern='lua',callback=function()
+--   if vim.bo.buflisted then
+--     vim.defer_fn(function()
+--       local attached_clients = any_client_attached()
+--       if #attached_clients == 0 or (#attached_clients==1 and attached_clients[1].name=='null-ls') then
+--         vim.cmd [[echohl WarningMsg]]
+--         vim.cmd [[echo 'Manually start lsp']]
+--         vim.cmd [[echohl None]]
+--         vim.defer_fn(function()
+--           vim.cmd [[LspStart]]
+--         end,0)
+--       end
+--     end,50)
+--   end
+-- end})
 
 
 -- PackerCompile when lua configs modified

@@ -35,7 +35,7 @@
 - HOT TODO:
 1. refer to https://github.com/glepnir/nvim/blob/main/lua/core/pack.lua
 ----]=====]
-debug_rc = true
+debug_rc = false
 local present, impatient = pcall(require, "impatient")
 
 if present then

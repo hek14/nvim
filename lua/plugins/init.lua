@@ -74,8 +74,25 @@ local plugins = {
 
   {
     "mhartington/oceanic-next",
+    disable = true,
     config = function ()
       vim.cmd[[ colorscheme OceanicNext ]]
+    end
+  },
+
+  {
+    "bluz71/vim-nightfly-guicolors",
+    disable = true,
+    config = function ()
+      vim.cmd [[colorscheme nightfly]]
+    end
+  },
+
+  {
+    "sainnhe/edge",
+    event = 'VimEnter',
+    config = function ()
+      vim.cmd [[ colorscheme edge ]]
     end
   },
 
@@ -131,6 +148,7 @@ local plugins = {
   },
   {
     "David-Kunz/treesitter-unit",
+    disable = true,
     after = "nvim-treesitter",
     config = function ()
       require"treesitter-unit".enable_highlighting()
@@ -143,6 +161,7 @@ local plugins = {
   },
   {
     'kevinhwang91/nvim-ufo',
+    disable = true,
     event = 'BufEnter',
     requires = 'kevinhwang91/promise-async',
     config = function ()

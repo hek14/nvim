@@ -1,6 +1,6 @@
 local util = require'lspconfig'.util
 local trouble_present = pcall(require, 'trouble')
-local navic_present,navic = require("nvim-navic")
+local navic_present,navic = pcall(require,"nvim-navic")
 local illuminate_present,illuminate = pcall(require,'illuminate')
 local ufo_present,ufo = pcall(require,'ufo')
 

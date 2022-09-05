@@ -7,6 +7,7 @@ end
 
 bufferline.setup {
    options = {
+      highlights = require("catppuccin.groups.integrations.bufferline").get(),
       numbers = "ordinal",
       offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
       buffer_close_icon = "",
@@ -46,12 +47,14 @@ bufferline.setup {
    },
 }
 
-map('n','<leader>1','<Cmd>BufferLineGoToBuffer 1<CR>')
-map('n','<leader>2','<Cmd>BufferLineGoToBuffer 2<CR>')
-map('n','<leader>3','<Cmd>BufferLineGoToBuffer 3<CR>')
-map('n','<leader>4','<Cmd>BufferLineGoToBuffer 4<CR>')
-map('n','<leader>5','<Cmd>BufferLineGoToBuffer 5<CR>')
-map('n','<leader>6','<Cmd>BufferLineGoToBuffer 6<CR>')
-map('n','<leader>7','<Cmd>BufferLineGoToBuffer 7<CR>')
-map('n','<leader>8','<Cmd>BufferLineGoToBuffer 8<CR>')
-map('n','<leader>9','<Cmd>BufferLineGoToBuffer 9<CR>')
+map('n','<leader>0','<cmd>lua require("bufferline").go_to_buffer(0, true)<cr>')
+map('n','<leader>1','<cmd>lua require("bufferline").go_to_buffer(1, true)<cr>')
+map('n','<leader>2','<cmd>lua require("bufferline").go_to_buffer(2, true)<cr>')
+map('n','<leader>3','<cmd>lua require("bufferline").go_to_buffer(3, true)<cr>')
+map('n','<leader>4','<cmd>lua require("bufferline").go_to_buffer(4, true)<cr>')
+map('n','<leader>5','<cmd>lua require("bufferline").go_to_buffer(5, true)<cr>')
+map('n','<leader>6','<cmd>lua require("bufferline").go_to_buffer(6, true)<cr>')
+map('n','<leader>7','<cmd>lua require("bufferline").go_to_buffer(7, true)<cr>')
+map('n','<leader>8','<cmd>lua require("bufferline").go_to_buffer(8, true)<cr>')
+map('n','<leader>9','<cmd>lua require("bufferline").go_to_buffer(9, true)<cr>')
+map('n','<leader>$','<cmd>lua require("bufferline").go_to_buffer(-1, true)<cr>')

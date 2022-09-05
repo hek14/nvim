@@ -83,7 +83,7 @@ M.general = function()
     map("x", ',s',require('core.utils').ScopeSearch)
 
     map("n", "<leadr>ts", [[ :keeppatterns<Bar>:%s/\s\+$//e<CR> ]] )
-    cmd [[ command DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]
+    cmd [[ command! DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]
     map("n", "<space>", "<Nop>", {noremap = true, silent = true})
     map("n", "<leader>cd", [[<cmd>lua require('core.utils').smart_current_dir()<cr>]], {silent = false}) -- example to delete the buffer
     map("n", "<F1>", "<Tab>", {noremap=true}) -- because I set <Ctrl-I> to send the same escape bytes as <Home>, so <Tab>/<Ctrl-I> can be used with this keymap
@@ -188,12 +188,12 @@ M.general = function()
         endfunction
         ]])
     -- Add Packer commands because we are not loading it at startup
-    cmd "silent! command PackerClean lua require 'plugins' require('packer').clean()"
-    cmd "silent! command PackerCompile lua require 'plugins' require('packer').compile()"
-    cmd "silent! command PackerInstall lua require 'plugins' require('packer').install()"
-    cmd "silent! command PackerStatus lua require 'plugins' require('packer').status()"
-    cmd "silent! command PackerSync lua require 'plugins' require('packer').sync()"
-    cmd "silent! command PackerUpdate lua require 'plugins' require('packer').update()"
+    cmd "silent! command! PackerClean lua require 'plugins' require('packer').clean()"
+    cmd "silent! command! PackerCompile lua require 'plugins' require('packer').compile()"
+    cmd "silent! command! PackerInstall lua require 'plugins' require('packer').install()"
+    cmd "silent! command! PackerStatus lua require 'plugins' require('packer').status()"
+    cmd "silent! command! PackerSync lua require 'plugins' require('packer').sync()"
+    cmd "silent! command! PackerUpdate lua require 'plugins' require('packer').update()"
   end
 
   others()

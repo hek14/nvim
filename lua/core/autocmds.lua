@@ -31,10 +31,10 @@ au("FileType",{
   pattern="lua",
   command="setlocal shiftwidth=2"
 })
--- au("FileType",{
---   pattern='txt',
---   command= 'if expand("%:t")=="pose.txt" | set ro | endif'
--- })
+au("FileType",{
+  pattern='txt',
+  command= 'if expand("%:t")=="pose.txt" | set ro | endif'
+})
 
 -- VimEnter event: just like ~/.config/nvim/after/plugin
 -- group: set {clear = true} will make sure that the autocmds will be hooked only once.

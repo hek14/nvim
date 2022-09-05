@@ -128,4 +128,4 @@ local cmp_config = function()
 end
 vim.keymap.set('i','<C-c>',cmp_config,{noremap=true,silent=true})
 
-vim.cmd('hi CmpFloatBorder guifg=red')
+vim.cmd('hi! CmpFloatBorder guifg=red')

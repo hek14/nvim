@@ -36,7 +36,7 @@ local plugins = {
   {
     "akinsho/bufferline.nvim",
     branch = "main",
-    after = "nvim-web-devicons",
+    after = { "nvim-web-devicons" },
     config = "require('plugins.configs.bufferline')",
     setup = function()
       local map = require("core.utils").map
@@ -46,8 +46,34 @@ local plugins = {
   },
 
   {
-    "lukas-reineke/indent-blankline.nvim",
+    'romgrk/barbar.nvim',
     disable = true,
+    after = 'nvim-web-devicons',
+    requires = {'kyazdani42/nvim-web-devicons'},
+    config = function ()
+      require'bufferline'.setup {
+        icons = false,
+      }
+      local map = vim.api.nvim_set_keymap
+      local opts = { noremap = true, silent = true }
+      map('n', '<leader>1', '<Cmd>BufferGoto 1<CR>', opts)
+      map('n', '<leader>2', '<Cmd>BufferGoto 2<CR>', opts)
+      map('n', '<leader>3', '<Cmd>BufferGoto 3<CR>', opts)
+      map('n', '<leader>4', '<Cmd>BufferGoto 4<CR>', opts)
+      map('n', '<leader>5', '<Cmd>BufferGoto 5<CR>', opts)
+      map('n', '<leader>6', '<Cmd>BufferGoto 6<CR>', opts)
+      map('n', '<leader>7', '<Cmd>BufferGoto 7<CR>', opts)
+      map('n', '<leader>8', '<Cmd>BufferGoto 8<CR>', opts)
+      map('n', '<leader>9', '<Cmd>BufferGoto 9<CR>', opts)
+      map('n', '<leader>0', '<Cmd>BufferLast<CR>', opts)
+      -- map('n', '[b', '<Cmd>BufferPrevious<CR>', opts)
+      -- map('n', ']b', '<Cmd>BufferNext<CR>', opts)
+    end
+  },
+
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    disable = false,
     event = "BufRead",
     config = function ()
       local default = {
@@ -90,12 +116,51 @@ local plugins = {
 
   {
     "sainnhe/edge",
+    disable = true,
     event = 'VimEnter',
     config = function ()
       vim.cmd [[ colorscheme edge ]]
     end
   },
 
+  {
+    "catppuccin/nvim", as = "catppuccin",
+    module = 'catppuccin',
+    event = 'VimEnter',
+    config = function ()
+      require("catppuccin").setup({})
+      vim.cmd [[ colorscheme catppuccin ]]
+    end
+  },
+
+  {
+    "Mofiqul/vscode.nvim",
+    disable = true,
+    opt = false,
+    config = function ()
+      vim.o.background = 'dark'
+      local c = require('vscode.colors')
+      require('vscode').setup({
+        -- Enable transparent background
+        -- transparent = true,
+        -- Enable italic comment
+        italic_comments = true,
+        -- Disable nvim-tree background color
+        -- disable_nvimtree_bg = true,
+        -- Override colors (see ./lua/vscode/colors.lua)
+        -- color_overrides = {
+        --   vscLineNumber = '#FFFFFF',
+        -- },
+        -- Override highlight groups (see ./lua/vscode/theme.lua)
+        -- group_overrides = {
+        --   -- this supports the same val table as vim.api.nvim_set_hl
+        --   -- use colors from this colorscheme by requiring vscode.colors!
+        --   Cursor = { fg=c.vscDarkBlue, bg=c.vscLightGreen, bold=true },
+        --   StatusLine = { fg=c.vscDarkBlue, bg='#800020',italic=true }
+        -- }
+      })
+    end
+  },
   {
     "nvim-treesitter/nvim-treesitter",
     event = { "BufRead", "BufNewFile" },
@@ -747,7 +812,12 @@ local plugins = {
   {
     "rcarriga/nvim-notify",
     config = function()
+      require('notify').setup(
+        {
+          background_colour = "#000000",
+        })
       vim.notify = require("notify")
+
     end,
   },
   {

@@ -36,7 +36,7 @@ local plugins = {
   {
     "akinsho/bufferline.nvim",
     branch = "main",
-    after = { "nvim-web-devicons" },
+    after = { "nvim-web-devicons", "catppuccin" },
     config = "require('plugins.configs.bufferline')",
     setup = function()
       local map = require("core.utils").map
@@ -125,8 +125,7 @@ local plugins = {
 
   {
     "catppuccin/nvim", as = "catppuccin",
-    module = 'catppuccin',
-    event = 'VimEnter',
+    event = 'BufRead',
     config = function ()
       require("catppuccin").setup({})
       vim.cmd [[ colorscheme catppuccin ]]
@@ -922,6 +921,7 @@ local plugins = {
   },
   {
     "folke/which-key.nvim",
+    disable = true,
     config = function()
       require("which-key").setup {}
     end

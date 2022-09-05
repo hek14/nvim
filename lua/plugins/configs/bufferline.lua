@@ -7,7 +7,16 @@ end
 
 bufferline.setup {
    options = {
-      highlights = require("catppuccin.groups.integrations.bufferline").get(),
+       highlights = require("catppuccin.groups.integrations.bufferline").get(
+       {
+         custom = {
+           all = {
+             buffer_selected = {
+               fg = '#164C9B', bg = '#9B1633', style = {'bold','italic' }, -- current
+             }
+           }
+         }
+       }),
       numbers = "ordinal",
       offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
       buffer_close_icon = "",

@@ -126,10 +126,7 @@ local plugins = {
   {
     "catppuccin/nvim", as = "catppuccin",
     event = 'BufRead',
-    config = function ()
-      require("catppuccin").setup({})
-      vim.cmd [[ colorscheme catppuccin ]]
-    end
+    config = "require('plugins.configs.catppuccin')",
   },
 
   {

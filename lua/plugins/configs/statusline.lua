@@ -298,10 +298,10 @@ local ok,illuminate = pcall(require, 'illuminate')
 if ok then
   illuminate_references_context = {
     provider = function()
-      return "   references: " .. vim.g.curr_references_number
+      return "   references: " .. #references[vim.api.nvim_get_current_buf()]
     end,
     enabled = function()
-      return vim.g.curr_references_number ~= nil
+      return references ~= nil and references[vim.api.nvim_get_current_buf()] ~= nil
     end,
     hl = {fg = colors.magenta}
   }

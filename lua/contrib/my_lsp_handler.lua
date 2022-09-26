@@ -50,7 +50,7 @@ local popup_options = {
     },
   },
   win_options = {
-    winhighlight = "Normal:Normal",
+    winhighlight = "Normal:reverse",
   }
 }
 
@@ -483,6 +483,14 @@ M.location_handler = function(label, result, ctx, config)
   local menu = Menu(
     popup_options,
     {
+      border = {
+        style = "double",
+        highlight = "FloatBorder",
+        text = {
+          top = "yo",
+          top_align = "center",
+        },
+      },
       lines = menus,
       min_width = 40,
       max_width = vim.fn.winwidth(0),

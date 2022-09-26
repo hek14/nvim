@@ -612,6 +612,7 @@ M.grep_last_search = function()
 end
 
 vim.cmd [[
+  let g:i = 0
   function! Inc(...)
     let result = g:i
     let g:i += a:0 > 0 ? a:1 : 1

@@ -198,6 +198,10 @@ M.general = function()
 
   others()
   colemak()
+  vim.cmd [[
+    nnoremap n gj
+    nnoremap e gk
+  ]]
 end
 
 return M

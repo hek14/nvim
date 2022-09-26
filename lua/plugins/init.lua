@@ -972,6 +972,9 @@ if is_mac then
     { "kdheepak/cmp-latex-symbols", after = "nvim-cmp" },
     {
       "lervag/vimtex",
+      setup = function()
+        vim.g.vimtex_motion_enabled = 0
+      end,
       config = function()
         vim.g.vimtex_view_method = "skim"
         vim.cmd([[

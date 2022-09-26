@@ -105,6 +105,15 @@ cmp.setup {
    },
 }
 
+-- Set configuration for specific filetype.
+cmp.setup.filetype('tex', {
+  sources = {
+    { name = 'omni' },
+    { name = 'luasnip' },
+    { name = 'buffer' },
+  },
+})
+
 local cmp_rg_complete = function()
   cmp.complete({
     config = {

@@ -150,6 +150,26 @@ au("FileType",{callback=function ()
   end
 end})
 
+au("FileType",{callback=function ()
+  vim.defer_fn(function()
+    print('should override vimtex')
+    pcall(function ()
+      vim.cmd [[
+      xunmap <buffer> ic
+      xunmap <buffer> ie
+      xunmap <buffer> im
+      xunmap <buffer> iP
+      xunmap <buffer> i$
+      xunmap <buffer> id
+      nunmap <buffer> ]c
+      nunmap <buffer> [c
+      nmap <buffer> ,t  :VimtexCompileSS<CR>
+      nmap <buffer> ,v  :VimtexView<CR>
+      ]]
+    end)
+  end,50)
+end,pattern='tex'})
+
 M.ft_map = function(ft,mode,lhs,rhs,opts)
   au('FileType',{callback=function ()
     local merged_opts = vim.tbl_extend('force',{buffer=true},opts or {})

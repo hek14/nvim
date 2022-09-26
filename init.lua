@@ -34,6 +34,7 @@
 
 - HOT TODO:
 1. refer to https://github.com/glepnir/nvim/blob/main/lua/core/pack.lua
+2. refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 ----]=====]
 debug_rc = false
 local present, impatient = pcall(require, "impatient")

@@ -1078,7 +1078,7 @@ end
 local function process_local_plugins(spec)
   if type(spec) == "string" then
     local name, owner = get_name(spec)
-    local local_pkg = "~/github/" .. name
+    local local_pkg = vim.fn.stdpath("config") .. "/lua/contrib/" .. name
 
     if local_plugins[name] or local_plugins[owner] or local_plugins[owner .. "/" .. name] then
       if has_local(local_pkg) then

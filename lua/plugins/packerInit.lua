@@ -35,8 +35,11 @@ packer.init {
       prompt_border = "single",
    },
    git = {
-      clone_timeout = 6000, -- seconds
-   },
+      clone_timeout = 60, -- seconds
+      subcommands = { -- Format strings for git subcommands
+         update = 'pull --progress --rebase=true',
+    }
+  },
    auto_clean = true,
    compile_on_sync = true,
    max_jobs = 16,

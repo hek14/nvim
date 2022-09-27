@@ -37,20 +37,25 @@ local function PIG_in_progress()
 end
 
 local popup_options = {
-  relative = "cursor",
+  -- position = "50%",
   position = {
-    row = 1,
+    row = 0,
     col = 0,
   },
+  size = {
+    -- width = 40,
+    height = 20,
+  },
+  relative = "cursor",
   border = {
-    style = "rounded",
+    style = "double",
     text = {
       top = "PIG:🐷",
       top_align = "center",
     },
   },
   win_options = {
-    winhighlight = "Normal:reverse",
+    winhighlight = "Normal:Normal,FloatBorder:Normal",
   }
 }
 
@@ -243,7 +248,7 @@ local make_menu = function(groups,ctx)
   local location_id = 0
   for i,group in ipairs(groups) do
     local file_name = fn.fnamemodify(vim.uri_to_fname(group[1]),':~:.')
-    table.insert(menus,Menu.separator('-- ' .. file_name,{text_align = "left"}))
+    table.insert(menus,Menu.separator('File: ' .. file_name,{text_align = "left"}))
     total_lines = total_lines + 1
     table.insert(file_lines,{line=total_lines-1,start_col=0,end_col=-1})
     for j = 2, #group do
@@ -251,7 +256,7 @@ local make_menu = function(groups,ctx)
       local item = lsp.util.locations_to_items({loc},vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)[1]
       local range = loc.range or loc.targetSelectionRange
       location_id = location_id + 1
-      table.insert(menus,Menu.separator("-- location " .. location_id, {text_align = "left"}))
+      table.insert(menus,Menu.separator("Loc: " .. location_id, {text_align = "left"}))
       total_lines = total_lines + 1
       for k = -ctx_lines,ctx_lines do
         ---- NOTE: any lines in the same context block refer to the same location
@@ -483,17 +488,9 @@ M.location_handler = function(label, result, ctx, config)
   local menu = Menu(
     popup_options,
     {
-      border = {
-        style = "double",
-        highlight = "FloatBorder",
-        text = {
-          top = "yo",
-          top_align = "center",
-        },
-      },
       lines = menus,
-      min_width = 40,
-      max_width = vim.fn.winwidth(0),
+      -- min_width = 40,
+      -- max_width = vim.fn.winwidth(0),
       keymap = {
         focus_next = { "n", "<Down>", "<Tab>" },
         focus_prev = { "e", "<Up>", "<S-Tab>" },
@@ -539,10 +536,11 @@ M.location_handler = function(label, result, ctx, config)
   menu.rename_params = ctx.rename_params
   menu:mount() -- call the render here
   PIG_menu = menu
+  vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft) -- set the highlight for ft
   vim.api.nvim_buf_call(menu.bufnr,function ()
     _goto_next_loc_in_menu(1)
+    vim.cmd[[TSBufDisable highlight]]
   end)
-  vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft) -- set the highlight for ft
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]r","",{noremap=true,callback=function ()
     _goto_next_loc_in_menu(1)
   end})
@@ -556,8 +554,8 @@ M.location_handler = function(label, result, ctx, config)
     _goto_next_file_in_menu(-1)
   end})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>q","",{noremap=true,callback=dump_qflist})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>s",":lua require('contrib.my_lsp_handler').open_split('h')<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>v",":lua require('contrib.my_lsp_handler').open_split('v')<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n",",s",":lua require('contrib.my_lsp_handler').open_split('h')<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n",",v",":lua require('contrib.my_lsp_handler').open_split('v')<CR>",{noremap=true})
 
   for _, loc in ipairs(rename_lines) do
     vim.api.nvim_buf_add_highlight(menu.bufnr,pig_ns,"Error",loc.line,loc.start_col,loc.end_col)

@@ -60,6 +60,3 @@ end
 
 require('core.mappings').general() -- load the mappings at the end of config to ensure it taking effects
 require("core.lazy")
-print("HK config loaded")
-vim.g.curr_references_number = {}
-vim.g.curr_references = {}

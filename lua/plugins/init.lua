@@ -1082,7 +1082,6 @@ local function process_local_plugins(spec)
 
     if local_plugins[name] or local_plugins[owner] or local_plugins[owner .. "/" .. name] then
       if has_local(local_pkg) then
-        print('use local package: ',local_pkg)
         return local_pkg
       else
         vim.notify("Local package " .. name .. " not found", vim.log.levels.ERROR, { title = 'Packer Starup' })

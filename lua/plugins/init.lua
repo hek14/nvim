@@ -1026,9 +1026,16 @@ local plugins = {
         return
       end
       cybu.setup()
-      vim.keymap.set("n", "<leader>n", "<Plug>(CybuNext)")
-      vim.keymap.set("n", "<leader>e", "<Plug>(CybuPrev)")
+      vim.keymap.set("n", "<leader>n", "<Plug>(CybuNext)",{})
+      vim.keymap.set("n", "<leader>e", "<Plug>(CybuPrev)",{})
     end,
+  },
+  {
+    "habamax/vim-winlayout",
+    config = function()
+      vim.keymap.set("n", ",,", "<Plug>(WinlayoutBackward)",{})
+      vim.keymap.set("n", ",.", "<Plug>(WinlayoutBackward)",{})
+    end
   }
 }
 

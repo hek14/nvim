@@ -19,8 +19,14 @@ local PIG_state = {
 }
 
 local PIG_menu = nil
+local PIG_window = nil
 local PIG_node = nil
-local pig_ns = vim.api.nvim_create_namespace("pig")
+local last_source_bufnr = nil
+local last_source_buf_location = nil
+local last_winnr = nil
+local last_PIG_location = nil
+local last_PIG_call_params = nil
+local pig_ns = vim.api.nvim_create_namespace("PIG")
 local rename_lines = {}
 local ref_lines = {}
 local file_lines = {}
@@ -37,16 +43,16 @@ local function PIG_in_progress()
 end
 
 local popup_options = {
-  -- position = "50%",
-  position = {
-    row = 0,
-    col = 0,
-  },
+  position = "50%",
+  -- position = {
+  --   row = 0,
+  --   col = 0,
+  -- },
   size = {
     -- width = 40,
     height = 20,
   },
-  relative = "cursor",
+  -- relative = "cursor",
   border = {
     style = "double",
     text = {
@@ -135,12 +141,12 @@ end
 --       line = 90
 --     }
 --   },
---   targetUri = "file:///home/heke/.config/nvim/contrib/my_lsp_handler.lua"
+--   targetUri = "file:///home/heke/.config/nvim/contrib/pig.lua"
 -- }
 --
 -- "item" {
 --   col = 9,
---   filename = "/home/heke/.config/nvim/contrib/my_lsp_handler.lua",
+--   filename = "/home/heke/.config/nvim/contrib/pig.lua",
 --   lnum = 91,
 --   text = "  local menus = {}"
 -- }
@@ -276,7 +282,7 @@ local make_menu = function(groups,ctx)
           table.insert(menus,Menu.item(new_text, {new_name=ctx.new_name,loc=loc,ctx=ctx,item=item,is_ref=(k==0),line=total_lines-k,col=range.start.character}))
           table.insert(rename_lines,vim.tbl_deep_extend('force',_rename_location,{line=total_lines-1}))
         else
-          table.insert(menus,Menu.item(ctx_item.text, {loc=loc,ctx=ctx,item=item,is_ref=(k==0),line=total_lines-k,col=range.start.character}))
+          table.insert(menus,Menu.item(ctx_item.text, {loc=ctx_loc,ctx=ctx,item=item,is_ref=(k==0),line=total_lines-k,col=range.start.character}))
         end
         if k==0 then
           table.insert(ref_lines,{line=total_lines-1,start_col=0,end_col=-1})
@@ -490,7 +496,7 @@ M.location_handler = function(label, result, ctx, config)
     {
       lines = menus,
       -- min_width = 40,
-      -- max_width = vim.fn.winwidth(0),
+      max_width = math.floor(vim.fn.winwidth(0)*0.8),
       keymap = {
         focus_next = { "n", "<Down>", "<Tab>" },
         focus_prev = { "e", "<Up>", "<S-Tab>" },
@@ -507,9 +513,15 @@ M.location_handler = function(label, result, ctx, config)
       on_close = function()
         print("PIG CLOSED")
         vim.api.nvim_buf_clear_namespace(0,pig_ns,0,-1)
+        PIG_window = nil
       end,
       on_change = function(node,menu)
         PIG_node = node
+        vim.pretty_print('pig_location: ',last_PIG_location)
+        if PIG_window then
+          last_PIG_location = vim.api.nvim_win_get_cursor(PIG_window)
+        end
+        vim.pretty_print('index: ',node._index)
       end,
       on_submit = function(item)
         if label == "Refactor" then
@@ -530,15 +542,29 @@ M.location_handler = function(label, result, ctx, config)
             echo('ErrorMsg', "can't jump to location")
           end
         end
+        PIG_menu.menu_props.on_close()
       end,
     }
   )
   menu.rename_params = ctx.rename_params
-  menu:mount() -- call the render here
+
+  last_source_bufnr = vim.fn.bufnr()
+  last_winnr = vim.fn.winnr()
+  last_source_buf_location = {ctx.token[1],ctx.token[2]}
+  -- ========== now everything is saved
+  menu:mount()
+  -- ========== render PIG
   PIG_menu = menu
+  last_PIG_call_params = {label, result, ctx, config}
   vim.api.nvim_buf_set_option(menu.bufnr,"ft",ft) -- set the highlight for ft
   vim.api.nvim_buf_call(menu.bufnr,function ()
-    _goto_next_loc_in_menu(1)
+    PIG_window = vim.api.nvim_get_current_win()
+    if ctx.resume and last_PIG_location then
+      vim.pretty_print('resume to: ',last_PIG_location)
+      vim.api.nvim_win_set_cursor(0,last_PIG_location)
+    else
+      _goto_next_loc_in_menu(1)
+    end
     vim.cmd[[TSBufDisable highlight]]
   end)
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]r","",{noremap=true,callback=function ()
@@ -554,8 +580,26 @@ M.location_handler = function(label, result, ctx, config)
     _goto_next_file_in_menu(-1)
   end})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<leader>q","",{noremap=true,callback=dump_qflist})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n",",s",":lua require('contrib.my_lsp_handler').open_split('h')<CR>",{noremap=true})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n",",v",":lua require('contrib.my_lsp_handler').open_split('v')<CR>",{noremap=true})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n",",s","",{noremap=true,callback=function ()
+    M.open_split('h')
+  end})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n",",v","",{noremap=true,callback=function ()
+    M.open_split('v')
+  end})
+  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<C-c>","",{noremap=true,callback=function ()
+    M.my_ctrl_c()    
+  end})
+
+  vim.keymap.set("n",",g","",{noremap=true,callback=function ()
+    vim.cmd(fmt('%s wincmd w',last_winnr))
+    vim.cmd(fmt('b %s',last_source_bufnr))
+    vim.cmd('wincmd o')
+    vim.pretty_print('last_source_buf_location: ',last_source_buf_location)
+    vim.api.nvim_win_set_cursor(0,last_source_buf_location)
+    last_PIG_call_params[3].resume = true
+    vim.pretty_print('last_PIG_call_params: ','result: ',#last_PIG_call_params[2],' ctx: ',ctx)
+    M.location_handler(unpack(last_PIG_call_params))
+  end})
 
   for _, loc in ipairs(rename_lines) do
     vim.api.nvim_buf_add_highlight(menu.bufnr,pig_ns,"Error",loc.line,loc.start_col,loc.end_col)
@@ -609,6 +653,7 @@ M.wrap_handler = function (handler)
       ctx.rename_params = handler.rename_params
     end
     ctx.token = handler.token
+    ctx.resume = handler.resume
     local hdl_result = handler.target(handler.label, result, ctx, config)
     if not hdl_result then
       PIG_state[handler.label] = "failure"
@@ -654,7 +699,7 @@ M.setup_handler = function ()
   end
 end
 
-M.async_ref = function (fallback)
+M.async_ref = function (fallback,resume)
   if not PIG_in_progress() then
     M.ctrl_c_pressed = false
     local ref_params = vim.lsp.util.make_position_params()
@@ -662,7 +707,7 @@ M.async_ref = function (fallback)
     local token = vim.api.nvim_win_get_cursor(0)
     local clock = os.clock()
     M.token = {token[1],token[2],clock}
-    local _,result = vim.lsp.buf_request(0,'textDocument/references', ref_params, M.wrap_handler{label = 'References', target = M.location_handler,fallback=fallback,token={token[1],token[2],clock}})
+    local _,result = vim.lsp.buf_request(0,'textDocument/references', ref_params, M.wrap_handler{label = 'References', target = M.location_handler,resume=resume, fallback=fallback,token={token[1],token[2],clock}})
     M.request_func[1] = "References"
     M.request_func[2] = result
     PIG_state.References="in_progress"
@@ -819,7 +864,5 @@ M.my_ctrl_c = function ()
   M.cancel_request()
   vim.api.nvim_feedkeys(_q("<C-c>"),'n',true)
 end
-
-require("core.utils").map("n","<C-c>","<Cmd>lua require('contrib.my_lsp_handler').my_ctrl_c()<CR>")
 
 return M

@@ -122,7 +122,7 @@ end
 function M.Smart_goto_definition()
   local bufnr = vim.fn.bufnr()
   vim.cmd [[normal! m`]]
-  require('contrib.my_lsp_handler').async_def(function()
+  require('contrib.pig').async_def(function()
     print('using fallback')
     require'nvim-treesitter-refactor.navigation'.goto_definition(bufnr,
       function()
@@ -150,7 +150,7 @@ end
 function M.Smart_goto_next_ref(index)
   local bufnr = vim.fn.bufnr()
   vim.cmd [[normal! m`]]
-  require('contrib.my_lsp_handler').next_lsp_reference(index, function()
+  require('contrib.pig').next_lsp_reference(index, function()
     print('using fallback')
     if index > 0 then
       require"illuminate".next_reference{wrap=true}
@@ -261,7 +261,7 @@ local on_server_ready = function(server)
     buf_set_keymap("n", "gd", "<cmd>lua require('plugins.configs.lspconfig').Smart_goto_definition()<CR>",
       map_opts)
     buf_set_keymap("n", "gr",
-      "<cmd>lua require('contrib.my_lsp_handler').async_ref()<CR>",
+      "<cmd>lua require('contrib.pig').async_ref()<CR>",
       map_opts)
     buf_set_keymap("n", "gt",
       "<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>",
@@ -304,7 +304,7 @@ local on_server_ready = function(server)
     -- buf_set_keymap("i", "<C-k>",
     --                "<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
     buf_set_keymap("n", "<leader>rn",
-      "<cmd>lua require('contrib.my_lsp_handler').rename()<CR>",
+      "<cmd>lua require('contrib.pig').rename()<CR>",
       map_opts)
     buf_set_keymap("n", "<leader>wa",
       "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",

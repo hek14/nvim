@@ -323,7 +323,7 @@ local plugins = {
     -- if other formatting method is enabled by the lspconfig(pyright for example), then you should turn that of in the on_attach function like below:
     -- function on_attach(client,bufnr)
     --    if client.name = "pyright" then
-    --         client.resolved_capabilities.document_formatting = false
+    --         client.server_capabilities.document_formatting = false
     --    end
     -- end
     after = "nvim-lspconfig",
@@ -340,7 +340,7 @@ local plugins = {
 
         -- format on save
         -- on_attach = function(client)
-        --   if client.resolved_capabilities.document_formatting then
+        --   if client.server_capabilities.document_formatting then
         --       vim.cmd "autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()"
         --   end
         -- end

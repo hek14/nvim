@@ -229,8 +229,8 @@ local on_server_ready = function(server)
       vim.api.nvim_buf_set_option(bufnr, ...)
     end
 
-    client.resolved_capabilities.document_formatting = false
-    client.resolved_capabilities.document_range_formatting = false
+    client.server_capabilities.document_formatting = false
+    client.server_capabilities.document_range_formatting = false
     -- Enable completion triggered by <c-x><c-o>
     buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 
@@ -337,7 +337,7 @@ local on_server_ready = function(server)
     require('contrib.my_document_highlight').on_attach(bufnr)
     -- require('contrib.show_diagnostic_in_message').on_attach(bufnr)
     if vim.tbl_contains({"pyright", "sumneko_lua"}, client.name) then
-      client.resolved_capabilities.document_formatting = false
+      client.server_capabilities.document_formatting = false
     end
   end
 

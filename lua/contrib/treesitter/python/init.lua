@@ -68,10 +68,9 @@ function M.goto_python_main(buffer)
   local iter = my_ts.get_query_matches(buffer,'python',query)
   local locations = {}
   for who,match,metadata in iter do
-    -- P(metadata)
+    -- vim.pretty_print(metadata)
     table.insert(locations, {
-      start = {metadata.content[1][1]+1,metadata.content[1][2]}
-      -- goto the inside of if block
+      start = {metadata[1].range[1]+1,metadata[1].range[2]}
     })
   end
   -- actually: a python file should only have one '__name__=="__main__"'

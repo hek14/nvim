@@ -1,3 +1,5 @@
+; extends
+
 ; __init__ of class
 (class_definition 
   body : (block

@@ -129,9 +129,10 @@ highlight def Visual guibg=#6c6c6c
 " " def a highlight by linking
 " highlight def link Search Todo
 ]]
-require"nvim-treesitter.highlight".set_custom_captures {
-  ["init_func"] = "KK_init",
-}
+-- require"nvim-treesitter.highlight".set_custom_captures {
+--   ["init_func"] = "KK_init",
+-- }
+vim.api.nvim_set_hl(0, "@init_func.python", { link = "KK_init" })
 
 -- treesitter seems to have no bug about the indentation
 -- function _G.ensure_ts_indent ()

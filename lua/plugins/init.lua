@@ -949,7 +949,7 @@ local plugins = {
     end
   },
   {
-    "folke/lua-dev.nvim",
+    "folke/neodev.nvim",
   },
   {
     'sindrets/diffview.nvim',

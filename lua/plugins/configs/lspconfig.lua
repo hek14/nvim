@@ -383,7 +383,7 @@ local on_server_ready = function(server)
     }
   end
   if server == "sumneko_lua" then
-    local luadev = require("lua-dev").setup({
+    local luadev = require("neodev").setup({
       -- add any options here, or leave empty to use the default settings
       lspconfig = {
         cmd = {root_dir .. "/sumneko_lua/extension/server/bin/lua-language-server"},

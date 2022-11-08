@@ -30,7 +30,4 @@ require("catppuccin").setup {
 		},
 	},
 }
-vim.defer_fn(function()
-  vim.cmd [[ colorscheme catppuccin ]]
-  print('catppuccin loaded')
-end,0)
+vim.cmd [[ colorscheme catppuccin ]]

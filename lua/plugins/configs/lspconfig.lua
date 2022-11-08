@@ -383,22 +383,16 @@ local on_server_ready = function(server)
     }
   end
   if server == "sumneko_lua" then
-    local luadev = require("neodev").setup({
-      -- add any options here, or leave empty to use the default settings
-      lspconfig = {
-        cmd = {root_dir .. "/sumneko_lua/extension/server/bin/lua-language-server"},
-        on_attach = opts.on_attach,
-        capabilities = opts.capabilities,
-        settings = {
-          Lua = {
-            workspace = {
-              checkThirdParty = false, -- THIS IS THE IMPORTANT LINE TO ADD: avoid the annoying "OpenResty"
-            },
+    require("neodev").setup({})
+    require('lspconfig').sumneko_lua.setup({
+      settings = {
+        Lua = {
+          completion = {
+            callSnippet = "Replace"
           }
         }
-      },
+      }
     })
-    require('lspconfig').sumneko_lua.setup(luadev)
   else
     require('lspconfig')[server].setup(opts)
   end

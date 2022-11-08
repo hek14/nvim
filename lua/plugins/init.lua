@@ -124,8 +124,9 @@ local plugins = {
   },
 
   {
-    "catppuccin/nvim", as = "catppuccin",
-    event = 'BufRead',
+    "catppuccin/nvim",
+    as = "catppuccin",
+    opt = false,
     config = "require('plugins.configs.catppuccin')",
   },
 

@@ -235,6 +235,7 @@ local on_server_ready = function(server)
     buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 
     print("Lsp catches this buffer!")
+    require("contrib.pig").on_attach(bufnr)
     if illuminate_present then
       require 'illuminate'.on_attach(client)
     end

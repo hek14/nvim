@@ -517,11 +517,9 @@ M.location_handler = function(label, result, ctx, config)
       end,
       on_change = function(node,menu)
         PIG_node = node
-        vim.pretty_print('pig_location: ',last_PIG_location)
         if PIG_window then
           last_PIG_location = vim.api.nvim_win_get_cursor(PIG_window)
         end
-        vim.pretty_print('index: ',node._index)
       end,
       on_submit = function(item)
         if label == "Refactor" then
@@ -585,9 +583,6 @@ M.location_handler = function(label, result, ctx, config)
   end})
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n",",v","",{noremap=true,callback=function ()
     M.open_split('v')
-  end})
-  vim.api.nvim_buf_set_keymap(menu.bufnr,"n","<C-c>","",{noremap=true,callback=function ()
-    M.my_ctrl_c()    
   end})
 
   vim.keymap.set("n",",g","",{noremap=true,callback=function ()
@@ -863,6 +858,12 @@ end
 M.my_ctrl_c = function ()
   M.cancel_request()
   vim.api.nvim_feedkeys(_q("<C-c>"),'n',true)
+end
+
+M.on_attach = function(bufnr)
+  vim.api.nvim_buf_set_keymap(bufnr,"n","<C-c>","",{noremap=true,callback=function ()
+    M.my_ctrl_c()    
+  end})
 end
 
 return M

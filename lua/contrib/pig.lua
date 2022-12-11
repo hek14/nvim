@@ -30,6 +30,7 @@ local pig_ns = vim.api.nvim_create_namespace("PIG")
 local rename_lines = {}
 local ref_lines = {}
 local file_lines = {}
+local au_group = vim.api.nvim_create_augroup("PIG",{clear=true})
 
 local function PIG_in_progress()
   local in_progress = false
@@ -206,41 +207,19 @@ end
 
 local Inc_loc = function(loc,index)
   local new_loc = deepcopy(loc)
-  if loc.targetSelectionRange then
-    new_loc.targetSelectionRange = {
-      ['end'] = {
+  for i,k in ipairs({"targetSelectionRange","range","targetRange"}) do
+    if loc[k] ~= nil then
+      new_loc[k] = {
+        ['end'] = {
         character = 0,
-        line = loc.targetSelectionRange['end'].line + index
+        line = loc[k]['end'].line + index
       },
       ['start'] = {
         character = 0,
-        line = loc.targetSelectionRange['start'].line + index
+        line = loc[k]['start'].line + index
       }
     }
-  end
-  if loc.range then
-    new_loc.range = {
-      ['end'] = {
-        character = 0,
-        line = loc.range['end'].line + index
-      },
-      ['start'] = {
-        character = 0,
-        line = loc.range['start'].line + index
-      }
-    }
-  end
-  if loc.targetRange then
-    new_loc.targetRange = {
-      ['end'] = {
-        character = 0,
-        line = loc.targetRange['end'].line + index
-      },
-      ['start'] = {
-        character = 0,
-        line = loc.targetRange['start'].line + index
-      }
-    }
+    end
   end
   return new_loc
 end
@@ -517,9 +496,6 @@ M.location_handler = function(label, result, ctx, config)
       end,
       on_change = function(node,menu)
         PIG_node = node
-        if PIG_window then
-          last_PIG_location = vim.api.nvim_win_get_cursor(PIG_window)
-        end
       end,
       on_submit = function(item)
         if label == "Refactor" then
@@ -535,7 +511,37 @@ M.location_handler = function(label, result, ctx, config)
         else
           local loc = item.loc
           if loc then
-            lsp.util.jump_to_location(loc,vim.lsp.get_client_by_id(item.ctx.client_id).offset_encoding)
+            if last_PIG_call_params then
+              -- use stack
+              to_search = {{loc,{}}}
+              while #to_search > 0 do
+                pop = to_search[#to_search][1]
+                path = to_search[#to_search][2]
+                to_search[#to_search] = nil
+                for k,v in pairs(pop) do
+                  if k=='character' then
+                    -- change the node
+                    pop[k] = last_PIG_location[2]
+                    -- NOTE: you cannot use the following way, this will not change the loc table
+                    -- v = last_PIG_location[2]
+
+                  else 
+                    if type(v)=="table" then
+                      first = v
+                      now_path = vim.deepcopy(path)
+                      now_path[#now_path+1] = k
+                      second = now_path
+                      to_search[#to_search+1] =  {first,second}
+                    end
+                  end
+                end
+              end
+              vim.pretty_print("loc",loc)
+
+              lsp.util.jump_to_location(loc,vim.lsp.get_client_by_id(item.ctx.client_id).offset_encoding)
+            else
+              lsp.util.jump_to_location(loc,vim.lsp.get_client_by_id(item.ctx.client_id).offset_encoding)
+            end
           else
             echo('ErrorMsg', "can't jump to location")
           end
@@ -565,6 +571,10 @@ M.location_handler = function(label, result, ctx, config)
     end
     vim.cmd[[TSBufDisable highlight]]
   end)
+  vim.api.nvim_create_autocmd("CursorMoved",{callback = function()
+    last_PIG_location = vim.api.nvim_win_get_cursor(PIG_window)
+  end, buffer = menu.bufnr, group=au_group})
+
   vim.api.nvim_buf_set_keymap(menu.bufnr,"n","]r","",{noremap=true,callback=function ()
     _goto_next_loc_in_menu(1)
   end})

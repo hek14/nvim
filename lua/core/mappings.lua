@@ -101,6 +101,7 @@ M.general = function()
     map("n", "<leader>mc", "<cmd>Messages clear<CR>")
     map("n", "<leader>mm", "<cmd>Messages<CR>")
     ft_map({'lua','vim'}, "n", ",t", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
+    map("n","<leader>ls",":SymbolsOutline<CR>")
 
     -- map("i", "<C-n>", "<C-O>o",{noremap = true})
     -- map("i", "<C-e>", "<C-O>O",{noremap = true})

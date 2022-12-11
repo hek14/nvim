@@ -317,6 +317,19 @@ local plugins = {
     end
   },
   {
+    "simrat39/symbols-outline.nvim",
+    cmd = { "SymbolsOutline" },
+    config = function()
+      opts = {
+        keymaps = {
+          fold = "f",
+          unfold = "F",
+        }
+      }
+      require("symbols-outline").setup(opts)
+    end
+  },
+  {
     "jose-elias-alvarez/null-ls.nvim",
     -- providing extra formatting and linting
     -- NullLsInfo to show what's now enabled

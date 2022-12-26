@@ -16,5 +16,6 @@ scratch
 reference
 
 *.log
+*.json
 
 lua/contrib/cmp_github_handler.lua

@@ -6,7 +6,8 @@
 1.4 https://github.com/glepnir/nvim.git
 1.5 https://github.com/ziontee113/nvim-config -- nice youtube vlog
 1.6 https://github.com/s1n7ax/dotnvim: Power of LuaSnip with TreeSitter in Neovim
-1.7 https://github.com/folke/dot/tree/master/config/nvim: hack packer for local plugins
+1.7 https://github.com/folke/dot/tree/master/config/nvim
+1.8 https://github.com/williamboman/nvim-config: the author of mason.nvim
 2. refer to useful plugins
 2.1 https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
 2.2 https://github.com/ziontee113/syntax-tree-surfer: navigater/swap based on syntax tree(powered by treesitter)
@@ -36,27 +37,33 @@
 1. refer to https://github.com/glepnir/nvim/blob/main/lua/core/pack.lua
 2. refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 ----]=====]
-debug_rc = false
-local present, impatient = pcall(require, "impatient")
 
-if present then
-   impatient.enable_profile()
-end
+vim.api.nvim_create_autocmd("UIEnter", {
+  callback = function()
+    local pid = vim.loop.os_getpid()
+    local ctime = vim.loop.fs_stat("/proc/" .. pid).ctime
+    local start = ctime.sec + ctime.nsec / 1e9
+    local tod = { vim.loop.gettimeofday() }
+    local now = tod[1] + tod[2] / 1e6
+    local startuptime = (now - start) * 1000
+    vim.notify(startuptime .. "ms")
+  end,
+})
 
 local modules = {
-   "utils",
-   "options",
-   "autocmds",
-   "mappings",
+   "core.utils",
+   "core.options",
+   "core.lazy",
+   "core.autocmds",
+   "core.mappings",
 }
 
 for _, module in ipairs(modules) do
-   local ok, err = pcall(require, "core." .. module)
-
+   local ok, err = pcall(require, module)
    if not ok then
       error("Error loading " .. module .. "\n\n" .. err)
    end
 end
 
 require('core.mappings').general() -- load the mappings at the end of config to ensure it taking effects
-require("core.lazy")
+-- require("core.mylazy")

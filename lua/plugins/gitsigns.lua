@@ -1,6 +1,10 @@
-local present, gitsigns = pcall(require, "gitsigns")
-if present then
-  gitsigns.setup {
+local M = {
+  "lewis6991/gitsigns.nvim",
+  event = 'BufRead',
+}
+
+function M.config()
+  require"gitsigns".setup {
     signs = {
       add = { hl = "DiffAdd", text = "│", numhl = "GitSignsAddNr" },
       change = { hl = "DiffChange", text = "│", numhl = "GitSignsChangeNr" },
@@ -25,3 +29,4 @@ if present then
     }
   }
 end
+return M

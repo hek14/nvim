@@ -1,13 +1,15 @@
-local present, nvimtree = pcall(require, "nvim-tree")
+local M = {
+  "nvim-tree/nvim-tree.lua",
+  cmd = { "NvimTreeToggle", "NvimTreeFocus" },
+  init = function()
+    local map = require("core.utils").map
+    map("n", "<leader>et", ":NvimTreeToggle <CR>")
+    map("n", "<leader>ef", ":NvimTreeFocus <CR>")
+  end,
+}
 
-if not present then
-   return
-end
-
--- setup with all defaults
--- each of these are documented in `:help nvim-tree.OPTION_NAME`
--- nested options are documented by accessing them with `.` (eg: `:help nvim-tree.view.mappings.list`).
-local default = { -- BEGIN_DEFAULT_OPTS
+M.config = function(override_flag)
+  local default = { -- BEGIN_DEFAULT_OPTS
   auto_reload_on_write = true,
   create_in_closed_folder = false,
   disable_netrw = false,
@@ -179,14 +181,7 @@ local default = { -- BEGIN_DEFAULT_OPTS
     },
   },
 } -- END_DEFAULT_OPTS
-
-local M = {}
-
-M.setup = function(override_flag)
-   if override_flag then
-      default = require("core.utils").tbl_override_req("nvim_tree", default)
-   end
-   nvimtree.setup(default)
+require("nvim-tree").setup(default)
 end
 
 return M

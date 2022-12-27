@@ -26,7 +26,7 @@ local plugins = {
   },
   {
     "lukas-reineke/indent-blankline.nvim",
-    event = "BufRead",
+    event = "VimEnter",
     config = function ()
       local default = {
         indentLine_enabled = 1,
@@ -260,6 +260,7 @@ local plugins = {
     end,
   },
   {
+    -- TOOO: change it to leap.nvim
     "ggandor/lightspeed.nvim",
     event = "VimEnter",
     config = function()
@@ -353,6 +354,7 @@ local plugins = {
     },
     {
       "dstein64/vim-startuptime",
+      lazy = false,
     },
     {
       "stevearc/dressing.nvim",

@@ -12,7 +12,7 @@ M.close_buffer = function(force)
 
   -- if file doesnt exist & its modified
   if fileExists == 0 and modified then
-    print "no file name? add it now!"
+    vim.notify("no file name? add it now!",vim.log.levels.ERROR)
     return
   end
 
@@ -120,67 +120,11 @@ M.map = function(mode, keys, command, opt)
   map_wrapper(mode, keys, command, options)
 end
 
--- load plugin after entering vim ui
-M.packer_lazy_load = function(plugin, timer)
-  if plugin then
-    timer = timer or 0
-    vim.defer_fn(function()
-      require("packer").loader(plugin)
-    end, timer)
-  end
-end
-
--- Highlights functions
-
--- Define bg color
--- @param group Group
--- @param color Color
-
-M.bg = function(group, col)
-  cmd("hi " .. group .. " guibg=" .. col)
-end
-
--- Define fg color
--- @param group Group
--- @param color Color
-M.fg = function(group, col)
-  cmd("hi " .. group .. " guifg=" .. col)
-end
-
--- Define bg and fg color
--- @param group Group
--- @param fgcol Fg Color
--- @param bgcol Bg Color
-M.fg_bg = function(group, fgcol, bgcol)
-  cmd("hi " .. group .. " guifg=" .. fgcol .. " guibg=" .. bgcol)
-end
-
-
---provide labels to plugins instead of integers
-M.label_plugins = function(plugins)
-  local plugins_labeled = {}
-  for _, plugin in ipairs(plugins) do
-    plugins_labeled[plugin[1]] = plugin
-  end
-  return plugins_labeled
-end
-
-
 -- clear command line from lua
 M.clear_cmdline = function()
   vim.defer_fn(function()
     vim.cmd "echo"
   end, 0)
-end
-
--- wrapper to use vim.api.nvim_echo
--- table of {string, highlight}
--- e.g echo({{"Hello", "Title"}, {"World"}})
-M.echo = function(opts)
-  if opts == nil or type(opts) ~= "table" then
-    return
-  end
-  vim.api.nvim_echo(opts, false, {})
 end
 
 -- clear last echo using feedkeys (this is a bit hacky)
@@ -208,6 +152,7 @@ end
 
 M.file = function(mode, filepath, content)
   local data
+  filepath = vim.fn.expand(filepath)
   local fd = assert(vim.loop.fs_open(filepath, mode, 438))
   local stat = assert(vim.loop.fs_fstat(fd))
   if stat.type ~= "file" then
@@ -361,7 +306,7 @@ function _G.TimeTravel(args)
 end
 
 
-function _G.my_hack_undo_redo()
+function _G.back_to_future()
   local time_travel = {menu=nil,tmp_buffer=nil}
   local Menu = require("nui.menu")
   local event = require("nui.utils.autocmd").event
@@ -455,7 +400,7 @@ M.repeat_timer = function(fn)
 end
 
 M.log = function(...)
-  local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/neovim_debug.log"
+  local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/kk_debug.log"
   local arg = {...}
   local str = "שׁ "
   local lineinfo = ''

@@ -34,8 +34,7 @@
 10. TODO: PLEASE learn this: `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 
 - HOT TODO:
-1. refer to https://github.com/glepnir/nvim/blob/main/lua/core/pack.lua
-2. refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
+  - [] refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 ----]=====]
 
 vim.api.nvim_create_autocmd("UIEnter", {
@@ -46,7 +45,7 @@ vim.api.nvim_create_autocmd("UIEnter", {
     local tod = { vim.loop.gettimeofday() }
     local now = tod[1] + tod[2] / 1e6
     local startuptime = (now - start) * 1000
-    vim.notify(startuptime .. "ms")
+    vim.notify("startup: " .. startuptime .. "ms")
   end,
 })
 
@@ -64,6 +63,3 @@ for _, module in ipairs(modules) do
       error("Error loading " .. module .. "\n\n" .. err)
    end
 end
-
-require('core.mappings').general() -- load the mappings at the end of config to ensure it taking effects
--- require("core.mylazy")

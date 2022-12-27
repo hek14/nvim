@@ -412,9 +412,6 @@ M.config = function()
     table.insert(a, b)
   end
 
-  if override_flag then
-    default = require("core.utils").tbl_override_req("feline", default)
-  end
   -- components are divided in 3 sections
   default.left = {}
   default.middle = {}

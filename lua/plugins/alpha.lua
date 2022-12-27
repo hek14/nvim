@@ -69,10 +69,7 @@ default.buttons = {
   },
 }
 
-M.config = function(override_flag)
-  if override_flag then
-    default = require("core.utils").tbl_override_req("alpha", default)
-  end
+M.config = function()
   require"alpha".setup {
     layout = {
       { type = "padding", val = 9 },

@@ -1,6 +1,6 @@
 -- load builtin plugin before lazy.nvim, because lazy.nvim will totally change &rtp
-vim.cmd[[packadd! cfilter]]
-vim.cmd[[packadd! matchit]]
+vim.cmd[[packadd cfilter]]
+vim.cmd[[packadd matchit]]
 
 -- bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -19,6 +19,39 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.runtimepath:prepend(lazypath)
 
+-- disable some builtin vim plugins
+local disabled_built_ins = {
+  "2html_plugin",
+  "getscript",
+  "getscriptPlugin",
+  "gzip",
+  "logipat",
+  "netrw",
+  "netrwPlugin",
+  "netrwSettings",
+  "netrwFileHandlers",
+  "tar",
+  "tarPlugin",
+  "rrhelper",
+  "spellfile_plugin",
+  "vimball",
+  "vimballPlugin",
+  "zip",
+  "zipPlugin",
+  -- "matchparen",
+}
+
+-- NOTE: no need to manually do the following:
+-- for _, plugin in pairs(disabled_built_ins) do
+--    g["loaded_" .. plugin] = 1
+-- end
+
 require('lazy').setup("plugins", {
   defaults = { lazy = true },
+  performance = {
+    rtp = {
+       reset = false,
+       disabled_plugins = disabled_built_ins
+    }
+  }
 })

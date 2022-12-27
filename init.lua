@@ -40,9 +40,9 @@
 vim.api.nvim_create_autocmd("UIEnter", {
   callback = function()
     local is_mac = vim.loop.os_uname().sysname=="Darwin"
-    if is_mac then 
+    if is_mac then
       print('please use startuptime to profile')
-      return 
+      return
     else
       local pid = vim.loop.os_getpid()
       local ctime = vim.loop.fs_stat("/proc/" .. pid).ctime

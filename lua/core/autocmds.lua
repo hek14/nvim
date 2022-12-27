@@ -86,9 +86,6 @@ au("BufReadPost",{callback=function ()
   end
 end,desc="Return to last edit position when opening files (You want this!)"})
 
-au("User",{callback=function ()
-  require("notify")('Packer Sucessful')
-end,pattern={"PackerComplete","PackerCompileDone"},})
 
 au("BufNew",{callback=function ()
   if vim.bo.ft~='TelescopePrompt' then --NOTE: telescope already do this
@@ -98,7 +95,7 @@ au("BufNew",{callback=function ()
   end
 end,})
 
-local any_client_attached = function ()
+_G.any_client_attached = function ()
   local bufnr = vim.fn.bufnr()
   -- local clients = vim.lsp.get_active_clients()
   -- local attached = {}
@@ -108,13 +105,15 @@ local any_client_attached = function ()
   --   end
   -- end
   local attached = {}
-  for i,client in ipairs(vim.lsp.buf_get_clients(bufnr)) do
-    table.insert(attached,{id=client.id,name=client.name})
+  local clients = vim.lsp.buf_get_clients(bufnr) or {}
+  for id,client in pairs(clients) do
+    if client.name~='null-ls' then
+      table.insert(attached,{id=id,name=client.name})
+    end
   end
   return attached
 end
 
-_G.any_client_attached = any_client_attached
 -- au("FileType",{pattern='lua',callback=function()
 --   if vim.bo.buflisted then
 --     vim.defer_fn(function()
@@ -130,16 +129,6 @@ _G.any_client_attached = any_client_attached
 --     end,50)
 --   end
 -- end})
-
-
--- PackerCompile when lua configs modified
--- vim.cmd([[
---   augroup packer_user_config
---     autocmd!
---     autocmd BufWritePost plugins.lua source <afile> | PackerCompile
---     autocmd User PackerCompileDone LspStop
---   augroup end
--- ]])
 
 
 -- disable syntax in large file

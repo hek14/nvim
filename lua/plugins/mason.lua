@@ -1,3 +1,4 @@
+-- NOTE: manage all of the external tools that need to be installed by lsp/dap
 local M = {
   "williamboman/mason.nvim",
 }
@@ -5,15 +6,15 @@ local M = {
 M.tools = {
   "prettierd",
   "stylua",
-  "selene",
   "luacheck",
-  "eslint_d",
   "shellcheck",
-  "deno",
   "shfmt",
-  "black",
-  "isort",
-  "flake8",
+  -- "isort",
+  -- "flake8",
+  -- "black",
+  -- "selene",
+  -- "eslint_d",
+  -- "deno",
 }
 
 function M.check()

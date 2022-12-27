@@ -109,49 +109,6 @@ local group_by_uri = function(locations)
   end
   return groups
 end
---[=====[ TODO:
--- location and item looks like below:
--- "location" {
---   originSelectionRange = {
---     end = {
---       character = 14,
---       line = 103
---     },
---     start = {
---       character = 9,
---       line = 103
---     }
---   },
---   targetRange = {
---     end = {
---       character = 13,
---       line = 90
---     },
---     start = {
---       character = 8,
---       line = 90
---     }
---   },
---   targetSelectionRange = {
---     end = {
---       character = 13,
---       line = 90
---     },
---     start = {
---       character = 8,
---       line = 90
---     }
---   },
---   targetUri = "file:///home/heke/.config/nvim/contrib/pig.lua"
--- }
---
--- "item" {
---   col = 9,
---   filename = "/home/heke/.config/nvim/contrib/pig.lua",
---   lnum = 91,
---   text = "  local menus = {}"
--- }
-----]=====]
 
 local function deepcopy(orig)
     local orig_type = type(orig)

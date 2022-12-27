@@ -97,7 +97,7 @@ local function others()
   map("n", "<right>", "5<C-w>>")
   map("n", "<Esc>", [[:noh <Bar> :lua require('core.utils').closing_float_window()<CR>]])
   map("n", "<leader>mc", "<cmd>Messages clear<CR>")
-  map("n", "<leader>mm", "<cmd>Messages<CR>")
+  vim.cmd([[nmap <leader>mm :<C-u>Messages<CR>20 <C-w>+]])
   ft_map({'lua','vim'}, "n", ",t", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
   map("n","<leader>ls",":SymbolsOutline<CR>")
 

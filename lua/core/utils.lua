@@ -1,5 +1,18 @@
 local M = {}
 
+-- selene: allow(global_usage)
+_G.profile = function(cmd, times, flush)
+  times = times or 100
+  local start = vim.loop.hrtime()
+  for _ = 1, times, 1 do
+    if flush then
+      jit.flush(cmd, true)
+    end
+    cmd()
+  end
+  print('Profile: ' .. ((vim.loop.hrtime() - start) / 1000000 / times) .. "ms")
+end
+
 local cmd = vim.cmd
 M.close_buffer = function(force)
   if vim.bo.buftype == "terminal" then
@@ -490,7 +503,7 @@ M.range_search = function(pattern,_start,_end)
 end
 
 
-local lsp_num_to_str = {
+_G.lsp_num_to_str = {
   [1]  = "File",
   [2]  = "Module",
   [3]  = "Namespace",

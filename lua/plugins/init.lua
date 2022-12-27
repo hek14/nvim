@@ -92,47 +92,6 @@ local plugins = {
     end
   },
   {
-    'j-hui/fidget.nvim', -- show lsp progress
-    config = function() require('fidget').setup {
-      text = {
-        spinner = 'dots', -- or 'line'
-        done = "Done",
-        commenced = "Started",
-        completed = "Completed",
-      },
-      window = {
-        blend = 0,  -- &winblend for the window
-      },
-      fmt = {
-        stack_upwards = true,  -- list of tasks grows upwards
-      }
-    } end
-  },
-  {
-    "ray-x/lsp_signature.nvim",
-    enabled = false,
-    config = function ()
-      local default = {
-        bind = true,
-        doc_lines = 0,
-        floating_window = true,
-        fix_pos = true,
-        hint_enabled = true,
-        hint_prefix = " ",
-        hint_scheme = "String",
-        hi_parameter = "Search",
-        max_height = 22,
-        max_width = 120, -- max_width of signature floating_window, line will be wrapped if exceed max_width
-        handler_opts = {
-          border = "single", -- double, single, shadow, none
-        },
-        zindex = 200, -- by default it will be on top of all floating windows, set to 50 send it to bottom
-        padding = "", -- character to pad on left and right of signature can be ' ', or '|'  etc
-      }
-      lspsignature.setup(default)
-    end
-  },
-  {
     "simrat39/symbols-outline.nvim",
     cmd = { "SymbolsOutline" },
     config = function()
@@ -144,12 +103,6 @@ local plugins = {
       }
       require("symbols-outline").setup(opts)
     end
-  },
-  {
-    "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",
-    init = function()
-      vim.cmd([[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]])
-    end,
   },
   {
     'hek14/nvim-navic',
@@ -485,7 +438,8 @@ local plugins = {
       },
       {
         "folke/todo-comments.nvim",
-        enabled = false, -- just use treesitter comment instead, keep minimal
+        enabled = true, -- just use treesitter comment instead, keep minimal
+        event = 'BufRead',
         dependencies = "nvim-lua/plenary.nvim",
         config = function()
           -- HACK: #104 Invalid in command-line window
@@ -545,6 +499,7 @@ local plugins = {
       },
       {
         'alexghergh/nvim-tmux-navigation',
+        event = 'VeryLazy',
         config = function()
           require'nvim-tmux-navigation'.setup {
             disable_when_zoomed = true, -- defaults to false

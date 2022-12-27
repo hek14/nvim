@@ -1,1 +1,0 @@
-nvim --headless -c 'PackerCompile' -c 'qall'

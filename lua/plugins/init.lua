@@ -260,12 +260,11 @@ local plugins = {
     end,
   },
   {
-    -- TOOO: change it to leap.nvim
-    "ggandor/lightspeed.nvim",
-    event = "VimEnter",
+    "ggandor/leap.nvim",
+    event = 'BufRead',
     config = function()
-      require("lightspeed").setup({})
-    end,
+      require('leap').add_default_mappings()
+    end
   },
   -- 1. populate the quickfix
   {

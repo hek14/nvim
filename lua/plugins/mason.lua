@@ -1,9 +1,5 @@
 local M = {
   "williamboman/mason.nvim",
-  lazy = false,
-  dependencies = {
-    "williamboman/mason-lspconfig.nvim",
-  }
 }
 
 M.tools = {
@@ -31,11 +27,7 @@ function M.check()
 end
 
 function M.config()
-  require("mason").setup()
   M.check()
-  require("mason-lspconfig").setup({
-    automatic_installation = true,
-  })
 end
 
 return M

@@ -3,7 +3,9 @@ local M = {
   event = "BufReadPre",
   dependencies = {
     "jose-elias-alvarez/null-ls.nvim",
-    "j-hui/fidget.nvim"
+    "j-hui/fidget.nvim",
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim"
   }
 }
 
@@ -75,7 +77,6 @@ function M.toggle_diagnostics_visibility()
   end
 end
 function M.config()
-  require("mason")
   local util = require'lspconfig'.util
   local illuminate_present,illuminate = pcall(require,'illuminate')
   local function lspSymbol(name, icon)
@@ -318,6 +319,11 @@ function M.config()
       },
       sumneko_lua = {}
     }
+    require("mason").setup()
+    require("mason-lspconfig").setup({
+      automatic_installation = true,
+      ensure_installed = vim.tbl_keys(servers),
+    })
     for server, opts in pairs(servers) do
       opts = vim.tbl_deep_extend("force", {}, options, opts or {})
       require("lspconfig")[server].setup(opts)

@@ -10,6 +10,7 @@ M.tools = {
   "shellcheck",
   "shfmt",
   "ruff",
+  "jsonlint",
   -- "isort",
   -- "flake8",
   -- "black",

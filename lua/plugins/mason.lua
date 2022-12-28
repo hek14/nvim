@@ -9,6 +9,7 @@ M.tools = {
   "luacheck",
   "shellcheck",
   "shfmt",
+  "ruff",
   -- "isort",
   -- "flake8",
   -- "black",

@@ -493,8 +493,6 @@ M.location_handler = function(label, result, ctx, config)
                   end
                 end
               end
-              vim.pretty_print("loc",loc)
-
               lsp.util.jump_to_location(loc,vim.lsp.get_client_by_id(item.ctx.client_id).offset_encoding)
             else
               lsp.util.jump_to_location(loc,vim.lsp.get_client_by_id(item.ctx.client_id).offset_encoding)
@@ -556,7 +554,6 @@ M.location_handler = function(label, result, ctx, config)
     vim.cmd(fmt('%s wincmd w',last_winnr))
     vim.cmd(fmt('b %s',last_source_bufnr))
     vim.cmd('wincmd o')
-    vim.pretty_print('last_source_buf_location: ',last_source_buf_location)
     vim.api.nvim_win_set_cursor(0,last_source_buf_location)
     last_PIG_call_params[3].resume = true
     vim.pretty_print('last_PIG_call_params: ','result: ',#last_PIG_call_params[2],' ctx: ',ctx)

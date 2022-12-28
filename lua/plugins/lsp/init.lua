@@ -142,6 +142,7 @@ function M.config()
   require("mason").setup()
   require("mason-lspconfig").setup({
     automatic_installation = true,
+    -- ensure_installed = {'sumneko_lua','pyright','ruff_lsp'},
     ensure_installed = {'sumneko_lua','pyright'},
   })
 
@@ -176,6 +177,14 @@ function M.config()
               diagnosticMode = "openFilesOnly", -- "workspace"
               useLibraryCodeForTypes = true,
               logLevel = "Error",
+              diagnosticSeverityOverrides = {
+                -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+                reportGeneralTypeIssues = "none",
+                reportOptionalMemberAccess = "none",
+                reportOptionalSubscript = "none",
+                reportPrivateImportUsage = "none",
+                reportUnusedImport = "none"
+              },
             },
           },
         },
@@ -189,6 +198,22 @@ function M.config()
       opt = vim.tbl_deep_extend('force',options,opt)
       require("lspconfig").pyright.setup(opt)
     end,
+    -- ["ruff_lsp"] = function ()
+    --   local opt = {
+    --     settings = {
+    --       ruff_lsp = {
+    --         args = ["--config=/path/to/pyproject.toml"],
+    --       }
+    --     },
+    --     root_dir = function(fname)
+    --       local root_files = {'pyproject.toml', 'pyrightconfig.json'}
+    --       return util.find_git_ancestor(fname) or
+    --       util.root_pattern(unpack(root_files))(fname) or
+    --       util.path.dirname(fname)
+    --     end
+    --   }
+    --   require("lspconfig").ruff_lsp.setup(opt)
+    -- end,
     ["texlab"] = function ()
       local opt = {
         settings = {

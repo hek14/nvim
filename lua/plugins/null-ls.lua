@@ -8,8 +8,9 @@ function M.setup(options)
   require("null-ls").setup({
     sources = {
       formatting.lua_format.with({ extra_args = {"--indent-width=2"}}),
-      -- formatting.black.with({ extra_args = {"--fast" }}),
+      diagnostics.jsonlint,
       code_actions.gitsigns,
+      -- formatting.black.with({ extra_args = {"--fast" }}),
     },
     -- on_attach = options.on_attach,
     root_dir = require("null-ls.utils").root_pattern(".null-ls-root", ".neoconf.json", ".git"),

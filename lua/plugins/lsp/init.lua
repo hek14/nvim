@@ -142,8 +142,7 @@ function M.config()
   require("mason").setup()
   require("mason-lspconfig").setup({
     automatic_installation = true,
-    -- ensure_installed = {'sumneko_lua','pyright','ruff_lsp'},
-    ensure_installed = {'sumneko_lua','pyright'},
+    ensure_installed = {'sumneko_lua','pyright', 'jsonls'}, -- ruff_lsp not needed, use ruff with null-ls instead
   })
 
   require("mason-lspconfig").setup_handlers({

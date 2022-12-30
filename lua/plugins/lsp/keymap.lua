@@ -15,11 +15,18 @@ function M.peek_type(cursor)
     end
     local msg = result.contents.value
     vim.pretty_print('msg: ',msg)
-    local curr_word = vim.fn.expand('<cexpr>')
+    local curr_expr = vim.fn.expand('<cexpr>')
+    local curr_word = vim.fn.expand('<cword>')
     local ok,_ = pcall(function ()
       msg = require('core.utils').stringSplit(msg,'\n')[2] -- 2nd line is what we need
-      -- local type = string.match(msg,'%((.-)%)')
-      local type = string.match(msg,'(.-) ' .. curr_word)
+      local type = string.match(msg,'^%((.+)%)$')
+      if type then
+        -- 2nd line only contains: (xxx), then xxx is what we need
+        lsp_util.open_floating_preview({'Symbol type: ',type},syntax,{})
+        return
+      end
+
+      type = string.match(msg,'(.-) ' .. curr_word) or string.match(msg,'(.-) ' .. curr_expr)
       type = string.gsub(type,'[%(%)]','') -- remove the possible parens
       if type==nil then
         lsp_util.open_floating_preview({'Symbol type: ','Unknown'},syntax,{})

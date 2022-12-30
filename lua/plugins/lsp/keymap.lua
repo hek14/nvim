@@ -1,4 +1,38 @@
 local M = {}
+local lsp_util = vim.lsp.util
+
+function M.peek_type(cursor)
+  cursor = cursor or vim.api.nvim_win_get_cursor(0)
+  local def_params = vim.lsp.util.make_position_params()
+  def_params.position.line = cursor[1] - 1
+  def_params.position.character = cursor[2]
+  local _,result = vim.lsp.buf_request(0,'textDocument/hover', def_params, function (err, result, ctx, config)
+    local bufnr = vim.api.nvim_get_current_buf()
+    local syntax = 'markdown'
+    if err or (not result) or (not result.contents) then
+      lsp_util.open_floating_preview({'Symbol type: ','Unknown'},syntax,{})
+      return
+    end
+    local msg = result.contents.value
+    vim.pretty_print('msg: ',msg)
+    local curr_word = vim.fn.expand('<cexpr>')
+    local ok,_ = pcall(function ()
+      msg = require('core.utils').stringSplit(msg,'\n')[2] -- 2nd line is what we need
+      -- local type = string.match(msg,'%((.-)%)')
+      local type = string.match(msg,'(.-) ' .. curr_word)
+      type = string.gsub(type,'[%(%)]','') -- remove the possible parens
+      if type==nil then
+        lsp_util.open_floating_preview({'Symbol type: ','Unknown'},syntax,{})
+      else 
+        lsp_util.open_floating_preview({'Symbol type: ',type},syntax,{})
+      end
+    end)
+    if not ok then
+      lsp_util.open_floating_preview({'Symbol type: ','Unknown'},syntax,{})
+    end
+  end)
+end
+
 
 function M.Smart_goto_definition()
   local bufnr = vim.fn.bufnr()
@@ -66,6 +100,7 @@ function M.setup(client,bufnr)
   buf_set_keymap("n", "<leader>gd","<cmd>lua require('telescope.builtin').lsp_definitions()<CR>",map_opts)
   buf_set_keymap("n", "<leader>gr","<cmd>lua require('telescope.builtin').lsp_references()<CR>",map_opts)
   buf_set_keymap("n", "gd", "", {callback = M.Smart_goto_definition})
+  buf_set_keymap("n", "gk", "", {callback = M.peek_type})
   buf_set_keymap("n", "gD", "", {callback = M.definition_in_split})
   buf_set_keymap("n", "gr","<cmd>lua require('contrib.pig').async_ref()<CR>",map_opts)
   buf_set_keymap("n", "gt","<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>",map_opts)

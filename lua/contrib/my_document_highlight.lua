@@ -353,9 +353,9 @@ end
 
 function M.kk_highlight()
   profile_start(vim.api.nvim_get_current_buf())
-  if references and #references[vim.api.nvim_get_current_buf()] > 0 then
+  if illuminate_references and #illuminate_references[vim.api.nvim_get_current_buf()] > 0 then
     print("using cached references:->>")
-    handle_document_highlight(references[vim.api.nvim_get_current_buf()],vim.api.nvim_get_current_buf())
+    handle_document_highlight(illuminate_references[vim.api.nvim_get_current_buf()],vim.api.nvim_get_current_buf())
   else
     print("send request by myself")
     local highlight_params = vim.tbl_deep_extend("force",vim.lsp.util.make_position_params(),{offset_encoding=hl_offset_encoding})

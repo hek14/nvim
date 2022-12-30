@@ -277,10 +277,10 @@ M.config = function()
   if ok then
     illuminate_references_context = {
       provider = function()
-        return "   references: " .. #references[vim.api.nvim_get_current_buf()]
+        return "   references: " .. #illuminate_references[vim.api.nvim_get_current_buf()]
       end,
       enabled = function()
-        return references ~= nil and references[vim.api.nvim_get_current_buf()] ~= nil
+        return illuminate_references ~= nil and illuminate_references[vim.api.nvim_get_current_buf()] ~= nil
       end,
       hl = {fg = colors.magenta}
     }

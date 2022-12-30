@@ -136,7 +136,7 @@ source.complete = function(self, request, callback)
           one_json = {}
           file = string.gsub(line,'"FILE:','')
           file = string.gsub(file,'"$','')
-          depth = #_G.stringSplit(file,"/")
+          depth = require('core.utils').stringSplit(file,"/")
         else
           table.insert(one_json,#one_json+1,line)
         end

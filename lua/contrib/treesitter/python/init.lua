@@ -28,7 +28,7 @@ local rep = require("luasnip.extras").rep
 local M = {}
 
 local get_args = function(argument_string)
-  local arguments = stringSplit(argument_string,',')
+  local arguments = require('core.utils').stringSplit(argument_string,',')
   if arguments[1] == "self" then
     arguments = vim.list_slice(arguments,2,#arguments)
   end

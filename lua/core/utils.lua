@@ -182,28 +182,35 @@ M.file = function(mode, filepath, content)
   return data
 end
 
+M.sleep = function(n)
+  os.execute("sleep " .. tonumber(n))
+end
+
+
 M.reload_plugin = function(plugins)
-  local status = true
   local function _reload_plugin(plugin)
     local loaded = package.loaded[plugin]
     if loaded then
       package.loaded[plugin] = nil
     end
-    local ok, err = pcall(require, plugin)
+    local ok, reloaded_plugin = pcall(require, plugin)
     if not ok then
-      print("Error: Cannot load " .. plugin .. " plugin!\n" .. err .. "\n")
-      status = false
+      print("Error: Cannot load " .. plugin)
+      return nil
+    else
+      return reloaded_plugin
     end
   end
 
   if type(plugins) == "string" then
-    _reload_plugin(plugins)
+    return _reload_plugin(plugins)
   elseif type(plugins) == "table" then
-    for _, plugin in ipairs(plugins) do
-      _reload_plugin(plugin)
+    local reloaded_plugins = {}
+    for i, plugin in ipairs(plugins) do
+      reloaded_plugins[i] = _reload_plugin(plugin)
     end
+    return reloaded_plugins
   end
-  return status
 end
 
 _G.R = M.reload_plugin
@@ -268,7 +275,7 @@ function M.get_relative_path(base_path, my_path)
 end
 -- ==========
 
-function _G.stringSplit(inputstr, sep)
+M.stringSplit = function(inputstr, sep)
   sep=sep or '%s'
   local t={}
   for field,s in string.gmatch(inputstr, "([^"..sep.."]*)("..sep.."?)") do

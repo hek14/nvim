@@ -37,6 +37,7 @@ local M = {
       end,
     },
     { "nvim-telescope/telescope-file-browser.nvim" },
+    {'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
   },
   lazy = false,
   init = function()
@@ -154,6 +155,13 @@ function M.config()
             bookmarks = {
               -- Available: 'brave', 'chrome', 'edge', 'firefox', 'safari'
               selected_browser = 'chrome'
+            },
+            fzf = {
+              fuzzy = true,                    -- false will only do exact matching
+              override_generic_sorter = true,  -- override the generic sorter
+              override_file_sorter = true,     -- override the file sorter
+              case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+              -- the default case_mode is "smart_case"
             }
           }
         }
@@ -161,7 +169,7 @@ function M.config()
         telescope.setup(default)
 
         local extensions = {
-          "bookmarks", "neoclip", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args"
+          "bookmarks", "neoclip", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf"
         }
         for _, ext in ipairs(extensions) do telescope.load_extension(ext) end
       end

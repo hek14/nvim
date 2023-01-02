@@ -1,3 +1,4 @@
+-- NOTE: refer to https://github.com/rmagatti/goto-preview
 local M = {}
 local timer = {}
 local log = require('core.utils').log

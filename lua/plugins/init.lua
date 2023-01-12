@@ -2,6 +2,13 @@ local plugins = {
   { "nvim-lua/plenary.nvim" },
   { "nvim-tree/nvim-web-devicons" },
   {
+    'RRethy/vim-tranquille',
+    lazy = false, 
+    config = function ()
+      vim.keymap.set('n','g/','<Plug>(tranquille_search)',{ noremap = true, silent = true }) 
+    end
+  },
+  {
     'romgrk/barbar.nvim',
     enabled = false,
     config = function ()

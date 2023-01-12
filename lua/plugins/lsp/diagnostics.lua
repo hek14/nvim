@@ -12,7 +12,6 @@ end
 local function filter(arr, func, args)
   -- Filter in place
   -- https://stackoverflow.com/questions/49709998/how-to-filter-a-lua-array-inplace
-  local start = vim.loop.hrtime()
   local new_index = 1
   local size_orig = #arr
   for old_index, v in ipairs(arr) do
@@ -22,7 +21,6 @@ local function filter(arr, func, args)
     end
   end
   for i = new_index, size_orig do arr[i] = nil end
-  print('filter ' .. size_orig .. ' diagnostics spent: ' .. ((vim.loop.hrtime() - start) / 1000000) .. 'ms')
 end
 
 local function filter_rule_fn(diagnostic,old_index,symbols)

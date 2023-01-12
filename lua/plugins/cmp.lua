@@ -153,6 +153,10 @@ function M.config()
       { name = "path" },
       { name = "latex_symbols"}
     },
+    window = {
+      completion = cmp.config.window.bordered(),
+      documentation = cmp.config.window.bordered(),
+    },
   }
 
   -- Set configuration for specific filetype.

@@ -40,18 +40,19 @@ function M.peek_type(cursor)
   end)
 end
 
-
 function M.Smart_goto_definition()
   local bufnr = vim.fn.bufnr()
   vim.cmd [[normal! m`]]
-  require('contrib.pig').async_def(function()
-    print('using fallback')
-    require'nvim-treesitter-refactor.navigation'.goto_definition(bufnr,
-    function()
-      print("dumb goto")
-      vim.cmd [[normal! gd]] -- dumb goto definition
-    end)
-  end)
+  require('contrib.pig').async_fn({
+    label = 'definition',
+    fallback = function()
+      print('using fallback, dumb goto definition')
+      require'nvim-treesitter-refactor.navigation'.goto_definition(bufnr,
+      function()
+        vim.cmd [[normal! gd]] -- dumb goto definition
+      end)
+    end
+  })
 end
 
 function M.definition_in_split()
@@ -62,17 +63,17 @@ function M.definition_in_split()
       vim.cmd[[vsplit]]
     end
   end
-  if package.loaded['lspconfig']~=nil then
-    vim.lsp.buf.definition() -- built-in lsp
-  else
-    vim.cmd [[exe "normal \<Plug>(coc-definition)"]] -- or coc
-  end
+  vim.lsp.buf.definition() -- built-in lsp
+  -- vim.cmd [[exe "normal \<Plug>(coc-definition)"]] -- or coc
 end
 
 function M.Smart_goto_next_ref(index)
   local bufnr = vim.fn.bufnr()
   vim.cmd [[normal! m`]]
-  require('contrib.pig').next_lsp_reference(index, function()
+  require('contrib.pig').async_fn({
+    label = 'next_reference',
+    index = index, 
+    fallback = function()
     print('using fallback')
     if index > 0 then
       require"illuminate".next_reference{wrap=true}
@@ -81,7 +82,8 @@ function M.Smart_goto_next_ref(index)
       require"illuminate".next_reference{reverse=true,wrap=true}
       -- require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
     end
-  end)
+  end
+})
 end
 
 -- NOTE: refer to https://github.com/lucasvianav/nvim
@@ -109,7 +111,11 @@ function M.setup(client,bufnr)
   buf_set_keymap("n", "gd", "", {callback = M.Smart_goto_definition})
   buf_set_keymap("n", "gk", "", {callback = M.peek_type})
   buf_set_keymap("n", "gD", "", {callback = M.definition_in_split})
-  buf_set_keymap("n", "gr","<cmd>lua require('contrib.pig').async_ref()<CR>",map_opts)
+  buf_set_keymap("n", "gr","",vim.tbl_deep_extend('force',map_opts,{callback = function ()
+    require('contrib.pig').async_fn({
+      label = 'reference'
+    })
+  end}))
   buf_set_keymap("n", "gt","<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>",map_opts)
   buf_set_keymap("n", "<leader>gt","<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols()<CR>",map_opts)
   buf_set_keymap("n", "<leader>ca","<cmd>lua require('telescope.builtin').lsp_code_actions()<CR>",map_opts)
@@ -130,7 +136,9 @@ function M.setup(client,bufnr)
   -- buf_set_keymap("n", "]r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",map_opts)
   buf_set_keymap("n", "<C-k>","<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
   -- buf_set_keymap("i", "<C-k>","<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
-  buf_set_keymap("n", "<leader>rn","<cmd>lua require('contrib.pig').rename()<CR>",map_opts)
+  buf_set_keymap("n", "<leader>rn","",vim.tbl_deep_extend('force',map_opts,{callback=function()
+    require('contrib.pig').rename()
+  end}))
   buf_set_keymap("n", "<leader>wa","<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",map_opts)
   buf_set_keymap("n", "<leader>wr","<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>",map_opts)
   buf_set_keymap("n", "<leader>wl","<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",map_opts)

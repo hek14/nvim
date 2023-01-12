@@ -3,11 +3,11 @@ local protocol = require('vim.lsp.protocol')
 local highlight = require('vim.highlight')
 local fmt = string.format
 local log = require('core.utils').log
+local group = vim.api.nvim_create_augroup('kk_highlight',{clear=true})
 
 -- ========== state
 local M = {}
 local curr_references = {}
-local timers = {}
 local reference_mark_group = {}
 local last_clear = {}
 local last_highlight = {}
@@ -46,6 +46,16 @@ end
 local function profile_end(bufnr,name)
   log(fmt("Profile %s: %s",name,os.clock()-profile_time[bufnr]))
   profile_time[bufnr] = os.clock()
+end
+
+local function echo(hlgroup, msg)
+  vim.cmd(fmt('echohl %s', hlgroup))
+  vim.cmd(fmt('echo "[PIG] %s"', msg))
+  vim.cmd('echohl None')
+end
+
+local function error(msg)
+  echo('ErrorMsg: ', msg)
 end
 
 local function get_lines(bufnr, rows)
@@ -174,7 +184,6 @@ local function point_in_range(point, range)
 end
 
 local function cursor_in_references(bufnr)
-  -- do not highlight outdated references
   if not curr_references[bufnr] then
     return false
   end
@@ -184,8 +193,7 @@ local function cursor_in_references(bufnr)
   local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
   crow = crow - 1 -- reference ranges are (0,0)-indexed for (row,col)
   for _, reference in pairs(curr_references[bufnr]) do
-    local range = reference.range
-    if point_in_range({row=crow,col=ccol}, range) then
+    if point_in_range({row=crow,col=ccol}, reference.range) then
       return true
     end
   end
@@ -200,16 +208,11 @@ local function before_by_start(r1, r2)
 end
 ---- ========== utils function end
 
-local function my_buf_highlight_references(bufnr, _references, offset_encoding)
+local function my_buf_highlight_references(bufnr, _references)
   local ns = vim.api.nvim_create_namespace('')
   local color_used_write = fmt('kk_highlight_%s_write',math.fmod(color_index,#colors) + 1)
   local color_used_read = fmt('kk_highlight_%s_read',math.fmod(color_index,#colors) + 1)
   color_index = color_index + 1
-  if reference_mark_group[bufnr] == nil then
-    print('bad, no attach')
-    reference_mark_group[bufnr] = {}
-  end
-
   reference_mark_group[bufnr][ns] = {}
 
   local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
@@ -220,15 +223,12 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
   for _, reference in ipairs(_references) do
     local start_line, start_char = reference['range']['start']['line'], reference['range']['start']['character']
     local end_line, end_char = reference['range']['end']['line'], reference['range']['end']['character']
-    print(fmt('highlight: %s, %s',start_line,start_char))
-
     local start_idx = get_line_byte_from_position(
       bufnr,
       { line = start_line, character = start_char },
-      offset_encoding
+      hl_offset_encoding
     )
-    local end_idx = get_line_byte_from_position(bufnr, { line = start_line, character = end_char }, offset_encoding)
-
+    local end_idx = get_line_byte_from_position(bufnr, { line = start_line, character = end_char }, hl_offset_encoding)
     local document_highlight_kind = {
       [protocol.DocumentHighlightKind.Text] = color_used_read, --'LspReferenceText',
       [protocol.DocumentHighlightKind.Read] = color_used_read, --'LspReferenceRead',
@@ -238,7 +238,7 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
 
     if not checked then
       local found_ns,_,ns_marks = M.check_if_any_ns_exists({start_line,start_idx})
-      if found_ns and found_ns~=ns then
+      if found_ns and found_ns~=ns and ns_marks then
         print("existing old ns: ",found_ns)
         vim.api.nvim_buf_clear_namespace(bufnr, found_ns, 0, -1)
         for _,mark in ipairs(ns_marks) do
@@ -264,48 +264,29 @@ local function my_buf_highlight_references(bufnr, _references, offset_encoding)
     local start_mark = vim.api.nvim_buf_set_extmark(bufnr,ns,start_line,start_idx,{})
     local end_mark = vim.api.nvim_buf_set_extmark(bufnr,ns,end_line,end_idx,{})
     table.insert(reference_mark_group[bufnr][ns],{['start']=start_mark,['end']=end_mark})
-    if point_in_range({row=crow,col=ccol}, reference.range) then
-      -- maintain a namespace and a start_mark and a end_mark (it's only once for each buffer, and created/deleted in this code block)
-      local symbol_name = vim.api.nvim_buf_get_text(bufnr,start_line,start_idx,end_line,end_idx,{})[1]
-      last_highlight[bufnr] = {['ns']=ns,['start']=start_mark,['end']=end_mark,['name']=symbol_name}
-    end
+    -- maintain a namespace and a start_mark and a end_mark (it's only once for each buffer, and created/deleted in this code block)
+    local symbol_name = vim.api.nvim_buf_get_text(bufnr,start_line,start_idx,end_line,end_idx,{})[1]
+    last_highlight[bufnr] = {['ns']=ns,['start']=start_mark,['end']=end_mark,['name']=symbol_name}
     profile_end(bufnr,"extmark")
   end
   print(fmt("kk_highlight: %s %s",#_references,#_references>1 and "references" or "reference"))
 end
 
-local function async_handle_document_highlight(result, bufnr)
-  if not bufnr then return end
-  local btimer = timers[bufnr]
-  if btimer then
-    vim.loop.timer_stop(btimer) -- avoid high-frequency trigger
-  end
-  if type(result) ~= 'table' then
-    return
-  end
-  timers[bufnr] = vim.defer_fn(function()
-    if cursor_in_references(bufnr) then
-      my_buf_highlight_references(bufnr, result, hl_offset_encoding)
-    end
-    end, 17)
-  table.sort(result, function(a, b)
-    return before_by_start(a.range, b.range)
-  end)
-  curr_references[bufnr] = result
-end
-
 local function handle_document_highlight(result, bufnr)
-  if not bufnr then return end
-  if type(result) ~= 'table' then
-    return
+  if not bufnr or type(result) ~= 'table' then 
+    echo("highlight request results wrong")
+    return 
   end
   table.sort(result, function(a, b)
     return before_by_start(a.range, b.range)
   end)
   curr_references[bufnr] = result
   if cursor_in_references(bufnr) then
-    my_buf_highlight_references(bufnr, result, hl_offset_encoding)
-end
+    -- do not highlight outdated references, maybe the cursor moved in the process of request
+    my_buf_highlight_references(bufnr, result)
+  else
+    error("Cursor moved out of the range")
+  end
 end
 -- main test
 
@@ -352,6 +333,7 @@ function M.check_if_any_ns_exists(position)
 end
 
 function M.kk_highlight()
+  -- no need to use timer, because users wil not call this function very frequently
   profile_start(vim.api.nvim_get_current_buf())
   if illuminate_references and #illuminate_references[vim.api.nvim_get_current_buf()] > 0 then
     print("using cached references:->>")
@@ -394,7 +376,7 @@ function M.kk_clear_highlight()
 
   -- NOTE: following logic only triggered manually or by autocmd
   local found_ns,found_mark,ns_marks = M.check_if_any_ns_exists()
-  if found_ns~=nil then
+  if found_ns~=nil and found_mark~=nil then
     local _start = vim.api.nvim_buf_get_extmark_by_id(bufnr,found_ns,found_mark['start'],{})
     local _end = vim.api.nvim_buf_get_extmark_by_id(bufnr,found_ns,found_mark['end'],{})
 
@@ -433,10 +415,13 @@ function M.next_highlight(direction)
   local buffer = vim.api.nvim_get_current_buf()
   local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))
   crow = crow - 1
-  if last_highlight[buffer] == nil then return end
+  if last_highlight[buffer] == nil then 
+    error("no last_highlight")
+    return 
+  end
   local last_ns = last_highlight[buffer]['ns']
-  if last_ns == nil or reference_mark_group[buffer][last_ns] == nil then
-    print('The highlight has been cleared')
+  if reference_mark_group[buffer][last_ns] == nil then
+    error('The highlight has been cleared')
     return
   end
   local locations = {}
@@ -495,38 +480,6 @@ M.on_attach = function(_bufnr)
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>i',"",{callback=function()
     vim.pretty_print('inspect reference_mark_group: ',reference_mark_group[_bufnr])
-    if last_clear[_bufnr]~=nil then
-      local _start = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_clear[_bufnr]['ns'],last_clear[_bufnr]['start'],{})
-      local _end = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_clear[_bufnr]['ns'],last_clear[_bufnr]['end'],{})
-      local _range = {
-        ['start'] = {
-          line = _start[1],
-          character = _start[2]
-        },
-        ['end'] = {
-          line = _end[1],
-          character = _end[2]
-        }
-      }
-      last_clear[_bufnr]['range'] = _range
-      vim.pretty_print('inspect last_clear: ',last_clear[_bufnr])
-    end
-    if last_highlight[_bufnr]~=nil then
-      local _start = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_highlight[_bufnr]['ns'],last_highlight[_bufnr]['start'],{})
-      local _end = vim.api.nvim_buf_get_extmark_by_id(_bufnr,last_highlight[_bufnr]['ns'],last_highlight[_bufnr]['end'],{})
-      local _range = {
-        ['start'] = {
-          line = _start[1],
-          character = _start[2]
-        },
-        ['end'] = {
-          line = _end[1],
-          character = _end[2]
-        }
-      }
-      last_highlight[_bufnr]['range'] = _range
-      vim.pretty_print('inspect last_highlight: ',last_highlight[_bufnr])
-    end
   end})
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>dn','',{callback=function ()
@@ -536,8 +489,8 @@ M.on_attach = function(_bufnr)
     M.next_highlight('up')
   end})
 
-  local group = vim.api.nvim_create_augroup('kk_highlight',{clear=true})
   vim.api.nvim_create_autocmd({'InsertEnter','TextChanged'},{callback=function ()
+    print('TextChanged or InsertEnter')
     local result = M.kk_clear_highlight()
     if result then
       clear_by_autocmd[_bufnr] = true
@@ -550,7 +503,6 @@ M.on_attach = function(_bufnr)
     last_highlight[_bufnr]= nil
     last_clear[_bufnr]= nil
     curr_references[_bufnr] = nil
-    timers[_bufnr] = nil
   end,group=group,buffer=_bufnr})
 
   vim.api.nvim_create_autocmd({'InsertLeave'},{callback=function ()

@@ -40,21 +40,12 @@ return {
   }),
   s("fig1",
   fmt([[
-  {}fig,axes = plt.subplots({})
+  fig,axes = plt.subplots({})
   {}
   {}
   ]],{
-    d(1,function()
-      -- local found = vim.fn.search("import matplotlib.pyplot as plt")
-      local found = search_line('import matplotlib.pyplot as plt')
-      if found then
-        return sn(nil,{t("")})
-      else
-        return sn(nil,{t({"import matplotlib.pyplot as plt",""})})
-      end
-    end,{}),
-    i(2,"1"),
-    d(3,function(args,_,old_state)
+    i(1,"1"),
+    d(2,function(args,_,old_state)
       -- old_state is a customized data, you can define anything here to avoid failed snipped expansion
       local nodes = {}
       old_state = old_state or 1
@@ -77,30 +68,32 @@ return {
       local snip = sn(nil,nodes)
       snip.old_state = number -- NOTE: store th
       return snip
-    end,{2}),
-    c(4,{
+    end,{1}),
+    c(3,{
       t("plt.show()"),
       sn(nil,{t"plt.savefig(",i(1),t")"})
     })
-  }
-  )),
+  }),
+  {
+    -- NOTE: do some dynamic/context-wise things here
+    callbacks = {
+    [-1] = {
+      [events.pre_expand] = function (snippet, event_args)
+        local found = search_line('import matplotlib.pyplot as plt')
+        if not found then
+          print("matplotlib not found, insert it at the beginning")
+          vim.api.nvim_buf_set_lines(0,0,0,false,{'import matplotlib.pyplot as plt'})
+        end
+      end
+    }}}),
   s("fig2",
   fmt([[
-  {}fig,axes = plt.subplots({})
+  fig,axes = plt.subplots({})
   {}
   {}
   ]],{
-    d(1,function()
-      -- local found = vim.fn.search("import matplotlib.pyplot as plt")
-      local found = search_line('import matplotlib.pyplot as plt')
-      if found then
-        return sn(nil,{t("")})
-      else
-        return sn(nil,{t({"import matplotlib.pyplot as plt",""})})
-      end
-    end,{}),
-    i(2,"2,2"),
-    d(3,function(args,_,old_state)
+    i(1,"2,2"),
+    d(2,function(args,_,old_state)
       old_state = old_state or {2,2}
       local nodes = {}
       local str = string.gsub(args[1][1],' ','')
@@ -122,13 +115,24 @@ return {
       local snip = sn(nil,nodes)
       snip.old_state = numbers
       return snip
-    end,{2}),
-    c(4,{
+    end,{1}),
+    c(3,{
       t("plt.show()"),
       sn(nil,{t"plt.savefig(",i(1),t")"})
     })
-  }
-  )),
+  }),
+  {
+    -- NOTE: do some dynamic/context-wise things here
+    callbacks = {
+      [-1] = {
+        [events.pre_expand] = function (snippet, event_args)
+          local found = search_line('import matplotlib.pyplot as plt')
+          if not found then
+            print("matplotlib not found, insert it at the beginning")
+            vim.api.nvim_buf_set_lines(0,0,0,false,{'import matplotlib.pyplot as plt'})
+          end
+        end
+      }}}),
   s("ypr",fmt([[
   {}
   {}

@@ -490,7 +490,6 @@ M.on_attach = function(_bufnr)
   end})
 
   vim.api.nvim_create_autocmd({'InsertEnter','TextChanged'},{callback=function ()
-    print('TextChanged or InsertEnter')
     local result = M.kk_clear_highlight()
     if result then
       clear_by_autocmd[_bufnr] = true

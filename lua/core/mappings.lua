@@ -127,7 +127,7 @@ local function others()
   map("n", "<C-t>b", ":tabnew <CR>") -- new tabs
   map("n", "<leader>n", ":set nu! <CR>")
   map("n", "<leader>rn", ":set rnu! <CR>") -- relative line numbers
-  map("n", "<C-s>", ":w <CR>") -- ctrl + s to save file
+  map("n", "<C-s>", ":w! <CR>") -- ctrl + s to save file
 
   -- terminal mappings --
   -- get out of terminal mode

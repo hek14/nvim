@@ -1,3 +1,4 @@
+local M = {}
 local api, cmd, fn, g, vim = vim.api, vim.cmd, vim.fn, vim.g, vim
 local lsp = require 'vim.lsp'
 local fmt = string.format
@@ -6,7 +7,6 @@ local last_results = {}     -- hold last location results
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
 
-local M = {}
 
 local ctx_lines = 3 -- lines of context
 local timers = {}
@@ -24,29 +24,6 @@ local rename_lines = {}
 local ref_lines = {}
 local file_lines = {}
 local au_group = vim.api.nvim_create_augroup("PIG",{clear=true})
-
-local popup_options = {
-  position = "50%",
-  -- position = {
-  --   row = 0,
-  --   col = 0,
-  -- },
-  size = {
-    -- width = 40,
-    height = 20,
-  },
-  -- relative = "cursor",
-  border = {
-    style = "single",
-    text = {
-      top = "PIG:🐷",
-      top_align = "center",
-    },
-  },
-  win_options = {
-    winhighlight = "Normal:Normal,FloatBorder:Normal",
-  }
-}
 
 local function echo(hlgroup, msg)
   cmd(fmt('echohl %s', hlgroup))
@@ -379,11 +356,33 @@ M.location_handler = function(label, result, ctx, config)
   local sorted_locations = sort_locations(locations)
   local groups = group_by_uri(sorted_locations)
   local lines = make_menu(groups,ctx)
+  local popup_options = {
+    position = "50%",
+    -- position = {
+      --   row = 0,
+      --   col = 0,
+      -- },
+      size = {
+        -- width = 40,
+        height = math.floor(vim.fn.winheight(0)*0.4),
+      },
+      -- relative = "cursor",
+      border = {
+        style = "single",
+        text = {
+          top = "PIG:🐷",
+          top_align = "center",
+        },
+      },
+      win_options = {
+        winhighlight = "Normal:Normal,FloatBorder:Normal",
+      }
+    }
   last_pig_menu = Menu(
     popup_options,
     {
       lines = lines,
-      -- min_width = 40,
+      min_width = math.floor(vim.fn.winwidth(0)*0.4),
       max_width = math.floor(vim.fn.winwidth(0)*0.8),
       keymap = {
         focus_next = { "n", "<Down>", "<Tab>" },

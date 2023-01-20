@@ -311,19 +311,20 @@ local filter_locations_by_uri = function(locations,pattern)
   return results
 end
 
-local function next_ref_handler(label, result, ctx, config)
+M.next_ref_handler = function(label, result, ctx, config)
+  if not ctx.index or ctx.index==0 then 
+    if type(ctx.fallback) == 'function' then
+      ctx.fallback()  
+    end
+    return 
+  end
   local locations = vim.tbl_islist(result) and result or {result}
   local sorted_locations = sort_locations(locations)
   local current_line = vim.api.nvim_win_get_cursor(0)[1]
   local current_col = vim.api.nvim_win_get_cursor(0)[2]
-  local current_file = "file://" .. vim.api.nvim_buf_get_name(ctx.bufnr or 0)
-  local filtered_locations = filter_locations_by_uri(sorted_locations,current_file) -- only search the next_ref in current file
   local current_loc = nil
   local index = ctx.index
-  if not index or index==0 then
-    return
-  end
-  for i,loc in ipairs(filtered_locations) do
+  for i,loc in ipairs(sorted_locations) do
     local _start = loc.range.start
     local _end = loc.range['end']
     local condition = _start.line+1 == current_line and
@@ -337,16 +338,21 @@ local function next_ref_handler(label, result, ctx, config)
   end
   if not current_loc then
     error("weird: cannot find current location")
+    if type(ctx.fallback) == 'function' then
+      ctx.fallback()  
+    end
     return false
   end
+  vim.pretty_print("current_loc is: ",current_loc)
   local target = current_loc + index
-  if target > #filtered_locations then
+  if target > #sorted_locations then
     target = 1
   end
   if target < 1 then
-    target = #filtered_locations
+    target = #sorted_locations
   end
-  vim.lsp.util.jump_to_location(filtered_locations[target],vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
+  vim.cmd('normal! m`')
+  vim.api.nvim_win_set_cursor(0, {sorted_locations[target].range.start.line + 1, sorted_locations[target].range.start.character})
   return true
 end
 
@@ -559,7 +565,11 @@ M.wrap_handler = function (args)
       end
     end
     ctx = vim.tbl_deep_extend('force',ctx, args)
-    args.target(args.label, result, ctx, config)
+    if args.label == "next_reference" then
+      M.next_ref_handler(args.label, result, ctx, config)
+    else
+      M.location_handler(args.label, result, ctx, config)
+    end
     if timers[ctx.bufnr] then
       timers[ctx.bufnr] = nil
     end
@@ -596,7 +606,7 @@ M.async_fn = function(args)
     local methods = {
       definition = 'textDocument/definition',
       reference = 'textDocument/references',
-      next_reference = 'textDocument/references',
+      next_reference = 'textDocument/documentHighlight',
       rename = 'textDocument/references'
     }
     local ref_params = vim.lsp.util.make_position_params()

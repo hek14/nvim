@@ -69,21 +69,21 @@ end
 
 function M.Smart_goto_next_ref(index)
   local bufnr = vim.fn.bufnr()
-  vim.cmd [[normal! m`]]
+  -- vim.cmd [[normal! m`]] -- mark it inner the function, just before the jump
   require('contrib.pig').async_fn({
     label = 'next_reference',
     index = index, 
     fallback = function()
-    print('using fallback')
-    if index > 0 then
-      require"illuminate".next_reference{wrap=true}
-      -- require'nvim-treesitter-refactor.navigation'.goto_next_usage()
-    else
-      require"illuminate".next_reference{reverse=true,wrap=true}
-      -- require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
+      print('using fallback')
+      if index > 0 then
+        require"illuminate".next_reference()
+        -- require'nvim-treesitter-refactor.navigation'.goto_next_usage()
+      else
+        require"illuminate".next_reference({reverse=true})
+        -- require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
+      end
     end
-  end
-})
+  })
 end
 
 -- NOTE: refer to https://github.com/lucasvianav/nvim
@@ -125,15 +125,16 @@ function M.setup(client,bufnr)
   -- buf_set_keymap("n", "<leader>.", "<cmd>lua vim.lsp.buf.clear_references()<CR>",map_opts)
   buf_set_keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>",map_opts)
   buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",map_opts)
-  -- buf_set_keymap("n", "[r", "", {callback = function()
-  --   M.Smart_goto_next_ref(-1)
-  -- end})
-  -- buf_set_keymap("n", "]r", "", {callback = function()
-  --   M.Smart_goto_next_ref(1)
-  -- end})
-  buf_set_keymap("n", "[r", "<cmd>lua require'illuminate'.next_reference{reverse=true,wrap=true}<CR>",map_opts)
-  buf_set_keymap("n", "]r", "<cmd>lua require'illuminate'.next_reference{wrap=true}<CR>",map_opts)
-  -- buf_set_keymap("n", "]r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",map_opts)
+  buf_set_keymap("n", "[r", "", {callback = function()
+    M.Smart_goto_next_ref(-1)
+  end})
+  buf_set_keymap("n", "]r", "", {callback = function()
+    M.Smart_goto_next_ref(1)
+  end})
+  -- buf_set_keymap("n", "[r", "<cmd>lua require'illuminate'.goto_prev_reference()<CR>",map_opts)
+  -- buf_set_keymap("n", "]r", "<cmd>lua require'illuminate'.goto_next_reference()<CR>",map_opts)
+  -- buf_set_keymap("n", "[r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",map_opts)
+  -- buf_set_keymap("n", "]r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_previous_usage()<CR>",map_opts)
   buf_set_keymap("n", "<C-k>","<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
   -- buf_set_keymap("i", "<C-k>","<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
   buf_set_keymap("n", "<leader>rn","",vim.tbl_deep_extend('force',map_opts,{callback=function()

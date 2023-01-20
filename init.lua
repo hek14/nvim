@@ -21,7 +21,7 @@ local modules = {
    "core.options",
    "core.lazy",
    "core.autocmds",
-   "core.mappings",
+   "core.keymap",
 }
 
 for _, module in ipairs(modules) do

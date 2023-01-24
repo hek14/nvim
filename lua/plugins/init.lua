@@ -221,7 +221,7 @@ local plugins = {
   },
   {
     "ggandor/leap.nvim",
-    event = 'BufRead',
+    event = 'BufEnter',
     config = function()
       require('leap').add_default_mappings()
     end

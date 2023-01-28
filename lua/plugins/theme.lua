@@ -1,10 +1,11 @@
-local M = {
+local catppuccin = {
   "catppuccin/nvim",
   name = "catppuccin",
-  event = "VeryLazy"
+  event = "VeryLazy",
+  enabled = false
 }
 
-function M.config()
+function catppuccin.config()
   local ucolors = require "catppuccin.utils.colors"
   local latte = require("catppuccin.palettes").get_palette "latte"
   local frappe = require("catppuccin.palettes").get_palette "frappe"
@@ -39,4 +40,15 @@ function M.config()
   }
   vim.cmd [[ colorscheme catppuccin ]]
 end
-return M
+
+
+local kanagawa = {
+  "rebelot/kanagawa.nvim",
+  event = 'VeryLazy',
+  config = function ()
+    require('kanagawa').setup()
+    vim.cmd [[ colorscheme kanagawa ]]
+  end
+}
+
+return kanagawa

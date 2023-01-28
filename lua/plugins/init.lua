@@ -54,40 +54,6 @@ local plugins = {
     end
   },
   {
-    "mhartington/oceanic-next",
-    enabled = false,
-    config = function ()
-      vim.cmd[[ colorscheme OceanicNext ]]
-    end
-  },
-  {
-    "bluz71/vim-nightfly-guicolors",
-    enabled = false,
-    config = function ()
-      vim.cmd [[colorscheme nightfly]]
-    end
-  },
-  {
-    "sainnhe/edge",
-    enabled = false,
-    event = 'VimEnter',
-    config = function ()
-      vim.cmd [[ colorscheme edge ]]
-    end
-  },
-  {
-    "Mofiqul/vscode.nvim",
-    enabled = false,
-    lazy = false,
-    config = function ()
-      vim.o.background = 'dark'
-      local c = require('vscode.colors')
-      require('vscode').setup({
-        italic_comments = true,
-      })
-    end
-  },
-  {
     'kevinhwang91/nvim-ufo',
     enabled = false,
     event = 'BufEnter',

@@ -1,3 +1,46 @@
+# themes 
+```text
+  {
+    "mhartington/oceanic-next",
+    enabled = false,
+    config = function ()
+      vim.cmd[[ colorscheme OceanicNext ]]
+    end
+  },
+  {
+    "bluz71/vim-nightfly-guicolors",
+    enabled = false,
+    config = function ()
+      vim.cmd [[colorscheme nightfly]]
+    end
+  },
+  {
+    "sainnhe/edge",
+    enabled = false,
+    event = 'VimEnter',
+    config = function ()
+      vim.cmd [[ colorscheme edge ]]
+    end
+  },
+  {
+    "Mofiqul/vscode.nvim",
+    enabled = false,
+    lazy = false,
+    config = function ()
+      vim.o.background = 'dark'
+      local c = require('vscode.colors')
+      require('vscode').setup({
+        italic_comments = true,
+      })
+    end
+  },
+``` 
+
+# font website
+https://www.programmingfonts.org
+https://www.codingfont.com/
+https://www.nerdfonts.com/font-downloads
+
 # for newly installed:
 1. install nvim nightly
   1.1 wget -c xxx.tar.gz (from the github release page)
@@ -42,16 +85,26 @@
 6. https://github.com/stevearc/overseer.nvim: yet another task manager
 7. themes: https://alpha2phi.medium.com/12-neovim-themes-with-tree-sitter-support-8be320b683a4
 
-# for pyright completion stubs: https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs
+# refer to other resources
+1. jesse19skelton
+- https://www.youtube.com/@jesse19skelton -- nice videos about karabiner and  yabai [his github]()
+- https://www.youtube.com/watch?v=JL1lz77YbUE&ab_channel=JesseSkelton
+- https://www.notion.so/Yabai-8da3b829872d432fac43181b7ff628fc
+
+
+# for pyright completion stubs
+https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs
 example: how to use it for cv2 module completion:
 ```shell
 curl -sSL https://raw.githubusercontent.com/bschnurr/python-type-stubs/add-opencv/cv2/__init__.pyi \
   -o $(python -c 'import cv2, os; print(os.path.dirname(cv2.__file__))')/cv2.pyi
 ```
 
-# :help fillchars to change fold/endOfBuffer appearance
+# help fillchars 
+to change fold/endOfBuffer appearance
 
-# one tip for inspecting options and variables: instead of using message buffer, just create a new buffer, and normal mode: `:put =bufnr()`, `put =@"` or insert mode: `CTRL_R=bufnr()`
+# inspecting options and variables
+instead of using message buffer, just create a new buffer, and normal mode: `:put =bufnr()`, `put =@"` or insert mode: `CTRL_R=bufnr()`
 
 # really useful keymap fix for neovim in kitty/alacritty:
 1. video: https://www.youtube.com/watch?v=lHBD6pdJ-Ng
@@ -59,10 +112,12 @@ curl -sSL https://raw.githubusercontent.com/bschnurr/python-type-stubs/add-openc
 3. http://www.leonerd.org.uk/hacks/fixterms/
 4. https://en.wikipedia.org/wiki/List_of_Unicode_characters
 
-# `:verbose map m` don't work in normal case for mappings defined in lua, you should start nvim using `nvim -V1`
+# nvim -V1
+`:verbose map m` don't work in normal case for mappings defined in lua, you should start nvim using `nvim -V1`
 
-# `vim.loop`: https://teukka.tech/posts/2020-01-07-vimloop/
+# vim.loop
+https://teukka.tech/posts/2020-01-07-vimloop/
 
-# TODO: learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
-
-# TODO: refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
+# TODO: 
+- learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
+- refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS

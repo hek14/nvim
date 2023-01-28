@@ -84,7 +84,7 @@ local function others()
   cmd [[ command! DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]
   map("n", "<space>", "<Nop>", {noremap = true, silent = true})
   map("n", "<leader>cd", [[<cmd>lua require('core.utils').smart_current_dir()<cr>]], {silent = false}) -- example to delete the buffer
-  map("n", "<F1>", "<Tab>", {noremap=true}) -- because I set <Ctrl-I> to send the same escape bytes as <Home>, so <Tab>/<Ctrl-I> can be used with this keymap
+  map("n", "<F1>", "<Tab>", {noremap=true}) -- because I set <Ctrl-I> to send the same escape bytes as <F1>, so <Tab>/<Ctrl-I> can be used with this keymap
   map("x", ">", ">gv", {silent = false, noremap = true})
   map("x", "<", "<gv", {silent = false, noremap = true})
   map("t", "<C-w>n", "<C-\\><C-n><C-w>j")

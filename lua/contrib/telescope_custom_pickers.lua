@@ -54,7 +54,7 @@ M.actions = transform_mod {
       run_live_grep(current_input)
     end)
   end,
-  ---Ask the user for a folder and olen a new `live_grep` filtering by it
+  ---Ask the user for a folder and open a new `live_grep` filtering by it
   set_folders = function(prompt_bufnr)
     local current_picker = action_state.get_current_picker(prompt_bufnr)
     local current_input = action_state.get_current_line()

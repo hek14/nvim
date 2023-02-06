@@ -343,7 +343,6 @@ M.next_ref_handler = function(label, result, ctx, config)
     end
     return false
   end
-  vim.pretty_print("current_loc is: ",current_loc)
   local target = current_loc + index
   if target > #sorted_locations then
     target = 1

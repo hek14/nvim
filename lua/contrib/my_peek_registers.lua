@@ -35,11 +35,11 @@ local function set_timer()
 end
 
 local group = vim.api.nvim_create_augroup("kk_registers",{clear=true})
-vim.keymap.set("i","<C-R>",function ()
+require('core.utils').map("i","<C-R>",function ()
   insert_mode_cancelled = false
   set_timer()
 end,{noremap=true})
-vim.keymap.set("n",'"',function ()
+require('core.utils').map("n",'"',function ()
   normal_mode_cancelled = false
   set_timer()
 end,{noremap=true})

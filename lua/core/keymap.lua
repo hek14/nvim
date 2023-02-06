@@ -94,7 +94,7 @@ local function others()
   map("n", "<leader>k", "<Esc>:m .-2<CR>==")
   map("n",'<leader>tv', ":lua require('core.utils')<CR> | :lua back_to_future()<CR>")
   -- NOTE: a good example of a senmantic mapping that need some evaluation
-  vim.keymap.set("n", "<leader>sw", function ()
+  require('core.utils').map("n", "<leader>sw", function ()
     local cword = vim.fn.expand("<cword>")
     local cmd_str = string.format([[:<C-u>%%s/\<%s\>//g<Left><Left>]],cword)
     return cmd_str
@@ -130,7 +130,7 @@ local function others()
   -- NOTE: <C-g> and <C-t> to forward and backward when search
   -- ft_map("python",'n','<leader>p',[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]])
   -- BUG: why does my utils.map doesn't work
-  vim.keymap.set("n","<leader>p",[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]],{noremap=true})
+  require('core.utils').map("n","<leader>p",[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]],{noremap=true})
 
   map("x", "ul", "g_o^")
   map("o", "ul", ":normal vul<CR>")

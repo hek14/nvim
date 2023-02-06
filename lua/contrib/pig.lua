@@ -490,7 +490,7 @@ M.location_handler = function(label, result, ctx, config)
     M.open_split('v',ctx)
   end})
 
-  vim.keymap.set("n",",g","",{noremap=true,callback=function ()
+  require('core.utils').map("n",",g","",{noremap=true,callback=function ()
     vim.cmd(fmt('%s wincmd w',last_source_winnr))
     vim.cmd(fmt('b %s',last_source_bufnr))
     vim.cmd('wincmd o')

@@ -75,6 +75,7 @@ https://www.nerdfonts.com/font-downloads
 7. https://github.com/folke/dot/tree/master/config/nvim
 8. https://github.com/williamboman/nvim-config: the author of mason.nvim
 9. https://github.com/adoyle-h
+10. https://github.com/JoosepAlviste/dotfiles -- nice customizaion about telescope live_grep
 
 # refer to useful plugins
 1. https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here

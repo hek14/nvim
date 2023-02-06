@@ -1,6 +1,0 @@
-[submodule "lua/contrib/vim-illuminate"]
-	path = lua/contrib/vim-illuminate
-	url = https://github.com/hek14/vim-illuminate
-[submodule "lua/contrib/nvim-navic"]
-	path = lua/contrib/nvim-navic
-	url = https://github.com/hek14/nvim-navic

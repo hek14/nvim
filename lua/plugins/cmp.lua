@@ -177,7 +177,7 @@ function M.config()
       }
     })
   end
-  vim.keymap.set('i','<C-g>',cmp_rg_complete,{noremap=true,silent=true})
+  require('core.utils').map('i','<C-g>',cmp_rg_complete,{noremap=true,silent=true})
 
 
   local cmp_config = function()
@@ -189,7 +189,7 @@ function M.config()
       }
     })
   end
-  vim.keymap.set('i','<C-c>',cmp_config,{noremap=true,silent=true})
+  require('core.utils').map('i','<C-c>',cmp_config,{noremap=true,silent=true})
 
   vim.cmd('hi! CmpFloatBorder guifg=red')
 end

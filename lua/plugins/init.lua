@@ -5,7 +5,7 @@ local plugins = {
     'RRethy/vim-tranquille',
     lazy = false, 
     config = function ()
-      vim.keymap.set('n','g/','<Plug>(tranquille_search)',{ noremap = true, silent = true }) 
+      require('core.utils').map('n','g/','<Plug>(tranquille_search)',{ noremap = true, silent = true }) 
     end
   },
   {
@@ -15,20 +15,18 @@ local plugins = {
       require'bufferline'.setup {
         icons = false,
       }
-      local map = vim.api.nvim_set_keymap
-      local opts = { noremap = true, silent = true }
-      map('n', '<leader>1', '<Cmd>BufferGoto 1<CR>', opts)
-      map('n', '<leader>2', '<Cmd>BufferGoto 2<CR>', opts)
-      map('n', '<leader>3', '<Cmd>BufferGoto 3<CR>', opts)
-      map('n', '<leader>4', '<Cmd>BufferGoto 4<CR>', opts)
-      map('n', '<leader>5', '<Cmd>BufferGoto 5<CR>', opts)
-      map('n', '<leader>6', '<Cmd>BufferGoto 6<CR>', opts)
-      map('n', '<leader>7', '<Cmd>BufferGoto 7<CR>', opts)
-      map('n', '<leader>8', '<Cmd>BufferGoto 8<CR>', opts)
-      map('n', '<leader>9', '<Cmd>BufferGoto 9<CR>', opts)
-      map('n', '<leader>0', '<Cmd>BufferLast<CR>', opts)
-      map('n', '[b', '<Cmd>BufferPrevious<CR>', opts)
-      map('n', ']b', '<Cmd>BufferNext<CR>', opts)
+      local map = require("core.utils").map
+      map('n', '<leader>1', '<Cmd>BufferGoto 1<CR>')
+      map('n', '<leader>2', '<Cmd>BufferGoto 2<CR>')
+      map('n', '<leader>4', '<Cmd>BufferGoto 4<CR>')
+      map('n', '<leader>5', '<Cmd>BufferGoto 5<CR>')
+      map('n', '<leader>6', '<Cmd>BufferGoto 6<CR>')
+      map('n', '<leader>7', '<Cmd>BufferGoto 7<CR>')
+      map('n', '<leader>8', '<Cmd>BufferGoto 8<CR>')
+      map('n', '<leader>9', '<Cmd>BufferGoto 9<CR>')
+      map('n', '<leader>0', '<Cmd>BufferLast<CR>')
+      map('n', '[b', '<Cmd>BufferPrevious<CR>')
+      map('n', ']b', '<Cmd>BufferNext<CR>')
     end
   },
   {
@@ -477,7 +475,9 @@ local plugins = {
       },
       {
         "nvim-pack/nvim-spectre",
+        lazy = false,
         config = function ()
+          require("spectre").setup({ replace_engine = { sed = { cmd = "sed" } } })
           local map = require("core.utils").map
           map("n","<leader>S","<cmd>lua require('spectre').open()<CR>")
           map("n","<leader>sc","<cmd>lua require('spectre').open_file_search()<CR>")
@@ -541,15 +541,15 @@ local plugins = {
             return
           end
           cybu.setup()
-          vim.keymap.set("n", "<leader>n", "<Plug>(CybuNext)",{})
-          vim.keymap.set("n", "<leader>e", "<Plug>(CybuPrev)",{})
+          require('core.utils').map("n", "<leader>n", "<Plug>(CybuNext)",{})
+          require('core.utils').map("n", "<leader>e", "<Plug>(CybuPrev)",{})
         end,
       },
       {
         "habamax/vim-winlayout",
         config = function()
-          vim.keymap.set("n", ",,", "<Plug>(WinlayoutBackward)",{})
-          vim.keymap.set("n", ",.", "<Plug>(WinlayoutBackward)",{})
+          require('core.utils').map("n", ",,", "<Plug>(WinlayoutBackward)",{})
+          require('core.utils').map("n", ",.", "<Plug>(WinlayoutBackward)",{})
         end
       }
 }

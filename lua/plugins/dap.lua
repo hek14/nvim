@@ -89,7 +89,7 @@ function M.config()
     return found
   end
 
-  vim.keymap.set('n',',e',function ()
+  require('core.utils').map('n',',e',function ()
     local found_hover = focus_hover()
     if found_hover~=nil then
       return string.format([[:<C-u>%s wincmd w<CR>]],found_hover)
@@ -98,7 +98,7 @@ function M.config()
     end
   end,{expr=true})
 
-  vim.keymap.set('x',',e',function ()
+  require('core.utils').map('x',',e',function ()
     local found_hover = focus_hover()
     if found_hover~=nil then
       return string.format([[:<C-u>%s wincmd w<CR>]],found_hover)

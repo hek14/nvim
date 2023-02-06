@@ -49,13 +49,11 @@ local M = {
     map("n", "<leader>gs", ":Telescope git_status <CR>")
     map("n", "<leader>fh", ":Telescope help_tags <CR>")
     map("n", "<leader>fo", ":Telescope oldfiles <CR>")
-    map("n", "<leader>tm", ":Telescope themes <CR>")
     map("n", "<leader>fd", ":Telescope dotfiles <CR>")
-    map("n", "<leader>rr", "<cmd>lua require('telescope.builtin').resume()<CR>")
+    map("n", "<leader>fr", "<cmd>lua require('telescope.builtin').resume()<CR>")
     map("n",'<leader>fs','<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>')
     -- if you want to grep only in opened buffers: lua require('telescope.builtin').live_grep({grep_open_files=true})
     -- pick a hidden term
-    map("n", "<leader>T", ":Telescope terms <CR>")
     map("n", "<leader>f/", ":lua require('core.utils').grep_last_search()<CR>")
   end,
 }

@@ -27,7 +27,7 @@ local function filter_rule_fn(diagnostic,old_index,symbols)
   -- Only filter out Pyright stuff for now
   -- To get line diagnostics :lua =vim.lsp.diagnostic.get_line_diagnostics()
   if diagnostic.source == "Lua Diagnostics." then
-    if string.match(diagnostic.message, 'Undefined global.*vim') then
+    if string.match(diagnostic.message, 'Undefined global.*') then
       return false
     end
     if string.match(diagnostic.message, 'Deprecated.*current is Lua') then

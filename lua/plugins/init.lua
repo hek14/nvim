@@ -65,6 +65,13 @@ local plugins = {
     end
   },
   {
+    "luukvbaal/statuscol.nvim",
+    event = 'BufRead',
+    config = function() 
+      require("statuscol").setup({setopt = true}) 
+    end
+  },
+  {
     "simrat39/symbols-outline.nvim",
     cmd = { "SymbolsOutline" },
     config = function()
@@ -283,10 +290,36 @@ local plugins = {
     },
     {
       "stevearc/dressing.nvim",
+      enabled = false,
       event = "VimEnter",
       config = function()
         require("dressing").setup({})
       end,
+    },
+    {
+      "folke/noice.nvim",
+      enabled = false, -- currently very unstable
+      event = 'VimEnter',
+      config = function()
+        require("noice").setup({
+          lsp = {
+            hover = {
+              enabled = false
+            },
+            signature = {
+              enabled = false
+            }
+          },
+        })
+      end,
+      requires = {
+        -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+        "MunifTanjim/nui.nvim",
+        -- OPTIONAL:
+        --   `nvim-notify` is only needed, if you want to use the notification view.
+        --   If not available, we use `mini` as the fallback
+        "rcarriga/nvim-notify",
+      }
     },
     { "tpope/vim-scriptease", lazy=false },
     { "MunifTanjim/nui.nvim" },
@@ -380,7 +413,9 @@ local plugins = {
             local ft_map = require("core.autocmds").ft_map
             ft_map('python','n',',t','<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>')
           end
-        }},
+        },
+        { "preservim/vimux" }
+      },
         init = function ()
           vim.g.asyncrun_open = 6
         end
@@ -466,9 +501,6 @@ local plugins = {
       {
         "djoshea/vim-autoread",
         enabled = false,
-      },
-      {
-        "preservim/vimux",
       },
       {
         'alexghergh/nvim-tmux-navigation',

@@ -2,41 +2,23 @@ local ft_map = require("core.autocmds").ft_map
 
 local utils = require "core.utils"
 
-local map_wrapper = utils.map
+local map = utils.map
 
 local cmd = vim.cmd
-
--- This is a wrapper function made to disable a plugin mapping from chadrc
--- If keys are nil, false or empty string, then the mapping will be not applied
--- Useful when one wants to use that keymap for any other purpose
-local map = function(...)
-  local keys = select(2, ...)
-  if not keys or keys == "" then
-    return
-  end
-  map_wrapper(...)
-end
-
 
 -- these mappings will only be called during initialization
 local colemak = function ()
   local lhs = "neilukj"
   local rhs = "jkluine"
-  local modes = {"n", "x", "o"}
-  local opt = {silent = true, noremap = true}
+  local modes = "nxo"
   for i = 1, #lhs do
     local colemak = lhs:sub(i, i)
     local qwerty = rhs:sub(i, i)
-    for _, mode in ipairs(modes) do
-      vim.api.nvim_set_keymap(mode, colemak, qwerty, opt)
-      vim.api.nvim_set_keymap(mode, vim.fn.toupper(colemak),
-      vim.fn.toupper(qwerty), opt)
-      if i < 4 then -- for direction keys
-        vim.api.nvim_set_keymap(mode, "<C-w>" .. colemak, "<C-w>" .. qwerty,
-        opt)
-        vim.api.nvim_set_keymap(mode, "<C-w><C-" .. colemak .. ">",
-        "<C-w><C-" .. qwerty .. ">", opt)
-      end
+    map(modes, colemak, qwerty)
+    map(modes, vim.fn.toupper(colemak),vim.fn.toupper(qwerty))
+    if i < 4 then
+      map(modes, "<C-w>" .. colemak, "<C-w>" .. qwerty)
+      map(modes, "<C-w><C-" .. colemak .. ">", "<C-w><C-" .. qwerty .. ">")
     end
   end
 end
@@ -51,8 +33,8 @@ local function others()
   -- also don't use g[j|k] when in operator pending mode, so it doesn't alter d, y or c behaviour
   map({ "n", "x", "o" }, "j", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
   map({ "n", "x", "o" }, "k", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
-  map("", "<Down>", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
-  map("", "<Up>", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
+  map("n", "<Down>", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
+  map("n", "<Up>", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
 
   map("i", "<C-q>",function ()
     if vim.g.cmp_enabled then
@@ -64,10 +46,10 @@ local function others()
     end
   end)
   -- don't yank text on cut ( x )
-  -- map_wrapper({ "n", "v" }, "x", '"_x')
+  -- map({ "n", "v" }, "x", '"_x')
 
   -- don't yank text on delete ( dd )
-  -- map_wrapper({ "n", "v" }, "d", '"_d')
+  -- map({ "n", "v" }, "d", '"_d')
 
   -- navigation within insert mode
   map("i", "<C-b>", "<Left>")
@@ -138,13 +120,14 @@ local function others()
   map("n", "<leader>tw", ":execute 'terminal' | let b:term_type = 'wind' | startinsert <CR>")
   -- terminal mappings end --
 
-  map("c", '<C-a>','<Home>')
-  map("c", '<C-e>','<End>')
-  map("c", '<C-f>','<Right>')
-  map("c", '<C-b>','<Left>')
+  -- map("c", '<C-a>','<Home>')
+  -- map("c", '<C-e>','<End>')
+  -- map("c", '<C-f>','<Right>')
+  -- map("c", '<C-b>','<Left>')
+  -- map("c", '<C-d>','<C-f>') -- using Telescope <>
   map("c", '<C-p>','<Up>')
   map("c", '<C-n>','<Down>')
-  map("c", '<C-t>','<C-f>')
+  -- NOTE: <C-g> and <C-t> to forward and backward when search
   -- ft_map("python",'n','<leader>p',[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]])
   -- BUG: why does my utils.map doesn't work
   vim.keymap.set("n","<leader>p",[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]],{noremap=true})

@@ -79,7 +79,7 @@ end
 
 _G.deep_equal = M.deep_equal
 
-M.map = function(mode, keys, command, opt)
+M.map = function(mode, keys, rhs, opt)
   local options = { noremap = true, silent = true }
   if opt then
     options = vim.tbl_extend("force", options, opt)
@@ -88,7 +88,6 @@ M.map = function(mode, keys, command, opt)
   -- all valid modes allowed for mappings
   -- :h map-modes
   local valid_modes = {
-    [""] = true,
     ["n"] = true,
     ["v"] = true,
     ["s"] = true,
@@ -103,34 +102,48 @@ M.map = function(mode, keys, command, opt)
 
   -- helper function for M.map
   -- can gives multiple modes and keys
-  local function map_wrapper(sub_mode, lhs, rhs, sub_options)
-    if type(lhs) == "table" then
-      for _, key in ipairs(lhs) do
-        map_wrapper(sub_mode, key, rhs, sub_options)
-      end
-    else
-      if type(sub_mode) == "table" then
-        for _, m in ipairs(sub_mode) do
-          map_wrapper(m, lhs, rhs, sub_options)
-        end
+  local function map_wrapper(sub_mode, lhs)
+    if type(lhs)=='string' and lhs:match('|')==nil and valid_modes[sub_mode] then
+      if type(rhs)=='string' then
+        vim.keymap.set(sub_mode,lhs,rhs,options)
       else
-        if valid_modes[sub_mode] and lhs and rhs then
-          if vim.fn.has("nvim-0.7")>0 then
-            vim.keymap.set(sub_mode, lhs, rhs, sub_options)
-          else
-            vim.api.nvim_set_keymap(sub_mode, lhs, rhs, sub_options)
-          end
-        else
-          sub_mode, lhs, rhs = sub_mode or "", lhs or "", rhs or ""
-          print(
-            "Cannot set mapping [ mode = '" .. sub_mode .. "' | key = '" .. lhs .. "' | cmd = '" .. rhs .. "' ]"
-          )
-        end
+        options.callback = rhs
+        vim.keymap.set(sub_mode,lhs,'',options)
       end
+      return
+    end
+
+    if type(lhs)=='table' then
+      for _,k in ipairs(lhs) do
+        map_wrapper(sub_mode,k)
+      end
+      return
+    elseif type(lhs)=="string" and lhs:match('|')~=nil then
+      for _,k in ipairs(M.stringSplit(lhs,'|')) do
+        map_wrapper(sub_mode,k)
+      end
+      return
+    end
+
+    if type(sub_mode) == 'string' and #sub_mode > 1 then
+      for i = 1,#sub_mode do
+        local k = string.sub(sub_mode,i,i)
+        map_wrapper(k,lhs)
+      end
+      return
+    elseif type(sub_mode)=='table' then
+      for _,k in ipairs(sub_mode) do
+        map_wrapper(k,lhs)
+      end
+      return
+    else
+      local info = debug.getinfo(3,'Sln')
+      vim.notify("sub_mode should be table or string",vim.log.levels.ERROR)
+      vim.pretty_print('sub_mode: ',sub_mode, info)
+      return
     end
   end
-
-  map_wrapper(mode, keys, command, options)
+  map_wrapper(mode, keys)
 end
 
 -- clear command line from lua

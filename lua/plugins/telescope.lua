@@ -1,3 +1,4 @@
+local map = require("core.utils").map
 local M = {
   "nvim-telescope/telescope.nvim",
   dependencies = {
@@ -7,7 +8,7 @@ local M = {
     {
       'nvim-telescope/telescope-live-grep-args.nvim',
       config = function()
-        require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>')
+        -- require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>')
       end
     },
     {
@@ -41,7 +42,6 @@ local M = {
   },
   lazy = false,
   init = function()
-    local map = require("core.utils").map
     map("n", "<leader>fb", ":Telescope buffers <CR>")
     map("n", "<leader>ff", ":Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>")
     map("n", "<leader>fa", ":Telescope find_files follow=true no_ignore=true hidden=true <CR>")
@@ -59,6 +59,8 @@ local M = {
 }
 
 function M.config()
+  local custom_pickers = require 'contrib.telescope_custom_pickers'
+  map("n", "<leader>fw", custom_pickers.live_grep)
   telescope = require"telescope"
   local fixfolds = {
     hidden = true,
@@ -77,7 +79,14 @@ function M.config()
       find_files = fixfolds,
       git_files = fixfolds,
       grep_string = fixfolds,
-      live_grep = fixfolds,
+      live_grep = {
+        mappings = {
+          i = {
+            ['<c-f>'] = custom_pickers.actions.set_extension,
+            ['<c-l>'] = custom_pickers.actions.set_folders,
+          },
+        },
+      },
       oldfiles = fixfolds,
       lsp_definitions = fixfolds,
       lsp_references = fixfolds,

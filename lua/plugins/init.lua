@@ -9,6 +9,22 @@ local plugins = {
     end
   },
   {
+    "lmburns/lf.nvim",
+    cmd = "Lf",
+    dependencies = { "nvim-lua/plenary.nvim", "akinsho/toggleterm.nvim" },
+    opts = {
+      winblend = 0,
+      highlights = { NormalFloat = { guibg = "NONE" } },
+      border = "double", -- border kind: single double shadow curved
+      height = 0.70,
+      width = 0.85,
+      escape_quit = true,
+    },
+    keys = {
+      { "<cmd>Lf<cr>", desc = "lfcd" },
+    },
+  },
+  {
     'romgrk/barbar.nvim',
     enabled = false,
     config = function ()
@@ -473,12 +489,13 @@ local plugins = {
         cmd = 'DiffviewOpen',
         dependencies = 'nvim-lua/plenary.nvim',
       },
-      {
-        "nvim-pack/nvim-spectre",
-        lazy = false,
-        config = function ()
+      {                                                                
+        "nvim-pack/nvim-spectre",                                      
+        -- NOTE: to make this work, you should have `gsed` in the $PATH `ln -s ~/.nix-profile/bin/sed ~/.local/bin/gsed`
+        lazy = false,                                                  
+        config = function ()                                           
           require("spectre").setup({ replace_engine = { sed = { cmd = "sed" } } })
-          local map = require("core.utils").map
+          local map = require("core.utils").map                        
           map("n","<leader>S","<cmd>lua require('spectre').open()<CR>")
           map("n","<leader>sc","<cmd>lua require('spectre').open_file_search()<CR>")
           map("n","<leader>sw","<cmd>lua require('spectre').open_visual({select_word=true})<CR>")

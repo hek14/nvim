@@ -1,5 +1,6 @@
 local M = {
   "feline-nvim/feline.nvim",
+  enabled = false,
   dependencies = { "hek14/nvim-navic","hek14/vim-illuminate" },
   event = "VeryLazy"
 }

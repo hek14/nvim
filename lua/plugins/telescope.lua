@@ -13,36 +13,64 @@ local M = {
     },
     {
       "AckslD/nvim-neoclip.lua",
+      dependencies = {
+        "kkharji/sqlite.lua"
+      },
       config = function()
-        require("neoclip").setup()
-        vim.cmd([[inoremap <C-p> <cmd>Telescope neoclip<CR>]])
-      end,
-    },
-    {
-      "jvgrootveld/telescope-zoxide",
-      init = function()
-        require("core.utils").map("n", "<leader>z", ":Telescope zoxide list<CR>")
-      end,
-      config = function()
-        require("telescope._extensions.zoxide.config").setup({
-          mappings = {
-            ["<C-b>"] = {
-              keepinsert = true,
-              action = function(selection)
-                require("telescope").extensions.file_browser.file_browser({ cwd = selection.path })
-                -- vim.cmd('Telescope file_browser path=' .. selection.path)
-              end,
+        require('telescope').load_extension('neoclip')
+        require("neoclip").setup({
+          enable_persistent_history = true,
+          default_register = '+',
+          keys = {
+            telescope = {
+              i = {
+                select = '<CR>',
+                paste = '<C-P>',
+                paste_behind = '<C-B>',
+                replay = '<C-Q>',
+                delete = '<C-D>',
+                custom = {},
+              },
+              n = {
+                select = '<CR>',
+                paste = 'p',
+                paste_behind = 'P',
+                replay = 'q',
+                edit = '<C-e>',
+                delete = 'd',
+                custom = {},
+              }
+            }}
+          })
+          local map = require("core.utils").map
+          map("i","<C-x><C-p>","<cmd>lua require('telescope').extensions.neoclip.default()<CR>")
+        end,
+      },
+      {
+        "jvgrootveld/telescope-zoxide",
+        init = function()
+          require("core.utils").map("n", "<leader>z", ":Telescope zoxide list<CR>")
+        end,
+        config = function()
+          require("telescope._extensions.zoxide.config").setup({
+            mappings = {
+              ["<C-b>"] = {
+                keepinsert = true,
+                action = function(selection)
+                  require("telescope").extensions.file_browser.file_browser({ cwd = selection.path })
+                  -- vim.cmd('Telescope file_browser path=' .. selection.path)
+                end,
+              },
             },
-          },
-        })
-      end,
+          })
+        end,
+      },
+      { "nvim-telescope/telescope-file-browser.nvim" },
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
     },
-    { "nvim-telescope/telescope-file-browser.nvim" },
-    { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
-  },
   lazy = false,
   init = function()
-    map("n", "<leader>fb", ":Telescope buffers <CR>")
+    map("n", "<leader>b", ":Telescope buffers <CR>")
     map("n", "<leader>ff",
       ":Telescope find_files find_command=rg,--ignore-file=" ..
       vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>")
@@ -97,6 +125,19 @@ function M.config()
       lsp_dynamic_workspace_symbols = fixfolds
     },
     defaults = {
+      mappings = {
+        i = {
+          ["<cr>"] = function(prompt_bufnr)
+            require('telescope.actions').select_default(prompt_bufnr)
+            -- vim.cmd[[normal! zv]]
+            vim.cmd [[echom "telescope hello"]]
+          end
+        },
+        n = {
+          ["n"] = require('telescope.actions').move_selection_next,
+          ["e"] = require('telescope.actions').move_selection_previous,
+        }
+      },
       vimgrep_arguments = {
         "rg",
         "--color=never",
@@ -165,21 +206,12 @@ function M.config()
         -- the default case_mode is "smart_case"
       }
     },
-    mappings = {
-      i = {
-        ["<cr>"] = function(prompt_bufnr)
-          require('telescope.actions').select_default(prompt_bufnr)
-          -- vim.cmd[[normal! zv]]
-          vim.cmd [[echom "telescope hello"]]
-        end
-      }
-    },
   }
 
   telescope.setup(options)
 
   local extensions = {
-    "bookmarks", "neoclip", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf"
+    "bookmarks", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf"
   }
   for _, ext in ipairs(extensions) do telescope.load_extension(ext) end
 end

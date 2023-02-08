@@ -156,9 +156,14 @@ local plugins = {
   -- file managing , picker etc
   {
     'ThePrimeagen/harpoon',
+    keys = {
+      { "<leader>ma", "<cmd>lua require('harpoon.mark').add_file()<cr>", desc = "harpoon add" },
+      { "<leader>mt", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", desc = "harpoon toggle" },
+    },
   },
   {
-    "tversteeg/registers.nvim"
+    "tversteeg/registers.nvim",
+    enabled = false,
   },
   {
     "rrethy/vim-hexokinase",

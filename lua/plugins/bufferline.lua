@@ -1,5 +1,6 @@
 local M = {
   "akinsho/bufferline.nvim",
+  enabled = false,
   event = 'VimEnter',
   init = function()
     local map = require("core.utils").map
@@ -11,8 +12,7 @@ local M = {
 
 function M.config()
   local map = require("core.utils").map
-  bufferline = require"bufferline"
-  bufferline.setup {
+  require"bufferline".setup({
     options = {
       numbers = "ordinal",
       offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
@@ -51,7 +51,7 @@ function M.config()
         end
       end,
     },
-  }
+  })
 
   map('n','<leader>0','<cmd>lua require("bufferline").go_to_buffer(-1, true)<cr>')
   map('n','<leader>1','<cmd>lua require("bufferline").go_to_buffer(1, true)<cr>')

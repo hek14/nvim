@@ -4,6 +4,7 @@ local M = {}
 M.config = {
   kitty_export_path = os.getenv "HOME" .. "/.config/kitty/",
   wezterm_export_path = os.getenv "HOME" .. "/.config/wezterm/colors/",
+  alacritty_export_path = os.getenv "HOME" .. "/.config/alacritty/"
 }
 
 M.export_colors_to_kitty = function()
@@ -29,6 +30,41 @@ M.export_colors_to_kitty = function()
       end
     end
   end
+  io.close(file)
+  print("Colors exported to " .. filename)
+end
+
+M.export_colors_to_alacritty = function()
+  local fn = vim.fn
+  local filename = M.config.alacritty_export_path .. "nvim_export.yml"
+  local file = io.open(filename, "w")
+  io.output(file)
+  io.write("# vim:ft=alacritty" .. "\n\n")
+  io.write("# exported from " .. vim.g.colors_name .. "\n\n")
+  local fg = fn.synIDattr(fn.hlID "Normal", "fg")
+  local bg = fn.synIDattr(fn.hlID "Normal", "bg")
+  io.write("colrs:\n")
+  io.write("  primary:\n")
+  io.write("    background: '" .. bg .. "'\n")
+  io.write("    foreground: '" .. fg .. "'\n")
+  io.write("  normal:\n")
+  io.write("    black: '" ..     fn.eval("g:terminal_color_0") .. "'\n")
+  io.write("    red: '" ..       fn.eval("g:terminal_color_1") .. "'\n")
+  io.write("    green: '" ..     fn.eval("g:terminal_color_2") .. "'\n")
+  io.write("    yellow: '" ..    fn.eval("g:terminal_color_3") .. "'\n")
+  io.write("    blue: '" ..      fn.eval("g:terminal_color_4") .. "'\n")
+  io.write("    magenta: '" ..   fn.eval("g:terminal_color_5") .. "'\n")
+  io.write("    cyan: '" ..      fn.eval("g:terminal_color_6") .. "'\n")
+  io.write("    white: '" ..     fn.eval("g:terminal_color_7") .. "'\n")
+  io.write("  bright:\n")
+  io.write("    black: '" ..     fn.eval("g:terminal_color_8") .. "'\n")
+  io.write("    red: '" ..       fn.eval("g:terminal_color_9") .. "'\n")
+  io.write("    green: '" ..     fn.eval("g:terminal_color_10") .. "'\n")
+  io.write("    yellow: '" ..    fn.eval("g:terminal_color_11") .. "'\n")
+  io.write("    blue: '" ..      fn.eval("g:terminal_color_12") .. "'\n")
+  io.write("    magenta: '" ..   fn.eval("g:terminal_color_13") .. "'\n")
+  io.write("    cyan: '" ..      fn.eval("g:terminal_color_14") .. "'\n")
+  io.write("    white: '" ..     fn.eval("g:terminal_color_15") .. "'\n")
   io.close(file)
   print("Colors exported to " .. filename)
 end

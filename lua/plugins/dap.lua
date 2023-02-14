@@ -7,7 +7,7 @@ local M = {
     "rcarriga/nvim-dap-ui",
   },
   keys = {
-    { '<leader>b', ':lua require"dap".toggle_breakpoint()<CR>' },
+    -- { '<leader>b', ':lua require"dap".toggle_breakpoint()<CR>' },
     { '<leader>B', ":lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>" },
     { '<leader>lp',":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>" },
     { '<F12>', ':lua require"dap".step_out()<CR>' },

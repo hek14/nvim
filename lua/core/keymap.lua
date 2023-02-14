@@ -145,6 +145,9 @@ local function others()
   map('i','<C-x><C-g>','<Cmd>lua require("contrib.treesitter.python").fast_init_class()<CR>')
   map('n','<leader>dt','<Cmd>lua require("contrib.my_diagnostic").toggle_line_diagnostic()<CR>')
 
+  map("n", {"<TAB>","]b"}, ":bn<CR>")
+  map("n", {"<S-Tab>","[b"}, ":bp<CR>")
+
   vim.cmd([[
   function! Cabbrev(key, value) abort
   execute printf('cabbrev <expr> %s (getcmdtype() == ":" && getcmdpos() <= %d) ? %s : %s',
@@ -155,27 +158,19 @@ local function others()
   return "'" . substitute(copy(a:str), "'", "''", 'g') . "'"
   endfunction
 
-  call Cabbrev('pi', 'PackerInstall')
-  call Cabbrev('pud', 'PackerUpdate')
-  call Cabbrev('pc', 'PackerCompile')
-  call Cabbrev('ps', 'PackerSync')
+  call Cabbrev('LI', 'Lazy install')
+  call Cabbrev('LU', 'Lazy update')
+  call Cabbrev('LS', 'Lazy sync')
+  call Cabbrev('LP', 'Lazy profile')
+  call Cabbrev('LC', 'Lazy clean')
   call Cabbrev('li', 'let i =1 \|')
-  call Cabbrev('py', 'PYTHON')
   call Cabbrev('lg', 'Lazygit')
-  call Cabbrev('ft', 'FloatermNew')
   xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
   function! ExecuteMacroOverVisualRange()
   echo "@".getcmdline()
   execute ":'<,'>normal @".nr2char(getchar())
   endfunction
   ]])
-  -- Add Packer commands because we are not loading it at startup
-  cmd "silent! command! PackerClean lua require 'plugins' require('packer').clean()"
-  cmd "silent! command! PackerCompile lua require 'plugins' require('packer').compile()"
-  cmd "silent! command! PackerInstall lua require 'plugins' require('packer').install()"
-  cmd "silent! command! PackerStatus lua require 'plugins' require('packer').status()"
-  cmd "silent! command! PackerSync lua require 'plugins' require('packer').sync()"
-  cmd "silent! command! PackerUpdate lua require 'plugins' require('packer').update()"
 end
 
 others()

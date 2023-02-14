@@ -1,5 +1,5 @@
 local plugins = {
-  { "nvim-lua/plenary.nvim" },
+  { "nvim-lua/plenary.nvim" , lazy = false },
   { "nvim-tree/nvim-web-devicons" },
   {
     'RRethy/vim-tranquille',
@@ -7,6 +7,22 @@ local plugins = {
     config = function ()
       require('core.utils').map('n','g/','<Plug>(tranquille_search)',{ noremap = true, silent = true }) 
     end
+  },
+  {
+    "lmburns/lf.nvim",
+    cmd = "Lf",
+    dependencies = { "nvim-lua/plenary.nvim", "akinsho/toggleterm.nvim" },
+    opts = {
+      winblend = 0,
+      highlights = { NormalFloat = { guibg = "NONE" } },
+      border = "double", -- border kind: single double shadow curved
+      height = 0.70,
+      width = 0.85,
+      escape_quit = true,
+    },
+    keys = {
+      { "<cmd>Lf<cr>", desc = "lfcd" },
+    },
   },
   {
     'romgrk/barbar.nvim',
@@ -140,9 +156,14 @@ local plugins = {
   -- file managing , picker etc
   {
     'ThePrimeagen/harpoon',
+    keys = {
+      { "<leader>ma", "<cmd>lua require('harpoon.mark').add_file()<cr>", desc = "harpoon add" },
+      { "<leader>mt", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", desc = "harpoon toggle" },
+    },
   },
   {
-    "tversteeg/registers.nvim"
+    "tversteeg/registers.nvim",
+    enabled = false,
   },
   {
     "rrethy/vim-hexokinase",
@@ -473,12 +494,13 @@ local plugins = {
         cmd = 'DiffviewOpen',
         dependencies = 'nvim-lua/plenary.nvim',
       },
-      {
-        "nvim-pack/nvim-spectre",
-        lazy = false,
-        config = function ()
+      {                                                                
+        "nvim-pack/nvim-spectre",                                      
+        -- NOTE: to make this work, you should have `gsed` in the $PATH `ln -s ~/.nix-profile/bin/sed ~/.local/bin/gsed`
+        lazy = false,                                                  
+        config = function ()                                           
           require("spectre").setup({ replace_engine = { sed = { cmd = "sed" } } })
-          local map = require("core.utils").map
+          local map = require("core.utils").map                        
           map("n","<leader>S","<cmd>lua require('spectre').open()<CR>")
           map("n","<leader>sc","<cmd>lua require('spectre').open_file_search()<CR>")
           map("n","<leader>sw","<cmd>lua require('spectre').open_visual({select_word=true})<CR>")

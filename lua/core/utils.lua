@@ -153,6 +153,27 @@ M.clear_cmdline = function()
   end, 0)
 end
 
+function M.termcode(str)
+  return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
+
+function M.read_json_file(filename)
+  local Path = require 'plenary.path'
+
+  local path = Path:new(filename)
+  if not path:exists() then
+    return nil
+  end
+
+  local json_contents = path:read()
+  local json = vim.fn.json_decode(json_contents)
+
+  return json
+end
+
+function M.read_package_json()
+  return M.read_json_file 'package.json'
+end
 -- clear last echo using feedkeys (this is a bit hacky)
 M.clear_last_echo = function()
   -- wrap this with inputsave and inputrestore just in case

@@ -70,12 +70,13 @@ https://www.nerdfonts.com/font-downloads
 2. https://github.com/lucasvianav/nvim: nice hacking about lspconfig handlers
 3. https://github.com/leaxoy/v
 4. https://github.com/glepnir/nvim.git
-5. https://github.com/ziontee113/nvim-config -- nice youtube vlog
+5. https://github.com/ziontee113/nvim-config: nice youtube vlog
 6. https://github.com/s1n7ax/dotnvim: Power of LuaSnip with TreeSitter in Neovim
 7. https://github.com/folke/dot/tree/master/config/nvim
 8. https://github.com/williamboman/nvim-config: the author of mason.nvim
 9. https://github.com/adoyle-h
-10. https://github.com/JoosepAlviste/dotfiles -- nice customizaion about telescope live_grep
+10. https://github.com/JoosepAlviste/dotfiles: nice customizaion about telescope live_grep
+11. https://github.com/joshmedeski/dotfiles: yabai,skhd,alacritty,tmux
 
 # refer to useful plugins
 1. https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
@@ -85,12 +86,16 @@ https://www.nerdfonts.com/font-downloads
 5. https://github.com/williamboman/mason.nvim: a all-in-one lsp-installer and dap-installer
 6. https://github.com/stevearc/overseer.nvim: yet another task manager
 7. themes: https://alpha2phi.medium.com/12-neovim-themes-with-tree-sitter-support-8be320b683a4
+8. https://github.com/cshuaimin/ssr.nvim: Structural search and replace for Neovim
 
 # refer to other resources
 1. jesse19skelton
 - https://www.youtube.com/@jesse19skelton -- nice videos about karabiner and  yabai [his github]()
 - https://www.youtube.com/watch?v=JL1lz77YbUE&ab_channel=JesseSkelton
 - https://www.notion.so/Yabai-8da3b829872d432fac43181b7ff628fc
+
+2. s1n7ax
+https://www.youtube.com/@s1n7ax/videos
 
 
 # for pyright completion stubs

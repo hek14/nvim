@@ -14,11 +14,11 @@ au("TermOpen",{
   pattern="term://*",
 })
 -- Don't show status line on certain windows
-au({"BufEnter","BufRead","BufWinEnter","FileType","WinEnter"},{
-  callback = function ()
-    require("core.utils").hide_statusline()
-  end,
-})
+-- au({"BufEnter","BufRead","BufWinEnter","FileType","WinEnter"},{
+--   callback = function ()
+--     require("core.utils").hide_statusline()
+--   end,
+-- })
 au("BufReadPost",{
   command=[[ if expand('%:p') !~# '\m/\.git/' && line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif ]],
 })

@@ -21,6 +21,8 @@ end
 
 local inactive_winbar = function ()
   local filename = vim.fn.expand('%:p')
+  local home = vim.fn.expand("$HOME") .. '/'
+  filename = string.gsub(filename, home, '')
   return filename
 end
 

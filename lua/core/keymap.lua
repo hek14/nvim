@@ -145,6 +145,9 @@ local function others()
   map('i','<C-x><C-g>','<Cmd>lua require("contrib.treesitter.python").fast_init_class()<CR>')
   map('n','<leader>dt','<Cmd>lua require("contrib.my_diagnostic").toggle_line_diagnostic()<CR>')
 
+  map("n", {"<TAB>","]b"}, ":bn<CR>")
+  map("n", {"<S-Tab>","[b"}, ":bp<CR>")
+
   vim.cmd([[
   function! Cabbrev(key, value) abort
   execute printf('cabbrev <expr> %s (getcmdtype() == ":" && getcmdpos() <= %d) ? %s : %s',

@@ -94,6 +94,9 @@ https://www.nerdfonts.com/font-downloads
 - https://www.youtube.com/watch?v=JL1lz77YbUE&ab_channel=JesseSkelton
 - https://www.notion.so/Yabai-8da3b829872d432fac43181b7ff628fc
 
+2. s1n7ax
+https://www.youtube.com/@s1n7ax/videos
+
 
 # for pyright completion stubs
 https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs

@@ -6,7 +6,7 @@
 
 local M = {
   "neovim/nvim-lspconfig",
-  event = "BufReadPre",
+  event = "BufRead",
   dependencies = {
     "jose-elias-alvarez/null-ls.nvim",
     "j-hui/fidget.nvim",

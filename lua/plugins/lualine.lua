@@ -46,7 +46,26 @@ M.config = function ()
     sections = {
       lualine_a = {'mode'},
       lualine_b = {'branch', 'diff', 'diagnostics'},
-      lualine_c = {},
+      lualine_c = {
+        {
+          'buffers',
+          show_modified_status = true, -- Shows indicator when the buffer is modified.
+          mode = 4,
+          -- 0: Shows buffer name
+          -- 1: Shows buffer index
+          -- 2: Shows buffer name + buffer index
+          -- 3: Shows buffer number
+          -- 4: Shows buffer name + buffer number
+          max_length = vim.o.columns * 2 / 3, -- Maximum width of buffers component,
+          -- it can also be a function that returns
+          -- the value of `max_length` dynamically.
+          symbols = {
+            modified = ' ●',      -- Text to show when the buffer is modified
+            alternate_file = '#', -- Text to show to identify the alternate file
+            directory =  '',     -- Text to show when the buffer is a directory
+          },
+        }
+      },
       lualine_x = {'filetype'},
       lualine_y = {'progress'},
       lualine_z = {'location'}

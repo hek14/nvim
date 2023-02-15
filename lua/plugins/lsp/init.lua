@@ -110,7 +110,7 @@ function M.config()
   capabilities.offsetEncoding = { "utf-16" }
 
   local on_attach = function(client, bufnr)
-    -- if vim.tbl_contains({"pyright", "sumneko_lua"}, client.name) then
+    -- if vim.tbl_contains({"pyright", "lua_ls"}, client.name) then
     --   client.server_capabilities.document_formatting = false
     -- end
     -- client.server_capabilities.document_formatting = true
@@ -142,14 +142,14 @@ function M.config()
   require("mason").setup()
   require("mason-lspconfig").setup({
     automatic_installation = true,
-    ensure_installed = {'sumneko_lua','pyright', 'jsonls'}, -- ruff_lsp not needed, use ruff with null-ls instead
+    ensure_installed = {'lua_ls','pyright', 'jsonls'}, -- ruff_lsp not needed, use ruff with null-ls instead
   })
 
   require("mason-lspconfig").setup_handlers({
     function (server_name) -- the default one
        require("lspconfig")[server_name].setup(options)
     end,
-    ["sumneko_lua"] = function ()
+    ["lua_ls"] = function ()
       local opt = {
         settings = {
           single_file_support = true,
@@ -162,7 +162,7 @@ function M.config()
         }
       }
       opt = vim.tbl_deep_extend('force',options,opt)
-      require("lspconfig").sumneko_lua.setup(opt)
+      require("lspconfig").lua_ls.setup(opt)
     end,
     ["pyright"] = function ()
       local opt = {

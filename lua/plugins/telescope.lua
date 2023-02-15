@@ -1,6 +1,7 @@
 local map = require("core.utils").map
 local M = {
   "nvim-telescope/telescope.nvim",
+  lazy = true,
   dependencies = {
     {
       "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
@@ -68,24 +69,20 @@ local M = {
       { "nvim-telescope/telescope-file-browser.nvim" },
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
     },
-  lazy = false,
-  init = function()
-    map("n", "<leader>b", ":Telescope buffers <CR>")
-    map("n", "<leader>ff",
-      ":Telescope find_files find_command=rg,--ignore-file=" ..
-      vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>")
-    map("n", "<leader>fa", ":Telescope find_files follow=true no_ignore=true hidden=true <CR>")
-    map("n", "<leader>fg", ":Telescope git_commits <CR>")
-    map("n", "<leader>gs", ":Telescope git_status <CR>")
-    map("n", "<leader>fh", ":Telescope help_tags <CR>")
-    map("n", "<leader>fo", ":Telescope oldfiles <CR>")
-    map("n", "<leader>fd", ":Telescope dotfiles <CR>")
-    map("n", "<leader>fr", "<cmd>lua require('telescope.builtin').resume()<CR>")
-    map("n", '<leader>fs', '<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>')
+  keys = {
+    { "<leader>b", ":Telescope buffers <CR>" },
+    { "<leader>ff", ":Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>" },
+    { "<leader>fa", ":Telescope find_files follow=true no_ignore=true hidden=true <CR>" },
+    { "<leader>fg", ":Telescope git_commits <CR>" },
+    { "<leader>gs", ":Telescope git_status <CR>" },
+    { "<leader>fh", ":Telescope help_tags <CR>" },
+    { "<leader>fo", ":Telescope oldfiles <CR>" },
+    { "<leader>fd", ":Telescope dotfiles <CR>" },
+    { "<leader>fr", "<cmd>lua require('telescope.builtin').resume()<CR>" },
+    { '<leader>fs', '<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>' },
     -- if you want to grep only in opened buffers: lua require('telescope.builtin').live_grep({grep_open_files=true})
-    -- pick a hidden term
-    map("n", "<leader>f/", ":lua require('core.utils').grep_last_search()<CR>")
-  end,
+    { "<leader>f/", ":lua require('core.utils').grep_last_search()<CR>" },
+  }
 }
 
 function M.config()
@@ -104,7 +101,10 @@ function M.config()
 
   local options = {
     pickers = {
-      buffers = fixfolds,
+      buffers = {
+        ignore_current_buffer = true,
+        sort_lastused = true,
+      },
       file_browser = fixfolds,
       find_files = fixfolds,
       git_files = fixfolds,

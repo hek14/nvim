@@ -454,7 +454,6 @@ function M.next_highlight(direction)
     end
   end
 
-  vim.pretty_print("jump to: ",to_jump)
   if to_jump~=nil then
     vim.cmd("normal! m'")
     vim.api.nvim_win_set_cursor(0,{to_jump.line+1,to_jump.character})

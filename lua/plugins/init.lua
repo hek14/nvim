@@ -580,6 +580,7 @@ if is_mac then
     { "kdheepak/cmp-latex-symbols"},
     {
       "lervag/vimtex",
+      ft = 'tex',
       init = function()
         vim.g.vimtex_motion_enabled = 0
       end,

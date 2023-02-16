@@ -26,9 +26,11 @@ local plugins = {
   },
   {
     'romgrk/barbar.nvim',
-    event = 'BufRead',
+    event = 'VeryLazy',
     config = function ()
-      require'bufferline'.setup {}
+      require'bufferline'.setup({
+        icons = 'numbers'
+      })
       local map = require("core.utils").map
       map('n', '<leader>1', '<Cmd>BufferGoto 1<CR>')
       map('n', '<leader>2', '<Cmd>BufferGoto 2<CR>')

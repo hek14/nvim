@@ -50,7 +50,7 @@ end
 
 local function echo(hlgroup, msg)
   vim.cmd(fmt('echohl %s', hlgroup))
-  vim.cmd(fmt('echo "[PIG] %s"', msg))
+  vim.cmd(fmt('echo "[my_document_highlight] %s"', msg))
   vim.cmd('echohl None')
 end
 
@@ -213,6 +213,11 @@ local function my_buf_highlight_references(bufnr, _references)
   local color_used_write = fmt('kk_highlight_%s_write',math.fmod(color_index,#colors) + 1)
   local color_used_read = fmt('kk_highlight_%s_read',math.fmod(color_index,#colors) + 1)
   color_index = color_index + 1
+  if reference_mark_group[bufnr]==nil then
+    vim.pretty_print(reference_mark_group)
+    error("reference_mark_group")
+    return
+  end
   reference_mark_group[bufnr][ns] = {}
 
   local crow, ccol = unpack(vim.api.nvim_win_get_cursor(0))

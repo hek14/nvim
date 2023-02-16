@@ -2,6 +2,13 @@ local plugins = {
   { "nvim-lua/plenary.nvim" , lazy = false },
   { "nvim-tree/nvim-web-devicons" },
   {
+    "norcalli/nvim-colorizer.lua",
+    event = "BufEnter",
+    config = function ()
+      require'colorizer'.setup()
+    end
+  },
+  {
     'RRethy/vim-tranquille',
     lazy = false, 
     config = function ()
@@ -26,6 +33,7 @@ local plugins = {
   },
   {
     'romgrk/barbar.nvim',
+    enabled = false,
     event = 'VeryLazy',
     config = function ()
       require'bufferline'.setup({

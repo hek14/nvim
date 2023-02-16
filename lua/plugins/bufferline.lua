@@ -1,6 +1,5 @@
 local M = {
   "akinsho/bufferline.nvim",
-  enabled = false,
   event = 'VimEnter',
   init = function()
     local map = require("core.utils").map

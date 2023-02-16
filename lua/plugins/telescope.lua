@@ -1,6 +1,21 @@
 local map = require("core.utils").map
 local M = {
   "nvim-telescope/telescope.nvim",
+  cmd = "Telescope",
+  keys = {
+    { "<leader>b", "<cmd>Telescope buffers<CR>" },
+    { "<leader>ff", "<cmd>Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>" },
+    { "<leader>fa", "<cmd>Telescope find_files follow=true no_ignore=true hidden=true<CR>" },
+    { "<leader>fg", "<cmd>Telescope git_commits<CR>" },
+    { "<leader>gs", "<cmd>Telescope git_status<CR>" },
+    { "<leader>fh", "<cmd>Telescope help_tags<CR>" },
+    { "<leader>fo", "<cmd>Telescope oldfiles<CR>" },
+    { "<leader>fd", "<cmd>Telescope dotfiles<CR>" },
+    { "<leader>fr", "<cmd>lua require('telescope.builtin').resume()<CR>" },
+    { '<leader>fs', '<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>' },
+    -- if you want to grep only in opened buffers<cmd> lua require('telescope.builtin').live_grep({grep_open_files=true})
+    { "<leader>f/", "<cmd>lua require('core.utils').grep_last_search()<CR>" },
+  },
   dependencies = {
     {
       "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
@@ -8,7 +23,7 @@ local M = {
     {
       'nvim-telescope/telescope-live-grep-args.nvim',
       config = function()
-        -- require("core.utils").map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>')
+        -- map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>')
       end
     },
     {
@@ -42,14 +57,13 @@ local M = {
               }
             }}
           })
-          local map = require("core.utils").map
           map("i","<C-x><C-p>","<cmd>lua require('telescope').extensions.neoclip.default()<CR>")
         end,
       },
       {
         "jvgrootveld/telescope-zoxide",
         init = function()
-          require("core.utils").map("n", "<leader>z", ":Telescope zoxide list<CR>")
+          map("n", "<leader>z", ":Telescope zoxide list<CR>")
         end,
         config = function()
           require("telescope._extensions.zoxide.config").setup({
@@ -68,24 +82,6 @@ local M = {
       { "nvim-telescope/telescope-file-browser.nvim" },
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
     },
-  lazy = false,
-  init = function()
-    map("n", "<leader>b", ":Telescope buffers <CR>")
-    map("n", "<leader>ff",
-      ":Telescope find_files find_command=rg,--ignore-file=" ..
-      vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>")
-    map("n", "<leader>fa", ":Telescope find_files follow=true no_ignore=true hidden=true <CR>")
-    map("n", "<leader>fg", ":Telescope git_commits <CR>")
-    map("n", "<leader>gs", ":Telescope git_status <CR>")
-    map("n", "<leader>fh", ":Telescope help_tags <CR>")
-    map("n", "<leader>fo", ":Telescope oldfiles <CR>")
-    map("n", "<leader>fd", ":Telescope dotfiles <CR>")
-    map("n", "<leader>fr", "<cmd>lua require('telescope.builtin').resume()<CR>")
-    map("n", '<leader>fs', '<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>')
-    -- if you want to grep only in opened buffers: lua require('telescope.builtin').live_grep({grep_open_files=true})
-    -- pick a hidden term
-    map("n", "<leader>f/", ":lua require('core.utils').grep_last_search()<CR>")
-  end,
 }
 
 function M.config()
@@ -104,7 +100,10 @@ function M.config()
 
   local options = {
     pickers = {
-      buffers = fixfolds,
+      buffers = {
+        ignore_current_buffer = true,
+        sort_lastused = true,
+      },
       file_browser = fixfolds,
       find_files = fixfolds,
       git_files = fixfolds,
@@ -209,7 +208,6 @@ function M.config()
   }
 
   telescope.setup(options)
-
   local extensions = {
     "bookmarks", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf"
   }

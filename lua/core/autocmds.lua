@@ -36,6 +36,12 @@ au("FileType",{
   command= 'if expand("%:t")=="pose.txt" | set ro | endif'
 })
 
+au("VimEnter",{
+  callback = function()
+    require("contrib.winbar").create_winbar()
+  end
+})
+
 -- VimEnter event: just like ~/.config/nvim/after/plugin
 -- group: set {clear = true} will make sure that the autocmds will be hooked only once.
 local function setup_term()

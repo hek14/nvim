@@ -68,7 +68,7 @@ https://www.nerdfonts.com/font-downloads
 # refer to following dotfiles:
 1. https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
 2. https://github.com/lucasvianav/nvim: nice hacking about lspconfig handlers
-3. https://github.com/leaxoy/v
+3. https://github.com/leaxoy/dotfiles/tree/main/.config/nvim
 4. https://github.com/glepnir/nvim.git
 5. https://github.com/ziontee113/nvim-config: nice youtube vlog
 6. https://github.com/s1n7ax/dotnvim: Power of LuaSnip with TreeSitter in Neovim

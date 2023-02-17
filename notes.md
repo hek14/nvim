@@ -127,3 +127,4 @@ https://teukka.tech/posts/2020-01-07-vimloop/
 # TODO: 
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
+- consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree

@@ -32,6 +32,13 @@ local plugins = {
     },
   },
   {
+    "utilyre/barbecue.nvim",
+    dependencies = { 'hek14/nvim-navic', 'nvim-tree/nvim-web-devicons' },
+    name = "barbecue",
+    event = 'BufRead',
+    opts = {},
+  },
+  {
     'romgrk/barbar.nvim',
     enabled = false,
     event = 'VeryLazy',
@@ -120,10 +127,10 @@ local plugins = {
   },
   {
     "hek14/vim-illuminate",
+    event = "BufRead",
     config = function ()
       vim.g.Illuminate_delay = 17
-    end,
-    event = "BufRead"
+    end
   },
   {
     "andymass/vim-matchup",
@@ -564,7 +571,7 @@ local plugins = {
       },
       {
         "ghillb/cybu.nvim",
-        branch = "main",
+        lazy = false,
         config = function()
           local ok, cybu = pcall(require, "cybu")
           if not ok then
@@ -577,9 +584,11 @@ local plugins = {
       },
       {
         "habamax/vim-winlayout",
+        lazy = false,
+        enabled = false,
         config = function()
           require('core.utils').map("n", ",,", "<Plug>(WinlayoutBackward)",{})
-          require('core.utils').map("n", ",.", "<Plug>(WinlayoutBackward)",{})
+          require('core.utils').map("n", "..", "<Plug>(WinlayoutForward)",{})
         end
       }
 }

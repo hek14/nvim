@@ -45,7 +45,7 @@ local M = {
             end
         }, {
             "David-Kunz/treesitter-unit",
-            enabled = false,
+            enabled = true,
             config = function()
                 require"treesitter-unit".enable_highlighting()
                 local map = require("core.utils").map

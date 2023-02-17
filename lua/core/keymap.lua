@@ -107,7 +107,7 @@ local function others()
   map("n", "<M-c>", ":%y+ <CR>") -- copy whole file content
   map("n", "<S-t>", ":enew <CR>") -- new buffer
   map("n", "<C-t>b", ":tabnew <CR>") -- new tabs
-  map("n", "<leader>n", ":set nu! <CR>")
+  -- map("n", "<leader>n", ":set nu! <CR>")
   map("n", "<leader>rn", ":set rnu! <CR>") -- relative line numbers
   map("n", "<C-s>", ":w! <CR>") -- ctrl + s to save file
 

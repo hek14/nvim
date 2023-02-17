@@ -11,11 +11,12 @@ au("FileType",{
   command='if expand("%:t")=="pose.txt" | set ro | endif'
 })
 
-au("VimEnter",{
-  callback = function()
-    require("contrib.winbar").create_winbar()
-  end
-})
+-- NOTE: use utilyre/barbecue.nvim instead
+-- au("VimEnter",{
+--   callback = function()
+--     require("contrib.winbar").create_winbar()
+--   end
+-- })
 au("BufRead",{command="set foldlevel=99"})
 
 -- -- how to find which pattern triggeres the autocmd? example here:

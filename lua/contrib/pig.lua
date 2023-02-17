@@ -24,6 +24,8 @@ local rename_lines = {}
 local ref_lines = {}
 local file_lines = {}
 local au_group = vim.api.nvim_create_augroup("PIG",{clear=true})
+local profile_start = nil
+local profile_time = nil
 
 local function echo(hlgroup, msg)
   cmd(fmt('echohl %s', hlgroup))
@@ -352,6 +354,8 @@ M.next_ref_handler = function(label, result, ctx, config)
   end
   vim.cmd('normal! m`')
   vim.api.nvim_win_set_cursor(0, {sorted_locations[target].range.start.line + 1, sorted_locations[target].range.start.character})
+  profile_time = (vim.loop.hrtime() - profile_start) / 1000000
+  print(fmt("[PIG] next_ref spent %s",profile_time))
   return true
 end
 
@@ -510,6 +514,8 @@ M.location_handler = function(label, result, ctx, config)
   for _, loc in ipairs(ref_lines) do
     vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"Visual",loc.line,loc.start_col,loc.end_col)
   end
+  profile_time = (vim.loop.hrtime() - profile_start) / 1000000
+  print(fmt("[PIG] location spent %s",profile_time))
 end
 
 M.open_split = function(direction,ctx)
@@ -602,6 +608,7 @@ M.async_fn = function(args)
   local timer = vim.loop.new_timer()
   timers[bufnr] = timer
   timer:start(10,0,vim.schedule_wrap(function ()
+    profile_start = vim.loop.hrtime()
     local methods = {
       definition = 'textDocument/definition',
       reference = 'textDocument/references',

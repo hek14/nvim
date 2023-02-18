@@ -3,14 +3,14 @@ local M = {
   cmd = { "NvimTreeToggle", "NvimTreeFocus" },
   init = function()
     local map = require("core.utils").map
-    map("n", "<C-x>e", "<Cmd>NvimTreeToggle<CR>")
+    map("n", ",e", "<Cmd>NvimTreeToggle<CR>")
   end,
   config = function()
     require("nvim-tree").setup({
       view = {
         width = 50,
         mappings = {
-          custom_only = true,
+          custom_only = true, -- disable the default keymaps
           list = {
             { key = { "<CR>", "o", "<2-LeftMouse>" }, action = "edit" },
             { key = "<C-e>",                          action = "edit_in_place" },

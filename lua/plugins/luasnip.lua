@@ -1,6 +1,7 @@
 -- NOTE:refer to https://www.youtube.com/watch?v=ub0REXjhpmk
 local M = {
   "L3MON4D3/LuaSnip",
+  event = 'InsertEnter'
 }
 function M.config()
   local luasnip = require"luasnip"
@@ -15,7 +16,10 @@ function M.config()
     updateevents = "TextChanged,TextChangedI",
   }
 
-  require("luasnip/loaders/from_vscode").load()
+  local au = require("core.autocmds").au
+  au("InsertEnter", function()
+    require("luasnip/loaders/from_vscode").lazy_load()
+  end)
   require('luasnip.loaders.from_lua').lazy_load({ paths = vim.fn.stdpath('config') .. '/snippets' })
 
   -- <c-j> is my expansion key

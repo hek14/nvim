@@ -12,6 +12,7 @@ local M = {
     { "<leader>fo", "<cmd>Telescope oldfiles<CR>" },
     { "<leader>fd", "<cmd>Telescope dotfiles<CR>" },
     { "<leader>fr", "<cmd>lua require('telescope.builtin').resume()<CR>" },
+    { "<leader>fm", "<cmd>lua require('telescope.builtin').keymaps()<CR>" },
     { '<leader>fs', '<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>' },
     -- if you want to grep only in opened buffers<cmd> lua require('telescope.builtin').live_grep({grep_open_files=true})
     { "<leader>f/", "<cmd>lua require('core.utils').grep_last_search()<CR>" },

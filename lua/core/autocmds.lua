@@ -1,26 +1,31 @@
 local M = {}
 local map = require("core.utils").map
 local group = vim.api.nvim_create_augroup("KK",{clear=true}) -- {clear = true} will make sure that the autocmds will be hooked only once.
-local au = function(event,opt)
-  local merged_opts = vim.tbl_extend('force',{group=group},opt or {})
+M.au = function(event,opt)
+  if type(opt) == 'string' then
+    opt = {command = opt}
+  elseif type(opt) == 'function' then
+    opt = {callback = opt}
+  end
+  local merged_opts = vim.tbl_extend('force',{group=group},opt)
   vim.api.nvim_create_autocmd(event,merged_opts)
 end
 
-au("FileType",{
+M.au("FileType",{
   pattern='txt',
   command='if expand("%:t")=="pose.txt" | set ro | endif'
 })
 
 -- NOTE: use utilyre/barbecue.nvim instead
--- au("VimEnter",{
+-- M.au("VimEnter",{
 --   callback = function()
 --     require("contrib.winbar").create_winbar()
 --   end
 -- })
-au("BufRead",{command="set foldlevel=99"})
+M.au("BufRead",{command="set foldlevel=99"})
 
 -- -- how to find which pattern triggeres the autocmd? example here:
--- au("FileType",{,pattern="*",callback = function ()
+-- M.au("FileType",{,pattern="*",callback = function ()
 --   local data = {
 --     buf = vim.fn.expand('<abuf>'),
 --     file = vim.fn.expand('<afile>'),
@@ -29,16 +34,16 @@ au("BufRead",{command="set foldlevel=99"})
 -- end})
 
 local function setup_terminal()
-  au("TermOpen",{
+  M.au("TermOpen",{
     command=[[ setlocal nonumber norelativenumber | setfiletype terminal ]],
     pattern="term://*",
   })
 
-  au("FileType",{
+  M.au("FileType",{
     pattern = {"terminal","nvimgdb"},
     callback = function ()
       local buf = vim.api.nvim_get_current_buf()
-      au("BufEnter",{
+      M.au("BufEnter",{
         callback = function ()
           vim.cmd [[startinsert]]
           map('n','cc', 'a<C-u>',{buffer=true})
@@ -50,7 +55,7 @@ local function setup_terminal()
         end,
         buffer = buf
       })
-      au("BufLeave",{
+      M.au("BufLeave",{
         callback=function ()
           vim.cmd [[stopinsert]]
         end,
@@ -62,13 +67,13 @@ local function setup_terminal()
 end
 setup_terminal()
 
-au("BufReadPost",{callback=function ()
+M.au("BufReadPost",{callback=function ()
   if vim.fn.line("'\"")>0 and vim.fn.line("'\"")<=vim.fn.line("$") then
     vim.cmd [[ exe "normal! g`\"" ]]
   end
 end,desc="Return to last edit position when opening files (You want this!)"})
 
-au("BufNew",{callback=function ()
+M.au("BufNew",{callback=function ()
   if vim.bo.ft~='TelescopePrompt' and
     string.match(vim.bo.buftype,[[prompt]]) 
     and vim.api.nvim_get_mode()['mode']~='i' 
@@ -97,7 +102,7 @@ _G.any_client_attached = function ()
   return attached
 end
 
--- au("FileType",{pattern='lua',callback=function()
+-- M.au("FileType",{pattern='lua',callback=function()
 --   if vim.bo.buflisted then
 --     vim.defer_fn(function()
 --       local attached_clients = any_client_attached()
@@ -115,7 +120,7 @@ end
 
 
 -- disable syntax in large file: maybe consume too much time
--- au("FileType",{callback=function ()
+-- M.au("FileType",{callback=function ()
 --   if vim.fn.wordcount()['bytes'] > 2048000 or vim.fn.line('$') > 5000 then
 --     print("syntax off")
 --     vim.cmd("setlocal syntax=off")
@@ -123,7 +128,7 @@ end
 -- end})
 
 M.ft_map = function(ft,mode,lhs,rhs,opts)
-  au('FileType',{callback=function ()
+  M.au('FileType',{callback=function ()
     local merged_opts = vim.tbl_extend('force',{buffer=true},opts or {})
     map(mode,lhs,rhs,merged_opts)
   end,

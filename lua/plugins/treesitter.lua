@@ -66,6 +66,13 @@ local M = {
 function M.config()
     ts_config = require "nvim-treesitter.configs"
     ts_config.setup {
+        ensure_installed = {"python","c","query","vim"}, -- NOTE: playground need query parser
+        playground = { enable = true },
+        query_linter = {
+          enable = true,
+          use_virtual_text = true,
+          lint_events = { "BufWrite", "CursorHold" },
+        },
         highlight = {enable = true, use_languagetree = true},
         indent = {enable = false},
         incremental_selection = {

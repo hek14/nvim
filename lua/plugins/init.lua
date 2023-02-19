@@ -220,10 +220,10 @@ local plugins = {
     end,
   },
   {
-    "hekq/surround.nvim.bak",
+    "kylechui/nvim-surround",
     event = "BufEnter",
     config = function()
-      require("surround").setup({ mappings_style = "surround" })
+      require("nvim-surround").setup()
     end,
   },
   {

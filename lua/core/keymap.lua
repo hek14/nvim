@@ -93,12 +93,10 @@ local function others()
   map("n", "<leader>j", "<Esc>:m .+1<CR>==")
   map("n", "<leader>k", "<Esc>:m .-2<CR>==")
   map("n",'<leader>tv', ":lua require('core.utils')<CR> | :lua back_to_future()<CR>")
-  -- NOTE: a good example of a senmantic mapping that need some evaluation
-  require('core.utils').map("n", "<leader>sw", function ()
-    local cword = vim.fn.expand("<cword>")
-    local cmd_str = string.format([[:<C-u>%%s/\<%s\>//g<Left><Left>]],cword)
-    return cmd_str
-  end,{expr=true})
+  require('contrib.my_sub_word') -- need v:lua.get_sub_word, NOTE:treat the underline as a separator too
+  vim.cmd [[nmap <expr> ,r ":<C-u>s/" . v:lua.get_sub_word() . "//g<Left><Left>"]]
+  map("n",'<leader>rr',require('contrib.my_better_substitute').my_better_substitute)
+  -- line line_start line_end
 
   map("s","A","<Esc>A")
   map("s","U","<Esc>i")

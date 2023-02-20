@@ -94,9 +94,14 @@ local function others()
   map("n", "<leader>j", "<Esc>:m .+1<CR>==")
   map("n", "<leader>k", "<Esc>:m .-2<CR>==")
   map("n",'<leader>tv', ":lua require('core.utils')<CR> | :lua back_to_future()<CR>")
-  require('contrib.my_sub_word') -- need v:lua.get_sub_word, NOTE:treat the underline as a separator too
-  vim.cmd [[nmap <expr> ,r ":<C-u>s/" . v:lua.get_sub_word() . "//g<Left><Left>"]]
-  vim.cmd [[nmap <expr> ,z v:lua.quick_eval() . "<Left>"]]
+  map("n",",r", function ()
+    local sub_word = require('contrib.my_sub_word').get_sub_word()
+    return ":<C-u>s/"  .. sub_word .. "//g<Left><Left>"
+  end,{expr=true,silent=false}) -- NOTE: should specify silent=false, because we need the cmdline to be appeared for <Left>
+  map("n",",z", function ()
+    local eval_name = require('core.utils').quick_eval()
+    return eval_name .. '<Left>'
+  end,{expr=true,silent=false})-- NOTE: should specify silent=false, because we need the cmdline to be appeared for <Left>
   map("n",'<leader>rr',require('contrib.my_better_substitute').my_better_substitute)
   -- line line_start line_end
 

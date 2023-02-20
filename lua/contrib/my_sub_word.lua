@@ -40,6 +40,4 @@ M.get_sub_word = function ()
   return string.sub(word,left,right)
 end
 
-_G.get_sub_word = M.get_sub_word
-
 return M

@@ -106,9 +106,13 @@ M.map = function(mode, keys, rhs, opt)
     if type(lhs)=='string' and lhs:match('|')==nil and valid_modes[sub_mode] then
       if type(rhs)=='string' then
         vim.keymap.set(sub_mode,lhs,rhs,options)
-      else
-        options.callback = rhs
-        vim.keymap.set(sub_mode,lhs,'',options)
+      else 
+        if type(rhs)=='function' and (options.expr==nil or options.expr==false) then
+          options.callback = rhs
+          vim.keymap.set(sub_mode,lhs,'',options)
+        else
+          vim.keymap.set(sub_mode,lhs,rhs,options)
+        end
       end
       return
     end
@@ -153,7 +157,7 @@ M.clear_cmdline = function()
   end, 0)
 end
 
-function _G.quick_eval()
+function M.quick_eval()
   local path = vim.fn.expand('%:p')
   local base = vim.fn.stdpath('config') .. '/lua/'
   local _start,_end = path:find(base)
@@ -164,7 +168,7 @@ function _G.quick_eval()
   local comps = string.gsub(partial,'%.lua','')
   comps = string.gsub(comps,'/','.')
   local func = vim.fn.expand("<cword>")
-  comps = string.format(':lua require("%s").%s()',comps,func)
+  comps = string.format(':lua =require("%s").%s()',comps,func)
   return comps
 end
 

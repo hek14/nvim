@@ -15,7 +15,6 @@ local where_not_loaded = function()
       break
     end
   end
-  print('not_loaded_line: ',not_loaded_line)
   if timer then
     timer:stop()
     timer:close()
@@ -41,8 +40,6 @@ local set_winbar = function ()
   if not_loaded_line then
     local cursor = vim.api.nvim_win_get_cursor(win)
     local line = cursor[1]
-    print('line: ',line)
-    print('not_loaded_line: ',not_loaded_line)
     if line < not_loaded_line then
       vim.api.nvim_set_option_value( "winbar", "Loaded", { scope = "local" })
     else

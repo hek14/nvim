@@ -66,3 +66,16 @@ vim.api.nvim_create_autocmd(
   end,
 }
 )
+
+local goto_plugin = function()
+  local plugin = vim.fn.input('Goto plugin: ')
+  local search_str = string.format([[/\c^[^a-zA-Z0-9]*\zs%s<CR>]],plugin)
+  return search_str
+end
+
+vim.keymap.set('n','g/',goto_plugin,{
+  silent = true,
+  buffer = buf,
+  noremap = true,
+  expr = true,
+})

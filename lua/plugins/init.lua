@@ -441,15 +441,37 @@ local plugins = {
         "skywind3000/asynctasks.vim",
         cmd = 'AsyncTask',
         dependencies = { 
-          { "skywind3000/asyncrun.vim", 
-          cmd = 'AsyncRun',
-          init = function ()
-            local ft_map = require("core.autocmds").ft_map
-            ft_map('python','n',',t','<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>')
-          end
+          { 
+            "skywind3000/asyncrun.vim", 
+            -- << NOTE: macros
+            -- $(VIM_FILEPATH)  - File name of current buffer with full path
+            -- $(VIM_FILENAME)  - File name of current buffer without path
+            -- $(VIM_FILEDIR)   - Full path of current buffer without the file name
+            -- $(VIM_FILEEXT)   - File extension of current buffer
+            -- $(VIM_FILENOEXT) - File name of current buffer without path and extension
+            -- $(VIM_PATHNOEXT) - Current file name with full path but without extension
+            -- $(VIM_CWD)       - Current directory
+            -- $(VIM_RELDIR)    - File path relativize to current directory
+            -- $(VIM_RELNAME)   - File name relativize to current directory 
+            -- $(VIM_ROOT)      - Project root directory
+            -- $(VIM_CWORD)     - Current word under cursor
+            -- $(VIM_CFILE)     - Current filename under cursor
+            -- $(VIM_GUI)       - Is running under gui ?
+            -- $(VIM_VERSION)   - Value of v:version
+            -- $(VIM_COLUMNS)   - How many columns in vim's screen
+            -- $(VIM_LINES)     - How many lines in vim's screen
+            -- $(VIM_SVRNAME)   - Value of v:servername for +clientserver usage
+            -- $(VIM_PRONAME)   - Name of current project root directory
+            -- $(VIM_DIRNAME)   - Name of current directory
+            -- >> END
+            dependencies = { "preservim/vimux" },
+            cmd = 'AsyncRun',
+            init = function ()
+              local ft_map = require("core.autocmds").ft_map
+              ft_map('python','n',',t','<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>')
+            end
+          },
         },
-        { "preservim/vimux" }
-      },
         init = function ()
           vim.g.asyncrun_open = 6
         end

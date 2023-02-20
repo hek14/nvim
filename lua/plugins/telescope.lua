@@ -16,14 +16,15 @@ local M = {
     { '<leader>fs', '<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>' },
     -- if you want to grep only in opened buffers<cmd> lua require('telescope.builtin').live_grep({grep_open_files=true})
     { "<leader>f/", "<cmd>lua require('core.utils').grep_last_search()<CR>" },
-    { "<leader>fw", "<Cmd>lua require('contrib.telescope_custom_pickers').live_grep()<CR>"}
+    { "<leader>fw", "<Cmd>lua require('contrib.telescope_custom_pickers').live_grep()<CR>"},
+    { "<leader>fp", "<cmd>Telescope projects<CR>"},
   },
   dependencies = {
     {
       "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
     },
     {
-      "ahmedkhalf/project.nvim"
+      "project.nvim"
     },
     {
       'nvim-telescope/telescope-live-grep-args.nvim',
@@ -86,25 +87,6 @@ local M = {
       },
       { "nvim-telescope/telescope-file-browser.nvim" },
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-      {
-        "ahmedkhalf/project.nvim",
-        init = function ()
-          map("n","<leader>fp","<cmd>Telescope projects<CR>")
-        end,
-        config = function ()
-          require("project_nvim").setup {
-            manual_mode = false,
-            detection_methods = { "pattern" }, 
-            patterns = { ".git", ".project", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "main.py", "trainer*.py"},
-            exclude_dirs = {},
-            show_hidden = false,
-            silent_chdir = true,
-            datapath = vim.fn.stdpath("data"),
-          }
-          -- NOTE: important: just change root per window
-          vim.cmd[[autocmd WinEnter * ++nested lua require("project_nvim.project").on_buf_enter()]]
-        end
-      }
     },
 }
 

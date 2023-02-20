@@ -32,7 +32,7 @@ local plugins = {
     },
   },
   {
-    "utilyre/barbecue.nvim",
+    "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
     dependencies = { 'hek14/nvim-navic', 'nvim-tree/nvim-web-devicons' },
     name = "barbecue",
     event = 'BufRead',
@@ -438,6 +438,24 @@ local plugins = {
         end
       },
       {
+        "ahmedkhalf/project.nvim",
+        name = 'project.nvim',
+        lazy = false,
+        config = function ()
+          require("project_nvim").setup {
+            manual_mode = false,
+            detection_methods = { "pattern" }, 
+            patterns = { ".git", ".project", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "main.py", "trainer*.py"},
+            exclude_dirs = {},
+            show_hidden = false,
+            silent_chdir = true,
+            datapath = vim.fn.stdpath("data"),
+          }
+          -- NOTE: important: just change root per window
+          vim.cmd[[autocmd WinEnter * ++nested lua require("project_nvim.project").on_buf_enter()]]
+        end
+      },
+      {
         "skywind3000/asynctasks.vim",
         cmd = 'AsyncTask',
         dependencies = { 
@@ -464,7 +482,12 @@ local plugins = {
             -- $(VIM_PRONAME)   - Name of current project root directory
             -- $(VIM_DIRNAME)   - Name of current directory
             -- >> END
-            dependencies = { "preservim/vimux" },
+            dependencies = { 
+              "preservim/vimux",
+              init = function()
+                vim.g.VimuxHeight = "30"
+              end
+            },
             cmd = 'AsyncRun',
             init = function ()
               local ft_map = require("core.autocmds").ft_map

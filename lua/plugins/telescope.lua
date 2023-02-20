@@ -85,7 +85,26 @@ local M = {
         end,
       },
       { "nvim-telescope/telescope-file-browser.nvim" },
-      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      {
+        "ahmedkhalf/project.nvim",
+        init = function ()
+          map("n","<leader>fp","<cmd>Telescope projects<CR>")
+        end,
+        config = function ()
+          require("project_nvim").setup {
+            manual_mode = false,
+            detection_methods = { "pattern" }, 
+            patterns = { ".git", ".project", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "main.py", "trainer*.py"},
+            exclude_dirs = {},
+            show_hidden = false,
+            silent_chdir = true,
+            datapath = vim.fn.stdpath("data"),
+          }
+          -- NOTE: important: just change root per window
+          vim.cmd[[autocmd WinEnter * ++nested lua require("project_nvim.project").on_buf_enter()]]
+        end
+      }
     },
 }
 

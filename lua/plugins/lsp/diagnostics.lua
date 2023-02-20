@@ -43,7 +43,7 @@ local function filter_rule_fn(diagnostic,old_index,symbols)
   end
 
   if diagnostic.source == "Pyright" then
-    return false -- just do not use pyright diagnostics, use ruff instead
+    return true -- just do not use pyright diagnostics, use ruff instead
     -- if symbols == nil then return true end
     -- if string.match(diagnostic.message,'.*is not accessed') then
     --   local found = nil

@@ -9,7 +9,7 @@ function M.setup(options)
     sources = {
       formatting.stylua.with({ extra_args = {"--indent-width=2"}}),
       code_actions.gitsigns,
-      diagnostics.ruff.with({  extra_args = {"--ignore=F401,F811,E501,E402,E401,F541"} }),
+      -- diagnostics.ruff.with({  extra_args = {"--ignore=F401,F811,E501,E402,E401,F541"} }),
       diagnostics.jsonlint,
     },
     -- on_attach = options.on_attach,

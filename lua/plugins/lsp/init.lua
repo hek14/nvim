@@ -62,6 +62,40 @@ local M = {
   }
 }
 
+function M.lsp_hover(_, result, ctx, config)
+    local bufnr, winnr = vim.lsp.handlers.hover(_, result, ctx, config)
+    print(string.format('bufnr:%s, winnr:%s',bufnr,winnr))
+    if bufnr and winnr then
+        vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
+        return bufnr, winnr
+    end
+end
+
+function M.lsp_signature_help(_, result, ctx, config)
+    local bufnr, winnr = vim.lsp.handlers.signature_help(_, result, ctx, config)
+
+    local current_cursor_line = vim.api.nvim_win_get_cursor(0)[1]
+    local ok, window_height = pcall(vim.api.nvim_win_get_height, winnr)
+
+    if not ok then
+        return
+    end
+
+    if current_cursor_line > window_height + 2 then
+        ---@diagnostic disable-next-line: param-type-mismatch
+        vim.api.nvim_win_set_config(winnr, {
+            anchor = "SW",
+            relative = "cursor",
+            row = 0,
+            col = -1,
+        })
+    end
+
+    if bufnr and winnr then
+        vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
+        return bufnr, winnr
+    end
+end
 
 function M.config()
   local util = require'lspconfig'.util
@@ -83,13 +117,16 @@ function M.config()
   ]])
 
 
-  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-    border = "single",
-  })
-  vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-    border = "single",
-  })
-
+  local my_lsp_handlers = {
+    ["textDocument/hover"] = vim.lsp.with(M.lsp_hover, {
+      border = "rounded",
+      filetype = "lsp-hover"
+    }),
+    ["textDocument/signatureHelp"] = vim.lsp.with(M.lsp_signature_help, {
+      border = "rounded",
+      filetype = "lsp-signature-help"
+    }),
+  }
 
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
   capabilities.textDocument.completion.completionItem.documentationFormat = { "markdown", "plaintext" }
@@ -139,6 +176,7 @@ function M.config()
     },
     settings = {},
     on_attach = on_attach,
+    handlers = my_lsp_handlers
   }
 
 

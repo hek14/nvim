@@ -153,6 +153,22 @@ M.clear_cmdline = function()
   end, 0)
 end
 
+function _G.quick_eval()
+  local path = vim.fn.expand('%:p')
+  local base = vim.fn.stdpath('config') .. '/lua/'
+  local _start,_end = path:find(base)
+  if _start == nil or _end == nil then 
+    return nil 
+  end
+  local partial = string.sub(path,_end+1)
+  local comps = string.gsub(partial,'%.lua','')
+  comps = string.gsub(comps,'/','.')
+  local func = vim.fn.expand("<cword>")
+  comps = string.format(':lua require("%s").%s()',comps,func)
+  return comps
+end
+
+
 function M.termcode(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
 end

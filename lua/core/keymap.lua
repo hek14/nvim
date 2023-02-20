@@ -95,6 +95,7 @@ local function others()
   map("n",'<leader>tv', ":lua require('core.utils')<CR> | :lua back_to_future()<CR>")
   require('contrib.my_sub_word') -- need v:lua.get_sub_word, NOTE:treat the underline as a separator too
   vim.cmd [[nmap <expr> ,r ":<C-u>s/" . v:lua.get_sub_word() . "//g<Left><Left>"]]
+  vim.cmd [[nmap <expr> ,z v:lua.quick_eval() . "<Left>"]]
   map("n",'<leader>rr',require('contrib.my_better_substitute').my_better_substitute)
   -- line line_start line_end
 

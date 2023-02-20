@@ -4,7 +4,6 @@ local M = {
     "hek14/nvim-navic",
     "hek14/vim-illuminate",
     "nvim-tree/nvim-web-devicons",
-    "yorik1984/newpaper.nvim"
   },
   event = "VeryLazy",
 }

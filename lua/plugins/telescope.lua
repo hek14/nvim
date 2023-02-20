@@ -23,6 +23,9 @@ local M = {
       "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
     },
     {
+      "ahmedkhalf/project.nvim"
+    },
+    {
       'nvim-telescope/telescope-live-grep-args.nvim',
       config = function()
         -- map('n','<leader>fw','<Cmd>lua require("telescope").extensions.live_grep_args.live_grep_args()<CR>')

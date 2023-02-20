@@ -68,4 +68,20 @@ local newpaper = {
   end
 }
 
-return newpaper
+local abscs = {
+  "Abstract-IDE/Abstract-cs",
+  event = "VimEnter",
+  config = function ()
+    vim.cmd[[colorscheme abscs]]   
+  end
+}
+
+local everforest = {
+  "sainnhe/everforest",
+  event = "VimEnter",
+  config = function ()
+    vim.cmd[[colorscheme everforest]]   
+  end
+}
+
+return everforest

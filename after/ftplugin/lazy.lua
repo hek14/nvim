@@ -23,19 +23,21 @@ local where_not_loaded = function()
   end
 end
 
-where_not_loaded()
+pcall(where_not_loaded)
 vim.api.nvim_create_autocmd("TextChanged",{
   callback = function ()
     if not timer then
       timer = vim.loop.new_timer()
-      timer:start(100,0,vim.schedule_wrap(where_not_loaded))
+      timer:start(100,0,vim.schedule_wrap(function ()
+        pcall(where_not_loaded)
+      end))
     end
   end,
   group = group,
   buffer = buf
 })
 
-local get_winbar = function ()
+local set_winbar = function ()
   if not_loaded_line then
     local cursor = vim.api.nvim_win_get_cursor(win)
     local line = cursor[1]
@@ -61,7 +63,9 @@ vim.api.nvim_create_autocmd(
   buffer = buf,
   callback = function()
     timer2 = vim.loop.new_timer()
-    timer2:start(100,0,vim.schedule_wrap(get_winbar))
+    timer2:start(100,0,vim.schedule_wrap(function ()
+      pcall(set_winbar)
+    end))
   end,
 }
 )

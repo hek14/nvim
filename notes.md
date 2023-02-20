@@ -77,6 +77,7 @@ https://www.nerdfonts.com/font-downloads
 9. https://github.com/adoyle-h
 10. https://github.com/JoosepAlviste/dotfiles: nice customizaion about telescope live_grep
 11. https://github.com/joshmedeski/dotfiles: yabai,skhd,alacritty,tmux
+12. https://github.com/askfiy/nvim: [bilibili](https://space.bilibili.com/35183144)
 
 # refer to useful plugins
 1. https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
@@ -123,6 +124,15 @@ instead of using message buffer, just create a new buffer, and normal mode: `:pu
 
 # vim.loop
 https://teukka.tech/posts/2020-01-07-vimloop/
+
+# window ID and window number
+Window ID is unique and not changed. It's valid across tabs. Manipulate window should use win-ID more because it's unique.
+But window nubmer is only valid for the current Tab. `wincmd` can prefixed with window number.
+Convert between them:
+`win_id2win`
+
+relations with bufnr:
+`winbufnr` and `bufwinnr`
 
 # TODO: 
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)

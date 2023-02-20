@@ -16,6 +16,7 @@ local M = {
     { '<leader>fs', '<Cmd>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>' },
     -- if you want to grep only in opened buffers<cmd> lua require('telescope.builtin').live_grep({grep_open_files=true})
     { "<leader>f/", "<cmd>lua require('core.utils').grep_last_search()<CR>" },
+    { "<leader>fw", "<Cmd>lua require('contrib.telescope_custom_pickers').live_grep()<CR>"}
   },
   dependencies = {
     {
@@ -85,9 +86,30 @@ local M = {
     },
 }
 
+local open_in_nvim_tree = function(prompt_bufnr)
+    local action_state = require "telescope.actions.state"
+    local Path = require "plenary.path"
+    local actions = require "telescope.actions"
+
+    local entry = action_state.get_selected_entry()[1]
+    local entry_path = Path:new(entry):parent():absolute()
+    actions._close(prompt_bufnr, true)
+    entry_path = Path:new(entry):parent():absolute() 
+    entry_path = entry_path:gsub("\\", "\\\\")
+
+    vim.cmd("NvimTreeClose")
+    vim.cmd("NvimTreeOpen " .. entry_path)
+
+    local file_name = nil
+    for s in string.gmatch(entry, "[^/]+") do
+        file_name = s
+    end
+
+    vim.cmd("/" .. file_name)
+end
+
 function M.config()
   local custom_pickers = require 'contrib.telescope_custom_pickers'
-  map("n", "<leader>fw", custom_pickers.live_grep)
   local telescope = require "telescope"
   local fixfolds = {
     hidden = true,
@@ -131,11 +153,13 @@ function M.config()
             require('telescope.actions').select_default(prompt_bufnr)
             -- vim.cmd[[normal! zv]]
             vim.cmd [[echom "telescope hello"]]
-          end
+          end,
+          ["<c-s>"] = open_in_nvim_tree,
         },
         n = {
           ["n"] = require('telescope.actions').move_selection_next,
           ["e"] = require('telescope.actions').move_selection_previous,
+          ["<c-s>"] = open_in_nvim_tree,
         }
       },
       vimgrep_arguments = {

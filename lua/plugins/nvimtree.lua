@@ -1,6 +1,6 @@
 local M = {
   "nvim-tree/nvim-tree.lua",
-  cmd = { "NvimTreeToggle", "NvimTreeFocus" },
+  cmd = { "NvimTreeToggle", "NvimTreeFocus", "NvimTreeClose", "NvimTreeOpen"},
   init = function()
     local map = require("core.utils").map
     map("n", ",e", "<Cmd>NvimTreeToggle<CR>")

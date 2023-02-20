@@ -65,6 +65,8 @@ local M = {
 
 function M.config()
   local util = require'lspconfig'.util
+  local python_lsp = 'pyright'
+
   local illuminate_present,illuminate = pcall(require,'illuminate')
   vim.cmd([[
   autocmd ColorScheme * |
@@ -166,37 +168,39 @@ function M.config()
       require("lspconfig").lua_ls.setup(opt)
     end,
     ["pyright"] = function ()
-      local opt = {
-        settings = {
-          python = {
-            analysis = {
-              typeCheckingMode = "off",
-              extraPaths = { '.', './*', './**/*', './**/**/*' },
-              autoImportCompletions = false,
-              autoSearchPaths = true,
-              diagnosticMode = "openFilesOnly", -- "workspace"
-              useLibraryCodeForTypes = true,
-              logLevel = "Error",
-              diagnosticSeverityOverrides = {
-                -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-                reportGeneralTypeIssues = "none",
-                reportOptionalMemberAccess = "none",
-                reportOptionalSubscript = "none",
-                reportPrivateImportUsage = "none",
-                reportUnusedImport = "none"
+      if python_lsp == 'pyright' then
+        local opt = {
+          settings = {
+            python = {
+              analysis = {
+                typeCheckingMode = "off",
+                extraPaths = { '.', './*', './**/*', './**/**/*' },
+                autoImportCompletions = false,
+                autoSearchPaths = true,
+                diagnosticMode = "openFilesOnly", -- "workspace"
+                useLibraryCodeForTypes = true,
+                logLevel = "Error",
+                diagnosticSeverityOverrides = {
+                  -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+                  reportGeneralTypeIssues = "none",
+                  reportOptionalMemberAccess = "none",
+                  reportOptionalSubscript = "none",
+                  reportPrivateImportUsage = "none",
+                  reportUnusedImport = "none"
+                },
               },
             },
           },
-        },
-        root_dir = function(fname)
-          local root_files = {'pyproject.toml', 'pyrightconfig.json'}
-          return util.find_git_ancestor(fname) or
-          util.root_pattern(unpack(root_files))(fname) or
-          util.path.dirname(fname)
-        end
-      }
-      opt = vim.tbl_deep_extend('force',options,opt)
-      require("lspconfig").pyright.setup(opt)
+          root_dir = function(fname)
+            local root_files = {'pyproject.toml', 'pyrightconfig.json'}
+            return util.find_git_ancestor(fname) or
+            util.root_pattern(unpack(root_files))(fname) or
+            util.path.dirname(fname)
+          end
+        }
+        opt = vim.tbl_deep_extend('force',options,opt)
+        require("lspconfig").pyright.setup(opt)
+      end
     end,
     -- ["ruff_lsp"] = function ()
     --   local opt = {
@@ -238,6 +242,12 @@ function M.config()
       require("lspconfig").texlab.setup(opt)
     end
   })
+  if python_lsp == 'pylance' then
+    require('lspconfig.configs').pylance = require('plugins.lsp.pylance_expand')
+    local pylance_config = require('plugins.lsp.pylance_config')
+    pylance_config = vim.tbl_deep_extend('force',options,pylance_config)
+    require('lspconfig').pylance.setup(pylance_config)
+  end
   require("plugins.null-ls").setup()
   require("plugins.lsp.diagnostics").setup()
 end

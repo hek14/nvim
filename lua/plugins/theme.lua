@@ -84,4 +84,4 @@ local everforest = {
   end
 }
 
-return everforest
+return catppuccin

@@ -111,6 +111,7 @@ M.map = function(mode, keys, rhs, opt)
           options.callback = rhs
           vim.keymap.set(sub_mode,lhs,'',options)
         else
+          options.silent = false
           vim.keymap.set(sub_mode,lhs,rhs,options)
         end
       end

@@ -99,8 +99,6 @@ end
 
 function M.config()
   local util = require'lspconfig'.util
-  local python_lsp = 'pyright'
-
   local illuminate_present,illuminate = pcall(require,'illuminate')
   vim.cmd([[
   autocmd ColorScheme * |
@@ -150,9 +148,17 @@ function M.config()
   capabilities.offsetEncoding = { "utf-16" }
 
   local on_attach = function(client, bufnr)
-    -- if vim.tbl_contains({"pyright", "lua_ls"}, client.name) then
-    --   client.server_capabilities.document_formatting = false
-    -- end
+    if vim.tbl_contains({"pylance"}, client.name) then
+      print('turn off semanticTokensProvider')
+      client.server_capabilities.semanticTokensProvider = {
+        legend = {
+          tokenTypes = {},
+          tokenModifiers = {},
+        },
+        full = false,
+        range = false,
+      }
+    end
     -- client.server_capabilities.document_formatting = true
     -- client.server_capabilities.document_range_formatting = true
     -- if client.name == "pyright" then
@@ -178,6 +184,38 @@ function M.config()
     on_attach = on_attach,
     handlers = my_lsp_handlers
   }
+
+  local python_lsp = 'pylance'
+  local pyright_opts = {
+    settings = {
+      python = {
+        analysis = {
+          typeCheckingMode = "off",
+          extraPaths = { '.', './*', './**/*', './**/**/*' },
+          autoImportCompletions = false,
+          autoSearchPaths = true,
+          diagnosticMode = "openFilesOnly", -- "workspace"
+          useLibraryCodeForTypes = true,
+          logLevel = "Error",
+          diagnosticSeverityOverrides = {
+            -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+            reportGeneralTypeIssues = "none",
+            reportOptionalMemberAccess = "none",
+            reportOptionalSubscript = "none",
+            reportPrivateImportUsage = "none",
+            reportUnusedImport = "none"
+          },
+        },
+      },
+    },
+    root_dir = function(fname)
+      local root_files = {'pyproject.toml', 'pyrightconfig.json'}
+      return util.find_git_ancestor(fname) or
+      util.root_pattern(unpack(root_files))(fname) or
+      util.path.dirname(fname)
+    end
+  }
+  pyright_opts = vim.tbl_deep_extend('force',options,pyright_opts)
 
   require("mason-lspconfig").setup({
     automatic_installation = true,
@@ -205,37 +243,7 @@ function M.config()
     end,
     ["pyright"] = function ()
       if python_lsp == 'pyright' then
-        local opt = {
-          settings = {
-            python = {
-              analysis = {
-                typeCheckingMode = "off",
-                extraPaths = { '.', './*', './**/*', './**/**/*' },
-                autoImportCompletions = false,
-                autoSearchPaths = true,
-                diagnosticMode = "openFilesOnly", -- "workspace"
-                useLibraryCodeForTypes = true,
-                logLevel = "Error",
-                diagnosticSeverityOverrides = {
-                  -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-                  reportGeneralTypeIssues = "none",
-                  reportOptionalMemberAccess = "none",
-                  reportOptionalSubscript = "none",
-                  reportPrivateImportUsage = "none",
-                  reportUnusedImport = "none"
-                },
-              },
-            },
-          },
-          root_dir = function(fname)
-            local root_files = {'pyproject.toml', 'pyrightconfig.json'}
-            return util.find_git_ancestor(fname) or
-            util.root_pattern(unpack(root_files))(fname) or
-            util.path.dirname(fname)
-          end
-        }
-        opt = vim.tbl_deep_extend('force',options,opt)
-        require("lspconfig").pyright.setup(opt)
+        require("lspconfig").pyright.setup(pyright_opts)
       end
     end,
     -- ["ruff_lsp"] = function ()
@@ -279,10 +287,8 @@ function M.config()
     end
   })
   if python_lsp == 'pylance' then
-    require('lspconfig.configs').pylance = require('plugins.lsp.pylance_expand')
-    local pylance_config = require('plugins.lsp.pylance_config')
-    pylance_config = vim.tbl_deep_extend('force',options,pylance_config)
-    require('lspconfig').pylance.setup(pylance_config)
+    require('plugins.lsp.pylance_config')
+    require('lspconfig').pylance.setup(pyright_opts)
   end
   require("plugins.null-ls").setup()
   require("plugins.lsp.diagnostics").setup()

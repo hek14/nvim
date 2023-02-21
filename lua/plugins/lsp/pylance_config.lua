@@ -1,113 +1,65 @@
 -- https://github.com/microsoft/pylance-release
 
 local util = require("lspconfig.util")
-local tools = {}
-
-function tools.didChangeConfiguration(client, filetype)
-    vim.api.nvim_create_autocmd(
-        { "DirChanged", "CursorMoved", "BufWinEnter", "BufFilePost", "InsertEnter", "BufNewFile" },
-        {
-            pattern = { filetype, "NvimTree_*" },
-            callback = function()
-                client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
-            end,
-        }
-    )
+local bin_name = "pylance-langserver"
+local found_exe = vim.fn.executable('pylance-langserver')  
+if found_exe == 0 then
+  error("install pylance first: source ~/.config/nvim/lua/plugins/lsp/check_pylance.lua")
+  return false
 end
-
-function tools.filter_publish_diagnostics(a, params, client_info, extra_message, config)
-    ---@diagnostic disable-next-line: unused-local
-    local client = vim.lsp.get_client_by_id(client_info.client_id)
-
-    if extra_message.ignore_diagnostic_message then
-        local new_index = 1
-
-        for _, diagnostic in ipairs(params.diagnostics) do
-            if not vim.tbl_contains(extra_message.ignore_diagnostic_message, diagnostic.message) then
-                params.diagnostics[new_index] = diagnostic
-                new_index = new_index + 1
-            end
-        end
-
-        for i = new_index, #params.diagnostics do
-            params.diagnostics[i] = nil
-        end
-    end
-
-    ---@diagnostic disable-next-line: redundant-parameter
-    vim.lsp.diagnostic.on_publish_diagnostics(a, params, client_info, extra_message, config)
-end
-
-
+local cmd = { bin_name, "--stdio" }
 local root_files = {
-    "pyproject.toml",
-    "setup.py",
-    "setup.cfg",
-    "requirements.txt",
-    "Pipfile",
-    "pyrightconfig.json",
-    -- customize
-    "manage.py",
+  "pyproject.toml",
+  "setup.py",
+  "setup.cfg",
+  "requirements.txt",
+  "Pipfile",
+  "pyrightconfig.json",
+  "project.md",
 }
+local function organize_imports()
+  local params = {
+    command = "pyright.organizeimports",
+    arguments = { vim.uri_from_bufnr(0) },
+  }
+  vim.lsp.buf.execute_command(params)
+end
 
-local ignore_diagnostic_message = {
-    '"self" is not accessed',
-    '"args" is not accessed',
-    '"kwargs" is not accessed',
+local default_config = {
+  name = "pylance",
+  autostart = true,
+  single_file_support = true,
+  cmd = cmd,
+  filetypes = { "python" },
+  root_dir = function(fname)
+    return util.root_pattern(unpack(root_files))(fname) or util.find_git_ancestor(fname) or util.path.dirname(fname)
+  end,
+  settings = {
+    python = {
+      analysis = vim.empty_dict(),
+    },
+    telemetry = {
+      telemetryLevel = "off",
+    },
+  },
 }
+default_config = vim.tbl_extend("force", util.default_config, default_config)
+local configs = require("lspconfig.configs")
+if not configs.pylance then
+  configs.pylance = {
+    default_config = default_config,
+    commands = {
+      PyrightOrganizeImports = {
+        organize_imports,
+        description = "Organize Imports",
+      },
+    },
+    docs = {
+      description = [[
+      https://github.com/microsoft/pyright
 
-return {
-    filetypes = { "python" },
-    single_file_support = true,
-    -- cmd = { "pylance-langserver", "--stdio" },
-    ---@diagnostic disable-next-line: deprecated
-    root_dir = util.root_pattern(unpack(root_files)),
-    handlers = {
-        -- If you want to disable pylance's diagnostic prompt, open the code below
-        -- ["textDocument/publishDiagnostics"] = function(...) end,
-        -- If you want to disable pylance from diagnosing unused parameters, open the function below
-        ["textDocument/publishDiagnostics"] = vim.lsp.with(tools.filter_publish_diagnostics, {
-            ignore_diagnostic_message = ignore_diagnostic_message,
-        }),
+      `pyright`, a static type checker and language server for python
+      ]],
     },
-    on_init = function(client, _)
-        -- BUG: https://github.com/neovim/nvim-lspconfig/issues/1851
-        tools.didChangeConfiguration(client, "*.py")
-    end,
-    settings = {
-        python = {
-            analysis = {
-                typeCheckingMode = "off", -- off, basic, strict
-                autoSearchPaths = true,
-                useLibraryCodeForTypes = true,
-                autoImportCompletions = true,
-                diagnosticMode = "workspace",
-                -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md#type-check-diagnostics-settings
-                diagnosticSeverityOverrides = {
-                    strictListInference = true,
-                    strictDictionaryInference = true,
-                    strictSetInference = true,
-                    reportUnusedImport = "warning",
-                    reportUnusedClass = "warning",
-                    reportUnusedFunction = "warning",
-                    reportUnusedVariable = "warning",
-                    reportUnusedCoroutine = "warning",
-                    reportDuplicateImport = "warning",
-                    reportPrivateUsage = "warning",
-                    reportUnusedExpression = "warning",
-                    reportConstantRedefinition = "error",
-                    reportIncompatibleMethodOverride = "error",
-                    reportMissingImports = "error",
-                    reportUndefinedVariable = "error",
-                    reportAssertAlwaysTrue = "error",
-                },
-                -- pylance
-                inlayHints = {
-                    variableTypes = true,
-                    functionReturnTypes = true,
-                    pytestParameters = true,
-                },
-            },
-        },
-    },
-}
+  }
+end

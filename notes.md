@@ -146,7 +146,7 @@ relations with bufnr:
 7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的licence不通过的那句话
 
 # find what highlight is used undercursor
-`:lua =vim.inspect_pos()`
+`:Redir lua =vim.inspect_pos()`
 
 # TODO: 
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)

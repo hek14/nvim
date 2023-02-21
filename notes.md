@@ -134,6 +134,17 @@ Convert between them:
 relations with bufnr:
 `winbufnr` and `bufwinnr`
 
+# how to use pylance!!!
+1. 利用vscode安装pylance插件, 版本是: `2023.2.30`
+2. 进入到插件目录, 例如: `/Users/hk/.vscode/extensions/ms-python.vscode-pylance-2023.2.30`
+3. 利用Mason安装prettier, 安装之后会在这里: `/Users/hk/.local/share/nvim/mason/bin/prettier`
+3. 利用prettier format如下文件: `/Users/hk/.vscode/extensions/ms-python.vscode-pylance-2023.2.30/dist/server.bundle.js`
+命令如下: `./prettier --write /Users/hk/.vscode/extensions/ms-python.vscode-pylance-2023.2.30/dist/server.bundle.js`
+4. vim打开这个`server.bundle.js`, 此时它已经变成很多行了(format之前就只有一行)
+5. 到26099行或者搜索0x1ad9, 加上`return !0x0;` 这一行
+6. 测试: `node server.bundle.js --stdio` 通过!!!
+7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的licence不通过的那句话
+
 # TODO: 
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS

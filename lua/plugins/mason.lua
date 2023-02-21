@@ -4,7 +4,7 @@ local M = {
 }
 
 M.tools = {
-  "prettierd",
+  "prettier", -- NOTE: for typescript/javascript, modify the server.bunble.js
   "stylua",
   "luacheck",
   "shellcheck",

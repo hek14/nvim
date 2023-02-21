@@ -630,6 +630,31 @@ M.grep_last_search = function()
   end
 end
 
+local filter_path = function(paths)
+  local index = 1
+  for _,p in ipairs(paths) do
+    if vim.loop.fs_stat(p) then
+      paths[index] = p
+      index = index + 1
+    end
+  end
+  if index == 1 then
+    if vim.loop.fs_stat(paths[1]) then
+      return paths
+    else
+      return {}
+    end
+  end
+  return paths
+end
+
+local table_combine = function(table1,table2)
+  for i,p in ipairs(table2) do
+    table1[#table1+i] = p
+  end
+  return table1
+end
+
 vim.cmd [[
   let g:i = 0
   function! Inc(...)

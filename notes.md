@@ -145,6 +145,9 @@ relations with bufnr:
 6. 测试: `node server.bundle.js --stdio` 通过!!!
 7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的licence不通过的那句话
 
+# find what highlight is used undercursor
+`:lua =vim.inspect_pos()`
+
 # TODO: 
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS

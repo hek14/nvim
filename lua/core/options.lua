@@ -84,3 +84,4 @@ vim.schedule(function()
 end)
 
 vim.cmd [[set viminfo+=:2000]]
+vim.env['PATH'] = vim.fn.stdpath('config') .. '/bin:' .. vim.env['PATH']

@@ -2,9 +2,9 @@
 
 local util = require("lspconfig.util")
 local bin_name = "pylance-langserver"
-local found_exe = vim.fn.executable('pylance-langserver')  
+local found_exe = vim.fn.executable('pylance-langserver')
 if found_exe == 0 then
-  error("install pylance first: source ~/.config/nvim/lua/plugins/lsp/check_pylance.lua")
+  error("install pylance first: check ~/.config/nvim/lua/plugins/lsp/check_pylance.lua")
   return false
 end
 local cmd = { bin_name, "--stdio" }

@@ -1,10 +1,10 @@
 local install_helper = function()
   print('Step 1. download pylance from my own BaiDuDisk or install in vscode ONLY FOR: 2023-2-30 version')
-  print('Step 2. mv /path/to/download/ms-python.vscode-pylance-2023.2.30 ~/.local/share/nvim/mason/bin/')
-  print('Step 3. use prettier to format it `~/.local/share/nvim/mason/bin/prettier --write ~/.local/share/nvim/mason/bin/ms-python.vscode-pylance-2023.2.30/dist/server.bundle.js`')
+  print('Step 2. mv /path/to/download/ms-python.vscode-pylance-2023.2.30 ~/.config/nvim/bin')
+  print('Step 3. use prettier to format it `~/.local/share/nvim/mason/bin/prettier --write ~/.config/nvim/bin/ms-python.vscode-pylance-2023.2.30/dist/server.bundle.js`')
   print('Step 4. insert `return !0x0;` at line 20699, which means after `const _0x2500a7 = _0x415341;` and before `for (const _0x411f95 of [`')
-  print('Step 5. run `node ~/.local/share/nvim/mason/bin/ms-python.vscode-pylance-2023.2.30/dist/server.bundle.js --stdio` to check or this script again')
-  print('Step 6. create a file called pylance-langserver under `~/.local/share/nvim/mason/bin`')
+  print('Step 5. run `node ~/.config/nvim/bin/ms-python.vscode-pylance-2023.2.30/dist/server.bundle.js --stdio` to check or this script again')
+  print('Step 6. create a file called pylance-langserver under `~/.config/nvim/bin` (should be already there)')
   print('Step 7. write the following lines: ')
   print([[
 #!/usr/bin/env node
@@ -16,7 +16,7 @@ global.__rootDirectory = __dirname + '/ms-python.vscode-pylance-2023.2.30/dist';
 
 require('./ms-python.vscode-pylance-2023.2.30/dist/server.bundle.js');
 ]])
-  print('chmod +x ~/.local/share/nvim/mason/bin/pylance-langserver')
+  print('chmod +x ~/.config/nvim/bin/pylance-langserver')
 end
 
 local found_exe = vim.fn.executable('pylance-langserver')  
@@ -61,6 +61,7 @@ end)
 -- end)
 uv.read_start(stderr, function(err, data)
   if data and (string.match(data,'license') or string.match(data,'stand-alone')) then
+    print(data)
     execute_ok = false
   end
 end)

@@ -179,8 +179,6 @@ function M.config()
     handlers = my_lsp_handlers
   }
 
-
-  require("mason").setup()
   require("mason-lspconfig").setup({
     automatic_installation = true,
     ensure_installed = {'lua_ls','pyright', 'jsonls'}, -- ruff_lsp not needed, use ruff with null-ls instead

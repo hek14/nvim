@@ -30,6 +30,7 @@ function M.check()
 end
 
 function M.config()
+  require('mason').setup()
   M.check()
 end
 

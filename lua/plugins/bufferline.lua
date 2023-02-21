@@ -14,7 +14,7 @@ function M.config()
   require"bufferline".setup({
     options = {
       numbers = "ordinal",
-      offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
+      offsets = { { filetype = "NvimTree", text = "Finder", padding = 1 } },
       buffer_close_icon = "",
       modified_icon = "",
       close_icon = "",

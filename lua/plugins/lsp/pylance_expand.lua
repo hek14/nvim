@@ -1,6 +1,13 @@
 -- https://github.com/microsoft/pylance-release
 
 local util = require("lspconfig.util")
+require('core.options')
+local vscode_base
+if is_mac then
+  vscode_base = vim.fn.expand('$HOME/.vscode/')
+else
+  vscode_base = vim.fn.expand('$HOME/.vscode-server/')
+end
 
 local filter_path = function(paths)
   local index = 1
@@ -29,7 +36,12 @@ end
 
 local get_script_path = function()
     -- NOTE: node version should be lastest, unless an error `Unexpected token` will occur
-    local scripts = vim.fn.expand("$HOME/github/ms-python.vscode-pylance-*/dist/server.bundle.js", false, true)
+    local scripts = {}
+    if is_mac then
+      scripts = vim.fn.expand(vscode_base .. "extensions/ms-python.vscode-pylance-*/dist/server.bundle.js", false, true)
+    else
+      scripts = vim.fn.expand(vscode_base .. "extensions/ms-python.vscode-pylance-*/dist/server.bundle.js", false, true)
+    end
     scripts = filter_path(scripts)
     if #scripts == 0 then
       error("Failed to resolve path to Pylance server")
@@ -70,7 +82,7 @@ return {
         },
         docs = {
             package_json = vim.fn.expand(
-                "$HOME/github/ms-python.vscode-pylance-*/package.json",
+                vscode_base .. "extensions/ms-python.vscode-pylance-*/package.json",
                 false,
                 true
             )[1],

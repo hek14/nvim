@@ -99,7 +99,7 @@ end
 
 function M.config()
   local util = require'lspconfig'.util
-  local python_lsp = 'pylance'
+  local python_lsp = 'pyright'
 
   local illuminate_present,illuminate = pcall(require,'illuminate')
   vim.cmd([[

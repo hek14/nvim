@@ -70,7 +70,7 @@ return {
         },
         docs = {
             package_json = vim.fn.expand(
-                "$HOME/.vscode/extensions/ms-python.vscode-pylance-*/package.json",
+                "$HOME/github/ms-python.vscode-pylance-*/package.json",
                 false,
                 true
             )[1],

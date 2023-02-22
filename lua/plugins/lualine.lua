@@ -55,8 +55,18 @@ local reference_hint = function ()
         break
       end
     end
+    return string.format("%d|%d",current_loc,#refs)
+  end
+end
 
-    return string.format("reference: %d|%d",current_loc,#refs)
+local function pwd()
+  local win = vim.api.nvim_get_current_win()
+  local path = vim.fn.getcwd(win)
+  path =  string.gsub(path,vim.env['HOME'],'~')
+  if path=='~' then
+    return "HOME"
+  else
+    return path
   end
 end
 
@@ -65,14 +75,27 @@ M.config = function ()
   require('lualine').setup {
     options = {
       globalstatus = true,
+      theme = 'auto'    
     },
     winbar = {},
     inactive_winbar = {},
     sections = {
       lualine_a = {'mode'},
       lualine_b = {'branch', 'diff', 'diagnostics'},
-      lualine_c = {},
-      lualine_x = {reference_hint},
+      lualine_c = { 
+        { 
+          pwd, 
+          icon = ':Dir:',
+          color = { fg='#8caaee', bg='#51576d' }
+        }
+      },
+      lualine_x = {
+        {
+          reference_hint,
+          icon = ' Reference:',
+          color = { fg='#8caaee', bg='#51576d' }
+        },
+      },
       lualine_y = {'filetype'},
       lualine_z = {'progress'}
     },

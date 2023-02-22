@@ -89,7 +89,7 @@ https://www.nerdfonts.com/font-downloads
 7. themes: https://alpha2phi.medium.com/12-neovim-themes-with-tree-sitter-support-8be320b683a4
 8. https://github.com/cshuaimin/ssr.nvim: Structural search and replace for Neovim
 
-# refer to other resources
+# Youtuber to follow
 1. jesse19skelton
 - https://www.youtube.com/@jesse19skelton -- nice videos about karabiner and  yabai [his github]()
 - https://www.youtube.com/watch?v=JL1lz77YbUE&ab_channel=JesseSkelton
@@ -97,6 +97,9 @@ https://www.nerdfonts.com/font-downloads
 
 2. s1n7ax
 https://www.youtube.com/@s1n7ax/videos
+
+3. yukiUthman
+https://www.youtube.com/@yukiuthman8358
 
 
 # for pyright completion stubs

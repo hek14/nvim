@@ -60,13 +60,13 @@ local set_virtual_text = function ()
     local cursor = vim.api.nvim_win_get_cursor(win)
     local line = cursor[1]
     if line < not_loaded_line then
-      vim.api.nvim_buf_set_extmark(buf,ns,cursor[1],cursor[2],{
+      vim.api.nvim_buf_set_extmark(buf,ns,cursor[1]-1,cursor[2],{
         id = 1,
         virt_text = { { "Loaded","DiagnosticVirtualTextHint" } },
         virt_text_win_col = math.floor(win_width*0.5)
       })
     else
-      vim.api.nvim_buf_set_extmark(buf,ns,cursor[1],cursor[2],{
+      vim.api.nvim_buf_set_extmark(buf,ns,cursor[1]-1,cursor[2],{
         id = 1,
         virt_text = { { "Not Loaded","DiagnosticVirtualTextError" } },
         virt_text_win_col = math.floor(win_width*0.5)

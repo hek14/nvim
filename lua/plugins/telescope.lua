@@ -87,6 +87,7 @@ local M = {
       },
       { "nvim-telescope/telescope-file-browser.nvim" },
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      { 'IllustratedMan-code/telescope-conda.nvim' }
     },
 }
 
@@ -238,7 +239,7 @@ function M.config()
 
   telescope.setup(options)
   local extensions = {
-    "bookmarks", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf"
+    "bookmarks", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf","conda"
   }
   for _, ext in ipairs(extensions) do telescope.load_extension(ext) end
 end

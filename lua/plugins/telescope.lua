@@ -18,6 +18,7 @@ local M = {
     { "<leader>f/", "<cmd>lua require('core.utils').grep_last_search()<CR>" },
     { "<leader>fw", "<Cmd>lua require('contrib.telescope_custom_pickers').live_grep()<CR>"},
     { "<leader>fp", "<cmd>Telescope projects<CR>"},
+    { "<leader>z", ":Telescope zoxide list<CR>" }
   },
   dependencies = {
     {
@@ -66,25 +67,7 @@ local M = {
           map("i","<C-x><C-p>","<cmd>lua require('telescope').extensions.neoclip.default()<CR>")
         end,
       },
-      {
-        "jvgrootveld/telescope-zoxide",
-        init = function()
-          map("n", "<leader>z", ":Telescope zoxide list<CR>")
-        end,
-        config = function()
-          require("telescope._extensions.zoxide.config").setup({
-            mappings = {
-              ["<C-b>"] = {
-                keepinsert = true,
-                action = function(selection)
-                  require("telescope").extensions.file_browser.file_browser({ cwd = selection.path })
-                  -- vim.cmd('Telescope file_browser path=' .. selection.path)
-                end,
-              },
-            },
-          })
-        end,
-      },
+      { "jvgrootveld/telescope-zoxide" },
       { "nvim-telescope/telescope-file-browser.nvim" },
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
       { 'IllustratedMan-code/telescope-conda.nvim' }
@@ -233,6 +216,17 @@ function M.config()
         override_file_sorter = true, -- override the file sorter
         case_mode = "smart_case", -- or "ignore_case" or "respect_case"
         -- the default case_mode is "smart_case"
+      },
+      zoxide = {
+        mappings = {
+          ["<C-b>"] = {
+            keepinsert = true,
+            action = function(selection)
+              require("telescope").extensions.file_browser.file_browser({ cwd = selection.path })
+              -- vim.cmd('Telescope file_browser path=' .. selection.path)
+            end,
+          },
+        },
       }
     },
   }

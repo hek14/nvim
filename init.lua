@@ -23,6 +23,7 @@ local modules = {
    "core.lazy",
    "core.autocmds",
    "core.keymap",
+   "core.gui"
 }
 
 for _, module in ipairs(modules) do

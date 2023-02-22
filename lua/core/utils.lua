@@ -516,6 +516,7 @@ M.smart_current_dir = function()
   local fname = vim.api.nvim_buf_get_name(0)
   local dir = require('lspconfig').util.find_git_ancestor(fname) or
   vim.fn.expand('%:p:h')
+  print("cd " .. dir)
   vim.cmd("cd " .. dir)
 end
 

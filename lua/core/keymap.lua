@@ -134,8 +134,7 @@ local function others()
   map("c", '<C-n>','<Down>')
   -- NOTE: <C-g> and <C-t> to forward and backward when search
   -- ft_map("python",'n','<leader>p',[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]])
-  -- BUG: why does my utils.map doesn't work
-  require('core.utils').map("n","<leader>p",[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]],{noremap=true})
+  map("n","<leader>p",":lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>",{silent=false})
 
   map("x", "ul", "g_o^")
   map("o", "ul", ":normal vul<CR>")

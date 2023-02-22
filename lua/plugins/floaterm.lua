@@ -7,12 +7,12 @@ function M.init()
   local map = require('core.utils').map
   vim.cmd[[command! PYTHON FloatermNew python]]
   vim.cmd[[command! Lazygit FloatermNew --height=0.8 --width=0.8 lazygit]]
-  map("n", "<leader>ts", "<cmd>FloatermNew --wintype=split --height=0.3 <CR>")
-  vim.g.floaterm_keymap_new = "<leader>tn"
-  vim.g.floaterm_keymap_toggle = "<leader>tt"
+  map("n", ",ts", "<cmd>FloatermNew --wintype=split --height=0.3 <CR>")
+  vim.g.floaterm_keymap_new = ",tn"
+  vim.g.floaterm_keymap_toggle = ",tt"
   vim.g.floaterm_keymap_next = ",n"
   vim.g.floaterm_keymap_prev = ",p"
-  vim.g.floaterm_keymap_kill = "<leader>tk"
+  vim.g.floaterm_keymap_kill = ",tk"
   vim.g.floaterm_autoinsert = true
   vim.cmd([[
     function! Floaterm_open_in_normal_window() abort

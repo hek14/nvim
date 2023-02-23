@@ -60,7 +60,7 @@ end)
 -- uv.read_start(stdout, function(err, data)
 -- end)
 uv.read_start(stderr, function(err, data)
-  if data and (string.match(data,'license') or string.match(data,'stand-alone')) then
+  if data and (string.match(data,'license') or string.match(data,'stand-alone') or string.match(data,'MODULE_NOT_FOUND')) then
     print(data)
     execute_ok = false
   end

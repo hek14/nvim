@@ -4,8 +4,14 @@ local cmd = vim.cmd
 
 local M = {}
 
-M.buf_valid = function () return M.buf and a.nvim_buf_is_valid(M.buf) end
-M.win_valid = function () return M.win and a.nvim_win_is_valid(M.win) end
+M.buf_valid = function () 
+  return M.buf and a.nvim_buf_is_valid(M.buf) 
+end
+
+M.win_valid = function () 
+  return M.win and a.nvim_win_is_valid(M.win) 
+end
+
 M.cnl_valid = function ()
   return M.chan and not vim.tbl_isempty(vim.tbl_filter(function(cnl)
     return cnl.id == M.chan
@@ -58,6 +64,16 @@ M.runfile = function ()
   local oldprint = print
   print = M.liveprint
   cmd('luafile %')
+  print = oldprint
+  vim.api.nvim_win_set_cursor(0, cursorpos)
+end
+
+M.runcmd = function (cmd_str)
+  if M.exists() then M.clear() end
+  local cursorpos = vim.api.nvim_win_get_cursor(0)
+  local oldprint = print
+  print = M.liveprint
+  cmd(cmd_str)
   print = oldprint
   vim.api.nvim_win_set_cursor(0, cursorpos)
 end

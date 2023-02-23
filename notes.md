@@ -78,6 +78,7 @@ https://www.nerdfonts.com/font-downloads
 10. https://github.com/JoosepAlviste/dotfiles: nice customizaion about telescope live_grep
 11. https://github.com/joshmedeski/dotfiles: yabai,skhd,alacritty,tmux
 12. https://github.com/askfiy/nvim: [bilibili](https://space.bilibili.com/35183144)
+13. https://github.com/zbirenbaum/zvim
 
 # refer to useful plugins
 1. https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
@@ -147,6 +148,10 @@ relations with bufnr:
 5. 到26099行或者搜索0x1ad9, 加上`return !0x0;` 这一行
 6. 测试: `node server.bundle.js --stdio` 通过!!!
 7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的licence不通过的那句话
+8. answer from askfiy: 
+```markdown
+If you know node.js, you can try to find the answer from Pylance's encryption source code, it is actually very simple. The verification code is similar to "if !has(vscode) { return false};".
+```
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`

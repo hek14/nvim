@@ -147,6 +147,15 @@ relations with bufnr:
 5. 到26099行或者搜索0x1ad9, 加上`return !0x0;` 这一行
 6. 测试: `node server.bundle.js --stdio` 通过!!!
 7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的licence不通过的那句话
+8. 以'2023.2.30'版本为例: 
+8.1. 定位`0x1ad9`
+在server.bundle.js中搜索即可, 这个object一般不改名. 如果搜不到了, 那么按照下面方法:
+2023.2.30版本 [25872-26003]行 其实就是  `node server.bundle.js --stdio` 报的那些错, 
+这堆报错信息信息下方的就是这个`0x1ad9`object
+8.2. 继续往下定位`utf8`
+在2023.2.30版本中是: 26090行
+8.3. 最后来到26097这一行的(function () {....)
+8.4. 在26099行添加: `return !0x0;`
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`

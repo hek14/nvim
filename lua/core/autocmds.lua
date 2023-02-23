@@ -94,6 +94,14 @@ M.au("WinLeave",{callback=function ()
   end
 end})
 
+M.au("BufEnter",{callback=function ()
+  local is_dir = vim.fn.expand('%') == "."
+  if is_dir then
+    vim.cmd("NvimTreeClose")
+    vim.cmd("NvimTreeOpen .")
+  end
+end})
+
 _G.any_client_attached = function ()
   local bufnr = vim.fn.bufnr()
   -- local clients = vim.lsp.get_active_clients()

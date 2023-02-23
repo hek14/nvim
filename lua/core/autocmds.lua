@@ -83,6 +83,17 @@ M.au("BufNew",{callback=function ()
   end,
 })
 
+vim.g.old_current_word = ""
+M.au("WinLeave",{callback=function ()
+  local buf = vim.api.nvim_get_current_buf()
+  local ft = vim.api.nvim_buf_get_option(buf,'filetype')
+  if not (string.match(ft,'Telescope')) then
+    local start = vim.loop.hrtime()
+    vim.g.old_current_word = vim.fn.expand('<cword>')
+    vim.cmd(string.format(":call setreg('c','%s')",vim.g.old_current_word))
+  end
+end})
+
 _G.any_client_attached = function ()
   local bufnr = vim.fn.bufnr()
   -- local clients = vim.lsp.get_active_clients()

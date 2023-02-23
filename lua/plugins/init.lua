@@ -617,6 +617,7 @@ local plugins = {
       },
       {
         "ghillb/cybu.nvim",
+        enabled = false,
         lazy = false,
         config = function()
           local ok, cybu = pcall(require, "cybu")

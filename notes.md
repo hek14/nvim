@@ -78,6 +78,7 @@ https://www.nerdfonts.com/font-downloads
 10. https://github.com/JoosepAlviste/dotfiles: nice customizaion about telescope live_grep
 11. https://github.com/joshmedeski/dotfiles: yabai,skhd,alacritty,tmux
 12. https://github.com/askfiy/nvim: [bilibili](https://space.bilibili.com/35183144)
+13. https://github.com/zbirenbaum/zvim
 
 # refer to useful plugins
 1. https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
@@ -156,6 +157,10 @@ relations with bufnr:
 在2023.2.30版本中是: 26090行
 8.3. 最后来到26097这一行的(function () {....)
 8.4. 在26099行添加: `return !0x0;`
+8.5. answer from askfiy: 
+```markdown
+If you know node.js, you can try to find the answer from Pylance's encryption source code, it is actually very simple. The verification code is similar to "if !has(vscode) { return false};".
+```
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
@@ -168,3 +173,6 @@ relations with bufnr:
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 - consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
+- refactor my_document_highlight.lua: to directly set_extmark
+- add print() custom_capture for python
+- TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not

@@ -17,8 +17,14 @@ local M = {
     -- if you want to grep only in opened buffers<cmd> lua require('telescope.builtin').live_grep({grep_open_files=true})
     { "<leader>f/", "<cmd>lua require('core.utils').grep_last_search()<CR>" },
     { "<leader>fw", "<Cmd>lua require('contrib.telescope_custom_pickers').live_grep()<CR>"},
+    { "<leader><leader>w", "<Cmd>lua require('telescope.builtin').grep_string()<CR>"},
     { "<leader>fp", "<cmd>Telescope projects<CR>"},
-    { "<leader>z", ":Telescope zoxide list<CR>" }
+    { "<leader>z", ":Telescope zoxide list<CR>" },
+    { "<leader>sd", function ()
+      require('telescope.builtin').live_grep({
+        cwd = '/usr/local/share/nvim/runtime/doc/'
+      })
+    end }
   },
   dependencies = {
     {
@@ -140,7 +146,6 @@ function M.config()
           ["<cr>"] = function(prompt_bufnr)
             require('telescope.actions').select_default(prompt_bufnr)
             -- vim.cmd[[normal! zv]]
-            vim.cmd [[echom "telescope hello"]]
           end,
           ["<c-s>"] = open_in_nvim_tree,
         },

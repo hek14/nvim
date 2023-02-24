@@ -1,5 +1,5 @@
 local theme = require('plugins.theme')
-theme_plugin = theme.name and theme.name or theme[1]
+local theme_plugin = theme.name and theme.name or theme[1]
 local M = {
   "nvim-lualine/lualine.nvim",
   dependencies = { 
@@ -34,30 +34,50 @@ local inactive_winbar = function ()
   return filename
 end
 
+local total_ref 
+local current_loc
+local current_tick
+
 local reference_hint = function ()
   local buf = vim.api.nvim_get_current_buf()
   local ok,illuminate = require('illuminate')
   if not ok then
-    return ""
+    return 'ERR'
   else
     local refs = _G.illuminate_references[buf]
-    local current_loc = nil
-    local current_line = vim.api.nvim_win_get_cursor(0)[1]
-    local current_col = vim.api.nvim_win_get_cursor(0)[2]
-    for i,ref in ipairs(refs) do
-      local _start = ref.range.start
-      local _end = ref.range['end']
-      local condition = _start.line+1 == current_line and
-      _start.character <= current_col and
-      _end.line+1 >= current_line and
-      _end.character >= current_col
-      if condition then
-        current_loc = i
-        break
+    if current_tick~=_G.illuminate_update_tick[buf] then
+      total_ref = #refs
+      current_tick = _G.illuminate_update_tick[buf]
+      local current_line = vim.api.nvim_win_get_cursor(0)[1]
+      local current_col = vim.api.nvim_win_get_cursor(0)[2]
+      for i,ref in ipairs(refs) do
+        local _start = ref.range.start
+        local _end = ref.range['end']
+        local condition = _start.line+1 == current_line and
+        _start.character <= current_col and
+        _end.line+1 >= current_line and
+        _end.character >= current_col
+        if condition then
+          current_loc = i
+          break
+        end
+      end
+      if current_loc == nil then
+        current_loc = 'ERR'
       end
     end
-    return string.format("%d|%d",current_loc,#refs)
+    return string.format("%d|%d",current_loc,total_ref)
   end
+end
+
+local lsp_name = function ()
+  local clients = any_client_attached() 
+  local names = ""
+  for _,client in ipairs(clients) do
+    names = names .. client.name .. "|"
+  end
+  names = string.sub(names,1,#names-1)
+  return names
 end
 
 local function pwd()
@@ -96,6 +116,11 @@ M.config = function ()
           icon = ' Reference:',
           color = { fg='#8caaee', bg='#51576d' }
         },
+        {
+          lsp_name,
+          icon = ' LSP:',
+          color = { fg='#8caaee', bg='#51576d' }
+        }
       },
       lualine_y = {'filetype'},
       lualine_z = {'progress'}

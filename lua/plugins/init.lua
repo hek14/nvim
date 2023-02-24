@@ -382,6 +382,7 @@ local plugins = {
         vim.cmd([[
         function! Clippy_open_browser(url) abort
         echom('opening ' . a:url)
+        call system('clippy command ssh -N -f -L 9999:127.0.0.1:9999 qingdao')
         call system('clippy openurl ' . a:url)
         endfunction
         ]])
@@ -617,6 +618,7 @@ local plugins = {
       },
       {
         "ghillb/cybu.nvim",
+        enabled = false,
         lazy = false,
         config = function()
           local ok, cybu = pcall(require, "cybu")

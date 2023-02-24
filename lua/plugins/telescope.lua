@@ -146,7 +146,6 @@ function M.config()
           ["<cr>"] = function(prompt_bufnr)
             require('telescope.actions').select_default(prompt_bufnr)
             -- vim.cmd[[normal! zv]]
-            vim.cmd [[echom "telescope hello"]]
           end,
           ["<c-s>"] = open_in_nvim_tree,
         },

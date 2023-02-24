@@ -164,3 +164,6 @@ If you know node.js, you can try to find the answer from Pylance's encryption so
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 - consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
+- refactor my_document_highlight.lua: to directly set_extmark
+- add print() custom_capture for python
+- TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not

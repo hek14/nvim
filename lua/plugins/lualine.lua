@@ -120,7 +120,13 @@ M.config = function ()
           lsp_name,
           icon = ' LSP:',
           color = { fg='#8caaee', bg='#51576d' }
-        }
+        },
+        {
+          function ()
+            return require'lsp-status'.status()
+          end,
+          color = { fg='#8caaee', bg='#51576d' }
+        },
       },
       lualine_y = {'filetype'},
       lualine_z = {'progress'}

@@ -21,3 +21,5 @@ bin/ms-python.vscode-pylance-*
 *.json
 
 lua/contrib/cmp_github_handler.lua
+
+.DS_Store

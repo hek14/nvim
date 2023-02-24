@@ -15,7 +15,7 @@ lua/contrib/goto-preview
 scratch
 reference
 
-bin/ms-python.vscode-pylance-2023.2.30
+bin/ms-python.vscode-pylance-*
 
 *.log
 *.json

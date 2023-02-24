@@ -4,6 +4,7 @@ local M = {
   "nvim-lualine/lualine.nvim",
   dependencies = { 
     "hek14/nvim-navic",
+    "nvim-lua/lsp-status.nvim",
     "hek14/vim-illuminate",
     "nvim-tree/nvim-web-devicons",
     theme_plugin

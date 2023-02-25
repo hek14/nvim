@@ -90,7 +90,12 @@ M.au("WinLeave",{callback=function ()
   if not (string.match(ft,'Telescope')) then
     local start = vim.loop.hrtime()
     vim.g.old_current_word = vim.fn.expand('<cword>')
-    vim.cmd(string.format(":call setreg('c','%s')",vim.g.old_current_word))
+    local ok, err = pcall(function()
+      vim.cmd(string.format(":call setreg('c','%s')",vim.g.old_current_word))
+    end)
+    if not ok then
+      print("cannot set old_current_word")
+    end
   end
 end})
 
@@ -102,8 +107,8 @@ M.au("BufEnter",{callback=function ()
   end
 end})
 
-_G.any_client_attached = function ()
-  local bufnr = vim.fn.bufnr()
+_G.any_client_attached = function (bufnr)
+  bufnr = bufnr or vim.fn.bufnr()
   -- local clients = vim.lsp.get_active_clients()
   -- local attached = {}
   -- for i,client in ipairs(clients) do

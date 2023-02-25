@@ -102,14 +102,14 @@ M.config = function ()
     inactive_winbar = {},
     sections = {
       lualine_a = {'mode'},
-      lualine_b = {'branch', 'diff', 'diagnostics'},
-      lualine_c = { 
+      lualine_b = { 
         { 
           pwd, 
           icon = ':Dir:',
           color = { fg='#8caaee', bg='#51576d' }
         }
       },
+      lualine_c = {'branch', 'diff', 'diagnostics'},
       lualine_x = {
         {
           reference_hint,

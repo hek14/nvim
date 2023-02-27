@@ -286,12 +286,12 @@ local function handle_document_highlight(result, bufnr)
     return before_by_start(a.range, b.range)
   end)
   curr_references[bufnr] = result
-  if cursor_in_references(bufnr) then
-    -- do not highlight outdated references, maybe the cursor moved in the process of request
-    my_buf_highlight_references(bufnr, result)
-  else
-    error("Cursor moved out of the range")
-  end
+  my_buf_highlight_references(bufnr, result) 
+  -- if cursor_in_references(bufnr) then
+  --   my_buf_highlight_references(bufnr, result) -- do not highlight outdated references, maybe the cursor moved in the process of request
+  -- else
+  --   error("Cursor moved out of the range")
+  -- end
 end
 -- main test
 
@@ -340,7 +340,8 @@ end
 function M.kk_highlight()
   -- no need to use timer, because users wil not call this function very frequently
   profile_start(vim.api.nvim_get_current_buf())
-  if illuminate_references and #illuminate_references[vim.api.nvim_get_current_buf()] > 0 then
+  -- if illuminate_references and #illuminate_references[vim.api.nvim_get_current_buf()] > 0 then
+  if false then
     print("using cached references:->>")
     handle_document_highlight(illuminate_references[vim.api.nvim_get_current_buf()],vim.api.nvim_get_current_buf())
   else

@@ -2,7 +2,12 @@
 local M = {}
 local timer = {}
 local log = require('core.utils').log
-
+local uv = vim.loop
+local function safe_close(handle)
+  if not uv.is_closing(handle) then
+    uv.close(handle)
+  end
+end
 local function lspSymbol(name, icon)
   local hl = "DiagnosticSign" .. name
   vim.fn.sign_define(hl, {text = icon, numhl = hl, texthl = hl})
@@ -23,47 +28,87 @@ local function filter(arr, func, args)
   for i = new_index, size_orig do arr[i] = nil end
 end
 
+
+local filter_rule_fn_lua = function (diagnostic,old_index,symbols)
+  if string.match(diagnostic.message, 'Unused local.*') then
+    return false
+  end
+  if string.match(diagnostic.message, 'Unused function.*') then
+    return false
+  end
+  if string.match(diagnostic.message, 'Deprecated.*current is Lua') then
+    return false
+  end
+  if string.match(diagnostic.message, 'Line with postspace') then
+    return false
+  end
+  return true
+end
+
+local handle_import = function(diagnostic)
+  local buf = vim.api.nvim_get_current_buf()
+  local line = diagnostic.range.start.line
+  local text = vim.api.nvim_buf_get_lines(buf,line,line+1,false)[1]
+  local module_name = string.sub(text,diagnostic.range.start.character,diagnostic.range['end'].character)
+  local stdout = uv.new_pipe(false)
+  local stderr = uv.new_pipe(false)
+  local handle,pid_or_err
+  local no_module_found = false
+  local other_err = false
+  local opts = {
+    args = {"-c",text},
+    stdio = { nil, stdout, stderr }
+  }
+  handle, pid_or_err = uv.spawn("python", opts, function(code)
+    uv.read_stop(stdout)
+    uv.read_stop(stderr)
+    safe_close(handle)
+    safe_close(stdout)
+    safe_close(stderr)
+    if no_module_found then
+      print(string.format("module %s is actually not there",module_name))
+    else
+      if other_err then
+        print(string.format("err: %s",other_err))
+      else
+        vim.notify("no err:!!! ",no_module_found,other_err)
+        print("no err:!!! ",no_module_found,other_err)
+        local clients = vim.lsp.buf_get_clients(buf)
+        for id,client in pairs(clients) do
+          if client.name=='pylance' then
+            print('try to fix!!! pylance')
+            client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+          end
+        end
+      end
+    end
+  end)
+  uv.read_start(stderr, function(err, data)
+    if data and string.match(data,'ModuleNotFoundError') then
+      no_module_found = true
+    else
+      other_err = data
+    end
+  end)
+end
+
+local filter_rule_fn_python = function(diagnostic,old_index,symbols)
+  if (diagnostic.code and string.match(diagnostic.code,'reportMissingImports')) or
+    (diagnostic.message and string.match(diagnostic.message, 'Import.*could not be resolved'))
+    then
+      handle_import(diagnostic)
+    end
+  return true
+end
+
 local function filter_rule_fn(diagnostic,old_index,symbols)
   -- Only filter out Pyright stuff for now
   -- To get line diagnostics :lua =vim.lsp.diagnostic.get_line_diagnostics()
   if diagnostic.source == "Lua Diagnostics." then
-    if string.match(diagnostic.message, 'Unused local.*') then
-      return false
-    end
-    if string.match(diagnostic.message, 'Unused function.*') then
-      return false
-    end
-    if string.match(diagnostic.message, 'Deprecated.*current is Lua') then
-      return false
-    end
-    if string.match(diagnostic.message, 'Line with postspace') then
-      return false
-    end
-    return true
+    return filter_rule_fn_lua(diagnostic,old_index,symbols)
   end
-
   if diagnostic.source == "Pyright"  or diagnostic.source == 'Pylance' then
-    return false -- just do not use pyright diagnostics, use ruff instead
-    -- if symbols == nil then return true end
-    -- if string.match(diagnostic.message,'.*is not accessed') then
-    --   local found = nil
-    --   for i,symbol in ipairs(symbols or {}) do
-    --     if vim.deep_equal(diagnostic.range,symbol.range) then 
-    --       found = symbol
-    --     end
-    --   end
-    --   if found == nil then
-    --     return false  -- not found: it's not documentSymbol, maybe function/module/package, just filter it
-    --   else
-    --     if lsp_num_to_str[found.kind] == 'Variable' then
-    --       return true
-    --     else
-    --       return false
-    --     end
-    --   end
-    -- else
-    --   return true
-    -- end
+    return filter_rule_fn_python(diagnostic,old_index,symbols)
   end
   return true
 end

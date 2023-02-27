@@ -153,6 +153,13 @@ local function others()
   map("n", {"<TAB>","]b"}, ":bn<CR>")
   map("n", {"<S-Tab>","[b"}, ":bp<CR>")
 
+  local escape = require('core.utils').termcode
+  local function quick_insert_profile()
+    vim.fn.feedkeys(escape('local start = vim.loop.hrtime()\n'),'n')
+    vim.fn.setreg('v',[[print(string.format('spent time: %s ms',(vim.loop.hrtime()-start)/1000000))]])
+  end
+  map('i','<C-w>',quick_insert_profile)
+
   vim.cmd([[
   function! Cabbrev(key, value) abort
   execute printf('cabbrev <expr> %s (getcmdtype() == ":" && getcmdpos() <= %d) ? %s : %s',

@@ -32,3 +32,5 @@ for _, module in ipairs(modules) do
       error("Error loading " .. module .. "\n\n" .. err)
    end
 end
+require("core.utils").ppid()
+_G.p = require('contrib.print_to_buf').liveprint

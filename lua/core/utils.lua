@@ -34,7 +34,20 @@ M.close_buffer = function(force)
   -- if not force, change to prev buf and then close current
   -- local close_cmd = force and ":bd!" or ":e #| bd" .. vim.fn.bufnr()
   local close_cmd = force and ":bd!" or ":b# | bd" .. vim.fn.bufnr()
-  vim.cmd(close_cmd)
+  local ok, err = pcall(function()
+    vim.cmd(close_cmd)
+  end)
+  print(err and err)
+end
+
+M.ppid = function()
+  local pid = vim.fn.getpid()
+  local ppid = vim.trim(vim.fn.system(string.format('ps -p %s -o ppid=',pid)))
+  local cmd_str = string.format([[:echo 'current nvim ppid: %s']],ppid)
+  vim.api.nvim_echo({
+    { "current nvim ppid: " .. ppid,  "Visual" },
+    { "" }
+  }, true, {})
 end
 
 -- hide statusline
@@ -542,6 +555,9 @@ M.my_print = function (...)
 end
 
 M.range_search = function(pattern,_start,_end)
+  if pattern == nil then
+    pattern = vim.fn.input('Search pattern: ',vim.fn.expand('<cword>'))
+  end
   local mode = vim.fn.mode()
   if _start==nil and _end==nil then
     if mode=="n" then
@@ -557,12 +573,9 @@ M.range_search = function(pattern,_start,_end)
       _end = vim.fn.getpos("'>")[2]
     end
   end
-  if pattern == nil then
-    pattern = vim.fn.input('Search pattern: ',vim.fn.expand('<cword>'))
-  end
-  pcall(function ()
+  if _start and _end and pattern then
     vim.cmd(string.format([[/\%%>%sl\%%<%sl%s]],_start-1,_end+1,pattern))
-  end)
+  end
 end
 
 

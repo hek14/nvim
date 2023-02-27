@@ -89,6 +89,8 @@ https://www.nerdfonts.com/font-downloads
 6. https://github.com/stevearc/overseer.nvim: yet another task manager
 7. themes: https://alpha2phi.medium.com/12-neovim-themes-with-tree-sitter-support-8be320b683a4
 8. https://github.com/cshuaimin/ssr.nvim: Structural search and replace for Neovim
+9. https://github.com/mg979/vim-visual-multi: multi-cursor plugin
+10. https://github.com/echasnovski/mini.nvim
 
 # Youtuber to follow
 1. jesse19skelton

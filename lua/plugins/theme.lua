@@ -84,4 +84,12 @@ local everforest = {
   end
 }
 
-return catppuccin
+local vscode_theme = {
+  dir = "~/github/nvim_vscode_theme",
+  event = "VimEnter",
+  config = function ()
+    require('visual_studio_code').setup({mode='dark'})
+  end
+}
+
+return vscode_theme

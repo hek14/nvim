@@ -92,6 +92,18 @@ local function pwd()
 end
 
 vim.opt.laststatus = 3
+M.highlight = function ()
+  local modes = {'normal','visual','insert','command'}
+  local things = {"","diagnostics_info","diagnostics_hint","diagnostics_warn"}
+  for _,thing in ipairs(things) do
+    for _,m in ipairs(modes) do
+      local src = #thing==0 and ('lualine_c_' .. m) or ('lualine_c_' .. thing .. '_' .. m)
+      local tar = #thing==0 and ('lualine_b_' .. m) or ('lualine_b_' .. thing .. '_' .. m)
+      vim.api.nvim_set_hl(0,src,{link = tar})
+    end
+  end
+  vim.api.nvim_set_hl(0,"lualine_c_diagnostics_error_normal", { fg = '#f14c4c', bg = '#212121' })
+end
 M.config = function ()
   require('lualine').setup {
     options = {
@@ -109,7 +121,7 @@ M.config = function ()
           color = { fg='#8caaee', bg='#51576d' }
         }
       },
-      lualine_c = {'branch', 'diff', 'diagnostics'},
+      lualine_c = {'branch', 'diagnostics'},
       lualine_x = {
         {
           reference_hint,
@@ -133,6 +145,7 @@ M.config = function ()
     },
     inactive_sections = {},
   }  
+  M.highlight()
 end
 
 return M

@@ -1,3 +1,12 @@
+local override_hl = function ()
+  vim.cmd([[
+  hi clear CursorLine
+  hi default LspReferenceRead ctermbg=237 guibg=#343d46
+  hi default LspReferenceText ctermbg=237 guibg=#343d46
+  hi default LspReferenceWrite ctermbg=237 guibg=#343d46 gui=Bold,Italic
+  ]])
+end
+
 local catppuccin = {
   "catppuccin/nvim",
   name = "catppuccin",
@@ -38,7 +47,6 @@ local catppuccin = {
     vim.cmd [[ colorscheme catppuccin ]]
   end
 }
-
 
 local kanagawa = {
   "rebelot/kanagawa.nvim",
@@ -89,6 +97,7 @@ local vscode_theme = {
   event = "VimEnter",
   config = function ()
     require('visual_studio_code').setup({mode='dark'})
+    override_hl()
   end
 }
 

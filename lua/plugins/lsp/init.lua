@@ -100,20 +100,6 @@ end
 function M.config()
   local util = require'lspconfig'.util
   local illuminate_present,illuminate = pcall(require,'illuminate')
-  vim.cmd([[
-  autocmd ColorScheme * |
-  " hi def link LspReferenceText CursorLine |
-  " hi def link LspReferenceWrite CursorLine |
-  " hi def link LspReferenceRead CursorLine
-  " hi default LspReferenceRead cterm=bold gui=Bold ctermbg=yellow guifg=yellow guibg=purple4 |
-  " hi default LspReferenceText cterm=bold gui=Bold ctermbg=red guifg=SlateBlue guibg=MidnightBlue |
-  " hi default LspReferenceWrite cterm=bold gui=Bold,Italic ctermbg=red guifg=DarkSlateBlue guibg=MistyRose
-  hi default LspReferenceRead ctermbg=237 guibg=#343d46
-  hi default LspReferenceText ctermbg=237 guibg=#343d46
-  hi default LspReferenceWrite ctermbg=237 guibg=#343d46
-  hi clear CursorLine
-  ]])
-
 
   local my_lsp_handlers = {
     ["textDocument/hover"] = vim.lsp.with(M.lsp_hover, {

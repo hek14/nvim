@@ -98,6 +98,9 @@ local filter_rule_fn_python = function(diagnostic,old_index,symbols)
     then
       handle_import(diagnostic)
     end
+  if (diagnostic.message and string.match(diagnostic.message,'not accessed')) then
+    return false
+  end
   return true
 end
 

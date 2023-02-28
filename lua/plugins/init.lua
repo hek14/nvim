@@ -1,5 +1,18 @@
 local plugins = {
   { "nvim-lua/plenary.nvim" , lazy = false },
+  { 
+    "bfredl/nvim-luadev",
+    cmd = 'Luadev',
+    keys = {'<Plug>(Luadev-RunLine)','<Plug>(Luadev-Run)','<Plug>(Luadev-RunWord)','<Plug>(Luadev-Complete)'},
+    init = function()
+      local map = require("core.utils").map
+      map('n','<C-x>l','<Plug>(Luadev-RunLine)',{remap=true})
+      map('n','<C-x>r','<Plug>(Luadev-Run)',{remap=true})
+      map('x','<C-x>r','<Plug>(Luadev-Run)',{remap=true})
+      map('n','<C-x>w','<Plug>(Luadev-RunWord)',{remap=true})
+      map('i','<C-x>c','<Plug>(Luadev-Complete)',{remap=true})
+    end
+  },
   { "nvim-tree/nvim-web-devicons" },
   {
     "norcalli/nvim-colorizer.lua",

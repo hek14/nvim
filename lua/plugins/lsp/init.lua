@@ -134,6 +134,16 @@ function M.config()
   capabilities.offsetEncoding = { "utf-16" }
 
   local on_attach = function(client, bufnr)
+    local launch_in_home = client.config.root_dir == vim.env["HOME"]
+    if launch_in_home then
+      local answer = vim.fn.input("really want to launch_in_home? y/n: ")
+      print('the answer is ',answer)
+      if answer == 'n' then
+        vim.lsp.buf_detach_client(bufnr,client.id)
+        return
+      end
+    end
+
     if vim.tbl_contains({"pylance"}, client.name) then
       print('turn off semanticTokensProvider')
       client.server_capabilities.semanticTokensProvider = {

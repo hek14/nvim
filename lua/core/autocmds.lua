@@ -84,8 +84,10 @@ M.au("BufNew",{callback=function ()
 })
 
 vim.g.old_current_word = ""
+vim.g.last_focused_win = nil
 M.au("WinLeave",{callback=function ()
   local buf = vim.api.nvim_get_current_buf()
+  vim.g.last_focused_win = vim.api.nvim_get_current_win()
   local ft = vim.api.nvim_buf_get_option(buf,'filetype')
   if not (string.match(ft,'Telescope')) then
     local start = vim.loop.hrtime()
@@ -98,6 +100,11 @@ M.au("WinLeave",{callback=function ()
     end
   end
 end})
+map("n","<C-w>l",function ()
+  if vim.api.nvim_win_is_valid(vim.g.last_focused_win)then
+    vim.api.nvim_set_current_win(vim.g.last_focused_win) 
+  end
+end)
 
 M.au("BufEnter",{callback=function ()
   local is_dir = vim.fn.expand('%') == "."

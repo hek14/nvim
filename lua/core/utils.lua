@@ -13,7 +13,6 @@ _G.profile = function(cmd, times, flush)
   print('Profile: ' .. ((vim.loop.hrtime() - start) / 1000000 / times) .. "ms")
 end
 
-local cmd = vim.cmd
 M.close_buffer = function(force)
   if vim.bo.buftype == "terminal" then
     vim.api.nvim_win_hide(0)

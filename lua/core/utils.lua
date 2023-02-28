@@ -36,7 +36,9 @@ M.close_buffer = function(force)
   local ok, err = pcall(function()
     vim.cmd(close_cmd)
   end)
-  print(err and err)
+  if err then
+    vim.cmd('bd')
+  end
 end
 
 M.ppid = function()

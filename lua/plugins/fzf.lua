@@ -1,3 +1,4 @@
+-- documentation: https://github.com/ibhagwan/fzf-lua/wiki/Advanced
 return {
   'ibhagwan/fzf-lua',
   cmd = 'FzfLua',
@@ -28,9 +29,6 @@ return {
       fzf_opts = {
         ['--layout'] = 'reverse',
       },
-      keymap = { fzf = {
-        ["ctrl-y"] = "transform-query(echo '{q} -- ')",
-      }}
     })
   end
 }

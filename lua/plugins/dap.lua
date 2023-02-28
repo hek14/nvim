@@ -1,7 +1,7 @@
+local au = require('core.autocmds').au
 local M = {
   "mfussenegger/nvim-dap",
   dependencies = {
-    "nvim-telescope/telescope-dap.nvim",
     "theHamsta/nvim-dap-virtual-text",
     "mfussenegger/nvim-dap-python",
     "rcarriga/nvim-dap-ui",
@@ -33,7 +33,7 @@ local M = {
 function M.config()
   local map = require('core.utils').map
   require('dap-python').setup(vim.fn.system("which python"):gsub('\n',''),{console = 'internalConsole'})
-  require('telescope').load_extension('dap')
+  -- require('dap-python').setup()
   require('nvim-dap-virtual-text').setup({
     enabled = true,                     -- enable this plugin (the default)
     enabled_commands = true,            -- create commands DapVirtualTextEnable, DapVirtualTextDisable, DapVirtualTextToggle, (DapVirtualTextForceRefresh for refreshing when debug adapter did not notify its termination)
@@ -62,6 +62,7 @@ function M.config()
           "breakpoints",
           "watches",
           "repl",
+          "console"
         },
         size = 0.25, -- 25% of total lines
         position = "bottom",
@@ -81,7 +82,7 @@ function M.config()
   dap.adapters.nlua = function(callback, config)
     callback({ type = 'server', host = config.host or "127.0.0.1", port = config.port or 8086 })
   end
-  dap.defaults.fallback.terminal_win_cmd = '80vsplit new'
+  -- dap.defaults.fallback.terminal_win_cmd = '80vsplit new'
   vim.fn.sign_define('DapBreakpoint', {text= '🐛', texthl='', linehl='', numhl=''})
   vim.fn.sign_define('DapBreakpointRejected', {text='🟦', texthl='', linehl='', numhl=''})
   vim.fn.sign_define('DapStopped', {text='⭐️', texthl='', linehl='', numhl=''})
@@ -119,8 +120,30 @@ function M.config()
     end
   end,{expr=true})
 
-  vim.cmd [[ autocmd FileType dap-repl lua require('dap.ext.autocompl').attach() ]]
-  vim.cmd [[ autocmd BufWinEnter,BufEnter,WinEnter * if &filetype=="dap-repl" | startinsert | endif ]]
+  au('FileType',{
+    pattern = 'dap-repl',
+    callback = require('dap.ext.autocompl').attach
+  })
+  au({'BufWinEnter','WinEnter'},{
+    callback = function ()
+      local buffer = vim.api.nvim_get_current_buf()
+      local ft = vim.api.nvim_buf_get_option(buffer,'filetype')
+      if ft=='dap-repl' then
+        vim.cmd [[ startinsert ]]
+      end
+      map("i","<C-w>l",function ()
+        if vim.api.nvim_win_is_valid(vim.g.last_focused_win)then
+          vim.api.nvim_set_current_win(vim.g.last_focused_win) 
+        end
+      end,{buffer=buffer})
+      au("WinLeave",{
+        buffer = buffer,
+        callback = function ()
+          vim.cmd [[ stopinsert ]]
+        end
+      })
+    end
+  })
 
   local dapui = require("dapui")
   dap.listeners.after.event_initialized["dapui_config"] = function()

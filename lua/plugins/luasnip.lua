@@ -1,7 +1,9 @@
 -- NOTE:refer to https://www.youtube.com/watch?v=ub0REXjhpmk
 local M = {
   "L3MON4D3/LuaSnip",
-  event = 'InsertEnter'
+  event = 'InsertEnter',
+  -- install jsregexp (optional!).
+  build = "make install_jsregexp"
 }
 function M.config()
   local luasnip = require"luasnip"

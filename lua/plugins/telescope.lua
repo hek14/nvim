@@ -1,6 +1,5 @@
 local map = require("core.utils").map
 local M = {
-  enabled = false,
   "nvim-telescope/telescope.nvim",
   cmd = "Telescope",
   keys = {

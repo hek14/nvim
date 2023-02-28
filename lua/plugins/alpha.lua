@@ -42,7 +42,8 @@ default.ascii = {
 "",
 "",
 "",
-"Hey! Because we fxxking can, and if we can, we do."
+"       Hey! Because we fxxking can.", 
+"       And if we can, we do."
 }
 
 default.header = {
@@ -57,11 +58,11 @@ default.header = {
 default.buttons = {
   type = "group",
   val = {
-    button("SPC f f", "  Find File  ", ":Telescope find_files<CR>"),
-    button("SPC f o", "  Recent File  ", ":Telescope oldfiles<CR>"),
-    button("SPC b m", "  Bookmarks  ", ":Telescope marks<CR>"),
-    button("SPC t h", "  Themes  ", ":Telescope themes<CR>"),
-    button("SPC e s", "  Settings", ":e $MYVIMRC | :cd %:p:h <CR>"),
+    -- button("SPC f f", "  Find File  ", ":Telescope find_files<CR>"),
+    -- button("SPC f o", "  Recent File  ", ":Telescope oldfiles<CR>"),
+    -- button("SPC b m", "  Bookmarks  ", ":Telescope marks<CR>"),
+    -- button("SPC t h", "  Themes  ", ":Telescope themes<CR>"),
+    -- button("SPC e s", "  Settings", ":e $MYVIMRC | :cd %:p:h <CR>"),
   },
   opts = {
     spacing = 1,

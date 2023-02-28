@@ -43,6 +43,7 @@ return {
   fig,axes = plt.subplots({})
   {}
   {}
+  {}
   ]],{
     i(1,"1"),
     d(2,function(args,_,old_state)
@@ -72,7 +73,8 @@ return {
     c(3,{
       t("plt.show()"),
       sn(nil,{t"plt.savefig(",i(1),t")"})
-    })
+    }),
+    i(0)
   }),
   {
     -- NOTE: do some dynamic/context-wise things here

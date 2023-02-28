@@ -42,8 +42,9 @@ default.ascii = {
 "",
 "",
 "",
-"       Hey! Because we fxxking can.", 
-"       And if we can, we do."
+"          Hey! Because we fxxking can.", 
+"",
+"          And if we can, we do."
 }
 
 default.header = {

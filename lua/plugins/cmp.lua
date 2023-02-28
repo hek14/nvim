@@ -131,10 +131,10 @@ function M.config()
       ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
       ["<Up>"] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i' }),
       ['<Down>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i' }),
-      ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-      ["<C-f>"] = cmp.mapping.scroll_docs(4),
+      -- ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+      -- ["<C-f>"] = cmp.mapping.scroll_docs(4),
       ["<C-Space>"] = cmp.mapping.complete(),
-      ["<C-e>"] = cmp.mapping.close(),
+      ["<C-v>"] = cmp.mapping.close(),
       ["<CR>"] = cmp.mapping.confirm {
         behavior = cmp.ConfirmBehavior.Replace,
         select = true,
@@ -162,14 +162,14 @@ function M.config()
       end
     },
     sources = {
+      { name = "luasnip" },
       { name = "nvim_lsp" },
       { name = 'nvim_lsp_signature_help' },
       -- { name = "mine_config_yaml", trigger_characters = { '.' } }, -- manually trigger
-      { name = "luasnip" },
-      { name = "buffer" },
       { name = "nvim_lua" },
       { name = "path" },
-      { name = "latex_symbols"}
+      { name = "latex_symbols"},
+      { name = "buffer" }
     },
     window = {
       completion = cmp.config.window.bordered(),

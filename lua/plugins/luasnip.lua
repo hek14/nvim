@@ -8,10 +8,38 @@ local M = {
 }
 
 function M.config()
+  -- help: `:help luasnip-config-reference`
   local ls = require("luasnip")
+  local types = require("luasnip.util.types")
   ls.setup({
-    update_events = {"TextChanged", "TextChangedI", "InsertLeave"}
+    history = true,
+    update_events = {"TextChanged", "TextChangedI"},
+    region_check_events = {'InsertEnter'},
+    ext_opts = {
+      [types.insertNode] = {
+        active = { hl_group = "ErrorMsg" },
+        visited = { hl_group = 'Visual' },
+        passive = { hl_group = 'Visual' },
+        snippet_passive = { hl_group = 'Visual' }
+      },
+      [types.choiceNode] = {
+        active = {  hl_group = "Visual" },
+        unvisited = { hl_group = 'Visual' }
+      },
+      [types.snippet] = {
+        -- passive = { hl_group = 'LspInfoTip' }
+      }
+    },
+    ext_base_prio = 200,
+    ext_prio_increase = 2
   })
+  map({'i','n'},'<C-e>',function ()
+    if ls.in_snippet() then
+      ls.unlink_current()
+    else
+      vim.fn.feedkeys("<C-e>",'n')
+    end
+  end,{silent=false})
   local line_breaker = function()
     return ls.t({"",""})
   end
@@ -22,16 +50,21 @@ function M.config()
   end)
   require('luasnip.loaders.from_lua').lazy_load({ paths = vim.fn.stdpath('config') .. '/snippets' })
 
+  function _G.ctrl_d()
+    if ls.expand_or_jumpable() then 
+      ls.expand_or_jump()
+    end
+  end
+  map({ "i", "s" }, "<c-d>", "<Cmd>lua ctrl_d()<CR>", { silent = true })
   -- <c-j> is my expansion key
   -- this will expand the current item or jump to the next item within the snippet.
   function _G.ls_Ctrl_j()
-    if ls.expand_or_jumpable() then
-      ls.expand_or_jump()
+    if ls.jumpable(1) then
+      ls.jump(1)
     end
   end
 
   map({ "i", "s" }, "<c-j>", "<Cmd>lua ls_Ctrl_j()<CR>", { silent = true })
-
   -- <c-k> is my jump backwards key.
   -- this always moves to the previous item within the snippet
   function _G.ls_Ctrl_k()
@@ -50,6 +83,8 @@ function M.config()
   end)
 
   -- shorcut to source my luasnips file again, which will reload my snippets
-  map("n", "<leader><leader>s", "<cmd>source ~/.config/nvim/lua/custom/pluginConfs/luasnip.lua<CR>")
+  map("n", "<leader><leader>s",function ()
+    require('luasnip.loaders.from_lua').lazy_load({ paths = vim.fn.stdpath('config') .. '/snippets' })
+  end)
 end
 return M

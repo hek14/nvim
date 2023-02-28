@@ -159,6 +159,7 @@ local function others()
     vim.fn.setreg('v',[[print(string.format('spent time: %s ms',(vim.loop.hrtime()-start)/1000000))]])
   end
   map('i','<C-w>',quick_insert_profile)
+  map('n','<C-p>',':set buflisted | set nohidden<CR>',{desc='pin this buffer'})
 
   vim.cmd([[
   function! Cabbrev(key, value) abort

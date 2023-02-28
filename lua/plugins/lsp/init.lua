@@ -3,7 +3,7 @@
   -- :lua =vim.lsp.get_active_clients()[1].server_capabilities
 -- To top-out one capability: client.server_capabilities.semanticTokensProvider = nil
 
-
+local au = require('core.autocmds').au
 local M = {
   "neovim/nvim-lspconfig",
   event = "BufRead",
@@ -150,7 +150,7 @@ function M.config()
     -- if client.name == "pyright" then
     --   client.server_capabilities.document_formatting = false
     -- end
-    vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
+    -- vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
     require 'illuminate'.on_attach(client)
     if client.server_capabilities.documentSymbolProvider then
       require("nvim-navic").attach(client, bufnr)
@@ -158,6 +158,14 @@ function M.config()
     require("contrib.pig").on_attach(bufnr)
     require('contrib.my_document_highlight').on_attach(bufnr)
     require('plugins.lsp.keymap').setup(client,bufnr)
+    if vim.tbl_contains({'pylance','Pylance','pyright','Pyright'},client.name) then
+      au('QuitPre',{
+        callback = function()
+          vim.fn.system(string.format("ps aux | grep -i '%s' | grep -v 'grep' | awk '{print $2}' | xargs -I {} kill -9 {}",client.name))
+        end,
+        once = true
+      })
+    end
     -- require('contrib.show_diagnostic_in_message').on_attach(bufnr)
   end
 

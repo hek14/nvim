@@ -1,3 +1,4 @@
+local map = require("core.utils").map
 -- NOTE:refer to https://www.youtube.com/watch?v=ub0REXjhpmk
 local M = {
   "L3MON4D3/LuaSnip",
@@ -5,18 +6,15 @@ local M = {
   -- install jsregexp (optional!).
   build = "make install_jsregexp"
 }
+
 function M.config()
-  local luasnip = require"luasnip"
-  local map = require("core.utils").map
   local ls = require("luasnip")
+  ls.setup({
+    update_events = {"TextChanged", "TextChangedI", "InsertLeave"}
+  })
   local line_breaker = function()
     return ls.t({"",""})
   end
-
-  luasnip.config.setup {
-    history = true,
-    updateevents = "TextChanged,TextChangedI",
-  }
 
   local au = require("core.autocmds").au
   au("InsertEnter", function()

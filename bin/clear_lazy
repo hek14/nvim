@@ -1,0 +1,1 @@
+cd ~/.local/share/nvim/lazy && ls -1 | xargs -I % zsh -c 'dir=%; output=$(git -C % status); match=$(echo $output | sed -n "/\(Untracked\|modified\)/p") ; if [ ${#match} -gt 0 ]; then echo "bad: "$dir ; git -C $dir reset --hard; fi'

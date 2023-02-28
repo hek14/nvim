@@ -71,3 +71,8 @@ require('lazy').setup("plugins", {
     },
   }
 })
+
+vim.api.nvim_create_user_command('Lazysync',function ()
+  vim.fn.system("~/.config/nvim/bin/clear_lazy")
+  vim.cmd [[ Lazy sync ]]
+end,{})

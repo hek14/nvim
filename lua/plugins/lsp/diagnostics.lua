@@ -93,11 +93,11 @@ local handle_import = function(diagnostic)
 end
 
 local filter_rule_fn_python = function(diagnostic,old_index,symbols)
-  if (diagnostic.code and string.match(diagnostic.code,'reportMissingImports')) or
-    (diagnostic.message and string.match(diagnostic.message, 'Import.*could not be resolved'))
-    then
-      handle_import(diagnostic)
-    end
+  -- if (diagnostic.code and string.match(diagnostic.code,'reportMissingImports')) or
+  --   (diagnostic.message and string.match(diagnostic.message, 'Import.*could not be resolved'))
+  --   then
+  --     handle_import(diagnostic)
+  --   end
   if (diagnostic.message and string.match(diagnostic.message,'not accessed')) then
     return false
   end

@@ -1,3 +1,5 @@
+# check default keymap
+`help index`
 # themes 
 ```text
   {
@@ -151,18 +153,28 @@ relations with bufnr:
 6. 测试: `node server.bundle.js --stdio` 通过!!!
 7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的licence不通过的那句话
 8. 以'2023.2.30'版本为例: 
-8.1. 定位`0x1ad9`
-在server.bundle.js中搜索即可, 这个object一般不改名. 如果搜不到了, 那么按照下面方法:
-2023.2.30版本 [25872-26003]行 其实就是  `node server.bundle.js --stdio` 报的那些错, 
-这堆报错信息信息下方的就是这个`0x1ad9`object
-8.2. 继续往下定位`utf8`
-在2023.2.30版本中是: 26090行
-8.3. 最后来到26097这一行的(function () {....)
-8.4. 在26099行添加: `return !0x0;`
-8.5. answer from askfiy: 
-```markdown
-If you know node.js, you can try to find the answer from Pylance's encryption source code, it is actually very simple. The verification code is similar to "if !has(vscode) { return false};".
+8.1. 定位报错的message, 这个要首先通过`node server.bundle.js --stdio`看原本的message, 然后搜索里面的部分关键词 
+2023.2.30版本 [25872-26003]行其实就是`node server.bundle.js --stdio`报的那些错, 
+8.2. 找到一个这样的结构:
+```node.js
+          (function () {
+            const _0x3bbf32 = _0x561cbb;
+            // return !0x0; 这就是我们要添加的
+            for (const _0x3c4358 of [
+                ...
+            ])
+          })
+
 ```
+8.3. answer from askfiy: 
+```markdown
+If you know node.js, you can try to find the answer from Pylance's encryption source code, it is actually very simple.
+The verification code is similar to "if !has(vscode) { return false};".
+```
+8.5. pylance各版本添加`return !0x0;`行的位置:
+2023.2.30: line 26099
+2023.2.40: line 26118
+2023.2.43: line 23401
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`

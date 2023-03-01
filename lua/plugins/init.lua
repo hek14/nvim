@@ -137,15 +137,6 @@ local plugins = {
     end
   },
   {
-    "andymass/vim-matchup",
-    enabled = false,
-    event = 'BufRead',
-    init = function()
-      vim.g.matchup_text_obj_enabled = 0
-      vim.g.matchup_surround_enabled = 1
-    end,
-  },
-  {
     "max397574/better-escape.nvim",
     event = "InsertCharPre",
     config = function ()
@@ -179,10 +170,6 @@ local plugins = {
       { "<leader>ma", "<cmd>lua require('harpoon.mark').add_file()<cr>", desc = "harpoon add" },
       { "<leader>mt", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", desc = "harpoon toggle" },
     },
-  },
-  {
-    "tversteeg/registers.nvim",
-    enabled = false,
   },
   {
     "sakhnik/nvim-gdb",
@@ -231,17 +218,6 @@ local plugins = {
       xmap <leader>gs  <plug>(GrepperOperator)
       ]])
     end,
-  },
-  {
-    'kevinhwang91/nvim-ufo',
-    enabled = false,
-    event = 'BufEnter',
-    dependencies = 'kevinhwang91/promise-async',
-    config = function ()
-      local map = require("core.utils").map
-      map('n', 'zR', require('ufo').openAllFolds)
-      map('n', 'zM', require('ufo').closeAllFolds)
-    end
   },
   {
     "kevinhwang91/nvim-bqf",
@@ -314,14 +290,9 @@ local plugins = {
     end,
     ft = { "markdown" },
   },
-  { 
-    'michaelb/sniprun',
-    enabled = false,
-    build = 'bash ./install.sh'
-  },
   {
     "metakirby5/codi.vim",
-    cmd = {"Codi","Codi!","CodiNew","CodiSelect","CodiExpand"},
+    cmd = {"Codi","CodiNew","CodiSelect","CodiExpand"},
   },
   {
     "nvim-neotest/neotest",
@@ -474,11 +445,6 @@ local plugins = {
       map("n","<leader>sw","<cmd>lua require('spectre').open_visual({select_word=true})<CR>")
       map("x","<leader>s","<cmd>lua require('spectre').open_visual()<CR>")
     end
-  },
-  {
-    'brooth/far.vim',
-    enabled = false,
-    -- nvim-spectre is better
   },
   {
     't9md/vim-choosewin',

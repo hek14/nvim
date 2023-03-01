@@ -1,66 +1,35 @@
 local M = {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    event = "BufReadPost",
-    dependencies = {
-        {"nvim-treesitter/nvim-treesitter-textobjects"},
-        {"nvim-treesitter/nvim-treesitter-refactor"}, {"p00f/nvim-ts-rainbow"},
-        {"theHamsta/nvim-treesitter-pairs"}, {
-            "ThePrimeagen/refactoring.nvim",
-            enabled = false, -- unstable and buggy
-            dependencies = {
-                {"nvim-lua/plenary.nvim"}, {"nvim-treesitter/nvim-treesitter"}
-            },
-            config = function()
-                require("refactoring").setup({})
-                local map = require("core.utils").map
-                map("v", "<leader>re",
-                    [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function')<CR>]],
-                    {noremap = true, silent = true, expr = false})
-                map("v", "<leader>rf",
-                    [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Function To File')<CR>]],
-                    {noremap = true, silent = true, expr = false})
-                map("v", "<leader>rv",
-                    [[ <Esc><Cmd>lua require('refactoring').refactor('Extract Variable')<CR>]],
-                    {noremap = true, silent = true, expr = false})
-                map("v", "<leader>ri",
-                    [[ <Esc><Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]],
-                    {noremap = true, silent = true, expr = false})
-                map("n", "<leader>ri",
-                    [[ <Cmd>lua require('refactoring').refactor('Inline Variable')<CR>]],
-                    {noremap = true, silent = true, expr = false})
-                map("n", "<leader>rb",
-                    [[ <Cmd>lua require('refactoring').refactor('Extract Block')<CR>]],
-                    {noremap = true, silent = true, expr = false})
-                map("n", "<leader>rbf",
-                    [[ <Cmd>lua require('refactoring').refactor('Extract Block To File')<CR>]],
-                    {noremap = true, silent = true, expr = false})
-            end
-        }, {
-            "nvim-treesitter/playground",
-            config = function()
-                require('core.utils').map('n', ',x', ':TSPlaygroundToggle<cr>')
-                require('core.utils').map('n', ',h',
-                                          ':TSHighlightCapturesUnderCursor<cr>')
-            end
-        }, {
-            "David-Kunz/treesitter-unit",
-            enabled = true,
-            config = function()
-                require"treesitter-unit".enable_highlighting()
-                local map = require("core.utils").map
-                map("x", "uu", ":lua require'treesitter-unit'.select()<CR>",
-                    {noremap = true})
-                map("x", "au", ":lua require'treesitter-unit'.select(true)<CR>",
-                    {noremap = true})
-                map("o", "uu", "<Cmd>lua require'treesitter-unit'.select()<CR>",
-                    {noremap = true})
-                map("o", "au",
-                    "<Cmd>lua require'treesitter-unit'.select(true)<CR>",
-                    {noremap = true})
-            end
-        }
+  "nvim-treesitter/nvim-treesitter",
+  build = ":TSUpdate",
+  event = "BufReadPost",
+  dependencies = {
+    {"nvim-treesitter/nvim-treesitter-textobjects"},
+    {"nvim-treesitter/nvim-treesitter-refactor"}, {"p00f/nvim-ts-rainbow"},
+    {"theHamsta/nvim-treesitter-pairs"},
+    {
+      "nvim-treesitter/playground",
+      config = function()
+        require('core.utils').map('n', ',x', ':TSPlaygroundToggle<cr>')
+        require('core.utils').map('n', ',h',':TSHighlightCapturesUnderCursor<cr>')
+      end
+    }, 
+    {
+      "David-Kunz/treesitter-unit",
+      config = function()
+        require"treesitter-unit".enable_highlighting()
+        local map = require("core.utils").map
+        map("x", "uu", ":lua require'treesitter-unit'.select()<CR>",
+        {noremap = true})
+        map("x", "au", ":lua require'treesitter-unit'.select(true)<CR>",
+        {noremap = true})
+        map("o", "uu", "<Cmd>lua require'treesitter-unit'.select()<CR>",
+        {noremap = true})
+        map("o", "au",
+        "<Cmd>lua require'treesitter-unit'.select(true)<CR>",
+        {noremap = true})
+      end
     }
+  }
 }
 
 function M.config()

@@ -30,30 +30,6 @@ local M = {
       } end
     },
     {
-      "ray-x/lsp_signature.nvim",
-      enabled = false,
-      config = function ()
-        local default = {
-          bind = true,
-          doc_lines = 0,
-          floating_window = true,
-          fix_pos = true,
-          hint_enabled = true,
-          hint_prefix = " ",
-          hint_scheme = "String",
-          hi_parameter = "Search",
-          max_height = 22,
-          max_width = 120, -- max_width of signature floating_window, line will be wrapped if exceed max_width
-          handler_opts = {
-            border = "single", -- double, single, shadow, none
-          },
-          zindex = 200, -- by default it will be on top of all floating windows, set to 50 send it to bottom
-          padding = "", -- character to pad on left and right of signature can be ' ', or '|'  etc
-        }
-        require("lspsignature").setup(default)
-      end
-    },
-    {
       "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",
       init = function()
         vim.cmd([[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]])
@@ -167,14 +143,15 @@ function M.config()
     require("contrib.pig").on_attach(bufnr)
     require('contrib.my_document_highlight').on_attach(bufnr)
     require('plugins.lsp.keymap').setup(client,bufnr)
-    if vim.tbl_contains({'pylance','Pylance','pyright','Pyright'},client.name) then
-      au('ExitPre',{
-        callback = function()
-          vim.fn.system(string.format("ps aux | grep -i '%s' | grep -v 'grep' | awk '{print $2}' | xargs -I {} kill -9 {}",client.name))
-        end,
-        once = true
-      })
-    end
+    -- NOTE: just use the vv wrapper in .zshrc to do this
+    -- if vim.tbl_contains({'pylance','Pylance','pyright','Pyright'},client.name) then
+    --   au('ExitPre',{
+    --     callback = function()
+    --       vim.fn.system(string.format("ps aux | grep -i '%s' | grep -v 'grep' | awk '{print $2}' | xargs -I {} kill -9 {}",client.name))
+    --     end,
+    --     once = true
+    --   })
+    -- end
     -- require('contrib.show_diagnostic_in_message').on_attach(bufnr)
   end
 

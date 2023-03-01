@@ -1,8 +1,7 @@
 local modules = {
-   "core.utils",
    "core.options",
-   "core.lazy",
    "core.autocmds",
+   "core.lazy",
    "core.keymap",
    "core.gui"
 }

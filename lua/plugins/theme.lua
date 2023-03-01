@@ -100,6 +100,7 @@ local vscode_theme = {
     require("visual_studio_code").setup({
       mode = "dark",
     })
+    override_hl()
   end,
 }
 

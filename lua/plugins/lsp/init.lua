@@ -145,7 +145,6 @@ function M.config()
     end
 
     if vim.tbl_contains({"pylance"}, client.name) then
-      print('turn off semanticTokensProvider')
       client.server_capabilities.semanticTokensProvider = {
         legend = {
           tokenTypes = {},
@@ -169,7 +168,7 @@ function M.config()
     require('contrib.my_document_highlight').on_attach(bufnr)
     require('plugins.lsp.keymap').setup(client,bufnr)
     if vim.tbl_contains({'pylance','Pylance','pyright','Pyright'},client.name) then
-      au('QuitPre',{
+      au('ExitPre',{
         callback = function()
           vim.fn.system(string.format("ps aux | grep -i '%s' | grep -v 'grep' | awk '{print $2}' | xargs -I {} kill -9 {}",client.name))
         end,

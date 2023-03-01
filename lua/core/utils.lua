@@ -1,6 +1,7 @@
 local M = {}
 
--- selene: allow(global_usage)
+_G.p = require('contrib.print_to_buf').liveprint
+
 _G.profile = function(cmd, times, flush)
   times = times or 100
   local start = vim.loop.hrtime()
@@ -40,6 +41,22 @@ M.close_buffer = function(force)
     vim.cmd('bd')
   end
 end
+
+M.zoom = function(buf_id, config)
+  if M.zoom_winid and vim.api.nvim_win_is_valid(M.zoom_winid) then
+    vim.api.nvim_win_close(M.zoom_winid, true)
+    M.zoom_winid = nil
+  else
+    buf_id = buf_id or 0
+    -- Currently very big `width` and `height` get truncated to maximum allowed
+    local default_config = { relative = 'editor', row = 0, col = 0, width = 1000, height = 1000 }
+    config = vim.tbl_deep_extend('force', default_config, config or {})
+    M.zoom_winid = vim.api.nvim_open_win(buf_id, true, config)
+    vim.cmd('setlocal winblend=0')
+    vim.cmd('normal! zz')
+  end
+end
+M.zoom_winid = nil
 
 M.ppid = function()
   local pid = vim.fn.getpid()

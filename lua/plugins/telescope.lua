@@ -146,6 +146,9 @@ function M.config()
         i = {
           ["<cr>"] = function(prompt_bufnr)
             require('telescope.actions').select_default(prompt_bufnr)
+            local action_state = require 'telescope.actions.state'
+            local val = action_state.get_current_line()
+            vim.fn.setreg('p',val)
             -- vim.cmd[[normal! zv]]
           end,
           ["<c-s>"] = open_in_nvim_tree,
@@ -154,6 +157,12 @@ function M.config()
           ["n"] = require('telescope.actions').move_selection_next,
           ["e"] = require('telescope.actions').move_selection_previous,
           ["<c-s>"] = open_in_nvim_tree,
+          ["<esc>"] = function(prompt_bufnr)
+            require('telescope.actions').close(prompt_bufnr)
+            local action_state = require 'telescope.actions.state'
+            local val = action_state.get_current_line()
+            vim.fn.setreg('p',val)
+          end,
         }
       },
       vimgrep_arguments = {

@@ -1,3 +1,165 @@
+local plugins = {
+  {
+    "kylechui/nvim-surround",
+    enabled = false,
+    event = "BufEnter",
+    config = function()
+      require("nvim-surround").setup()
+    end,
+  },
+  {
+    'romgrk/barbar.nvim',
+    enabled = false,
+    event = 'VeryLazy',
+    config = function ()
+      require'bufferline'.setup({
+        icons = 'numbers'
+      })
+      local map = require("core.utils").map
+      map('n', '<leader>1', '<Cmd>BufferGoto 1<CR>')
+      map('n', '<leader>2', '<Cmd>BufferGoto 2<CR>')
+      map('n', '<leader>4', '<Cmd>BufferGoto 4<CR>')
+      map('n', '<leader>5', '<Cmd>BufferGoto 5<CR>')
+      map('n', '<leader>6', '<Cmd>BufferGoto 6<CR>')
+      map('n', '<leader>7', '<Cmd>BufferGoto 7<CR>')
+      map('n', '<leader>8', '<Cmd>BufferGoto 8<CR>')
+      map('n', '<leader>9', '<Cmd>BufferGoto 9<CR>')
+      map('n', '<leader>0', '<Cmd>BufferLast<CR>')
+      map('n', '[b', '<Cmd>BufferPrevious<CR>')
+      map('n', ']b', '<Cmd>BufferNext<CR>')
+    end
+  },
+  {
+    "rrethy/vim-hexokinase",
+    enabled = false, -- NOTE: slow
+    cond = function()
+      return vim.fn.executable('go')==1
+    end,
+    build = "make hexokinase",
+    event = "BufRead"
+  },
+  {
+    "tmhedberg/SimpylFold",
+    enabled = false,
+    config = function()
+      vim.g.SimpylFold_docstring_preview = 1
+    end,
+  },
+  {
+    "ronakg/quickr-preview.vim",
+    enabled = false,
+    -- deprecated: using myself core.utils.preview_qf()
+    config = function()
+      vim.g.quickr_preview_keymaps = 0
+      vim.cmd([[
+      augroup qfpreview
+      autocmd!
+      autocmd FileType qf nmap <buffer> p <plug>(quickr_preview)
+      autocmd FileType qf nmap <buffer> q exe "normal \<plug>(quickr_preview_qf_close)<CR>"
+      augroup END
+      ]])
+    end,
+  },
+  {
+    'VonHeikemen/searchbox.nvim',
+    enabled = false, -- NOTE: can't resume previous/next search history
+    dependencies = {
+      {'MunifTanjim/nui.nvim'}
+    },
+    config = function ()
+      require("core.utils").map('n','/',":lua require('searchbox').match_all()<CR>")
+      require("core.utils").map('x','/',"<Esc>:lua require('searchbox').match_all({visual_mode = true})<CR>")
+      require("core.utils").map('n','?',":lua require('searchbox').match_all({reverse=true})<CR>")
+      require("core.utils").map('x','?',"<Esc>:lua require('searchbox').match_all({visual_mode = true,reverse = true})<CR>")
+    end
+  },
+  {
+    "stevearc/dressing.nvim",
+    enabled = false,
+    event = "VimEnter",
+    config = function()
+      require("dressing").setup({})
+    end,
+  },
+  {
+    "folke/noice.nvim",
+    enabled = false, -- currently very unstable
+    event = 'VimEnter',
+    config = function()
+      require("noice").setup({
+        lsp = {
+          hover = {
+            enabled = false
+          },
+          signature = {
+            enabled = false
+          }
+        },
+      })
+    end,
+    requires = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      "MunifTanjim/nui.nvim",
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      "rcarriga/nvim-notify",
+    }
+  },
+  {
+    "danilamihailov/beacon.nvim",
+    enabled = false, -- disabled because of buggy on OSX
+  },
+  {
+    "folke/which-key.nvim",
+    enabled = false,
+    config = function()
+      require("which-key").setup {}
+    end
+  },
+  {
+    "djoshea/vim-autoread",
+    enabled = false,
+  },
+  {
+    'ldelossa/litee.nvim',
+    enabled = false, -- feel slow
+    dependencies = {
+      {'ldelossa/litee-calltree.nvim',enabled = false},
+      {'ldelossa/litee-symboltree.nvim',enabled = false},
+    },
+    config = function()
+      require('litee.lib').setup({})
+      require('litee.calltree').setup({})
+      require('litee.symboltree').setup({})
+    end
+  },
+  {
+    "ghillb/cybu.nvim",
+    enabled = false,
+    lazy = false,
+    config = function()
+      local ok, cybu = pcall(require, "cybu")
+      if not ok then
+        return
+      end
+      cybu.setup()
+      require('core.utils').map("n", "<leader>n", "<Plug>(CybuNext)",{})
+      require('core.utils').map("n", "<leader>e", "<Plug>(CybuPrev)",{})
+    end,
+  },
+  {
+    "habamax/vim-winlayout",
+    lazy = false,
+    enabled = false,
+    config = function()
+      require('core.utils').map("n", ",,", "<Plug>(WinlayoutBackward)",{})
+      require('core.utils').map("n", "..", "<Plug>(WinlayoutForward)",{})
+    end
+  }
+}
+
+
 local lprint = require("core.utils").log
 -- deprecated: use :Lazy profile instead
 -- vim.api.nvim_create_autocmd("UIEnter", {

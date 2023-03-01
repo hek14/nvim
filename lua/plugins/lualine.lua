@@ -102,7 +102,7 @@ M.highlight = function ()
       vim.api.nvim_set_hl(0,src,{link = tar})
     end
   end
-  vim.api.nvim_set_hl(0,"lualine_c_diagnostics_error_normal", { fg = '#f14c4c', bg = '#212121' })
+  vim.api.nvim_set_hl(0,"lualine_c_diagnostics_error_normal", { fg = '#f14c4c', bg = '#007acc' })
 end
 M.config = function ()
   require('lualine').setup {
@@ -141,7 +141,7 @@ M.config = function ()
         },
       },
       lualine_y = {'filetype'},
-      lualine_z = {'progress'}
+      lualine_z = {'location'}
     },
     inactive_sections = {},
   }  

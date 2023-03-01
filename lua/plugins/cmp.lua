@@ -162,14 +162,14 @@ function M.config()
       end
     },
     sources = {
-      { name = "luasnip" },
-      { name = "nvim_lsp" },
-      { name = 'nvim_lsp_signature_help' },
+      { name = "luasnip", priority = 200 },
+      { name = "path" , priority = 200 },
+      { name = "nvim_lsp", priority = 100 },
+      { name = 'nvim_lsp_signature_help', priority = 100 },
+      { name = "nvim_lua", priority = 50 },
+      { name = "latex_symbols", priority = 1 },
+      { name = "buffer", priority = 1 }
       -- { name = "mine_config_yaml", trigger_characters = { '.' } }, -- manually trigger
-      { name = "nvim_lua" },
-      { name = "path" },
-      { name = "latex_symbols"},
-      { name = "buffer" }
     },
     window = {
       completion = cmp.config.window.bordered(),

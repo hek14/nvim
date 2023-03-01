@@ -93,12 +93,14 @@ local everforest = {
 }
 
 local vscode_theme = {
-  dir = "~/github/nvim_vscode_theme",
+  "askfiy/visual_studio_code",
   event = "VimEnter",
-  config = function ()
-    require('visual_studio_code').setup({mode='dark'})
-    override_hl()
-  end
+  priority = 100,
+  config = function()
+    require("visual_studio_code").setup({
+      mode = "dark",
+    })
+  end,
 }
 
 return vscode_theme

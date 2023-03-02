@@ -1,4 +1,8 @@
 local plugins = {
+  {
+    dir = '~/github/persistent_highlight',
+    lazy = false,
+  },
   { "nvim-lua/plenary.nvim" , lazy = false },
   { 
     "bfredl/nvim-luadev",

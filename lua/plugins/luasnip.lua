@@ -17,7 +17,7 @@ function M.config()
     region_check_events = {'InsertEnter'},
     ext_opts = {
       [types.insertNode] = {
-        active = { hl_group = "ErrorMsg" },
+        active = { hl_group = "LspInfoTip" },
         visited = { hl_group = 'Visual' },
         passive = { hl_group = 'Visual' },
         snippet_passive = { hl_group = 'Visual' }

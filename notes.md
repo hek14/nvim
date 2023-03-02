@@ -105,6 +105,8 @@ https://www.youtube.com/@s1n7ax/videos
 
 3. yukiUthman
 https://www.youtube.com/@yukiuthman8358
+https://www.youtube.com/watch?v=W8Mq--dqNow&ab_channel=YukiUthman : nice video about new_work threading!!!
+https://www.youtube.com/playlist?list=PLOe6AggsTaVvsguiM_LAbdkm7dFCxYxe3 : a whole video list !
 
 
 # for pyright completion stubs

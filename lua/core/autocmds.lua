@@ -83,6 +83,10 @@ M.au("BufNew",{callback=function ()
   end,
 })
 
+M.au("CmdwinLeave",{callback=function ()
+  require('cmp').close()
+end})
+
 vim.g.old_current_word = ""
 vim.g.last_focused_win = nil
 M.au("WinLeave",{callback=function ()

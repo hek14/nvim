@@ -43,7 +43,7 @@ M.print = function (...)
     elseif not M.win_valid() then M.show() end
     if type(input) == "table" then input = vim.inspect(input) end
     if type(input) == "number" then input = tostring(input) end
-    input = input:gsub("\n", "\r\n")
+    input = string.gsub(input,"\n", "\r\n")
     vim.schedule(function()
       vim.schedule(function()
         a.nvim_chan_send(M.chan, input .. '\r\n')

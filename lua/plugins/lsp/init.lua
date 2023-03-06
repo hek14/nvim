@@ -141,7 +141,6 @@ function M.config()
       require("nvim-navic").attach(client, bufnr)
     end
     require("contrib.pig").on_attach(bufnr)
-    require('contrib.my_document_highlight').on_attach(bufnr)
     require('plugins.lsp.keymap').setup(client,bufnr)
     -- NOTE: just use the vv wrapper in .zshrc to do this
     -- if vim.tbl_contains({'pylance','Pylance','pyright','Pyright'},client.name) then

@@ -83,6 +83,7 @@ https://www.nerdfonts.com/font-downloads
 13. https://github.com/zbirenbaum/zvim
 14. https://github.com/jmbuhr/quarto-nvim-kickstarter
 15. https://github.com/JuanZoran/myVimrc
+16. https://github.com/ray-x/nvim & http://rayx.me/ : author of navigator.lua
 
 # to try others' dotfiles
 ```shell

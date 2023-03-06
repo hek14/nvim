@@ -1,13 +1,18 @@
+local serialize_util = require('scratch.serialize')
 local func = function(p, uv)
   local main_loop_callback
-  main_loop_callback = uv.new_async(function(a, b, c)
+  local start = uv.hrtime()
+  main_loop_callback = uv.new_async(vim.schedule_wrap(function(a, b, c)
     p('main_loop_callback started, is_main: ',not vim.is_thread(), uv.hrtime()/1000000)
     uv.close(main_loop_callback)
-    p('main_loop_callback ended')
-  end)
-  local args = {500, 'string', nil, false, 5, "helloworld", main_loop_callback}
+    p('main_loop_callback ended, spent: ',(uv.hrtime()-start)/1000000)
+  end))
+  local t = vim.api.nvim_buf_get_lines(0,0,-1,false)
+  vim.pretty_print('t_in_main: ',t)
+  local t_str = serialize_util.pickle(t)
+  local args = {500, 'string', nil, false, 5, "helloworld", t_str, main_loop_callback}
   local unpack = unpack or table.unpack
-  local child_thread = uv.new_thread(function(num, s, null, bool, five, hw, asy)
+  local child_thread = uv.new_thread(function(num, s, null, bool, five, hw, t_str, asy)
     --[[
     NOTE: child thread is used to process necessary information needed in main_loop_callback
     any vim.api function is not accessible in the child_thread, because the child_thread is a separate lua interpreter, 
@@ -29,13 +34,17 @@ local func = function(p, uv)
     --[[
     NOTE: heavy work remains in child thread, it will not block the vim.loop(UI thread)
     --]]
-    uv2.sleep(1000) 
-
     print('ready to trigger main_loop_callback ',uv2.hrtime()/1000000)
 
     --[[
     NOTE: awake the main loop's callback function
     --]]
+    local serialize_util = require('scratch.serialize')
+    local t_in_thread = serialize_util.unpickle(t_str)
+    print('t_in_thread',vim.inspect(t_in_thread))
+    for i,line in ipairs(t_in_thread) do
+      uv2.sleep(100)  -- NOTE: this will not block the main thread
+    end
     asy:send('a',true,250) -- or: uv2.async_send(asy, 'a', true, 250)
     print('child_thread ended')
   end, unpack(args))
@@ -47,5 +56,5 @@ local func = function(p, uv)
 end
 
 local thread = func(print, vim.loop)
--- thread:join()
--- print('everything is finished')
+-- thread:join() -- NOTE: call join will block the main thread because it has to wait the thread to finish
+print('everything is finished')

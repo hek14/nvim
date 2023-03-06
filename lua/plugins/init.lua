@@ -3,23 +3,7 @@ local plugins = {
     'hek14/symbol-overlay.nvim',
     event = 'BufRead',
     config = function ()
-      require('symbol-overlay').setup({
-        colors = {
-          "#1F6C4A",
-          '#0000ff',
-          "#C70039",
-          '#ffa724',
-          "#b16286",
-          "#d79921",
-          "#d65d0e",
-          "#458588",
-          '#aeee00',
-          '#ff0000',
-          '#b88823',
-          "#a89984",
-          '#ff2c4b'
-        }
-      })
+      require('symbol-overlay').setup()
       require'telescope'.load_extension('symbol_overlay')
     end
   },

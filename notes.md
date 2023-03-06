@@ -82,6 +82,7 @@ https://www.nerdfonts.com/font-downloads
 12. https://github.com/askfiy/nvim: [bilibili](https://space.bilibili.com/35183144)
 13. https://github.com/zbirenbaum/zvim
 14. https://github.com/jmbuhr/quarto-nvim-kickstarter
+15. https://github.com/JuanZoran/myVimrc
 
 # to try others' dotfiles
 ```shell

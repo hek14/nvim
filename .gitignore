@@ -17,7 +17,6 @@ reference
 bin/ms-python.vscode-pylance-*
 
 *.log
-*.json
 
 lua/contrib/cmp_github_handler.lua
 

@@ -58,6 +58,10 @@ opt.termguicolors = true
 opt.timeoutlen = 400
 opt.undofile = true
 
+opt.listchars:append("space:⋅")
+opt.listchars:append("eol:↴")
+opt.listchars:append("tab:↹ ")
+
 -- interval for writing swap file to disk, also used by gitsigns
 opt.updatetime = 200
 

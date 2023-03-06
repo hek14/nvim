@@ -1,25 +1,4 @@
 local map = require("core.utils").map
-local action_state = require("telescope.actions.state")
-local actions = require("telescope.actions")
---- Insert filename into the current buffer and keeping the insert mode.
-actions.insert_name_i = function(prompt_bufnr)
-  local symbol = action_state.get_selected_entry().ordinal
-  actions.close(prompt_bufnr)
-  vim.schedule(function()
-    vim.cmd([[startinsert]])
-    vim.api.nvim_put({ symbol }, "", true, true)
-  end)
-end
-
---- Insert file path and name into the current buffer and keeping the insert mode.
-actions.insert_name_and_path_i = function(prompt_bufnr)
-  local symbol = action_state.get_selected_entry().value
-  actions.close(prompt_bufnr)
-  vim.schedule(function()
-    vim.cmd([[startinsert]])
-    vim.api.nvim_put({ symbol }, "", true, true)
-  end)
-end
 local M = {
   "nvim-telescope/telescope.nvim",
   cmd = "Telescope",
@@ -125,6 +104,24 @@ end
 function M.config()
   local custom_pickers = require 'contrib.telescope_custom_pickers'
   local telescope = require "telescope"
+  local action_state = require("telescope.actions.state")
+  local actions = require("telescope.actions")
+  actions.insert_name_i = function(prompt_bufnr)
+    local symbol = action_state.get_selected_entry().ordinal
+    actions.close(prompt_bufnr)
+    vim.schedule(function()
+      vim.cmd([[startinsert]])
+      vim.api.nvim_put({ symbol }, "", true, true)
+    end)
+  end
+  actions.insert_name_and_path_i = function(prompt_bufnr)
+    local symbol = action_state.get_selected_entry().value
+    actions.close(prompt_bufnr)
+    vim.schedule(function()
+      vim.cmd([[startinsert]])
+      vim.api.nvim_put({ symbol }, "", true, true)
+    end)
+  end
   local fixfolds = {
     hidden = false,
     attach_mappings = function(_)

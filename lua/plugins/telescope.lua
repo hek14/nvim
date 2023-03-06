@@ -1,4 +1,25 @@
 local map = require("core.utils").map
+local action_state = require("telescope.actions.state")
+local actions = require("telescope.actions")
+--- Insert filename into the current buffer and keeping the insert mode.
+actions.insert_name_i = function(prompt_bufnr)
+  local symbol = action_state.get_selected_entry().ordinal
+  actions.close(prompt_bufnr)
+  vim.schedule(function()
+    vim.cmd([[startinsert]])
+    vim.api.nvim_put({ symbol }, "", true, true)
+  end)
+end
+
+--- Insert file path and name into the current buffer and keeping the insert mode.
+actions.insert_name_and_path_i = function(prompt_bufnr)
+  local symbol = action_state.get_selected_entry().value
+  actions.close(prompt_bufnr)
+  vim.schedule(function()
+    vim.cmd([[startinsert]])
+    vim.api.nvim_put({ symbol }, "", true, true)
+  end)
+end
 local M = {
   "nvim-telescope/telescope.nvim",
   cmd = "Telescope",
@@ -82,9 +103,7 @@ local M = {
 }
 
 local open_in_nvim_tree = function(prompt_bufnr)
-    local action_state = require "telescope.actions.state"
     local Path = require "plenary.path"
-    local actions = require "telescope.actions"
 
     local entry = action_state.get_selected_entry()[1]
     local entry_path = Path:new(entry):parent():absolute()
@@ -146,7 +165,6 @@ function M.config()
         i = {
           ["<cr>"] = function(prompt_bufnr)
             require('telescope.actions').select_default(prompt_bufnr)
-            local action_state = require 'telescope.actions.state'
             local val = action_state.get_current_line()
             vim.fn.setreg('p',val)
             -- vim.cmd[[normal! zv]]
@@ -159,7 +177,6 @@ function M.config()
           ["<c-s>"] = open_in_nvim_tree,
           ["<esc>"] = function(prompt_bufnr)
             require('telescope.actions').close(prompt_bufnr)
-            local action_state = require 'telescope.actions.state'
             local val = action_state.get_current_line()
             vim.fn.setreg('p',val)
           end,

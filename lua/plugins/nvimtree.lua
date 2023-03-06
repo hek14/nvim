@@ -1,14 +1,14 @@
 local M = {
   "nvim-tree/nvim-tree.lua",
   cmd = { "NvimTreeToggle", "NvimTreeFocus", "NvimTreeClose", "NvimTreeOpen"},
-  init = function()
-    local map = require("core.utils").map
-    map("n", ",e", "<Cmd>NvimTreeToggle<CR>")
-  end,
+  keys = {
+    { ",e", "<Cmd>NvimTreeToggle<CR>" },
+    { ",f", "<Cmd>NvimTreeFindFileToggle<CR>" },
+  },
   config = function()
     require("nvim-tree").setup({
       view = {
-        width = 50,
+        width = 30,
         mappings = {
           custom_only = true, -- disable the default keymaps
           list = {

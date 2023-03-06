@@ -1,7 +1,27 @@
 local plugins = {
   {
-    dir = '~/github/persistent_highlight',
-    lazy = false,
+    'hek14/symbol-overlay.nvim',
+    event = 'BufRead',
+    config = function ()
+      require('symbol-overlay').setup({
+        colors = {
+          "#1F6C4A",
+          '#0000ff',
+          "#C70039",
+          '#ffa724',
+          "#b16286",
+          "#d79921",
+          "#d65d0e",
+          "#458588",
+          '#aeee00',
+          '#ff0000',
+          '#b88823',
+          "#a89984",
+          '#ff2c4b'
+        }
+      })
+      require'telescope'.load_extension('symbol_overlay')
+    end
   },
   { "nvim-lua/plenary.nvim" , lazy = false },
   { 
@@ -200,9 +220,13 @@ local plugins = {
   },
   {
     "ggandor/leap.nvim",
-    event = 'BufEnter',
+    event = 'BufRead',
     config = function()
-      require('leap').add_default_mappings()
+      require('leap').setup({})
+      local map = require('core.utils').map
+      map({'n', 'x', 'o'}, 'f', '<Plug>(leap-forward-to)')
+      map({'n', 'x', 'o'}, 'F', '<Plug>(leap-backward-to)')
+      map({'n','x'},'gs','<Plug>(leap-from-window)')
     end
   },
   -- 1. populate the quickfix

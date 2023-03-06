@@ -3,8 +3,6 @@ local map = require("core.utils").map
 local M = {
   "L3MON4D3/LuaSnip",
   event = 'InsertEnter',
-  -- install jsregexp (optional!).
-  build = "make install_jsregexp"
 }
 
 function M.config()

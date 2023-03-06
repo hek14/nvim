@@ -107,7 +107,7 @@ function M.config()
   local custom_pickers = require 'contrib.telescope_custom_pickers'
   local telescope = require "telescope"
   local fixfolds = {
-    hidden = true,
+    hidden = false,
     attach_mappings = function(_)
       require("telescope.actions.set").select:enhance({
         post = function() vim.cmd [[normal! zx]] end

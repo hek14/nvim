@@ -81,6 +81,12 @@ https://www.nerdfonts.com/font-downloads
 11. https://github.com/joshmedeski/dotfiles: yabai,skhd,alacritty,tmux
 12. https://github.com/askfiy/nvim: [bilibili](https://space.bilibili.com/35183144)
 13. https://github.com/zbirenbaum/zvim
+14. https://github.com/jmbuhr/quarto-nvim-kickstarter
+
+# to try others' dotfiles
+```shell
+docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest bash -c "apt-get update -y && apt-get install git fzf ripgrep neovim -y && nvim"
+```
 
 # refer to useful plugins
 1. https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
@@ -177,6 +183,7 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.2.30: line 26099
 2023.2.40: line 26118
 2023.2.43: line 23401
+2023.3.11: line 23431
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
@@ -185,10 +192,10 @@ The verification code is similar to "if !has(vscode) { return false};".
 `echo exepath('python')`
 `echo executable('clippy')`
 
+
 # TODO: 
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 - consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
-- refactor my_document_highlight.lua: to directly set_extmark
 - add print() custom_capture for python
 - TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not

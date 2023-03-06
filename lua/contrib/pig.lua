@@ -415,7 +415,6 @@ M.location_handler = function(label, result, ctx, config)
       on_submit = function(item)
         if label == "rename" then
           vim.lsp.buf_request(0,'textDocument/rename', ctx.rename_params)
-          require("contrib.my_document_highlight").kk_clear_highlight()
         else
           local loc = item.loc
           -- change all of the leaf node, which name is 'character': means the line numeber

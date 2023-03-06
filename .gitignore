@@ -22,3 +22,5 @@ bin/ms-python.vscode-pylance-*
 lua/contrib/cmp_github_handler.lua
 
 .DS_Store
+
+lua/scratch/a_table.lua

@@ -1,5 +1,6 @@
 local map = require("core.utils").map
 -- NOTE:refer to https://www.youtube.com/watch?v=ub0REXjhpmk
+-- NOTE:refer to https://www.youtube.com/watch?v=OIMPbNSxXbw&ab_channel=s1n7ax
 local M = {
   "L3MON4D3/LuaSnip",
   event = 'InsertEnter',

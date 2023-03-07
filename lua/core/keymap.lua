@@ -80,10 +80,20 @@ local function others()
   map("n", "<C-q>", [[:noh <Bar> :lua require('core.utils').close_float_window()<CR>]])
   map("n", "<Esc>", [[:noh<CR>]])
   map("n", "<leader>mc", "<cmd>Messages clear<CR>")
-  vim.cmd([[nmap <leader>mm :<C-u>Messages<CR>20 <C-w>+]])
+  map("n","<leader>mm","<Cmd>Messages<CR>")
   ft_map({'lua','vim'}, "n", "<leader>so", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
   map("n","<leader>ls",":SymbolsOutline<CR>")
   map("n",",q",":<C-u>cq 55<CR>")
+
+  vim.api.nvim_create_user_command('FixImport',function ()
+    local buf = vim.api.nvim_get_current_buf()
+    local clients = vim.lsp.buf_get_clients(buf)
+    for id,client in pairs(clients) do
+      if client.name~='null-ls' then
+        client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+      end
+    end
+  end,{})
 
   -- map("i", "<C-n>", "<C-O>o",{noremap = true})
   -- map("i", "<C-e>", "<C-O>O",{noremap = true})

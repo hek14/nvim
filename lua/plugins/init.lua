@@ -282,7 +282,7 @@ local plugins = {
     "dstein64/vim-startuptime",
     lazy = false,
   },
-  { "tpope/vim-scriptease", lazy=false },
+  { "tpope/vim-scriptease", lazy=false, enabled=false }, -- consume too much time at startup
   { "MunifTanjim/nui.nvim" },
   {
     "rcarriga/nvim-notify",
@@ -412,6 +412,7 @@ local plugins = {
   },
   {
     "folke/persistence.nvim",
+    enabled = false, -- use very few times, but consume too much time at startup
     event = "BufReadPre", -- this will only start session saving when an actual file was opened
     init = function ()
       -- this mapping should be in the init module, to that before the loading of whick-key, otherwise it will not work

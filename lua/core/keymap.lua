@@ -94,6 +94,9 @@ local function others()
       end
     end
   end,{})
+  map('n','<leader>pl',function ()
+    print(package.loaded['cmp'])
+  end,{silent=true})
 
   -- map("i", "<C-n>", "<C-O>o",{noremap = true})
   -- map("i", "<C-e>", "<C-O>O",{noremap = true})

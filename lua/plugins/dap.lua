@@ -2,6 +2,8 @@ local au = require('core.autocmds').au
 local M = {
   "mfussenegger/nvim-dap",
   dependencies = {
+    "nvim-telescope/telescope-dap.nvim",
+    "nvim-telescope/telescope.nvim",
     "theHamsta/nvim-dap-virtual-text",
     "mfussenegger/nvim-dap-python",
     "rcarriga/nvim-dap-ui",
@@ -31,6 +33,7 @@ local M = {
 }
 
 function M.config()
+  require("telescope").load_extension('dap')
   local map = require('core.utils').map
   require('dap-python').setup(vim.fn.system("which python"):gsub('\n',''),{console = 'internalConsole'})
   -- require('dap-python').setup()

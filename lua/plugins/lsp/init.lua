@@ -6,7 +6,18 @@
 local au = require('core.autocmds').au
 local M = {
   "neovim/nvim-lspconfig",
-  event = "BufRead",
+  cmd = 'LspStart',
+  init = function ()
+    require('core.autocmds').au('BufRead',function ()
+      local bufnr = vim.api.nvim_get_current_buf()
+      if vim.api.nvim_buf_line_count(bufnr) <= 3000 and not package.loaded['lspconfig'] then
+        require('lspconfig')
+        vim.schedule(function ()
+          vim.cmd[[LspStart]]
+        end)
+      end
+    end)
+  end,
   dependencies = {
     "jose-elias-alvarez/null-ls.nvim",
     "j-hui/fidget.nvim",
@@ -34,6 +45,28 @@ local M = {
       init = function()
         vim.cmd([[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]])
       end,
+    },
+    {
+      'hek14/nvim-navic',
+      config = function ()
+        require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
+      end
+    },
+    {
+      'hek14/vim-illuminate',
+    },
+    {
+      "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
+      dependencies = { 'hek14/nvim-navic', 'nvim-tree/nvim-web-devicons' },
+      name = "barbecue",
+      opts = {},
+    },
+    {
+      'hek14/symbol-overlay.nvim',
+      config = function ()
+        require('symbol-overlay').setup()
+        require'telescope'.load_extension('symbol_overlay')
+      end
     },
   }
 }

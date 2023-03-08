@@ -11,15 +11,7 @@ local plugins = {
       "nvim-telescope/telescope.nvim"
     }
   },
-  {
-    'hek14/symbol-overlay.nvim',
-    event = 'BufRead',
-    config = function ()
-      require('symbol-overlay').setup()
-      require'telescope'.load_extension('symbol_overlay')
-    end
-  },
-  { "nvim-lua/plenary.nvim" , lazy = false },
+  { "nvim-lua/plenary.nvim" },
   { 
     "bfredl/nvim-luadev",
     cmd = 'Luadev',
@@ -36,7 +28,7 @@ local plugins = {
   { "nvim-tree/nvim-web-devicons" },
   {
     "norcalli/nvim-colorizer.lua",
-    event = "BufEnter",
+    cmd = 'ColorizerToggle',
     config = function ()
       require'colorizer'.setup()
     end
@@ -79,13 +71,6 @@ local plugins = {
     config = function ()
       require('mini.surround').setup()
     end
-  },
-  {
-    "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
-    dependencies = { 'hek14/nvim-navic', 'nvim-tree/nvim-web-devicons' },
-    name = "barbecue",
-    event = 'BufRead',
-    opts = {},
   },
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -138,23 +123,10 @@ local plugins = {
     end
   },
   {
-    'hek14/nvim-navic',
-    config = function ()
-      require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
-    end
-  },
-  {
     "folke/trouble.nvim",
     config = function()
       require("trouble").setup({})
     end,
-  },
-  {
-    "hek14/vim-illuminate",
-    event = "BufRead",
-    config = function ()
-      vim.g.Illuminate_delay = 17
-    end
   },
   {
     "max397574/better-escape.nvim",
@@ -460,15 +432,15 @@ local plugins = {
   },
   {                                                                
     "nvim-pack/nvim-spectre",                                      
+    keys = {
+      {"<leader>S","<cmd>lua require('spectre').open()<CR>"},
+      {"<leader>sc","<cmd>lua require('spectre').open_file_search()<CR>"},
+      {"<leader>sw","<cmd>lua require('spectre').open_visual({select_word=true})<CR>"},
+      {"<leader>s","<cmd>lua require('spectre').open_visual()<CR>"},
+    },
     -- NOTE: to make this work, you should have `gsed` in the $PATH `ln -s ~/.nix-profile/bin/sed ~/.local/bin/gsed`
-    lazy = false,                                                  
     config = function ()                                           
       require("spectre").setup({ replace_engine = { sed = { cmd = "sed" } } })
-      local map = require("core.utils").map                        
-      map("n","<leader>S","<cmd>lua require('spectre').open()<CR>")
-      map("n","<leader>sc","<cmd>lua require('spectre').open_file_search()<CR>")
-      map("n","<leader>sw","<cmd>lua require('spectre').open_visual({select_word=true})<CR>")
-      map("x","<leader>s","<cmd>lua require('spectre').open_visual()<CR>")
     end
   },
   {

@@ -3,9 +3,7 @@ local theme_plugin = theme.name and theme.name or theme[1]
 local M = {
   "nvim-lualine/lualine.nvim",
   dependencies = { 
-    "hek14/nvim-navic",
     "nvim-lua/lsp-status.nvim",
-    "hek14/vim-illuminate",
     "nvim-tree/nvim-web-devicons",
     theme_plugin
   },
@@ -40,9 +38,8 @@ local current_tick
 
 local reference_hint = function ()
   local buf = vim.api.nvim_get_current_buf()
-  local ok,illuminate = require('illuminate')
-  if not ok then
-    return 'ERR'
+  if not package.loaded['illuminate'] then
+    return ""
   else
     local refs = _G.illuminate_references[buf]
     if current_tick~=_G.illuminate_update_tick[buf] then

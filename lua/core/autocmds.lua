@@ -83,10 +83,11 @@ M.au("BufNew",{callback=function ()
   end,
 })
 
-M.au("WinEnter",{callback=function ()
+M.au("BufEnter",{callback=function ()
   local bufnr = vim.api.nvim_get_current_buf()
   if vim.api.nvim_buf_line_count(bufnr) > 3000 then
     vim.o.foldenable = false
+    vim.b.indent_blankline_enabled = false -- NOTE: important for performance
   else
     vim.o.foldenable = true
     vim.o.foldmethod = "expr"

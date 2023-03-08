@@ -1,7 +1,17 @@
 local M = {
   "nvim-treesitter/nvim-treesitter",
   build = ":TSUpdate",
-  event = "BufReadPost",
+  init = function ()
+    require('core.autocmds').au('BufRead',function ()
+      local bufnr = vim.api.nvim_get_current_buf()
+      if vim.api.nvim_buf_line_count(bufnr) <= 3000 and not package.loaded['nvim-treesitter'] then
+        require('nvim-treesitter')
+        vim.schedule(function ()
+          vim.cmd[[TSBufEnable all]]
+        end)
+      end
+    end)
+  end,
   dependencies = {
     {"nvim-treesitter/nvim-treesitter-textobjects"},
     {"nvim-treesitter/nvim-treesitter-refactor"}, {"p00f/nvim-ts-rainbow"},

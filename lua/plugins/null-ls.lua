@@ -8,7 +8,7 @@ function M.setup(options)
   require("null-ls").setup({
     sources = {
       formatting.stylua.with({ extra_args = {"--indent-width=2"}}),
-      code_actions.gitsigns,
+      -- code_actions.gitsigns, -- disable this, never use, for performance
       -- diagnostics.ruff.with({  extra_args = {"--ignore=F401,F811,E501,E402,E401,F541"} }),
       diagnostics.jsonlint,
     },

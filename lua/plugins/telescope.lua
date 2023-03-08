@@ -28,7 +28,6 @@ local M = {
     end }
   },
   dependencies = {
-    { "nvim-telescope/telescope-dap.nvim" },
     {
       "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
     },
@@ -230,7 +229,7 @@ function M.config()
   -- options.defaults = require('telescope.themes').get_ivy(options.defaults)
   telescope.setup(options)
   local extensions = {
-    "bookmarks", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf","conda","dap"
+    "bookmarks", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf","conda"
   }
   for _, ext in ipairs(extensions) do telescope.load_extension(ext) end
 end

@@ -85,9 +85,9 @@ local M = {
 local open_in_nvim_tree = function(prompt_bufnr)
     local Path = require "plenary.path"
 
-    local entry = action_state.get_selected_entry()[1]
+    local entry = require('telescope.actions.state').get_selected_entry()[1]
     local entry_path = Path:new(entry):parent():absolute()
-    actions._close(prompt_bufnr, true)
+    require('telescope.actions')._close(prompt_bufnr, true)
     entry_path = Path:new(entry):parent():absolute() 
     entry_path = entry_path:gsub("\\", "\\\\")
 
@@ -178,8 +178,8 @@ function M.config()
         "--line-number",
         "--column",
         "--smart-case",
-        "--no-ignore",
         "--ignore-file=" .. vim.env["HOME"] .. "/.rg_ignore"
+        -- --no_ignore will search too much files, you can toggle this option in live_grep_args
       },
       file_ignore_patterns = {
         ".git",
@@ -197,19 +197,9 @@ function M.config()
       entry_prefix = '   ',
       initial_mode = "insert",
       path_display = { "truncate" },
-      winblend = 0, -- transparency = 0
+      winblend = 0,
       color_devicons = true,
-      set_env = { ["COLORTERM"] = "truecolor" }, -- default = nil,
-      -- theme
-      layout_strategy = "bottom_pane",
-      -- config
-      layout_config = {
-        bottom_pane = {
-          height = 15,
-          preview_cutoff = 100,
-          prompt_position = "bottom",
-        },
-      },
+      set_env = { ["COLORTERM"] = "truecolor" },
     },
     extensions = {
       bookmarks = {

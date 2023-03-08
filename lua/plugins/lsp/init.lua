@@ -1,6 +1,6 @@
 -- NOTE: 
 -- To learn what capabilities are available you can run the following command in a buffer with a started LSP client:
-  -- :lua =vim.lsp.get_active_clients()[1].server_capabilities
+-- :lua =vim.lsp.get_active_clients()[1].server_capabilities
 -- To top-out one capability: client.server_capabilities.semanticTokensProvider = nil
 
 local au = require('core.autocmds').au
@@ -126,8 +126,8 @@ function M.config()
           tokenTypes = {},
           tokenModifiers = {},
         },
-        full = false,
-        range = false,
+        full = true,
+        range = true,
       }
     end
     -- client.server_capabilities.document_formatting = true

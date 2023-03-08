@@ -1,3 +1,16 @@
+# important tips for raise keyboard response speed/make keypress snappier
+## on mac os
+```shell
+defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+```
+you should *restart* to make this work.
+## on linux
+```shell
+xset r rate 210 40
+```
+
+
 # check default keymap
 `help index`
 # themes 
@@ -84,6 +97,7 @@ https://www.nerdfonts.com/font-downloads
 14. https://github.com/jmbuhr/quarto-nvim-kickstarter
 15. https://github.com/JuanZoran/myVimrc
 16. https://github.com/ray-x/nvim & http://rayx.me/ : author of navigator.lua
+17. https://github.com/Fireond/Neovim-config: for latex writting 
 
 # to try others' dotfiles
 ```shell

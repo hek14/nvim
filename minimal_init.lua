@@ -1,3 +1,4 @@
+---< maps
 local lhs = "neilukj"
 local rhs = "jkluine"
 local modes = {"n","x","o"}
@@ -14,15 +15,15 @@ for i = 1,#lhs do
     end
   end
 end
+vim.api.nvim_set_keymap('n',"<Esc>",':noh<CR>',{silent=true,noremap=true})
+---> maps end
 
+---< options
 vim.o.ignorecase = true
 vim.o.number = true
-vim.cmd [[
-set expandtab ts=4 sw=4 ai
-autocmd FileType python set expandtab ts=4 sw=4 ai
-]]
-
-_G.map = function (mode,lhs,rhs,opts)
-  vim.api.nvim_set_keymap(mode,lhs,rhs,opts)
-end
-
+vim.o.relativenumber = true
+vim.opt.expandtab = true
+vim.opt.ts = 4
+vim.opt.sw = 4
+vim.opt.autoindent = true
+---> options end

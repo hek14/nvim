@@ -8,15 +8,24 @@ local M = {
   "neovim/nvim-lspconfig",
   cmd = 'LspStart',
   init = function ()
-    require('core.autocmds').au('BufRead',function ()
+    local group = vim.api.nvim_create_augroup('load_lsp',{clear=true})
+    vim.api.nvim_create_autocmd('BufRead', { callback = function ()
+      if package.loaded['lspconfig'] then
+        vim.schedule(function ()
+          vim.api.nvim_clear_autocmds({group='load_lsp'})
+        end)
+      end
       local bufnr = vim.api.nvim_get_current_buf()
       if vim.api.nvim_buf_line_count(bufnr) <= 3000 and not package.loaded['lspconfig'] then
         require('lspconfig')
         vim.schedule(function ()
           vim.cmd[[LspStart]]
+          vim.api.nvim_clear_autocmds({group='load_lsp'})
         end)
       end
-    end)
+    end,
+    group = group
+  })
   end,
   dependencies = {
     "jose-elias-alvarez/null-ls.nvim",
@@ -73,7 +82,6 @@ local M = {
 
 function M.lsp_hover(_, result, ctx, config)
     local bufnr, winnr = vim.lsp.handlers.hover(_, result, ctx, config)
-    print(string.format('bufnr:%s, winnr:%s',bufnr,winnr))
     if bufnr and winnr then
         vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
         return bufnr, winnr
@@ -146,7 +154,6 @@ function M.config()
     local launch_in_home = client.config.root_dir == vim.env["HOME"]
     if launch_in_home then
       local answer = vim.fn.input("really want to launch_in_home? y/n: ")
-      print('the answer is ',answer)
       if answer == 'n' then
         vim.lsp.buf_detach_client(bufnr,client.id)
         return

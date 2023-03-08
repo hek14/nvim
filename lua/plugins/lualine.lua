@@ -3,7 +3,6 @@ local theme_plugin = theme.name and theme.name or theme[1]
 local M = {
   "nvim-lualine/lualine.nvim",
   dependencies = { 
-    "nvim-lua/lsp-status.nvim",
     "nvim-tree/nvim-web-devicons",
     theme_plugin
   },
@@ -128,12 +127,6 @@ M.config = function ()
         {
           lsp_name,
           icon = ' LSP:',
-          color = { fg='#8caaee', bg='#51576d' }
-        },
-        {
-          function ()
-            return require'lsp-status'.status()
-          end,
           color = { fg='#8caaee', bg='#51576d' }
         },
       },

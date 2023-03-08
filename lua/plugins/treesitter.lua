@@ -2,15 +2,24 @@ local M = {
   "nvim-treesitter/nvim-treesitter",
   build = ":TSUpdate",
   init = function ()
-    require('core.autocmds').au('BufRead',function ()
+    local group = vim.api.nvim_create_augroup('load_treesitter',{clear=true})
+    vim.api.nvim_create_autocmd('BufRead',{ callback = function ()
+      if package.loaded['nvim-treesitter'] then
+        vim.schedule(function ()
+          vim.api.nvim_clear_autocmds({group='load_treesitter'})
+        end)
+      end
       local bufnr = vim.api.nvim_get_current_buf()
       if vim.api.nvim_buf_line_count(bufnr) <= 3000 and not package.loaded['nvim-treesitter'] then
         require('nvim-treesitter')
         vim.schedule(function ()
-          vim.cmd[[TSBufEnable all]]
+          vim.cmd[[TSBufEnable all]] -- for the first buffer
+          vim.api.nvim_clear_autocmds({group='load_treesitter'})
         end)
       end
-    end)
+    end,
+    group = group
+  })
   end,
   dependencies = {
     {"nvim-treesitter/nvim-treesitter-textobjects"},

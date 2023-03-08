@@ -75,17 +75,4 @@ opt.foldlevelstart = -1
 opt.foldenable = true
 
 g.mapleader = " "
-
-
---Defer loading shada until after startup_
-local backup_shadafile = vim.opt.shadafile
-vim.opt.shadafile = "NONE"
-
-
-vim.schedule(function()
-   vim.opt.shadafile = backup_shadafile
-   vim.cmd [[ silent! rsh ]]
-end)
-
-vim.cmd [[set viminfo+=:2000]]
 vim.env['PATH'] = vim.fn.stdpath('config') .. '/bin:' .. vim.env['PATH']

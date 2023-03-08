@@ -83,6 +83,17 @@ M.au("BufNew",{callback=function ()
   end,
 })
 
+M.au("WinEnter",{callback=function ()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if vim.api.nvim_buf_line_count(bufnr) > 3000 then
+    vim.o.foldenable = false
+  else
+    vim.o.foldenable = true
+    vim.o.foldmethod = "expr"
+    vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+  end
+end})
+
 M.au("CmdwinLeave",{callback=function ()
   require('cmp').close()
 end})

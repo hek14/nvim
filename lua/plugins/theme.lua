@@ -94,13 +94,13 @@ local everforest = {
 
 local vscode_theme = {
   "askfiy/visual_studio_code",
-  event = "VimEnter",
-  priority = 100,
-  config = function()
-    require("visual_studio_code").setup({
-      mode = "dark",
-    })
-    override_hl()
+  init = function()
+    vim.schedule(function ()
+      require("visual_studio_code").setup({
+        mode = "dark",
+      })
+      override_hl()
+    end)
   end,
 }
 

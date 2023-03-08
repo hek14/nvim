@@ -95,6 +95,14 @@ M.au("BufEnter",{callback=function ()
   end
 end})
 
+M.au('BufEnter',{callback=function ()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local buftype = vim.api.nvim_buf_get_option(bufnr,'buftype')
+  if buftype=='nofile' then
+    map('n','q',':q<CR>',{buffer=bufnr})
+  end
+end})
+
 M.au("CmdwinLeave",{callback=function ()
   require('cmp').close()
 end})

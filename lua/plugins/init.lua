@@ -1,5 +1,17 @@
 local plugins = {
   {
+    'AckslD/messages.nvim',
+    cmd = 'Messages',
+    init = function ()
+      msg = function(...)
+        require('messages.api').capture_thing(...)
+      end
+    end,
+    config = function ()
+      require("messages").setup()
+    end
+  },
+  {
     "jackMort/ChatGPT.nvim",
     cmd = {'ChatGPT','ChatGPTActAs'},
     config = function()

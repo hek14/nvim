@@ -1,17 +1,5 @@
 local plugins = {
   {
-    'AckslD/messages.nvim',
-    cmd = 'Messages',
-    init = function ()
-      msg = function(...)
-        require('messages.api').capture_thing(...)
-      end
-    end,
-    config = function ()
-      require("messages").setup()
-    end
-  },
-  {
     "jackMort/ChatGPT.nvim",
     cmd = {'ChatGPT','ChatGPTActAs'},
     config = function()
@@ -266,7 +254,10 @@ local plugins = {
     "dstein64/vim-startuptime",
     lazy = false,
   },
-  { "tpope/vim-scriptease", lazy=false, enabled=false }, -- consume too much time at startup
+  { 
+    "tpope/vim-scriptease", 
+    cmd = 'Messages',
+  },
   { "MunifTanjim/nui.nvim" },
   {
     "rcarriga/nvim-notify",

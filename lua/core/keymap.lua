@@ -73,13 +73,25 @@ local function others()
   map("t", "<C-w>e", "<C-\\><C-n><C-w>k")
   map("t", "<C-w>i", "<C-\\><C-n><C-w>l")
   map("t", "<S-Space>", "<Space>",{noremap=true})
+  map("t", "jj" , "<C-\\><C-n>")
+  local keycode = function (key)
+    return vim.api.nvim_replace_termcodes(key,true,false,true)
+  end
+  map("t",'<C-s>',function ()
+    vim.api.nvim_feedkeys(keycode('import numpy as np\n'),'n',false)
+    vim.api.nvim_feedkeys(keycode('import torch\n'),'n',false)
+    vim.api.nvim_feedkeys(keycode('import matplotlib.pyplot as plt\n'),'n',false)
+  end,{desc = "insert frequent python package"})
+
   map("n", "<Up>", "5<C-w>+")
   map("n", "<Down>", "5<C-w>-")
   map("n", "<left>", "5<C-w><")
   map("n", "<right>", "5<C-w>>")
   map("n", "<C-q>", [[:noh <Bar> :lua require('core.utils').close_float_window()<CR>]])
   map("n", "<Esc>", [[:noh<CR>]])
-  map("n","<leader>mm","<Cmd>Messages messages<CR>")
+  map("n", "<leader>mc", "<cmd>Messages clear<CR>")
+  map("n","<leader>mm","<Cmd>Messages<CR>")
+
   ft_map({'lua','vim'}, "n", "<leader>so", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
   map("n","<leader>ls",":SymbolsOutline<CR>")
   map("n",",q",":<C-u>cq 55<CR>")
@@ -131,7 +143,6 @@ local function others()
 
   -- terminal mappings --
   -- get out of terminal mode
-  map("t", "jj" , "<C-\\><C-n>")
   -- spawns terminals
   map("n", "<leader>th",":execute 15 .. 'new +terminal' | let b:term_type = 'hori' | startinsert <CR>")
   map("n", "<leader>tv", ":execute 'vnew +terminal' | let b:term_type = 'vert' | startinsert <CR>")

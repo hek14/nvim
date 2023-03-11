@@ -196,20 +196,16 @@ local function my_old_parse_position_at_buf(position,bufnr)
     return nil
   end
   local root = ts_utils.get_root_for_node(scope[1])
-  log('total scope: ',#scope)
   for i,s in ipairs(scope) do
     local srow,scol,erow,ecol = s:range()
     local srow2,scol2,erow2,ecol2 = root:range()
     if srow==srow2 and scol==scol2 and erow==erow2 and ecol==ecol2 then
-      log('hit root')
       break -- NOTE: hit the root
     end
-    log('current s: ',s:range()) 
     if s:type()=='for_statement' then
       table.insert(ret,1,{name='for_statement',text='for'})
     else
       local main_node = get_main_node(s)
-      log('main_code for s:',main_node:range())
       local query = vim.treesitter.parse_query(ft,parse_str[ft])
       for id, captures, metadata in query:iter_captures(main_node,bufnr,main_node:start(),main_node:end_()) do
         local name = query.captures[id] -- name of the capture in the query
@@ -287,7 +283,6 @@ local handle = function(id,input,event)
     if string.match(t,'FINISHED') then
       quit_after_parse = true
       t = t:gsub('FINISHED','')
-      log('should quit_after_parss!',t)
     end
     content = content .. t .. '\n'
   end
@@ -305,7 +300,6 @@ local handle = function(id,input,event)
       local pos_key = string.format('row:%scol:%s',item.position[1],item.position[2])
       results[item.file][pos_key] = ret
     end
-    log('results: ',results)
     if not TEST then
       vim.fn.chansend(id,sel.pickle(results))
       if quit_after_parse then

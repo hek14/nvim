@@ -160,7 +160,6 @@ local make_menu = function(groups,ctx,treesitter_data)
       local range = loc.range or loc.targetSelectionRange or loc.targetRange
       local pos_key = string.format('row:%scol:%s', range.start.line, range.start.character)
       local ts = treesitter_data[file_name_2][pos_key]
-      vim.pretty_print('locJ: ',loc,ts)
       location_id = location_id + 1
       table.insert(menus,Menu.separator(string.format('Loc: %s, %s',location_id,ts), {text_align = "left"}))
       total_lines = total_lines + 1

@@ -1,3 +1,4 @@
+local rep = require("luasnip.extras").rep
 local line_replace = function(args,_,user_arg_1)
   local og_line = args[1][1]
   local line = string.gsub(og_line,user_arg_1['pat'],user_arg_1['sub'])
@@ -172,6 +173,22 @@ return {
         return sn(nil,{t(class_name)})
       end
     end,{},{user_args = {}}),
+    rep(1)
+  })),
+  s("nor",fmt(
+  [[
+  {} = ({} - {}.min()) / ({}.max() - {}.min())
+  ]],
+  {
+    d(2,function(args,_,_)
+      return sn(nil,{i(1,args[1][1])})
+    end,{1}),
+    -- f(function(args,_,_)
+    --   return args[1][1]
+    -- end,{1}),
+    i(1),
+    rep(1),
+    rep(1),
     rep(1)
   }))
 }

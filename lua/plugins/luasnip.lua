@@ -14,6 +14,7 @@ function M.config()
     history = true,
     update_events = {"TextChanged", "TextChangedI"},
     region_check_events = {'InsertEnter'},
+    delete_check_events = {'TextChanged'},
     ext_opts = {
       [types.insertNode] = {
         active = { hl_group = "LspInfoTip" },
@@ -36,7 +37,7 @@ function M.config()
     if ls.in_snippet() then
       ls.unlink_current()
     else
-      vim.fn.feedkeys("<C-e>",'n')
+      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-e>',true,false,true),'n',false)
     end
   end,{silent=false})
   local line_breaker = function()

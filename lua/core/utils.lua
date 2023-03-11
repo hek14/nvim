@@ -505,6 +505,11 @@ M.repeat_timer = function(fn)
   timedFn()
 end
 
+M.clear_log = function ()
+  local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/kk_debug.log"
+  vim.fn.system('echo > ' .. log_path)
+end
+
 M.log = function(...)
   local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/kk_debug.log"
   local arg = {...}

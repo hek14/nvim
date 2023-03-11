@@ -7,6 +7,26 @@
 
 local log = require'core.utils'.log
 local sel = require('scratch.serialize')
+TEST = false
+-- local icons = {
+--   ["class-name"] = ' ',
+--   ["function-name"] = ' ',
+--   ["method-name"] = ' ',
+--   ["container-name"] = 'ﮅ ',
+--   ["tag-name"] = '炙',
+-- }
+local icons = {
+  ["class-name"] = 'cls:',
+  ["function-name"] = 'func:',
+  ["method-name"] = 'method:',
+  ["container-name"] = 'obj:',
+  ["tag-name"] = 'tag:',
+}
+setmetatable(icons,{
+  __index = function ()
+    return '🐷'
+  end
+})
 
 
 -- TODO: why we need to manually add runtimepath in 'headless' mode
@@ -74,6 +94,12 @@ local parse_str = {
       (identifier) @definition.function)
     (expression_list
       value: (function_definition)))
+
+  (assignment_statement
+    (variable_list
+      name: (dot_index_expression) @definition.function)
+    (expression_list
+      value: (function_definition)))
   ]],
 }
 
@@ -81,19 +107,109 @@ local matched = function (str)
   return string.match(str,'function') or string.match(str,'class') or string.match(str,'method')
 end
 
-local function parse_position_at_buf(position,bufnr)
+local function default_transform(capture_name, capture_text)
+  return {
+    text = capture_text,
+    type = capture_name,
+    icon = icons[capture_name]
+  }
+end
+
+local function get_data(filelang,node,bufnr)
+  local node_data = {}
+  local function add_node_data(pos, capture_name, capture_node)
+    local text = ""
+    text = vim.treesitter.query.get_node_text(capture_node, bufnr)
+    if text == nil then
+      return nil
+    end
+    text = string.gsub(text, "%s+", ' ')
+    local node_text = default_transform(capture_name,text)
+
+    if node_text ~= nil then
+      table.insert(node_data, pos, node_text)
+    end
+  end
+
+  local gps_query = ts_queries.get_query(filelang, "nvimGPS")
+  while node do
+    local iter = gps_query:iter_captures(node, bufnr)
+    local capture_ID, capture_node = iter()
+
+    if capture_node == node then
+      if gps_query.captures[capture_ID] == "scope-root" then
+        while capture_node == node do
+          capture_ID, capture_node = iter()
+        end
+        local capture_name = gps_query.captures[capture_ID]
+        add_node_data(1, capture_name, capture_node)
+
+      elseif gps_query.captures[capture_ID] == "scope-root-2" then
+        capture_ID, capture_node = iter()
+        local capture_name = gps_query.captures[capture_ID]
+        add_node_data(1, capture_name, capture_node)
+
+        capture_ID, capture_node = iter()
+        capture_name = gps_query.captures[capture_ID]
+        add_node_data(2, capture_name, capture_node)
+
+      end
+    end
+
+    node = node:parent()
+  end
+
+  local data = {}
+  for _, v in pairs(node_data) do
+    if not vim.tbl_islist(v) then
+      table.insert(data, v)
+    else
+      vim.list_extend(data, v)
+    end
+  end
+
+  local context = {}
+  for _, v in pairs(data) do
+    table.insert(context, v.icon..v.text)
+  end
+
+  local depth = 5
+  local separator = ' > '
+  local depth_limit_indicator = ".."
+
+  if #context > depth then
+    context = vim.list_slice(context, #context-depth+1, #context)
+    table.insert(context, 1, depth_limit_indicator)
+  end
+
+  context = table.concat(context, separator)
+  return context
+end
+
+
+local function my_old_parse_position_at_buf(position,bufnr)
   local node = vim.treesitter.get_node_at_pos(bufnr,position[1],position[2])
   local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
   local ret = {}
   local scope = ts_locals.get_scope_tree(node,bufnr)
+  if #scope == 0 then
+    return nil
+  end
+  local root = ts_utils.get_root_for_node(scope[1])
+  log('total scope: ',#scope)
   for i,s in ipairs(scope) do
-    if i == #scope then
-      break -- just skip the last scope, it's the root
+    local srow,scol,erow,ecol = s:range()
+    local srow2,scol2,erow2,ecol2 = root:range()
+    if srow==srow2 and scol==scol2 and erow==erow2 and ecol==ecol2 then
+      log('hit root')
+      break -- NOTE: hit the root
     end
+    log('current s: ',s:range()) 
     if s:type()=='for_statement' then
       table.insert(ret,1,{name='for_statement',text='for'})
     else
       local main_node = get_main_node(s)
+      log('main_code for s:',main_node:range())
       local query = vim.treesitter.parse_query(ft,parse_str[ft])
       for id, captures, metadata in query:iter_captures(main_node,bufnr,main_node:start(),main_node:end_()) do
         local name = query.captures[id] -- name of the capture in the query
@@ -106,6 +222,13 @@ local function parse_position_at_buf(position,bufnr)
       end
     end
   end
+  return ret
+end
+
+local function parse_position_at_buf(position,bufnr)
+  local node = vim.treesitter.get_node_at_pos(bufnr,position[1],position[2])
+  local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+  local ret = get_data(ft,node,bufnr)
   return ret
 end
 
@@ -128,7 +251,7 @@ local load_file_with_cache = function(input)
         vim.api.nvim_buf_set_lines(bufnr,0,-1,false,data)
         local filelang = ts_parsers.ft_to_lang(item.filetype)
         local parser = ts_parsers.get_parser(bufnr, filelang)
-        parser:parse()  -- NOTE: very important to attach a parser to this bufnr
+        parser:parse() -- NOTE: very important to attach a parser to this bufnr
         file_buf_map[item.file] = {bufnr=bufnr,filetick=item.filetick}
       end))
     else
@@ -147,7 +270,6 @@ local sync_load_file = function(input,cb)
         cnt = cnt + 1
       end
     end
-    log('check sync: ',cnt,#input)
     if cnt == #input and timer and not timer:is_closing() then
       timer:stop()
       timer:close()
@@ -156,13 +278,11 @@ local sync_load_file = function(input,cb)
   end))
 end
 
--- like: {['test.lua']={bufnr=3,filetick=1000}}
 local handle = function(id,input,event)
   -- needed item: { file = '', position = '', filetype = '', filetick = '' } filetick is for cache
   -- received is a table, should concat them for unpickle
   local content = ""
   local quit_after_parse = false
-  log('receive input',input)
   for i,t in ipairs(input) do
     if string.match(t,'FINISHED') then
       quit_after_parse = true
@@ -171,7 +291,6 @@ local handle = function(id,input,event)
     end
     content = content .. t .. '\n'
   end
-  log('content',content)
   content = string.sub(content,1,#content-1)
   input = sel.unpickle(content)
   load_file_with_cache(input)
@@ -183,12 +302,15 @@ local handle = function(id,input,event)
       if not results[item.file] then
         results[item.file] = {}
       end
-      results[item.file][item.position] = ret
+      local pos_key = string.format('row:%scol:%s',item.position[1],item.position[2])
+      results[item.file][pos_key] = ret
     end
     log('results: ',results)
-    vim.fn.chansend(id,sel.pickle(results))
-    if quit_after_parse then
-      vim.cmd[[:q!]]
+    if not TEST then
+      vim.fn.chansend(id,sel.pickle(results))
+      if quit_after_parse then
+        vim.cmd[[:q!]]
+      end
     end
   end)
 end
@@ -196,28 +318,16 @@ end
 local function test()
   local input = {
     {
-      file = '/Users/hk/.config/nvim/test.lua',
+      file = '/Users/hk/.config/nvim/lua/test.lua',
       filetick = 0,
       filetype = 'lua',
-      position = {5,16},
+      position = {14,14},
     },
     {
-      file = '/Users/hk/.config/nvim/test.lua',
+      file = '/Users/hk/server_files/qingdao/test/debug.py',
       filetick = 0,
-      filetype = 'lua',
-      position = {0,15},
-    },
-    {
-      file = '/Users/hk/.config/nvim/test.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {1,17},
-    },
-    {
-      file = '/Users/hk/.config/nvim/test.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {2,19},
+      filetype = 'python',
+      position = {61,15},
     },
   }
   input = sel.pickle(input)
@@ -225,5 +335,8 @@ local function test()
   handle(0,input,nil)
 end
 
--- test()
-vim.fn.stdioopen({on_stdin = handle})
+if TEST then
+  test()
+else
+  vim.fn.stdioopen({on_stdin = handle})
+end

@@ -5,14 +5,21 @@ local function safe_close(handle)
     uv.close(handle)
   end
 end
-local start = vim.loop.hrtime()
-local function exe()
+
+local M = {
+  data = nil,
+  done = false,
+}
+
+function M:exe(input)
+  self.done = false 
+  local start = vim.loop.hrtime()
   local stdin = uv.new_pipe(false)
   local stdout = uv.new_pipe(false)
   local stderr = uv.new_pipe(false)
   local handle,pid_or_err
   local opts = {
-    args = {'--headless','--cmd', 'source /Users/hk/.config/nvim/lua/scratch/ts_util.lua'}, -- TODO: norc, --clean, -u, -n, -i
+    args = {'--headless','-u','NORC','--cmd', 'source lua/scratch/ts_util.lua'}, -- TODO: --clean, -u, -n, -i
     -- args = {'--headless','--cmd', 'source /Users/hk/.config/nvim/uppercase.lua'},
     stdio = { stdin, stdout, stderr },
     cwd = vim.fn.stdpath('config'),
@@ -24,66 +31,24 @@ local function exe()
     safe_close(stdin)
     safe_close(stdout)
     safe_close(stderr)
-    print(string.format('spent time: %s ms',(vim.loop.hrtime()-start)/1000000))
+    print(string.format('treesitter job done, spent time: %s ms at %s',(vim.loop.hrtime()-start)/1000000,vim.loop.hrtime()))
   end)
   uv.read_start(stderr, function(err, data)
     assert(not err, err)
   end)
-  uv.read_start(stdout, function(err, data)
+  uv.read_start(stdout, vim.schedule_wrap(function(err, data)
     assert(not err,err)
     if data then
       data = sel.unpickle(data)
-      print('receive data: ',vim.inspect(data))
-      print('spent: ',(vim.loop.hrtime()-start)/1e6)
+      self.data = data
+      self.done = true
     end
-  end)
-  local test = {
-    {
-      file = '/Users/hk/.config/nvim/init.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {8,7},
-    },
-    {
-      file = '/Users/hk/.config/nvim/test.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {6,16},
-    },
-    {
-      file = '/Users/hk/.config/nvim/init.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {5,11},
-    },
-    {
-      file = '/Users/hk/.config/nvim/lua/contrib/pig.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {162,32},
-    },
-    {
-      file = '/Users/hk/.config/nvim/test.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {0,15},
-    },
-    {
-      file = '/Users/hk/.config/nvim/test.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {1,17},
-    },
-    {
-      file = '/Users/hk/.config/nvim/test.lua',
-      filetick = 0,
-      filetype = 'lua',
-      position = {2,19},
-    },
-  }
-  local send_input = sel.pickle(test)
+  end))
+  local send_input = sel.pickle(input) -- NOTE: input example: /Users/hk/.config/nvim/lua/scratch/a_input_t.lua
   uv.write(stdin, send_input)
-  uv.write(stdin, 'FINISHED')
+  uv.write(stdin,'FINISHED')
+  uv.shutdown(stdin, function()
+    safe_close(stdin)
+  end)
 end
-require('core.utils').clear_log()
-exe()
+return M

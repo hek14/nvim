@@ -204,6 +204,7 @@ local function others()
   call Cabbrev('LC', 'Lazy clean')
   call Cabbrev('li', 'let i =1 \|')
   call Cabbrev('lg', 'Lazygit')
+  call Cabbrev('nr', 'Nredir')
   xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
   function! ExecuteMacroOverVisualRange()
   echo "@".getcmdline()

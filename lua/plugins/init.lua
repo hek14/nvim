@@ -1,5 +1,9 @@
 local plugins = {
   {
+    "sbulav/nredir.nvim",
+    cmd = 'Nredir'
+  },
+  {
     "jackMort/ChatGPT.nvim",
     cmd = {'ChatGPT','ChatGPTActAs'},
     config = function()

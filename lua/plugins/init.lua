@@ -1,5 +1,15 @@
 local plugins = {
   {
+    "SmiteshP/nvim-gps",
+    lazy = false,
+    config = function ()
+      require("nvim-gps").setup()
+      vim.keymap.set('n',',w',function ()
+        vim.pretty_print(require('nvim-gps').get_location())
+      end)
+    end
+  },
+  {
     "sbulav/nredir.nvim",
     cmd = 'Nredir'
   },

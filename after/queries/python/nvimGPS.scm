@@ -17,3 +17,7 @@
 ((if_statement
 	condition: (comparison_operator
 		(string) @main-function (#match? @main-function "[\"\']__main__[\"\']"))) @scope-root)
+
+; while-loop
+((while_statement
+      condition: (identifier) @condition-name) @scope-root)

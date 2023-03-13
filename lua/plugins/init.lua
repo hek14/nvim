@@ -1,16 +1,5 @@
 local plugins = {
   {
-    'SmiteshP/nvim-gps',
-    lazy = false,
-    config = function ()
-      require("nvim-gps").setup()
-      vim.keymap.set('n',',g',function ()
-        local gps = require("nvim-gps")
-        print(gps.get_location())
-      end,{})
-    end
-  },
-  {
     "sbulav/nredir.nvim",
     cmd = 'Nredir'
   },
@@ -41,6 +30,13 @@ local plugins = {
     end
   },
   { "nvim-tree/nvim-web-devicons" },
+  {
+    'glepnir/nerdicons.nvim', 
+    cmd = 'NerdIcons', 
+    config = function() 
+      require('nerdicons').setup({}) 
+    end
+  },
   {
     "norcalli/nvim-colorizer.lua",
     cmd = 'ColorizerToggle',

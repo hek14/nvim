@@ -78,6 +78,10 @@ local function others()
     return vim.api.nvim_replace_termcodes(key,true,false,true)
   end
   map("t",'<C-s>',function ()
+    local line = vim.api.nvim_get_current_line()
+    if line ~= '>>> ' then
+      vim.api.nvim_feedkeys(keycode('python\n'),'n',false)
+    end
     vim.api.nvim_feedkeys(keycode('import numpy as np\n'),'n',false)
     vim.api.nvim_feedkeys(keycode('import torch\n'),'n',false)
     vim.api.nvim_feedkeys(keycode('import matplotlib.pyplot as plt\n'),'n',false)
@@ -178,7 +182,7 @@ local function others()
 
   local escape = require('core.utils').termcode
   local function quick_insert_profile()
-    vim.fn.feedkeys(escape('local start = vim.loop.hrtime()\n'),'n')
+    vim.fn.feedkeys(escape('local start = vim.loop.hrtime()'),'n')
     vim.fn.setreg('v',[[print(string.format('spent time: %s ms',(vim.loop.hrtime()-start)/1000000))]])
   end
   map('i','<C-w>',quick_insert_profile)

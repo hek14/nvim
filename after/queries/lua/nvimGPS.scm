@@ -40,3 +40,6 @@
 	name: (identifier) @container-name
 	value: (table_constructor)) @scope-root)
 
+; while-loop
+((while_statement
+      condition: (identifier) @condition-name) @scope-root)

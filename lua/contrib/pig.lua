@@ -35,6 +35,9 @@ local function echo(hlgroup, msg)
   cmd('echohl None')
 end
 
+_G.treesitter_job = require('scratch.test_headless')
+treesitter_job:batch(2)
+
 local sort_locations = function(locations)
   table.sort(locations, function(i, j)
     local i_uri = i.uri or i.targetUri
@@ -389,173 +392,164 @@ M.location_handler = function(label, result, ctx, config)
       })
     end
   end
-  local treesitter_job = require('scratch.test_headless')
-  treesitter_job:exe(inputs_for_treesitter)
+  treesitter_job:send(inputs_for_treesitter)
   -- NOTE: important here, do not directly call vim.loop.sleep(100),because this will also block the stdout read in test_headless
   local timer = vim.loop.new_timer()
   local has_done = false
-  timer:start(0,10,vim.schedule_wrap(function()
-    if treesitter_job.done and not has_done then
-      has_done = true
-      if not timer:is_closing() then
-        timer:stop()
-        timer:close()
-      end
-      local lines = make_menu(groups,ctx,treesitter_job.data)
-      local popup_options = {
-        position = "50%",
-        -- position = {
-          --   row = 0,
-          --   col = 0,
-          -- },
-          size = {
-            -- width = 40,
-            height = math.floor(vim.fn.winheight(0)*0.4),
+  treesitter_job:with_output(function(data)
+    print('treesitter_job done with: ',#treesitter_job.current_input)
+    local lines = make_menu(groups,ctx,treesitter_job.data)
+    local popup_options = {
+      position = "50%",
+      -- position = {
+        --   row = 0,
+        --   col = 0,
+        -- },
+        size = {
+          -- width = 40,
+          height = math.floor(vim.fn.winheight(0)*0.4),
+        },
+        -- relative = "cursor",
+        border = {
+          style = "single",
+          text = {
+            top = "PIG:🐷",
+            top_align = "center",
           },
-          -- relative = "cursor",
-          border = {
-            style = "single",
-            text = {
-              top = "PIG:🐷",
-              top_align = "center",
-            },
-          },
-          win_options = {
-            winhighlight = "Normal:Normal,FloatBorder:Normal",
-          }
+        },
+        win_options = {
+          winhighlight = "Normal:Normal,FloatBorder:Normal",
         }
-        last_pig_menu = Menu(
-        popup_options,
-        {
-          lines = lines,
-          min_width = math.floor(vim.fn.winwidth(0)*0.4),
-          max_width = math.floor(vim.fn.winwidth(0)*0.8),
-          keymap = {
-            focus_next = { "n", "<Down>", "<Tab>" },
-            focus_prev = { "e", "<Up>", "<S-Tab>" },
-            close =  { "<Esc>", "<C-c>" },
-            submit = { "<CR>", "<Space>" },
-          },
-          should_skip_item = function(item)
-            if item._type == "separator" then
-              return true
-            else
-              return item.PIG_skip
-            end
-          end,
-          on_close = function()
-            vim.api.nvim_buf_clear_namespace(0,PIG_ns,0,-1)
-          end,
-          on_change = function(node,menu)
-            last_pig_node = node
-          end,
-          on_submit = function(item)
-            if label == "rename" then
-              vim.lsp.buf_request(0,'textDocument/rename', ctx.rename_params)
-            else
-              local loc = item.loc
-              -- change all of the leaf node, which name is 'character': means the line numeber
-              local to_search = {{loc,{}}}
-              while #to_search > 0 do
-                local pop = to_search[#to_search][1]
-                local path = to_search[#to_search][2]
-                to_search[#to_search] = nil
-                for k,v in pairs(pop) do
-                  if k=='character' then
-                    -- change the node
-                    pop[k] = last_pig_window_location[2]
-                    -- NOTE: you cannot use the following way, this will not change the loc table
-                    -- v = last_pig_window_location[2]
-                    -- a small example here:
-                    -- local t = {a='x',b='y',c=1}
-                    -- for k,v in pairs(t) do
-                    --   if k=='a' then
-                    --     v = 3 -- will not work, should use t[k] = 3
-                    --   end
-                    -- end
-                    -- vim.pretty_print(t)
-                  else 
-                    if type(v)=="table" then
-                      local new_path = vim.deepcopy(path)
-                      new_path[#new_path+1] = k
-                      to_search[#to_search+1] =  {v,new_path}
-                    end
+      }
+      last_pig_menu = Menu(
+      popup_options,
+      {
+        lines = lines,
+        min_width = math.floor(vim.fn.winwidth(0)*0.4),
+        max_width = math.floor(vim.fn.winwidth(0)*0.8),
+        keymap = {
+          focus_next = { "n", "<Down>", "<Tab>" },
+          focus_prev = { "e", "<Up>", "<S-Tab>" },
+          close =  { "<Esc>", "<C-c>" },
+          submit = { "<CR>", "<Space>" },
+        },
+        should_skip_item = function(item)
+          if item._type == "separator" then
+            return true
+          else
+            return item.PIG_skip
+          end
+        end,
+        on_close = function()
+          vim.api.nvim_buf_clear_namespace(0,PIG_ns,0,-1)
+        end,
+        on_change = function(node,menu)
+          last_pig_node = node
+        end,
+        on_submit = function(item)
+          if label == "rename" then
+            vim.lsp.buf_request(0,'textDocument/rename', ctx.rename_params)
+          else
+            local loc = item.loc
+            -- change all of the leaf node, which name is 'character': means the line numeber
+            local to_search = {{loc,{}}}
+            while #to_search > 0 do
+              local pop = to_search[#to_search][1]
+              local path = to_search[#to_search][2]
+              to_search[#to_search] = nil
+              for k,v in pairs(pop) do
+                if k=='character' then
+                  -- change the node
+                  pop[k] = last_pig_window_location[2]
+                  -- NOTE: you cannot use the following way, this will not change the loc table
+                  -- v = last_pig_window_location[2]
+                  -- a small example here:
+                  -- local t = {a='x',b='y',c=1}
+                  -- for k,v in pairs(t) do
+                  --   if k=='a' then
+                  --     v = 3 -- will not work, should use t[k] = 3
+                  --   end
+                  -- end
+                  -- vim.pretty_print(t)
+                else 
+                  if type(v)=="table" then
+                    local new_path = vim.deepcopy(path)
+                    new_path[#new_path+1] = k
+                    to_search[#to_search+1] =  {v,new_path}
                   end
                 end
               end
-              lsp.util.jump_to_location(loc,vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
             end
-            last_pig_menu.menu_props.on_close()
-          end,
-        }
-        )
-        last_source_bufnr = ctx.bufnr
-        last_source_winnr = vim.fn.winnr()
-        last_source_buf_location = {ctx.token[1],ctx.token[2]}
-        last_pig_call_params = {label, result, ctx, config}
-        -- ========== now everything is saved
-        last_pig_menu:mount()
-        -- ========== render PIG
-        vim.api.nvim_buf_set_option(last_pig_menu.bufnr,"ft",ft) -- set the highlight for ft
-        vim.api.nvim_buf_call(last_pig_menu.bufnr,function ()
-          last_pig_window = vim.api.nvim_get_current_win()
-          if ctx.resume then
-            vim.api.nvim_win_set_cursor(0,last_pig_window_location)
-          else
-            _goto_next_loc_in_menu(1)
+            lsp.util.jump_to_location(loc,vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
           end
-          vim.cmd[[TSBufDisable highlight]]
-        end)
-        vim.api.nvim_create_autocmd("CursorMoved",{callback = function()
-          last_pig_window_location = vim.api.nvim_win_get_cursor(last_pig_window)
-        end, buffer = last_pig_menu.bufnr, group=au_group})
-
-        vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","]r","",{noremap=true,callback=function ()
+          last_pig_menu.menu_props.on_close()
+        end,
+      }
+      )
+      last_source_bufnr = ctx.bufnr
+      last_source_winnr = vim.fn.winnr()
+      last_source_buf_location = {ctx.token[1],ctx.token[2]}
+      last_pig_call_params = {label, result, ctx, config}
+      -- ========== now everything is saved
+      last_pig_menu:mount()
+      -- ========== render PIG
+      vim.api.nvim_buf_set_option(last_pig_menu.bufnr,"ft",ft) -- set the highlight for ft
+      vim.api.nvim_buf_call(last_pig_menu.bufnr,function ()
+        last_pig_window = vim.api.nvim_get_current_win()
+        if ctx.resume then
+          vim.api.nvim_win_set_cursor(0,last_pig_window_location)
+        else
           _goto_next_loc_in_menu(1)
-        end})
-        vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","[r","",{noremap=true,callback=function ()
-          _goto_next_loc_in_menu(-1)
-        end})
-        vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","]f","",{noremap=true, callback=function ()
-          _goto_next_file_in_menu(1)
-        end})
-        vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","[f","",{noremap=true,callback=function ()
-          _goto_next_file_in_menu(-1)
-        end})
-        vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","<leader>q","",{noremap=true,callback=dump_qflist})
-        vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n",",s","",{noremap=true,callback=function ()
-          M.open_split('h',ctx)
-        end})
-        vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n",",v","",{noremap=true,callback=function ()
-          M.open_split('v',ctx)
-        end})
-
-        require('core.utils').map("n",",g","",{noremap=true,callback=function ()
-          vim.cmd(fmt('%s wincmd w',last_source_winnr))
-          vim.cmd(fmt('b %s',last_source_bufnr))
-          vim.cmd('wincmd o')
-          vim.api.nvim_win_set_cursor(0,last_source_buf_location)
-          last_pig_call_params[3].resume = true
-          M.location_handler(unpack(last_pig_call_params))
-        end})
-
-        for _, loc in ipairs(rename_lines) do
-          vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"Error",loc.line,loc.start_col,loc.end_col)
         end
+        vim.cmd[[TSBufDisable highlight]]
+      end)
+      vim.api.nvim_create_autocmd("CursorMoved",{callback = function()
+        last_pig_window_location = vim.api.nvim_win_get_cursor(last_pig_window)
+      end, buffer = last_pig_menu.bufnr, group=au_group})
 
-        for _, loc in ipairs(file_lines) do
-          vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"htmlBold",loc.line,loc.start_col,loc.end_col)
-        end
+      vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","]r","",{noremap=true,callback=function ()
+        _goto_next_loc_in_menu(1)
+      end})
+      vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","[r","",{noremap=true,callback=function ()
+        _goto_next_loc_in_menu(-1)
+      end})
+      vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","]f","",{noremap=true, callback=function ()
+        _goto_next_file_in_menu(1)
+      end})
+      vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","[f","",{noremap=true,callback=function ()
+        _goto_next_file_in_menu(-1)
+      end})
+      vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n","<leader>q","",{noremap=true,callback=dump_qflist})
+      vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n",",s","",{noremap=true,callback=function ()
+        M.open_split('h',ctx)
+      end})
+      vim.api.nvim_buf_set_keymap(last_pig_menu.bufnr,"n",",v","",{noremap=true,callback=function ()
+        M.open_split('v',ctx)
+      end})
 
-        for _, loc in ipairs(ref_lines) do
-          vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"Visual",loc.line,loc.start_col,loc.end_col)
-        end
-        profile_time = (vim.loop.hrtime() - profile_start) / 1000000
-        print(fmt("[PIG] location spent %s",profile_time))
-      else
-        print('still waiting the treesitter_job')
+      require('core.utils').map("n",",g","",{noremap=true,callback=function ()
+        vim.cmd(fmt('%s wincmd w',last_source_winnr))
+        vim.cmd(fmt('b %s',last_source_bufnr))
+        vim.cmd('wincmd o')
+        vim.api.nvim_win_set_cursor(0,last_source_buf_location)
+        last_pig_call_params[3].resume = true
+        M.location_handler(unpack(last_pig_call_params))
+      end})
+
+      for _, loc in ipairs(rename_lines) do
+        vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"Error",loc.line,loc.start_col,loc.end_col)
       end
-  end))
+
+      for _, loc in ipairs(file_lines) do
+        vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"htmlBold",loc.line,loc.start_col,loc.end_col)
+      end
+
+      for _, loc in ipairs(ref_lines) do
+        vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"Visual",loc.line,loc.start_col,loc.end_col)
+      end
+      profile_time = (vim.loop.hrtime() - profile_start) / 1000000
+      print(fmt("[PIG] location spent %s",profile_time))
+  end)
 end
 
 M.open_split = function(direction,ctx)

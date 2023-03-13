@@ -137,7 +137,7 @@ function M.config()
   capabilities.textDocument.completion.completionItem.labelDetailsSupport = true
   capabilities.textDocument.completion.completionItem.deprecatedSupport = true
   capabilities.textDocument.completion.completionItem.commitCharactersSupport = true
-  capabilities.semanticTokensProvider = true
+  capabilities.semanticTokensProvider = nil
   capabilities.textDocument.completion.completionItem.tagSupport = { valueSet = { 1 } }
   capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = {
@@ -204,7 +204,7 @@ function M.config()
     handlers = my_lsp_handlers
   }
 
-  local python_lsp = 'pylance'
+  local python_lsp = 'pyright'
   local pyright_opts = {
     settings = {
       python = {

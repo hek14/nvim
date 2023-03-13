@@ -35,8 +35,7 @@ local function echo(hlgroup, msg)
   cmd('echohl None')
 end
 
-_G.treesitter_job = require('scratch.test_headless')
-treesitter_job:batch(2)
+_G.treesitter_job = require('scratch.test_headless'):spawn()
 
 local sort_locations = function(locations)
   table.sort(locations, function(i, j)
@@ -380,13 +379,14 @@ M.location_handler = function(label, result, ctx, config)
   local inputs_for_treesitter = {}
   for i, g in ipairs(groups) do
     local f = vim.uri_to_fname(g[1])
+    local filetick = vim.loop.fs_stat(f).mtime.nsec
     local ext = vim.fn.fnamemodify(f,':e')
     local _ft = extension_to_filetype[ext]
     for j = 2,#g do
       local range = g[j].range or g[j].targetRange or g[j].targetSelectionRange
       table.insert(inputs_for_treesitter,{
         file = f, 
-        filetick = vim.loop.fs_stat(f).mtime.nsec,
+        filetick = filetick,
         filetype = _ft,
         position = {range.start.line,range.start.character},
       })
@@ -396,9 +396,10 @@ M.location_handler = function(label, result, ctx, config)
   treesitter_job:send(inputs_for_treesitter)
   -- NOTE: important here, do not directly call vim.loop.sleep(100),because this will also block the stdout read in test_headless
   local timer = vim.loop.new_timer()
+
   local has_done = false
-  treesitter_job:with_output(function(data)
-    print(string.format('treesitter_job parsed %s symbols, spent: %s ms', treesitter_job.parsed_cnt,(vim.loop.hrtime()-start)/1000000))
+  treesitter_job:with_output(vim.schedule_wrap(function(data)
+    print(string.format('treesitter_job parsed symbols, spent: %s ms',(vim.loop.hrtime()-start)/1000000))
     local lines = make_menu(groups,ctx,treesitter_job.data)
     local popup_options = {
       position = "50%",
@@ -550,7 +551,7 @@ M.location_handler = function(label, result, ctx, config)
       end
       profile_time = (vim.loop.hrtime() - profile_start) / 1000000
       print(fmt("[PIG] location spent %s",profile_time))
-  end)
+  end))
 end
 
 M.open_split = function(direction,ctx)

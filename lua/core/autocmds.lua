@@ -18,7 +18,7 @@ M.au("FileType",{
 
 M.au('VimLeavePre',{
   callback = function ()
-    treesitter_job:kill_all()
+    treesitter_job:kill()
   end
 })
 

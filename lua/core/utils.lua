@@ -533,7 +533,6 @@ M.log = function(...)
       local f = io.open(log_path, "a+")
       io.output(f)
       io.write(str .. "=======\n")
-      io.write(string.format('LOG cost time: %s ms\n',(vim.loop.hrtime()-start)/1000000))
       io.close(f)
     else
       print(str .. "\n")

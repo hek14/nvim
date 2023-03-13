@@ -32,41 +32,11 @@ local ts_parsers = require("nvim-treesitter.parsers")
 local ts_queries = require("nvim-treesitter.query")
 local ts_locals = require('nvim-treesitter.locals')
 local get_node_text = vim.treesitter.query.get_node_text
-log("nvim-treesitter imported")
 
 local handle_err = function(file)
-  log('wrong file path:',file)
   file_buf_map[file] = 'error'
 end
-
 local uv = vim.loop
-local read_file = function(path, callback)
-  uv.fs_open(path, "r", 438, vim.schedule_wrap(function(err, fd)
-    if err then
-      handle_err(path)
-      return
-    end
-    uv.fs_fstat(fd, vim.schedule_wrap(function(err, stat)
-      if err then
-        handle_err(path)
-        return
-      end
-      uv.fs_read(fd, stat.size, 0, vim.schedule_wrap(function(err, data)
-        if err then
-          handle_err(path)
-          return
-        end
-        uv.fs_close(fd, vim.schedule_wrap(function(err)
-          if err then
-            handle_err(path)
-            return
-          end
-          callback(data)
-        end))
-      end))
-    end))
-  end))
-end
 
 local make_pos_key = function(position)
   return fmt('row:%scol:%s',position[1],position[2])
@@ -82,16 +52,12 @@ end
 
 local update_parse_results = function(item)
   if file_buf_map[item.file]==nil then
-    log('item.file should be pushed into file_buf_map')
     return
   end
   if file_buf_map[item.file]=='error' then
-    log('item.file does not exists',item.file)
     return
   end
-
   if file_buf_map[item.file].filetick~=item.filetick then
-    log('filetick not equal')
     return
   end
 
@@ -146,7 +112,7 @@ function M.get_data(filelang,node,bufnr)
     end
   end
 
-  local gps_query = ts_queries.get_query(filelang, "nvimGPS")
+  local gps_query = ts_queries.get_query(filelang, "nvimKK")
   while node do
     local iter = gps_query:iter_captures(node, bufnr)
     local capture_ID, capture_node = iter()
@@ -266,37 +232,24 @@ local function my_old_parse_position_at_buf(position,bufnr)
 end
 
 local init_file = function(item)
-  read_file(item.file,vim.schedule_wrap(function(data)
-    data = vim.split(data,'\n')
-    local bufnr = vim.api.nvim_create_buf(false,true)
-    file_buf_map[item.file] = {bufnr=bufnr,filetick=item.filetick}
+  vim.api.nvim_command(fmt('edit %s',item.file))
+  local bufnr = vim.fn.bufnr(item.file)
+  file_buf_map[item.file] = {bufnr=bufnr,filetick=item.filetick}
+  log('file reloaded! ',item.file,file_buf_map[item.file])
 
-    -- NOTE: the main time-consuming operation is the `nvim_buf_set_lines`
-    local start = vim.loop.hrtime()
-    vim.api.nvim_buf_set_option(bufnr,'filetype',item.filetype)
-    vim.api.nvim_buf_set_lines(bufnr,0,-1,false,data)
-    log(string.format('set_buf_lines cost time: %s ms',(vim.loop.hrtime()-start)/1000000))
-
-    local filelang = ts_parsers.ft_to_lang(item.filetype)
-    local parser = ts_parsers.get_parser(bufnr, filelang)
-    parser:parse() -- NOTE: very important to attach a parser to this bufnr
-  end))
+  -- NOTE: the main time-consuming operation is the `nvim_buf_set_lines`
+  vim.api.nvim_buf_set_option(bufnr,'filetype',item.filetype)
+  local filelang = ts_parsers.ft_to_lang(item.filetype)
+  local parser = ts_parsers.get_parser(bufnr, filelang)
+  parser:parse() -- NOTE: very important to attach a parser to this bufnr
 end
 
 local load_file_with_cache = function(input)
-  -- NOTE: the read_file is using async callback function, so we need this table to record loaded files
-  local current_load_queue = {} 
   for _,item in ipairs(input) do
     if file_buf_map[item.file] and file_buf_map[item.file].filetick==item.filetick then
-      log('file_buf_map has file in: ',file_buf_map[item.file])
+      log("the file is not changed: ",item.file)
     else
-      if not vim.tbl_contains(current_load_queue,item.file) then
-        log('init the file')
-        init_file(item)
-        table.insert(current_load_queue,item.file)
-      else
-        log(fmt('file %s already in the current_load_queue',item.file))
-      end
+      init_file(item)
     end
   end
 end
@@ -320,7 +273,6 @@ end
 
 local handle = function(id,raw_input,event)
   -- received is a table of string, should concat them for unpickle
-  local start = vim.loop.hrtime()
   local content = ""
   local quit_after_parse = false
   for i,t in ipairs(raw_input) do
@@ -332,18 +284,14 @@ local handle = function(id,raw_input,event)
   end
   content = string.sub(content,1,#content-1)
   local input = sel.unpickle(content)
-  log('unpickle spent: ',(vim.loop.hrtime()-start)/1e6)
 
-  start = vim.loop.hrtime()
+  log('input: ',input)
   load_file_with_cache(input)
   sync_load_file(input,function()
-    log('every file is already, spent: ',(vim.loop.hrtime()-start)/1e6)
     for i,item in ipairs(input) do
-      log('parse item: ',i,item)
       update_parse_results(item)
     end
     log('parse results',file_buf_map)
-    log('treesitter handle spent: ',(vim.loop.hrtime()-start)/1e6)
     if id and event=='stdin' then
       vim.fn.chansend(id,sel.pickle(file_buf_map))
       if quit_after_parse then
@@ -354,8 +302,8 @@ local handle = function(id,raw_input,event)
 end
 
 M.test = function ()
-  -- log = vim.pretty_print
-  local input = require('scratch.a_input_t')
+  log = vim.pretty_print
+  local input = R('scratch.two_input_t')
   input = sel.pickle(input)
   input = vim.split(input,'\n')
   handle(nil,input,nil)
@@ -380,7 +328,6 @@ M.get_info_under_cursor = function ()
 end
 
 M.wait_stdin = function ()
-  log('wait_stdin called')
   vim.fn.stdioopen({on_stdin = handle})
 end
 

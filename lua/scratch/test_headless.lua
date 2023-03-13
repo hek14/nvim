@@ -26,7 +26,6 @@ local group_by_path = function(input)
     return {}
   else
     for i = index,#input do
-      log('delete the: ',input[i])
       input[i] = nil
     end
   end
@@ -61,7 +60,6 @@ end
 
 function M:send(input)
   local grouped_input = group_by_path(input)
-  log("grouped_input: ",grouped_input)
   self.current_input = input
   for i,sub_input in ipairs(grouped_input) do
     self.childs[(i % #self.childs)+1]:send(sub_input)
@@ -128,17 +126,27 @@ function process:kill()
   uv.kill(self.pid,9)
 end
 
-function process:send(input)
-  log("sub_input: ",input)
+function process:with_output(cb)
   local timer = vim.loop.new_timer()
   timer:start(0,10,vim.schedule_wrap(function ()
     if self.done then
-      log("sub_input: ",input)
+      cb(self.data)
+      if timer and not timer:is_closing() then
+        timer:stop()
+        timer:close()
+      end
+    end
+  end))
+end
+
+function process:send(input)
+  local timer = vim.loop.new_timer()
+  timer:start(0,10,vim.schedule_wrap(function ()
+    if self.done then
       self.profile_start = vim.loop.hrtime()
       self.done = false
       local send_input = sel.pickle(input) -- NOTE: input example: /Users/hk/.config/nvim/lua/scratch/a_input_t.lua
       uv.write(self.stdin, send_input)
-      log('write end')
       if timer and not timer:is_closing() then
         timer:stop()
         timer:close()
@@ -161,13 +169,12 @@ function M:spawn()
   local stderr = uv.new_pipe(false)
   local handle,pid_or_err
   local opts = {
-    args = {'--headless','-u','NORC','--cmd', 'lua require("scratch.ts_util").wait_stdin()'}, -- TODO: --clean, -u, -n, -i
+    args = {'--headless','-u','NORC','-i','NONE','-n','--cmd', 'lua require("scratch.ts_util").wait_stdin()'},
     stdio = { stdin, stdout, stderr },
     cwd = vim.fn.stdpath('config'),
   }
 
   local on_exit = vim.schedule_wrap(function(code)
-    log('should exit now!')
     uv.read_stop(stdout)
     uv.read_stop(stderr)
     safe_close(handle)
@@ -186,16 +193,11 @@ function M:spawn()
     if data then
       data = sel.unpickle(data)
       -- child_process.data = data
-      log('before merge: ',child_process.data)
-      log('receive new: ',data)
       child_process.data = vim.tbl_deep_extend('force',data,child_process.data)
-      log('after merge: ',child_process.data)
       child_process.done = true
       child_process.spent = (vim.loop.hrtime() - child_process.profile_start)/1e6
-      log('child_process.spent: ',child_process.spent)
     end
   end))
-  log('spawn a background nvim process: ',child_process.pid)
   table.insert(M.childs,child_process)
   return child_process
 end

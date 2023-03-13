@@ -505,7 +505,13 @@ M.repeat_timer = function(fn)
   timedFn()
 end
 
+M.clear_log = function ()
+  local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/kk_debug.log"
+  vim.fn.system('echo > ' .. log_path)
+end
+
 M.log = function(...)
+  local start = vim.loop.hrtime()
   local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/kk_debug.log"
   local arg = {...}
   local str = "שׁ "
@@ -526,7 +532,8 @@ M.log = function(...)
     if log_path ~= nil and #log_path > 3 then
       local f = io.open(log_path, "a+")
       io.output(f)
-      io.write(str .. "\n")
+      io.write(str .. "=======\n")
+      io.write(string.format('LOG cost time: %s ms\n',(vim.loop.hrtime()-start)/1000000))
       io.close(f)
     else
       print(str .. "\n")

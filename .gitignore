@@ -23,3 +23,8 @@ lua/contrib/cmp_github_handler.lua
 .DS_Store
 
 lua/scratch/a_table.lua
+
+lua/test.lua
+lua/scratch/a_input_t.lua
+lua/scratch/two_input_t.lua
+lua/test2.lua

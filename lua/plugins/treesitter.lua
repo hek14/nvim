@@ -53,7 +53,7 @@ local M = {
 
 function M.config()
   local options = {
-    ensure_installed = {"python","c","query","vim"}, -- NOTE: playground need query parser
+    ensure_installed = {"python","c","query","vim","markdown"}, -- NOTE: playground need query parser
     playground = { 
       enable = true 
     },

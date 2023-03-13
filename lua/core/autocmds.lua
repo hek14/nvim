@@ -16,6 +16,12 @@ M.au("FileType",{
   command='if expand("%:t")=="pose.txt" | set ro | endif'
 })
 
+M.au('VimLeavePre',{
+  callback = function ()
+    treesitter_job:kill_all()
+  end
+})
+
 -- NOTE: use utilyre/barbecue.nvim instead
 -- M.au("VimEnter",{
 --   callback = function()

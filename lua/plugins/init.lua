@@ -1,15 +1,17 @@
 local plugins = {
   {
-    'AckslD/messages.nvim',
-    cmd = 'Messages',
-    init = function ()
-      msg = function(...)
-        require('messages.api').capture_thing(...)
-      end
-    end,
+    "SmiteshP/nvim-gps",
+    lazy = false,
     config = function ()
-      require("messages").setup()
+      require("nvim-gps").setup()
+      vim.keymap.set('n',',w',function ()
+        vim.pretty_print(require('nvim-gps').get_location())
+      end)
     end
+  },
+  {
+    "sbulav/nredir.nvim",
+    cmd = 'Nredir'
   },
   {
     "jackMort/ChatGPT.nvim",
@@ -38,6 +40,13 @@ local plugins = {
     end
   },
   { "nvim-tree/nvim-web-devicons" },
+  {
+    'glepnir/nerdicons.nvim', 
+    cmd = 'NerdIcons', 
+    config = function() 
+      require('nerdicons').setup({}) 
+    end
+  },
   {
     "norcalli/nvim-colorizer.lua",
     cmd = 'ColorizerToggle',
@@ -266,7 +275,10 @@ local plugins = {
     "dstein64/vim-startuptime",
     lazy = false,
   },
-  { "tpope/vim-scriptease", lazy=false, enabled=false }, -- consume too much time at startup
+  { 
+    "tpope/vim-scriptease", 
+    cmd = 'Messages',
+  },
   { "MunifTanjim/nui.nvim" },
   {
     "rcarriga/nvim-notify",

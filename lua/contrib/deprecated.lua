@@ -1,4 +1,17 @@
 local plugins = {
+  {
+    'AckslD/messages.nvim',
+    enabled = false,
+    cmd = 'Messages',
+    init = function ()
+      msg = function(...)
+        require('messages.api').capture_thing(...)
+      end
+    end,
+    config = function ()
+      require("messages").setup()
+    end
+  },
   { 
     "glepnir/whiskyline.nvim",
     enabled = false,

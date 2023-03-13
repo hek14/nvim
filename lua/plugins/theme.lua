@@ -104,4 +104,15 @@ local vscode_theme = {
   end,
 }
 
+local material = {
+  'marko-cerovac/material.nvim',
+  init = function()
+    vim.schedule(function ()
+      vim.g.material_style = "palenight"
+      vim.cmd 'colorscheme material'
+      override_hl()
+    end)
+  end,
+}
+
 return vscode_theme

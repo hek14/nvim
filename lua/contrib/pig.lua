@@ -392,12 +392,13 @@ M.location_handler = function(label, result, ctx, config)
       })
     end
   end
+  local start = vim.loop.hrtime()
   treesitter_job:send(inputs_for_treesitter)
   -- NOTE: important here, do not directly call vim.loop.sleep(100),because this will also block the stdout read in test_headless
   local timer = vim.loop.new_timer()
   local has_done = false
   treesitter_job:with_output(function(data)
-    print('treesitter_job done with: ',#treesitter_job.current_input)
+    print(string.format('treesitter_job parsed %s symbols, spent: %s ms', treesitter_job.parsed_cnt,(vim.loop.hrtime()-start)/1000000))
     local lines = make_menu(groups,ctx,treesitter_job.data)
     local popup_options = {
       position = "50%",

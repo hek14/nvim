@@ -48,12 +48,8 @@ end
 
 
 local update_parse_results = function(item)
-  if file_buf_map[item.file]==nil then
-    return
-  end
-  if file_buf_map[item.file].filetick~=item.filetick then
-    return
-  end
+  assert(file_buf_map[item.file],"file_buf_map has no: " .. item.file)
+  assert(file_buf_map[item.file].filetick==item.filetick,"filetick not latest")
 
   local pos_key = make_pos_key(item.position)
   if file_buf_map[item.file][pos_key] then
@@ -64,7 +60,6 @@ local update_parse_results = function(item)
     file_buf_map[item.file][pos_key] = ret
     return ret
   end
-
 end
 
 local get_main_node = function(node)
@@ -226,14 +221,9 @@ local function my_old_parse_position_at_buf(position,bufnr)
 end
 
 local reload_file = function(item)
-  if not vim.loop.fs_stat(item.file) then
-    log('file not exists: ',item.file)
-    return
-  end
-
+  assert(vim.loop.fs_stat(item.file),"file not exists")
   vim.api.nvim_command(fmt('noautocmd edit %s',item.file))
   local bufnr = vim.fn.bufnr(item.file)
-  file_buf_map[item.file] = {bufnr=bufnr,filetick=item.filetick}
 
   -- NOTE: should set the filetype manually for treesitter parse, because we use noautocmd
   vim.api.nvim_buf_set_option(bufnr,'filetype',item.filetype)
@@ -241,21 +231,23 @@ local reload_file = function(item)
   local parser = ts_parsers.get_parser(bufnr, filelang)
   parser:parse() -- NOTE: very important to attach a parser to this bufnr
   log('file reloaded! ',item.file,file_buf_map[item.file])
+  file_buf_map[item.file] = {bufnr=bufnr,filetick=item.filetick}
 end
 
 local load_file_with_cache = function(input)
   for _,item in ipairs(input) do
     if file_buf_map[item.file] and file_buf_map[item.file].filetick==item.filetick then
-      log("the file is not changed: ",item.file)
     else
       local ok, err = pcall(reload_file,item)
       if not ok then
         log('load file err: ',item.file,err)
+        file_buf_map[item.file] = {bufnr=-1,filetick=-1} -- NOTE: insert invalid bufnr and filetick
       end
     end
     local ok, err = pcall(update_parse_results,item)
     if not ok then
-      log("cannot parse item",item)
+      log("cannot parse item",item,err)
+      file_buf_map[item.file][make_pos_key(item.position)] = "error"
     end
   end
 end
@@ -273,9 +265,7 @@ local handle = function(id,raw_input,event)
   content = string.sub(content,1,#content-1)
   local input = sel.unpickle(content)
 
-  log('handle input: ',input)
   load_file_with_cache(input)
-  log('handle output',file_buf_map)
   if id and event=='stdin' then
     vim.fn.chansend(id,sel.pickle(file_buf_map))
   end

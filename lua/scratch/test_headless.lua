@@ -14,6 +14,23 @@ local M = {
   current_input = {},
 }
 
+local make_pos_key = function(position)
+  return string.format('row:%scol:%s',position[1],position[2])
+end
+
+function M:count()
+  local cnt = 0
+  for i,item in ipairs(self.current_input) do 
+    for i,c in ipairs(self.childs) do
+      if c.data[item.file] and c.data[item.file][make_pos_key(item.position)] then
+        cnt = cnt + 1
+        break
+      end
+    end
+  end
+  return cnt
+end
+
 function M:send(input)
   table.sort(input,function(a,b)
     return a.file < b.file
@@ -35,6 +52,7 @@ function M:send(input)
     end
   end
 
+  self.current_input = input
   local results = {{input[1]}} 
   local current_file = input[1].file
   for i=2,#input do
@@ -51,9 +69,9 @@ function M:send(input)
   for i,g in ipairs(results) do
     local c_file = g[1].file
     local handled = false
-    for _,c in ipairs(self.childs) do
+    for k,c in ipairs(self.childs) do
       if c.data[c_file] then
-        log("some child has handle this before ",c_file,'you: ',c.data)
+        log("some child has handle this before ",c_file,'you: ',k)
         c:send(g)
         handled = true
         break
@@ -80,20 +98,12 @@ function M:batch(cnt)
   end
 end
 
-local make_pos_key = function(position)
-  return string.format('row:%scol:%s',position[1],position[2])
-end
 
 function M:with_output(cb)
   local timer = uv.new_timer() 
   timer:start(0,10,vim.schedule_wrap(function()
-    local cnt = 0
-    for i,c in ipairs(self.childs) do
-      if c.done then
-        cnt = cnt + 1  
-      end
-    end
-    if cnt == #self.childs then
+    local cnt = self:count()
+    if cnt == #self.current_input then
       self.done = true
       for i,c in ipairs(self.childs) do
         self.data = vim.tbl_deep_extend('force',c.data,self.data)

@@ -204,8 +204,8 @@ local plugins = {
     config = function()
       require('leap').setup({})
       local map = require('core.utils').map
-      map({'n', 'x', 'o'}, 'f', '<Plug>(leap-forward-to)')
-      map({'n', 'x', 'o'}, 'F', '<Plug>(leap-backward-to)')
+      map({'n', 'x', 'o'}, '<C-f>', '<Plug>(leap-forward-to)')
+      map({'n', 'x', 'o'}, '<C-b>', '<Plug>(leap-backward-to)')
       map({'n','x'},'gs','<Plug>(leap-from-window)')
     end
   },

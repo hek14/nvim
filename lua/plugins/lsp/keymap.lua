@@ -150,7 +150,7 @@ function M.setup(client,bufnr)
   buf_set_keymap("n", "<leader>]r","<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",map_opts)
   buf_set_keymap('n', 'gi',"<cmd>lua vim.lsp.buf.incoming_calls()<CR>",map_opts)
   buf_set_keymap('n', 'go',"<cmd>lua vim.lsp.buf.outgoing_calls()<CR>",map_opts)
-  buf_set_keymap('n', '<C-b>',"",vim.tbl_deep_extend('force',map_opts,{callback = require('contrib.lsp_utils').scroll_docs_to_up('<C-b>')}))
-  buf_set_keymap('n', '<C-f>',"",vim.tbl_deep_extend('force',map_opts,{callback = require('contrib.lsp_utils').scroll_docs_to_down('<C-f>')}))
+  -- buf_set_keymap('n', '<C-b>',"",vim.tbl_deep_extend('force',map_opts,{callback = require('contrib.lsp_utils').scroll_docs_to_up('<C-b>')}))
+  -- buf_set_keymap('n', '<C-f>',"",vim.tbl_deep_extend('force',map_opts,{callback = require('contrib.lsp_utils').scroll_docs_to_down('<C-f>')}))
 end
 return M

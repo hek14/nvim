@@ -232,7 +232,7 @@ local function my_old_parse_position_at_buf(position,bufnr)
 end
 
 local init_file = function(item)
-  vim.api.nvim_command(fmt('edit %s',item.file))
+  vim.api.nvim_command(fmt('noautocmd edit %s',item.file))
   local bufnr = vim.fn.bufnr(item.file)
   file_buf_map[item.file] = {bufnr=bufnr,filetick=item.filetick}
   log('file reloaded! ',item.file,file_buf_map[item.file])

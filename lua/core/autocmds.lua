@@ -18,7 +18,7 @@ M.au("FileType",{
 
 M.au('VimLeavePre',{
   callback = function ()
-    treesitter_job:kill()
+    require('scratch.test_headless'):kill_all()
   end
 })
 

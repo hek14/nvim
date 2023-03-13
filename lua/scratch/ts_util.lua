@@ -33,9 +33,6 @@ local ts_queries = require("nvim-treesitter.query")
 local ts_locals = require('nvim-treesitter.locals')
 local get_node_text = vim.treesitter.query.get_node_text
 
-local handle_err = function(file)
-  file_buf_map[file] = 'error'
-end
 local uv = vim.loop
 
 local make_pos_key = function(position)
@@ -52,9 +49,6 @@ end
 
 local update_parse_results = function(item)
   if file_buf_map[item.file]==nil then
-    return
-  end
-  if file_buf_map[item.file]=='error' then
     return
   end
   if file_buf_map[item.file].filetick~=item.filetick then
@@ -231,17 +225,22 @@ local function my_old_parse_position_at_buf(position,bufnr)
   return ret
 end
 
-local init_file = function(item)
+local reload_file = function(item)
+  if not vim.loop.fs_stat(item.file) then
+    log('file not exists: ',item.file)
+    return
+  end
+
   vim.api.nvim_command(fmt('noautocmd edit %s',item.file))
   local bufnr = vim.fn.bufnr(item.file)
   file_buf_map[item.file] = {bufnr=bufnr,filetick=item.filetick}
-  log('file reloaded! ',item.file,file_buf_map[item.file])
 
-  -- NOTE: the main time-consuming operation is the `nvim_buf_set_lines`
+  -- NOTE: should set the filetype manually for treesitter parse, because we use noautocmd
   vim.api.nvim_buf_set_option(bufnr,'filetype',item.filetype)
   local filelang = ts_parsers.ft_to_lang(item.filetype)
   local parser = ts_parsers.get_parser(bufnr, filelang)
   parser:parse() -- NOTE: very important to attach a parser to this bufnr
+  log('file reloaded! ',item.file,file_buf_map[item.file])
 end
 
 local load_file_with_cache = function(input)
@@ -249,56 +248,37 @@ local load_file_with_cache = function(input)
     if file_buf_map[item.file] and file_buf_map[item.file].filetick==item.filetick then
       log("the file is not changed: ",item.file)
     else
-      init_file(item)
-    end
-  end
-end
-
-local sync_load_file = function(input,cb)
-  local timer = uv.new_timer() 
-  timer:start(0,2, vim.schedule_wrap(function()
-    local cnt = 0
-    for i,item in ipairs(input) do
-      if file_buf_map[item.file] then
-        cnt = cnt + 1
+      local ok, err = pcall(reload_file,item)
+      if not ok then
+        log('load file err: ',item.file,err)
       end
     end
-    if cnt == #input and timer and not timer:is_closing() then
-      timer:stop()
-      timer:close()
-      cb()
+    local ok, err = pcall(update_parse_results,item)
+    if not ok then
+      log("cannot parse item",item)
     end
-  end))
+  end
 end
 
 local handle = function(id,raw_input,event)
   -- received is a table of string, should concat them for unpickle
   local content = ""
-  local quit_after_parse = false
   for i,t in ipairs(raw_input) do
-    if string.match(t,'FINISHED') then
-      quit_after_parse = true
-      t = t:gsub('FINISHED','')
+    if i==1 and string.match(t,'FINISHED') then
+      vim.cmd[[:q!]]
+      return
     end
     content = content .. t .. '\n'
   end
   content = string.sub(content,1,#content-1)
   local input = sel.unpickle(content)
 
-  log('input: ',input)
+  log('handle input: ',input)
   load_file_with_cache(input)
-  sync_load_file(input,function()
-    for i,item in ipairs(input) do
-      update_parse_results(item)
-    end
-    log('parse results',file_buf_map)
-    if id and event=='stdin' then
-      vim.fn.chansend(id,sel.pickle(file_buf_map))
-      if quit_after_parse then
-        vim.cmd[[:q!]]
-      end
-    end
-  end)
+  log('handle output',file_buf_map)
+  if id and event=='stdin' then
+    vim.fn.chansend(id,sel.pickle(file_buf_map))
+  end
 end
 
 M.test = function ()

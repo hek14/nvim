@@ -35,7 +35,8 @@ local function echo(hlgroup, msg)
   cmd('echohl None')
 end
 
-_G.treesitter_job = require('scratch.test_headless'):spawn()
+_G.treesitter_job = require('scratch.test_headless')
+treesitter_job:batch(3)
 
 local sort_locations = function(locations)
   table.sort(locations, function(i, j)

@@ -7,12 +7,17 @@ local function safe_close(handle)
   end
 end
 
+local M = {
+  childs = {},
+  data = {},
+  done = false,
+  current_input = {},
+}
 
-local group_by_path = function(input)
+function M:send(input)
   table.sort(input,function(a,b)
     return a.file < b.file
   end)
-  
   -- NOTE: filter the non-exist path
   local index = 1
   for i,item in ipairs(input) do
@@ -30,11 +35,10 @@ local group_by_path = function(input)
     end
   end
 
-  local results = {
-    {input[1]}
-  } 
+  local results = {{input[1]}} 
   local current_file = input[1].file
-  for i,item in ipairs(input) do
+  for i=2,#input do
+    local item = input[i]
     if item.file~=current_file then
       table.insert(results, {item})
       current_file = item.file
@@ -42,15 +46,27 @@ local group_by_path = function(input)
       table.insert(results[#results],item)
     end
   end
+
+  local child_index = 1
+  for i,g in ipairs(results) do
+    local c_file = g[1].file
+    local handled = false
+    for _,c in ipairs(self.childs) do
+      if c.data[c_file] then
+        log("some child has handle this before ",c_file,'you: ',c.data)
+        c:send(g)
+        handled = true
+        break
+      end
+    end
+    if not handled then
+      log("nobody handle this yet: ",c_file,'you: ',child_index)
+      self.childs[child_index]:send(g)
+      child_index = (child_index + 1)<=#self.childs and child_index + 1 or 1
+    end
+  end
   return results
 end
-
-local M = {
-  childs = {},
-  data = {},
-  done = false,
-  current_input = {},
-}
 
 function M:kill_all()
   for i, c in ipairs(self.childs) do
@@ -58,11 +74,9 @@ function M:kill_all()
   end
 end
 
-function M:send(input)
-  local grouped_input = group_by_path(input)
-  self.current_input = input
-  for i,sub_input in ipairs(grouped_input) do
-    self.childs[(i % #self.childs)+1]:send(sub_input)
+function M:batch(cnt)
+  for i = 1,cnt do 
+    self:spawn()
   end
 end
 
@@ -70,26 +84,21 @@ local make_pos_key = function(position)
   return string.format('row:%scol:%s',position[1],position[2])
 end
 
-function M:count_results()
-  local cnt = 0
-  for i,item in ipairs(self.current_input) do
-    local pos_key = make_pos_key(item.position)
-    if self.data[item.file] and self.data[item.file][pos_key] then
-      cnt = cnt + 1
-    end
-  end
-  self.parsed_cnt = cnt
-end
-
 function M:with_output(cb)
   local timer = uv.new_timer() 
   timer:start(0,10,vim.schedule_wrap(function()
+    local cnt = 0
     for i,c in ipairs(self.childs) do
-      self.data = vim.tbl_deep_extend('force',c.data,self.data)
+      if c.done then
+        cnt = cnt + 1  
+      end
     end
-    self:count_results()
-    if self.parsed_cnt == #self.current_input then
+    if cnt == #self.childs then
       self.done = true
+      for i,c in ipairs(self.childs) do
+        self.data = vim.tbl_deep_extend('force',c.data,self.data)
+        log(string.format('child %s data',i),c.data)
+      end
       if timer and not timer:is_closing() then
         timer:stop()
         timer:close()
@@ -141,7 +150,7 @@ end
 
 function process:send(input)
   local timer = vim.loop.new_timer()
-  timer:start(0,10,vim.schedule_wrap(function ()
+  timer:start(0,5,vim.schedule_wrap(function ()
     if self.done then
       self.profile_start = vim.loop.hrtime()
       self.done = false
@@ -157,11 +166,6 @@ function process:send(input)
   end))
 end
 
-function M:batch(cnt)
-  for i = 1,cnt do 
-    self:spawn()
-  end
-end
 
 function M:spawn()
   local stdin = uv.new_pipe(false)

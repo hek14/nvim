@@ -510,7 +510,7 @@ M.clear_log = function ()
   vim.fn.system('echo > ' .. log_path)
 end
 
-M.log = function(...)
+M.log = vim.schedule_wrap(function(...)
   local start = vim.loop.hrtime()
   local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/kk_debug.log"
   local arg = {...}
@@ -538,7 +538,7 @@ M.log = function(...)
       print(str .. "\n")
     end
   end
-end
+end)
 
 M.source_curr_file = function()
   if vim.bo.ft == "lua" then

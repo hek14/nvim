@@ -53,7 +53,7 @@ local update_parse_results = function(item)
 
   local pos_key = make_pos_key(item.position)
   if file_buf_map[item.file][pos_key] then
-    log('use the cached results')
+    -- log('use the cached results')
     return file_buf_map[item.file][pos_key]
   else
     local ret = parse_position_at_buf(item.position,file_buf_map[item.file].bufnr)
@@ -230,7 +230,7 @@ local reload_file = function(item)
   local filelang = ts_parsers.ft_to_lang(item.filetype)
   local parser = ts_parsers.get_parser(bufnr, filelang)
   parser:parse() -- NOTE: very important to attach a parser to this bufnr
-  log('file reloaded! ',item.file,file_buf_map[item.file])
+  -- log('file reloaded! ',item.file,file_buf_map[item.file])
   file_buf_map[item.file] = {bufnr=bufnr,filetick=item.filetick}
 end
 
@@ -240,14 +240,14 @@ local load_file_with_cache = function(input)
     else
       local ok, err = pcall(reload_file,item)
       if not ok then
-        log('load file err: ',item.file,err)
+        -- log('load file err: ',item.file,err)
         file_buf_map[item.file] = {bufnr=-1,filetick=-1,[make_pos_key(item.position)]='error'} -- NOTE: insert invalid bufnr and filetick
         goto continue
       end
     end
     local ok, err = pcall(update_parse_results,item)
     if not ok then
-      log("cannot parse item",item,err)
+      -- log("cannot parse item",item,err)
       file_buf_map[item.file][make_pos_key(item.position)] = "error"
     end
     ::continue::

@@ -85,14 +85,14 @@ function M:send(input)
     local handled = false
     for k,c in ipairs(self.childs) do
       if c.data[c_file] then
-        log("some child has handle this before ",c_file,'you: ',k)
+        -- log("some child has handle this before ",c_file,'you: ',k)
         c:send(g)
         handled = true
         break
       end
     end
     if not handled then
-      log("nobody handle this yet: ",c_file,'you: ',child_index)
+      -- log("nobody handle this yet: ",c_file,'you: ',child_index)
       self.childs[child_index]:send(g)
       child_index = (child_index + 1)<=#self.childs and child_index + 1 or 1
     end
@@ -195,7 +195,7 @@ function process:send(input)
         timer:close()
       end
     else
-      log('not done yet,should queue')
+      -- log('not done yet,should queue')
     end
   end))
 end

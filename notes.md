@@ -236,3 +236,43 @@ end
 上面的代码中, 我们想遍历所有的t, 并利用一个vim.schedule delay处理: 本意是想快速的结束对于tt table的遍历. 
 但是这样不work, 因为vim.schedule 会把process(t)的过程delay到for循环后面. 这样没有一个t会在这个for循环中被处理.
 别这样写, 因为vim.schedule仍然是在vim main loop中执行的, 只是delay的串行, 并不会并行, 所以老老实实的挨个process(t) 
+
+# closure usage
+why using closure? -- enclose some state
+closure有一个妙用, 比方说一个callback function 调用方固定了其输入参数只有一个, bufnr, 但是我想传入其他任意的参数怎么办呢?
+方法是利用closure wrapper
+来自 ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/builtin/__lsp.lua:
+```lua
+local function get_workspace_symbols_requester(bufnr, opts)
+  local cancel = function() end
+
+  return function(prompt)
+    local tx, rx = channel.oneshot()
+    cancel()
+    _, cancel = vim.lsp.buf_request(bufnr, "workspace/symbol", { query = prompt }, tx)
+
+    -- Handle 0.5 / 0.5.1 handler situation
+    local err, res = rx()
+    assert(not err, err)
+
+    local locations = vim.lsp.util.symbols_to_items(res or {}, bufnr) or {}
+    if not vim.tbl_isempty(locations) then
+      locations = utils.filter_symbols(locations, opts) or {}
+    end
+    return locations
+  end
+end
+-- get_workspace_symbols_requester(0,opts) to get a new cb
+```
+
+# callback
+main thread(或者process) new了一个新的thread(或者spawn出去一个新的process),并指定其在结束时call function cb,那么这个cb就是所谓的callback.
+callback执行环境是: main thread(or process)
+怎么去建模这件事情呢: `||`脑子里开始只有一条主线, 然后fork出去一条并行的线, 某时再交汇回来, 主线交叉的那个点就是callback function执行的点
+(当然, 对于vim这类有loop的程序而言, 这个点可能暂时不安全, 那么会schedule cb's execution later) 
+
+# coroutine and stack
+coroutine的特点: 不管一个context(我们叫coroutine.create()出来的东西context)中调用多深,
+co.yield(val)的val值始终是yield给resume这个context的context.
+yield之后, 这个context会保存state: 当前的位置(即便是多层的函数调用),别的context再resume它的时候,
+它将直接从这个调用位置开始

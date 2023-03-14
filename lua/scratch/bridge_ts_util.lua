@@ -116,25 +116,34 @@ end
 
 function M:with_output(cb)
   local timer = uv.new_timer() 
+  local running = true
   timer:start(0,10,vim.schedule_wrap(function()
     local cnt = self:count()
     if cnt == #self.current_input then
       self.done = true
       for i,c in ipairs(self.childs) do
         self.data = vim.tbl_deep_extend('force',c.data,self.data)
-        log(string.format('child %s data',i),c.data)
       end
-      if timer and not timer:is_closing() then
+      if running and cb and type(cb)=='function' then
+        cb(self.data)
+      end
+      if not timer:is_closing() then
+        running = false
         timer:stop()
         timer:close()
-      end
-      if cb and type(cb)=='function' then
-        cb(self.data)
       end
     else
       self.done = false
     end
   end))
+  local cancel = function ()
+    running = false
+    if not timer:is_closing() then
+      timer:stop()
+      timer:close()
+    end
+  end
+  return cancel -- NOTE: just like lsp buf_request return value, you can cancel the cb call using `cancel`
 end
 
 local process = {}

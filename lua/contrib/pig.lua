@@ -398,7 +398,6 @@ M.location_handler = function(label, result, ctx, config)
   -- NOTE: important here, do not directly call vim.loop.sleep(100),because this will also block the stdout read in test_headless
   local timer = vim.loop.new_timer()
 
-  local has_done = false
   treesitter_job:with_output(vim.schedule_wrap(function(data)
     print(string.format('treesitter_job parsed symbols, spent: %s ms',(vim.loop.hrtime()-start)/1000000))
     local lines = make_menu(groups,ctx,treesitter_job.data)

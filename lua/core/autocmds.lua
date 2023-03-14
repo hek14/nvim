@@ -79,16 +79,6 @@ M.au("BufReadPost",{callback=function ()
   end
 end,desc="Return to last edit position when opening files (You want this!)"})
 
-M.au("BufNew",{callback=function ()
-  if vim.bo.ft~='TelescopePrompt' and
-    string.match(vim.bo.buftype,[[prompt]]) 
-    and vim.api.nvim_get_mode()['mode']~='i' 
-    then
-      vim.cmd [[ startinsert ]]
-    end
-  end,
-})
-
 M.au("BufEnter",{callback=function ()
   local bufnr = vim.api.nvim_get_current_buf()
   if vim.api.nvim_buf_line_count(bufnr) > 3000 then

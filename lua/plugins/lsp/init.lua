@@ -204,7 +204,7 @@ function M.config()
     handlers = my_lsp_handlers
   }
 
-  local python_lsp = 'pyright'
+  local python_lsp = 'pylance'
   local pyright_opts = {
     settings = {
       python = {

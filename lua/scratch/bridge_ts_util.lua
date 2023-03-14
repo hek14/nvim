@@ -42,10 +42,8 @@ end
 function M:send(input)
   local now = vim.loop.hrtime()
   if (now-self.last_request)/1e6<0.1 then -- the interval of two request less than 0.1
-    print('send too frequently') 
     self.current_input = expand_tbl(self.current_input,input)
   else
-    print('just ok: ',now,self.last_request)
     self.current_input = input
   end
 

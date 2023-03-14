@@ -216,3 +216,23 @@ The verification code is similar to "if !has(vscode) { return false};".
 - consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
 - add print() custom_capture for python
 - TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not
+
+# vim.schedule 陷阱/值得注意的点
+```lua
+local map = {}
+for i,t in ipairs(tt) do
+  local t 
+  vim.schedule(function()
+    -- do something to t
+    t_proc = process(t)
+    map[t] = t_proc
+  end)
+  if map[t] then
+    -- do something to proc_t
+    -- THIS IS NOT POSSIBLE
+  end
+end
+```
+上面的代码中, 我们想遍历所有的t, 并利用一个vim.schedule delay处理: 本意是想快速的结束对于tt table的遍历. 
+但是这样不work, 因为vim.schedule 会把process(t)的过程delay到for循环后面. 这样没有一个t会在这个for循环中被处理.
+别这样写, 因为vim.schedule仍然是在vim main loop中执行的, 只是delay的串行, 并不会并行, 所以老老实实的挨个process(t) 

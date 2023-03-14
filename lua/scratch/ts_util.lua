@@ -222,8 +222,8 @@ end
 
 local reload_file = function(item)
   assert(vim.loop.fs_stat(item.file),"file not exists")
-  vim.api.nvim_command(fmt('noautocmd edit %s',item.file))
-  local bufnr = vim.fn.bufnr(item.file)
+  vim.api.nvim_command(fmt('noautocmd edit %s',item.file)) -- the edit command will re-use buffer if the file is already opened
+  local bufnr = vim.fn.bufnr(item.file) -- will return the existed bufnr if opened before
 
   -- NOTE: should set the filetype manually for treesitter parse, because we use noautocmd
   vim.api.nvim_buf_set_option(bufnr,'filetype',item.filetype)
@@ -241,7 +241,8 @@ local load_file_with_cache = function(input)
       local ok, err = pcall(reload_file,item)
       if not ok then
         log('load file err: ',item.file,err)
-        file_buf_map[item.file] = {bufnr=-1,filetick=-1} -- NOTE: insert invalid bufnr and filetick
+        file_buf_map[item.file] = {bufnr=-1,filetick=-1,[make_pos_key(item.position)]='error'} -- NOTE: insert invalid bufnr and filetick
+        goto continue
       end
     end
     local ok, err = pcall(update_parse_results,item)
@@ -249,6 +250,7 @@ local load_file_with_cache = function(input)
       log("cannot parse item",item,err)
       file_buf_map[item.file][make_pos_key(item.position)] = "error"
     end
+    ::continue::
   end
 end
 
@@ -277,6 +279,7 @@ M.test = function ()
   input = sel.pickle(input)
   input = vim.split(input,'\n')
   handle(nil,input,nil)
+  log(file_buf_map)
 end
 
 M.get_info_under_cursor = function ()

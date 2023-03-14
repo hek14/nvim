@@ -195,11 +195,12 @@ relations with bufnr:
 If you know node.js, you can try to find the answer from Pylance's encryption source code, it is actually very simple.
 The verification code is similar to "if !has(vscode) { return false};".
 ```
-8.5. pylance各版本添加`return !0x0;`行的位置:
+8.5. record/log pylance各版本添加`return !0x0;`行的位置:
 2023.2.30: line 26099
 2023.2.40: line 26118
 2023.2.43: line 23401
 2023.3.11: line 23431
+2023.3.20: line 26940
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`

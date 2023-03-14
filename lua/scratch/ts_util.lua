@@ -2,21 +2,22 @@ local M = {}
 local log = require'core.utils'.log
 local sel = require('scratch.serialize')
 local fmt = string.format
--- local icons = {
---   ["class-name"] = ' ',
---   ["function-name"] = ' ',
---   ["method-name"] = ' ',
---   ["container-name"] = 'ﮅ ',
---   ["tag-name"] = '炙',
--- }
 local icons = {
-  ["class-name"] = 'cls: ',
-  ["function-name"] = 'func: ',
-  ["method-name"] = 'method: ',
-  ["container-name"] = 'container: ',
-  ["tag-name"] = 'tag: ',
-  ["condition-name"] = 'condition: ',
+  ["class-name"] = ' ',
+  ["function-name"] = ' ',
+  ["method-name"] = ' ',
+  ["container-name"] = 'ﮅ ',
+  ["tag-name"] = '炙',
+  ["condition-name"] = ' ',
 }
+-- local icons = {
+--   ["class-name"] = 'cls: ',
+--   ["function-name"] = 'func: ',
+--   ["method-name"] = 'method: ',
+--   ["container-name"] = 'container: ',
+--   ["tag-name"] = 'tag: ',
+--   ["condition-name"] = 'condition: ',
+-- }
 setmetatable(icons,{
   __index = function ()
     return 'obj: '

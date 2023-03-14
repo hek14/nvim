@@ -35,7 +35,7 @@ local function echo(hlgroup, msg)
   cmd('echohl None')
 end
 
-_G.treesitter_job = require('scratch.test_headless')
+_G.treesitter_job = require('scratch.bridge_ts_util')
 treesitter_job:batch(3)
 
 local sort_locations = function(locations)

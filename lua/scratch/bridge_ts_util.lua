@@ -11,6 +11,7 @@ local M = {
   childs = {},
   data = {},
   done = false,
+  last_request = vim.loop.hrtime(),
   current_input = {},
 }
 
@@ -31,7 +32,23 @@ function M:count()
   return cnt
 end
 
+local expand_tbl = function (t1,t2)
+  for j,d in ipairs(t2) do
+    t1[#t1+1] = d
+  end
+  return t1
+end
+
 function M:send(input)
+  local now = vim.loop.hrtime()
+  if (now-self.last_request)/1e6<0.1 then -- the interval of two request less than 0.1
+    print('send too frequently') 
+    self.current_input = expand_tbl(self.current_input,input)
+  else
+    print('just ok: ',now,self.last_request)
+    self.current_input = input
+  end
+
   table.sort(input,function(a,b)
     return a.file < b.file
   end)
@@ -52,7 +69,6 @@ function M:send(input)
     end
   end
 
-  self.current_input = input
   local results = {{input[1]}} 
   local current_file = input[1].file
   for i=2,#input do
@@ -83,6 +99,7 @@ function M:send(input)
       child_index = (child_index + 1)<=#self.childs and child_index + 1 or 1
     end
   end
+  self.last_request = vim.loop.hrtime()
   return results
 end
 

@@ -6,14 +6,18 @@ local encoding = function(t,tick)
   -- input: table1
   -- return: "START_12345_${table1}#_12345_END"
   local content = sel.pickle(t)
-  content = vim.split(content,'\n')
-  table.insert(content,1,fmt('START_%d_$',tick))
-  table.insert(content,#content+1,fmt('#_%d_END',tick))
-  log("encoding result(before sent): ",content,tick)
+  content = fmt('START_%d_$',tick) .. content .. fmt('#_%d_END',tick)
+  -- content = vim.split(content,'\n')
+  -- table.insert(content,1,fmt('START_%d_$',tick))
+  -- table.insert(content,#content+1,fmt('#_%d_END',tick))
+  -- log("encoding result(before sent): ",content,tick)
   return content
 end
 
 local decoding = function (s)
+  if type(s) == 'table' then
+    s = table.concat(s,'\n')
+  end
   -- input: "START_12345_${table1}#_12345_ENDSTART_45678_${table2}#_45678_END"
   -- return: { '12345' = table1, '45678' = table2 }
   local check_begin = function(ss)

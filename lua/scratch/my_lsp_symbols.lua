@@ -8,12 +8,7 @@ local pickers = require "telescope.pickers"
 local utils = require "telescope.utils"
 local entry_display = require "telescope.pickers.entry_display"
 local log = require('core.utils').log
-
-
-local make_pos_key = function(position)
-  return string.format('row:%scol:%s',position[1],position[2])
-end
-
+local treesitter_job = require('scratch.bridge_ts_parse')
 
 local function inject_ts_to_lsp_symbols(locations,f)
   local cancel = function() end
@@ -21,14 +16,14 @@ local function inject_ts_to_lsp_symbols(locations,f)
     loc.ts_info = ""
   end
   return function(prompt)
+    log('new_dynamic result_fn called')
     local tx, rx = channel.oneshot()
     cancel()
     cancel = treesitter_job:with_output(tx)
     local res = rx()
-
     if res then
       for i, loc in ipairs(locations) do
-        loc.ts_info = res[f][make_pos_key({loc.lnum-1,loc.col-1})]
+        loc.ts_info = treesitter_job:retrieve(f, {loc.lnum-1,loc.col-1})
       end
     end
     return locations
@@ -171,6 +166,7 @@ M.lsp_symbols = function(opts)
     --   push_tagstack_on_edit = true,
     -- }):find()
 
+    log('treesitter_job: ',inputs_for_treesitter)
     treesitter_job:send(inputs_for_treesitter)
     opts.path_display = { "hidden" }
     pickers

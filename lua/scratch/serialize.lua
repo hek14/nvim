@@ -67,7 +67,13 @@ local function unpickle(s)
     error("can't unpickle a "..type(s)..", only strings")
   end
   local gentables = loadstring("return "..s)
+  if not gentables then
+    require('core.utils').log('gentables nil',debug.getinfo(2,'Sl'))
+    require('core.utils').log('gentables nil',s)
+    return {}
+  end
   local tables = gentables()
+
   for tnum = 1, table.getn(tables) do
     local t = tables[tnum]
     local tcopy = {}; for i, v in pairs(t) do tcopy[i] = v end

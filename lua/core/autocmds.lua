@@ -18,7 +18,7 @@ M.au("FileType",{
 
 M.au('VimLeavePre',{
   callback = function ()
-    require('scratch.bridge_ts_util'):kill_all()
+    require('scratch.bridge_ts_parse'):kill_all()
   end
 })
 

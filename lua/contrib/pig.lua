@@ -35,8 +35,8 @@ local function echo(hlgroup, msg)
   cmd('echohl None')
 end
 
-_G.treesitter_job = require('scratch.bridge_ts_util')
-treesitter_job:batch(3)
+-- _G.treesitter_job = require('scratch.bridge_ts_util')
+-- treesitter_job:batch(3)
 
 local sort_locations = function(locations)
   table.sort(locations, function(i, j)
@@ -162,7 +162,10 @@ local make_menu = function(groups,ctx,treesitter_data)
       local item = lsp.util.locations_to_items({loc},vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)[1]
       local range = loc.range or loc.targetSelectionRange or loc.targetRange
       local pos_key = string.format('row:%scol:%s', range.start.line, range.start.character)
-      local ts = treesitter_data[file_name_2][pos_key]
+      local ts = ""
+      pcall(function ()
+        ts = treesitter_data[file_name_2][pos_key]
+      end)
       location_id = location_id + 1
       table.insert(menus,Menu.separator(string.format('Loc: %s, %s',location_id,ts), {text_align = "left"}))
       total_lines = total_lines + 1
@@ -394,13 +397,14 @@ M.location_handler = function(label, result, ctx, config)
     end
   end
   local start = vim.loop.hrtime()
-  treesitter_job:send(inputs_for_treesitter)
+  -- treesitter_job:send(inputs_for_treesitter)
   -- NOTE: important here, do not directly call vim.loop.sleep(100),because this will also block the stdout read in test_headless
   local timer = vim.loop.new_timer()
 
-  treesitter_job:with_output(vim.schedule_wrap(function(data)
-    print(string.format('treesitter_job parsed symbols, spent: %s ms',(vim.loop.hrtime()-start)/1000000))
-    local lines = make_menu(groups,ctx,treesitter_job.data)
+  -- treesitter_job:with_output(vim.schedule_wrap(function(data)
+    -- print(string.format('treesitter_job parsed symbols, spent: %s ms',(vim.loop.hrtime()-start)/1000000))
+    -- local lines = make_menu(groups,ctx,treesitter_job.data)
+    local lines = make_menu(groups,ctx,nil)
     local popup_options = {
       position = "50%",
       -- position = {
@@ -551,7 +555,7 @@ M.location_handler = function(label, result, ctx, config)
       end
       profile_time = (vim.loop.hrtime() - profile_start) / 1000000
       print(fmt("[PIG] location spent %s",profile_time))
-  end))
+  -- end))
 end
 
 M.open_split = function(direction,ctx)
@@ -656,8 +660,8 @@ M.async_fn = function(args)
     local token = M.create_token()
     args.token = token
     args = vim.tbl_deep_extend('force',args,{target=M.location_handler})
-    local _,fn = vim.lsp.buf_request(bufnr,methods[args.label], ref_params, M.wrap_handler(args))
-    cancel_fns[bufnr] = fn 
+    local _,cancel = vim.lsp.buf_request(bufnr,methods[args.label], ref_params, M.wrap_handler(args))
+    cancel_fns[bufnr] = cancel
   end))
 end
 

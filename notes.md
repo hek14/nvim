@@ -276,3 +276,5 @@ coroutine的特点: 不管一个context(我们叫coroutine.create()出来的东�
 co.yield(val)的val值始终是yield给resume这个context的context.
 yield之后, 这个context会保存state: 当前的位置(即便是多层的函数调用),别的context再resume它的时候,
 它将直接从这个调用位置开始
+
+'yield'对应的是coroutine, 值直接给co.resume的主, `return`对应的是栈, 值给调用它的函数

@@ -35,22 +35,46 @@ function M.send()
   end)
   handle = vim.loop.spawn("nvim", opts, on_exit)
 
-  vim.loop.read_start(stdout, vim.schedule_wrap(function(err, data)
-    assert(not err,err)
-    if data then
-      data = decoding(data)
-      print('data: ', type(data), data)
+  local wrapped_handle = function ()
+    local last_data = ""
+    local init = true
+    local wrapped = function(err, raw_input)
+      log('get back raw_input: ',type(raw_input),raw_input)
+      if init then
+        last_data = raw_input
+        init = false
+      else
+        last_data = string.sub(last_data,1,#last_data-1) .. raw_input
+      end
+      if string.match(raw_input,'END$') then
+        local data = decoding(last_data)
+        log('return back: ',data)
+        if data then
+          log('keys number: ',#vim.tbl_keys(data))
+          for k,v in pairs(data) do
+            log('return equal: ',vim.deep_equal(v,M.t),vim.deep_equal(v,M.t2),#v,#M.t,#M.t2)
+          end
+        end
+        last_data = ""
+        init = true
+      end
     end
-  end))
+    return wrapped
+  end
+
   -- vim.loop.stream_set_blocking(stdin,true)
-  -- for i = 1,50 do
-  --   vim.loop.write(stdin,encoding(M.t2, vim.loop.hrtime()))
-  -- end
+  for i = 1,20 do
+    vim.loop.write(stdin,encoding(M.t2, vim.loop.hrtime()))
+  end
+  -- vim.loop.sleep(100)
   vim.loop.write(stdin,encoding(M.t2, vim.loop.hrtime()))
-  vim.loop.write(stdin,encoding(M.t, vim.loop.hrtime()))
-  vim.loop.write(stdin,encoding(M.t2, vim.loop.hrtime()))
-  vim.loop.write(stdin,encoding(M.t, vim.loop.hrtime()))
-  vim.loop.write(stdin,'FINISH')
+  -- vim.loop.sleep(50)
+  -- vim.loop.write(stdin,encoding(M.t, vim.loop.hrtime()))
+  -- vim.loop.sleep(10)
+  -- vim.loop.write(stdin,encoding(M.t2, vim.loop.hrtime()))
+  -- vim.loop.write(stdin,encoding(M.t, vim.loop.hrtime()))
+
+  vim.loop.read_start(stdout, wrapped_handle())
 end
 
 
@@ -72,72 +96,51 @@ local concat_tbl = function(t1,t2)
   return t1
 end
 
-function M.receive()
-  local wrapped_handle = function (delay)
-    -- NOTE: delay: if the two interval is less than delay, it should be thought as a same stdin
-    local last_time = 0
-    local init = true
-    local last_data = {}
-    delay = delay or 10
+local ended = function(current)
+  local last = current[#current]
+  if string.match(last,'END%$') then
+  return true
+else
+  return false
+end
+end
 
-    local ended = function(current)
-      if type(current) == 'string' then
-        if string.match(current,'FINISH$') then
-          return true
-        else
-          return false
-        end
-      end
-      if type(current) == 'table' then
-        if string.match(current[#current],'FINISH$') then
-          return true
-        else
-          return false
-        end
-      end
-    end
+
+function M.receive()
+  local wrapped_handle = function ()
+    -- NOTE: delay: if the two interval is less than delay, it should be thought as a same stdin
+    local last_data = ""
 
     local wrapped = function(id,raw_input,event)
-      local now = vim.loop.hrtime()
-      log('interval: ',(now - last_time)/1e6)
-      log('raw_input: ',raw_input)
-      if init then
-        last_data = raw_input
-        init = false
-      end
-
-      if (now - last_time)/1e6 < delay then -- less than 10ms
-        local ok, last_data = pcall(concat_tbl,last_data,raw_input)
-        if not ok then
-          log('err: ',last_data)
-        end
-      end
-      last_time = now
-
-      if ended(last_data) then
-        local final_item = last_data[#last_data]
-        last_data[#last_data] = string.sub(final_item, 1, #final_item - 6)
-        log('ended!!!')
-        local data = decoding(last_data)
-        log('data: ',data)
-        if data then
-          for k,v in pairs(data) do
-            log('equal: ',vim.deep_equal(v,M.t),vim.deep_equal(v,M.t2))
-            if vim.deep_equal(v,M.t) then
-              local to_return = encoding({'is t'},k)
-              vim.fn.chansend(id,to_return)
-            else
-              local to_return = encoding({'is t2'},k)
-              vim.fn.chansend(id,to_return)
+      if raw_input and #raw_input == 1 and #raw_input[1] > 0 then
+        raw_input = raw_input[1] -- the str itself
+        last_data = last_data .. raw_input
+        if string.match(raw_input,'END$') then
+          local data = decoding(last_data)
+          if data then
+            for k,v in pairs(data) do
+              log('equal: ',vim.deep_equal(v,M.t),vim.deep_equal(v,M.t2))
+              if vim.deep_equal(v,M.t) then
+                local to_return = encoding(M.t,k)
+                log('ro return type: ',type(to_return))
+                vim.fn.chansend(id,to_return)
+              else
+                local to_return = encoding(M.t2,k)
+                log('ro return type: ',type(to_return))
+                vim.fn.chansend(id,to_return)
+              end
             end
           end
+          last_data = ""
         end
+      else
+        log('no: ',raw_input)
       end
     end
 
     return wrapped
   end
-  local handle = wrapped_handle(10)
+  local handle = wrapped_handle()
   vim.fn.stdioopen({on_stdin = handle})
 end
 

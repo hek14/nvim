@@ -148,23 +148,6 @@ M.lsp_symbols = function(opts)
       })
     end
 
-
-    -- pickers
-    -- .new(opts, {
-    --   prompt_title = "LSP Document Symbols",
-    --   finder = finders.new_table {
-    --     results = locations,
-    --     entry_maker = gen_lsp_and_ts_symbols(opts)
-    --   },
-    --   previewer = conf.qflist_previewer(opts),
-    --   sorter = conf.prefilter_sorter {
-    --     tag = "symbol_type",
-    --     sorter = conf.generic_sorter(opts),
-    --   },
-    --   push_cursor_on_edit = true,
-    --   push_tagstack_on_edit = true,
-    -- }):find()
-
     treesitter_job:send(inputs_for_treesitter)
     opts.path_display = { "hidden" }
     pickers
@@ -184,5 +167,133 @@ M.lsp_symbols = function(opts)
     }):find()
   end)
 end
+
+
+local function gen_lsp_and_ts_references(opts)
+  opts = opts or {}
+  local show_line = vim.F.if_nil(opts.show_line, true)
+  local hidden = utils.is_path_hidden(opts)
+  local items = {
+    { width = vim.F.if_nil(opts.fname_width, 30) },
+    { remaining = true },
+  }
+  if hidden then
+    items[1] = { width = 8 }
+  end
+  if not show_line then
+    table.remove(items, 1)
+  end
+
+  local displayer = entry_display.create { separator = " ▏", items = items }
+
+  local make_display = function(entry)
+    local input = {}
+    if not hidden then
+      table.insert(input, string.format("%s:%d:%d", utils.transform_path(opts, entry.filename), entry.lnum, entry.col))
+    else
+      table.insert(input, string.format("%4d:%2d", entry.lnum, entry.col))
+    end
+
+    table.insert(input,entry.ts_info)
+
+    if show_line then
+      local text = entry.text
+      if opts.trim_text then
+        text = text:gsub("^%s*(.-)%s*$", "%1")
+      end
+      text = text:gsub(".* | ", "")
+      table.insert(input, text)
+    end
+
+
+    return displayer(input)
+  end
+
+  return function(entry)
+    local filename = entry.filename
+    return make_entry.set_default_entry_mt({
+      value = entry,
+      ordinal = (not hidden and filename or "") .. " " .. entry.text .. entry.ts_info,
+      display = make_display,
+      ts_info = entry.ts_info,
+
+      bufnr = entry.bufnr,
+      filename = filename,
+      lnum = entry.lnum,
+      col = entry.col,
+      text = entry.text,
+      start = entry.start,
+      finish = entry.finish,
+    }, opts)
+  end
+end
+
+
+M.references = function(opts)
+  opts = opts or {bufnr = vim.api.nvim_get_current_buf(), winnr = vim.api.nvim_get_current_win()}
+  local filepath = vim.api.nvim_buf_get_name(opts.bufnr)
+  local lnum = vim.api.nvim_win_get_cursor(opts.winnr)[1]
+  local params = vim.lsp.util.make_position_params(opts.winnr)
+  local include_current_line = vim.F.if_nil(opts.include_current_line, false)
+  params.context = { includeDeclaration = vim.F.if_nil(opts.include_declaration, true) }
+
+  vim.lsp.buf_request(opts.bufnr, "textDocument/references", params, function(err, result, ctx, _)
+    if err then
+      vim.api.nvim_err_writeln("Error when finding references: " .. err.message)
+      return
+    end
+
+    local locations = {}
+    if result then
+      local results = vim.lsp.util.locations_to_items(result, vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
+      if not include_current_line then
+        locations = vim.tbl_filter(function(v)
+          -- Remove current line from result
+          return not (v.filename == filepath and v.lnum == lnum)
+        end, vim.F.if_nil(results, {}))
+      else
+        locations = vim.F.if_nil(results, {})
+      end
+    end
+
+    if vim.tbl_isempty(locations) then
+      return
+    end
+
+    local inputs_for_treesitter = {}
+    local ft = vim.api.nvim_buf_get_option(opts.bufnr,'filetype')
+    for i,item in ipairs(locations) do
+      table.insert(inputs_for_treesitter,{
+        file = item.filename,
+        filetick = vim.loop.fs_stat(item.filename).mtime.nsec,
+        filetype = ft,
+        position = {item.lnum-1,item.col-1},
+      })
+    end
+
+    local start = vim.loop.hrtime()
+    treesitter_job:send(inputs_for_treesitter)
+    treesitter_job:with_output(function()
+      print(string.format('treesitter_job reference spent time: %s ms',(vim.loop.hrtime()-start)/1000000))
+      for i, loc in ipairs(locations) do
+        loc.ts_info = treesitter_job:retrieve(loc.filename, {loc.lnum-1,loc.col-1})
+      end
+      pickers
+      .new(opts, {
+        prompt_title = "LSP References",
+        finder = finders.new_table {
+          results = locations,
+          entry_maker = gen_lsp_and_ts_references(opts)
+        },
+        previewer = conf.qflist_previewer(opts),
+        sorter = conf.generic_sorter(opts),
+        push_cursor_on_edit = true,
+        push_tagstack_on_edit = true,
+      })
+      :find()
+    end)
+  end)
+end
+
 
 return M

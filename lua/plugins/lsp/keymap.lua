@@ -111,11 +111,14 @@ function M.setup(client,bufnr)
   buf_set_keymap("n", "gd", "", {callback = M.Smart_goto_definition})
   buf_set_keymap("n", "gk", "", {callback = M.peek_type})
   buf_set_keymap("n", "gD", "", {callback = M.definition_in_split})
-  buf_set_keymap("n", "gr","",vim.tbl_deep_extend('force',map_opts,{callback = function ()
-    require('contrib.pig').async_fn({
-      label = 'reference'
-    })
-  end}))
+  -- buf_set_keymap("n", "gr","",vim.tbl_deep_extend('force',map_opts,{callback = function ()
+  --   require('contrib.pig').async_fn({
+  --     label = 'reference'
+  --   })
+  -- end}))
+  buf_set_keymap("n", "gr",function ()
+    require('scratch.my_lsp_symbols').references()
+  end,map_opts)
   -- buf_set_keymap("n", "gt","<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>",map_opts)
   buf_set_keymap("n", "gt",function ()
     require('scratch.my_lsp_symbols').lsp_symbols()

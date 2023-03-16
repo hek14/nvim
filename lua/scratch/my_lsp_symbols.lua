@@ -171,41 +171,23 @@ end
 
 local function gen_lsp_and_ts_references(opts)
   opts = opts or {}
-  local show_line = vim.F.if_nil(opts.show_line, true)
-  local hidden = utils.is_path_hidden(opts)
   local items = {
-    { width = vim.F.if_nil(opts.fname_width, 30) },
+    { width = 30 },
     { remaining = true },
   }
-  if hidden then
-    items[1] = { width = 8 }
-  end
-  if not show_line then
-    table.remove(items, 1)
-  end
-
   local displayer = entry_display.create { separator = " ▏", items = items }
 
   local make_display = function(entry)
     local input = {}
-    if not hidden then
-      table.insert(input, string.format("%s:%d:%d", utils.transform_path(opts, entry.filename), entry.lnum, entry.col))
-    else
-      table.insert(input, string.format("%4d:%2d", entry.lnum, entry.col))
-    end
-
+    table.insert(input, string.format("%s:%d:%d", utils.transform_path(opts, entry.filename), entry.lnum, entry.col))
     table.insert(input,entry.ts_info)
-
-    if show_line then
-      local text = entry.text
-      if opts.trim_text then
-        text = text:gsub("^%s*(.-)%s*$", "%1")
-      end
-      text = text:gsub(".* | ", "")
-      table.insert(input, text)
+    local text = entry.text
+    if opts.trim_text then
+      text = text:gsub("^%s*(.-)%s*$", "%1")
     end
-
-
+    text = text:gsub(".* | ", "")
+    table.insert(input, text)
+    log("in make_display, entry: ",entry)
     return displayer(input)
   end
 
@@ -213,7 +195,7 @@ local function gen_lsp_and_ts_references(opts)
     local filename = entry.filename
     return make_entry.set_default_entry_mt({
       value = entry,
-      ordinal = (not hidden and filename or "") .. " " .. entry.text .. entry.ts_info,
+      ordinal = filename .. " " .. entry.text .. entry.ts_info,
       display = make_display,
       ts_info = entry.ts_info,
 
@@ -233,33 +215,24 @@ M.references = function(opts)
   opts = opts or {bufnr = vim.api.nvim_get_current_buf(), winnr = vim.api.nvim_get_current_win()}
   local filepath = vim.api.nvim_buf_get_name(opts.bufnr)
   local lnum = vim.api.nvim_win_get_cursor(opts.winnr)[1]
-  local params = vim.lsp.util.make_position_params(opts.winnr)
-  local include_current_line = vim.F.if_nil(opts.include_current_line, false)
-  params.context = { includeDeclaration = vim.F.if_nil(opts.include_declaration, true) }
+  local params = vim.lsp.util.make_position_params()
+  params.context = {
+    includeDeclaration = true,
+  }
 
   vim.lsp.buf_request(opts.bufnr, "textDocument/references", params, function(err, result, ctx, _)
+    log('my references get err: ', err, result, ctx)
     if err then
       vim.api.nvim_err_writeln("Error when finding references: " .. err.message)
       return
     end
 
-    local locations = {}
-    if result then
-      local results = vim.lsp.util.locations_to_items(result, vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
-      if not include_current_line then
-        locations = vim.tbl_filter(function(v)
-          -- Remove current line from result
-          return not (v.filename == filepath and v.lnum == lnum)
-        end, vim.F.if_nil(results, {}))
-      else
-        locations = vim.F.if_nil(results, {})
-      end
-    end
-
-    if vim.tbl_isempty(locations) then
+    local locations = vim.lsp.util.locations_to_items(result, vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)
+    if not locations or #locations== 0 then
+      vim.notify('No references found')
+      log('no references')
       return
     end
-
     local inputs_for_treesitter = {}
     local ft = vim.api.nvim_buf_get_option(opts.bufnr,'filetype')
     for i,item in ipairs(locations) do

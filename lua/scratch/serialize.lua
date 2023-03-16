@@ -69,8 +69,7 @@ local function unpickle(s)
   local gentables = loadstring("return "..s)
   if not gentables then
     require('core.utils').log('gentables nil',debug.getinfo(2,'Sl'))
-    require('core.utils').log('gentables nil',s)
-    return {}
+    return
   end
   local tables = gentables()
 

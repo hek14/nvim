@@ -2,24 +2,22 @@ local sel = require('scratch.serialize')
 local log = require('core.utils').log
 local fmt = string.format
 
-local encoding = function(t,tick)
+local encoding = function(t,tick, as_str)
   -- input: table1
   -- return: "START_12345_${table1}#_12345_END"
   local content = sel.pickle(t)
 
-
-
-  -- method 1: a string
-  -- content = fmt('START_%d_$',tick) .. content .. fmt('#_%d_END',tick)
-
-
-  -- method 2: a table of string
-  content = vim.split(content,'\n')
-  table.insert(content,1,fmt('START_%d_$',tick))
-  table.insert(content,#content+1,fmt('#_%d_END',tick))
-
-
-  return content
+  if as_str then
+    -- method 1: a string: the receiver will get a table of string (typically split by '\n')
+    -- but if the string is very long, maybe each item will not ended with '\n'
+    return fmt('START_%d_$',tick) .. content .. fmt('#_%d_END',tick)
+  else -- as table
+    -- method 2: a table of string: the receiver will get the whole string
+    content = vim.split(content,'\n')
+    table.insert(content,1,fmt('START_%d_$',tick))
+    table.insert(content,#content+1,fmt('#_%d_END',tick))
+    return content
+  end
 end
 
 local decoding = function (s)
@@ -60,7 +58,63 @@ local decoding = function (s)
   return t
 end
 
+local wrap_for_on_stdout = function(cb)
+  -- NOTE: for: receiving from chansend, the raw_input is string (separated by '\n')
+  local last_data = ""
+  local wrapped = function(err, raw_input)
+    raw_input = raw_input:gsub('\n','')
+    -- log("stdou receive raw_input: ",raw_input)
+    if not raw_input or #raw_input==0 or err then 
+      log('err:',err,'raw_input:',raw_input) 
+      return 
+    end
+    -- NOTE: concat the end with the start(remove the \n)
+    last_data = last_data .. raw_input
+    if string.match(last_data,'END$') then
+      local ok, data = pcall(decoding,last_data)
+      if not ok or data==nil then
+        log('decoding err: ',data)
+        return
+      end
+      cb(data,err,raw_input)
+      last_data = ""
+    end
+  end
+  return wrapped
+end
+
+local wrap_for_stdin_handle = function(cb)
+  -- NOTE: for: receiving from vim.loop.write(stdin) 
+  local last_data = ""
+  local valid_raw_input = function (raw_input)
+    local ret = (raw_input and #raw_input == 1 and #raw_input[1] > 0)
+    if not ret then
+      log('invalid raw_input: ',raw_input)
+    end
+    return ret
+  end
+
+  local wrapped = function(id,raw_input,event)
+    if valid_raw_input(raw_input) then
+      raw_input = raw_input[1] -- the str itself
+      last_data = last_data .. raw_input
+      if string.match(last_data,"END$") then
+        local ok, data = pcall(decoding,last_data)
+        if not ok or data==nil then
+          log('decoding err: ',data)
+          return
+        end
+        cb(data,id,raw_input,event)
+        last_data = ""
+      end
+    end
+  end
+  return wrapped
+end
+
 return {
   encoding = encoding,
-  decoding = decoding
+  decoding = decoding,
+  wrap_for_stdin_handle = wrap_for_stdin_handle,
+  wrap_for_on_stdout = wrap_for_on_stdout,
 }

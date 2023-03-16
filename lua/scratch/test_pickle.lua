@@ -5,15 +5,13 @@ local M = {}
 M.t = require("scratch.large_input_t")
 M.t2 = require('scratch.two_input_t')
 local log = require('core.utils').log
+local coding_util = require("scratch.stream_coding")
 
 local function safe_close(handle)
   if not vim.loop.is_closing(handle) then
     vim.loop.close(handle)
   end
 end
-
-local encoding = require('scratch.stream_coding').encoding
-local decoding = require('scratch.stream_coding').decoding
 
 function M.send()
   local stdin = vim.loop.new_pipe(false)
@@ -35,46 +33,36 @@ function M.send()
   end)
   handle = vim.loop.spawn("nvim", opts, on_exit)
 
-  local wrapped_handle = function ()
-    local last_data = ""
-    local init = true
-    local wrapped = function(err, raw_input)
-      log('get back raw_input: ',type(raw_input),raw_input)
-      if init then
-        last_data = raw_input
-        init = false
+  local cnt = 0
+  local cb = function (data)
+    for k,v in pairs(data) do
+      cnt = cnt + 1
+      log(fmt('current tick: %s, cnt: %s',k,cnt))
+      if vim.deep_equal(v,M.t) then
+        log('sender get t back')
+      elseif vim.deep_equal(v,M.t2) then
+        log('sender get t2 back')
       else
-        last_data = string.sub(last_data,1,#last_data-1) .. raw_input
-      end
-      if string.match(raw_input,'END$') then
-        local data = decoding(last_data)
-        log('return back: ',data)
-        if data then
-          log('keys number: ',#vim.tbl_keys(data))
-          for k,v in pairs(data) do
-            log('return equal: ',vim.deep_equal(v,M.t),vim.deep_equal(v,M.t2),#v,#M.t,#M.t2)
-          end
-        end
-        last_data = ""
-        init = true
+        log('error: ',v)
       end
     end
-    return wrapped
   end
-
   -- vim.loop.stream_set_blocking(stdin,true)
   for i = 1,20 do
-    vim.loop.write(stdin,encoding(M.t2, vim.loop.hrtime()))
+    if i % 2 == 0 then
+      vim.loop.write(stdin,coding_util.encoding(M.t2, vim.loop.hrtime()))
+    else
+      vim.loop.write(stdin,coding_util.encoding(M.t, vim.loop.hrtime()))
+    end
   end
-  -- vim.loop.sleep(100)
-  vim.loop.write(stdin,encoding(M.t2, vim.loop.hrtime()))
+  vim.loop.sleep(50)
+  vim.loop.write(stdin,coding_util.encoding(M.t2, vim.loop.hrtime()))
   -- vim.loop.sleep(50)
   -- vim.loop.write(stdin,encoding(M.t, vim.loop.hrtime()))
   -- vim.loop.sleep(10)
   -- vim.loop.write(stdin,encoding(M.t2, vim.loop.hrtime()))
   -- vim.loop.write(stdin,encoding(M.t, vim.loop.hrtime()))
-
-  vim.loop.read_start(stdout, wrapped_handle())
+  vim.loop.read_start(stdout, coding_util.wrap_for_on_stdout(cb))
 end
 
 
@@ -107,41 +95,25 @@ end
 
 
 function M.receive()
-  local wrapped_handle = function ()
-    -- NOTE: delay: if the two interval is less than delay, it should be thought as a same stdin
-    local last_data = ""
-
-    local wrapped = function(id,raw_input,event)
-      if raw_input and #raw_input == 1 and #raw_input[1] > 0 then
-        raw_input = raw_input[1] -- the str itself
-        last_data = last_data .. raw_input
-        if string.match(raw_input,'END$') then
-          local data = decoding(last_data)
-          if data then
-            for k,v in pairs(data) do
-              log('equal: ',vim.deep_equal(v,M.t),vim.deep_equal(v,M.t2))
-              if vim.deep_equal(v,M.t) then
-                local to_return = encoding(M.t,k)
-                log('ro return type: ',type(to_return))
-                vim.fn.chansend(id,to_return)
-              else
-                local to_return = encoding(M.t2,k)
-                log('ro return type: ',type(to_return))
-                vim.fn.chansend(id,to_return)
-              end
-            end
-          end
-          last_data = ""
-        end
+  local cb = function(data,id)
+    for k,v in pairs(data) do
+      log('headless handle: ',vim.deep_equal(v,M.t),vim.deep_equal(v,M.t2))
+      if vim.deep_equal(v,M.t) then
+        local to_return = coding_util.encoding(M.t,k, true)
+        log('headless return t',type(to_return))
+        -- vim.fn.chansend(id,to_return)
+        vim.api.nvim_chan_send(id,to_return)
+      elseif vim.deep_equal(v,M.t2) then
+        local to_return = coding_util.encoding(M.t2,k, true)
+        log('headless return t2',type(to_return))
+        -- vim.fn.chansend(id,to_return)
+        vim.api.nvim_chan_send(id,to_return)
       else
-        log('no: ',raw_input)
+        log('err stdin: ',v)
       end
     end
-
-    return wrapped
   end
-  local handle = wrapped_handle()
-  vim.fn.stdioopen({on_stdin = handle})
+  vim.fn.stdioopen({on_stdin = coding_util.wrap_for_stdin_handle(cb)})
 end
 
 return M

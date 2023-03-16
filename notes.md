@@ -98,6 +98,9 @@ https://www.nerdfonts.com/font-downloads
 15. https://github.com/JuanZoran/myVimrc
 16. https://github.com/ray-x/nvim & http://rayx.me/ : author of navigator.lua
 17. https://github.com/Fireond/Neovim-config: for latex writting 
+18. https://github.com/ibhagwan/nvim-lua: the author of fzf-lua
+- and his dots: https://github.com/ibhagwan/dots
+- commented and documented about configs, really picky about plugins
 
 # to try others' dotfiles
 ```shell
@@ -278,3 +281,15 @@ yield之后, 这个context会保存state: 当前的位置(即便是多层的函�
 它将直接从这个调用位置开始
 
 'yield'对应的是coroutine, 值直接给co.resume的主, `return`对应的是栈, 值给调用它的函数
+想象这么一幅图: 两条生产线——两个coroutine, 每一个生产线从前到后有若干箱子从大到小——它们就是栈
+co.yield/resume 是直接从一条生产线跳到另外一条去换context干活, 而栈是在这条支线上做完直接扔掉一个箱子,
+把结果return给它的上层(仍在这条产线上). 协程是同一个线程内部的切换context, 不是多线程, 不可能两个产线同时在做
+(可以想象成, 不管咋切换, 干活的人还是一个人)
+
+# no-wait map
+When defining a buffer-local mapping for "," there may be a global mapping
+that starts with ",".  Then you need to type another character for Vim to know
+whether to use the "," mapping or the longer one.  To avoid this add the
+<nowait> argument.  Then the mapping will be used when it matches, Vim does
+not wait for more characters to be typed.  However, if the characters were
+already typed they are used.

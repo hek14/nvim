@@ -1,7 +1,7 @@
 -- documentation: https://github.com/ibhagwan/fzf-lua/wiki/Advanced
 return {
   'ibhagwan/fzf-lua',
-  enabled = false,
+  enabled = true,
   cmd = 'FzfLua',
   dependencies = {
     {'nvim-tree/nvim-web-devicons'},

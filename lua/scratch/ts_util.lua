@@ -59,6 +59,7 @@ function M.get_data(bufnr,position)
   local node = vim.treesitter.get_node_at_pos(bufnr,position[1],position[2])
   local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
   local node_data = {}
+  local nodes = {}
   local function add_node_data(pos, capture_name, capture_node)
     local text = ""
     text = vim.treesitter.query.get_node_text(capture_node, bufnr)
@@ -70,6 +71,7 @@ function M.get_data(bufnr,position)
 
     if node_text ~= nil then
       table.insert(node_data, pos, node_text)
+      table.insert(nodes, capture_node)
     end
   end
 
@@ -110,6 +112,17 @@ function M.get_data(bufnr,position)
     end
   end
 
+
+  local flat_nodes = {}
+  for _, v in pairs(nodes) do
+    if not vim.tbl_islist(v) then
+      table.insert(flat_nodes, v)
+    else
+      vim.list_extend(flat_nodes, v)
+    end
+  end
+
+
   local context = {}
   for _, v in pairs(data) do
     table.insert(context, v.icon..v.text)
@@ -121,11 +134,12 @@ function M.get_data(bufnr,position)
 
   if #context > depth then
     context = vim.list_slice(context, #context-depth+1, #context)
+    flat_nodes = vim.list_slice(flat_nodes,#flat_nodes-depth+1, #flat_nodes)
     table.insert(context, 1, depth_limit_indicator)
   end
 
   local context_str = table.concat(context, separator)
-  return context_str
+  return context_str, flat_nodes
 end
 
 return M

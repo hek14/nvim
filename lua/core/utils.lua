@@ -33,13 +33,15 @@ M.close_buffer = function(force)
 
   -- if not force, change to prev buf and then close current
   -- local close_cmd = force and ":bd!" or ":e #| bd" .. vim.fn.bufnr()
-  local close_cmd = force and ":bd!" or ":b# | bd" .. vim.fn.bufnr()
-  local ok, err = pcall(function()
-    vim.cmd(close_cmd)
-  end)
-  if err then
-    vim.cmd('bd')
+  local last_buf = vim.fn.bufnr('#')
+  local listed = vim.api.nvim_buf_get_option(last_buf,'buflisted')
+  local close_cmd
+  if listed then
+    close_cmd = force and ":bd!" or ":b# | bd" .. vim.fn.bufnr()
+  else
+    close_cmd = force and ":bd!" or ":bp | bd" .. vim.fn.bufnr()
   end
+  vim.cmd(close_cmd)
 end
 
 M.zoom = function(buf_id, config)

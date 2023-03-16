@@ -1,3 +1,19 @@
+-- NOTE: you can refer to the `chunks` process in easyformat.nvim format.lua, concat all of the chunks with '' and then split by '\n'
+-- in on_stdout:
+--   uv.read_start(stdout, function(err, data)
+--     -- data is string
+--     assert(not err, err)
+--     if data then
+--       chunks[#chunks + 1] = data
+--     end
+--   end)
+-- in on_exit: 
+--   chunks = vim.split(table.concat(chunks, ''), '\n')
+--   if #chunks[#chunks] == 0 then
+--     table.remove(chunks, #chunks)
+--   end
+
+
 local sel = require('scratch.serialize')
 local log = require('core.utils').log
 local fmt = string.format

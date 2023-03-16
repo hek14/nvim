@@ -35,9 +35,6 @@ local function echo(hlgroup, msg)
   cmd('echohl None')
 end
 
--- _G.treesitter_job = require('scratch.bridge_ts_util')
--- treesitter_job:batch(3)
-
 local sort_locations = function(locations)
   table.sort(locations, function(i, j)
     local i_uri = i.uri or i.targetUri
@@ -146,28 +143,25 @@ local Inc_loc = function(loc,index)
   return new_loc
 end
 
-local make_menu = function(groups,ctx,treesitter_data)
+local make_menu = function(groups,ctx)
   rename_lines = {}
   local menus = {}
   local total_lines = 0
   local location_id = 0
   for i,group in ipairs(groups) do
-    local file_name = fn.fnamemodify(vim.uri_to_fname(group[1]),':~:.')
-    local file_name_2 = vim.uri_to_fname(group[1])
-    table.insert(menus,Menu.separator('File: ' .. file_name,{text_align = "left"}))
+    local relative_file_path = fn.fnamemodify(vim.uri_to_fname(group[1]),':~:.')
+    local full_file_path = vim.uri_to_fname(group[1])
+    table.insert(menus,Menu.separator('File: ' .. relative_file_path,{text_align = "left"}))
     total_lines = total_lines + 1
     table.insert(file_lines,{line=total_lines-1,start_col=0,end_col=-1})
     for j = 2, #group do
       local loc = group[j]
       local item = lsp.util.locations_to_items({loc},vim.lsp.get_client_by_id(ctx.client_id).offset_encoding)[1]
       local range = loc.range or loc.targetSelectionRange or loc.targetRange
-      local pos_key = string.format('row:%scol:%s', range.start.line, range.start.character)
-      local ts = ""
-      pcall(function ()
-        ts = treesitter_data[file_name_2][pos_key]
-      end)
+      local ts = treesitter_job:retrieve(full_file_path,{ range.start.line, range.start.character })
+      ts = #ts>0 and ', ' .. ts or ''
       location_id = location_id + 1
-      table.insert(menus,Menu.separator(string.format('Loc: %s, %s',location_id,ts), {text_align = "left"}))
+      table.insert(menus,Menu.separator(string.format('Loc: %s%s',location_id,ts), {text_align = "left"}))
       total_lines = total_lines + 1
       for k = -ctx_lines,ctx_lines do
         ---- NOTE: any lines in the same context block refer to the same location
@@ -397,14 +391,11 @@ M.location_handler = function(label, result, ctx, config)
     end
   end
   local start = vim.loop.hrtime()
-  -- treesitter_job:send(inputs_for_treesitter)
+  treesitter_job:send(inputs_for_treesitter)
   -- NOTE: important here, do not directly call vim.loop.sleep(100),because this will also block the stdout read in test_headless
-  local timer = vim.loop.new_timer()
-
-  -- treesitter_job:with_output(vim.schedule_wrap(function(data)
-    -- print(string.format('treesitter_job parsed symbols, spent: %s ms',(vim.loop.hrtime()-start)/1000000))
-    -- local lines = make_menu(groups,ctx,treesitter_job.data)
-    local lines = make_menu(groups,ctx,nil)
+  treesitter_job:with_output(function()
+    print(string.format('treesitter_job parsed symbols, spent: %s ms',(vim.loop.hrtime()-start)/1000000))
+    local lines = make_menu(groups,ctx)
     local popup_options = {
       position = "50%",
       -- position = {
@@ -555,7 +546,7 @@ M.location_handler = function(label, result, ctx, config)
       end
       profile_time = (vim.loop.hrtime() - profile_start) / 1000000
       print(fmt("[PIG] location spent %s",profile_time))
-  -- end))
+  end)
 end
 
 M.open_split = function(direction,ctx)

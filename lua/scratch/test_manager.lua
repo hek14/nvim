@@ -1,12 +1,15 @@
+-- NOTE: this is a usage example of remote_ts_parse and bridge_ts_parse
 local print = vim.pretty_print
-local t = require('scratch.a_input_t')
+local t = require('scratch.large_input_t')
 local t2 = require('scratch.two_input_t')
+local t3 = require('scratch.a_input_t')
 manager = require('scratch.bridge_ts_parse')
 manager:batch(3)
 
 local start = vim.loop.hrtime()
 manager:send(t)
 manager:send(t2)
+manager:send(t3)
 
 
 local timer = vim.loop.new_timer()

@@ -1,4 +1,5 @@
 -- refer to :http://lua-users.org/wiki/PickleTable
+-- another refer: https://github.com/aroig/dotfiles/blob/master/awesome/abdo/pickle.lua
 ----------------------------------------------
 -- Pickle.lua
 -- A table serialization utility for lua

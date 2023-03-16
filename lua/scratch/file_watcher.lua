@@ -48,7 +48,7 @@ M.remove_watcher = function(path)
     file_watchers[path].cancel()
     file_watchers[path].timer = nil
     file_watchers[path] = nil
-    log('remove, current watchers: ', vim.tbl_keys(file_watchers))
+    -- log('remove, current watchers: ', vim.tbl_keys(file_watchers))
   end
 end
 
@@ -58,15 +58,12 @@ end
 
 M.add_watcher = function(path,cb_modified,cb_err)
   if file_watchers[path] then
-    log('already have watcher')
+    -- log('already have watcher')
     return
   end
   local timer,cancel = new_watcher(path,cb_modified,cb_err or default_cb_err)
   file_watchers[path] = {timer=timer,cancel=cancel,id=timer_id}
-  log('add, current watchers: ')
-  for k,v in pairs(file_watchers) do
-    log(fmt('path: %s',k))
-  end
+  -- log('add, current watchers: ')
 end
 
 M.timers = file_watchers

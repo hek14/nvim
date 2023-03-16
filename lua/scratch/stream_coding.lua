@@ -62,6 +62,11 @@ local wrap_for_on_stdout = function(cb)
   -- NOTE: for: receiving from chansend, the raw_input is string (separated by '\n')
   local last_data = ""
   local wrapped = function(err, raw_input)
+    if err then
+      log('stdout receive err: ',err)
+      return
+    end
+    if not raw_input then return end
     raw_input = raw_input:gsub('\n','')
     -- log("stdou receive raw_input: ",raw_input)
     if not raw_input or #raw_input==0 or err then 

@@ -16,7 +16,6 @@ local function inject_ts_to_lsp_symbols(locations,f)
     loc.ts_info = ""
   end
   return function(prompt)
-    log('new_dynamic result_fn called')
     local tx, rx = channel.oneshot()
     cancel()
     cancel = treesitter_job:with_output(tx)
@@ -166,7 +165,6 @@ M.lsp_symbols = function(opts)
     --   push_tagstack_on_edit = true,
     -- }):find()
 
-    log('treesitter_job: ',inputs_for_treesitter)
     treesitter_job:send(inputs_for_treesitter)
     opts.path_display = { "hidden" }
     pickers

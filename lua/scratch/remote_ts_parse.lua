@@ -7,8 +7,7 @@ local uv = vim.loop
 local log = require'core.utils'.log
 local sel = require('scratch.serialize')
 local fmt = string.format
-local encoding = require('scratch.stream_coding').encoding
-local decoding = require('scratch.stream_coding').decoding
+local coding_util = require('scratch.stream_coding')
 local get_data = require('scratch.ts_util').get_data
 local watch_util = require('scratch.file_watcher')
 
@@ -35,20 +34,20 @@ local reload_and_reparse_file = function(item)
   local filelang = ts_parsers.ft_to_lang(item.filetype)
   local parser = ts_parsers.get_parser(bufnr, filelang)
   parser:parse() -- NOTE: very important to attach a parser to this bufnr
-  log('file reloaded! ',item.file)
+  -- log('file reloaded! ',item.file)
   reset_file_data(item.file,item.filetick,bufnr,item.filetype)
 end
 
 
 local on_file_modified = function(path,filetick_now)
-  log('should called: on_file_modified with: ',path, filetick_now, #watch_util.timers)
+  -- log('should called: on_file_modified with: ',path, filetick_now, #watch_util.timers)
   if parse_results[path].filetick ~= filetick_now then -- maybe the send function already update it
     local item = {file = path, filetick = filetick_now, filetype = parse_results[path].filetype}
     local ok, err = pcall(reload_and_reparse_file,item)
     if not ok then log(fmt('cannot automatically reload_and_reparse_file for ',path),err) end
-    log(fmt('watcher update: [%s]: ',path))
+    -- log(fmt('watcher update: [%s]: ',path))
   else
-    log(fmt("the handle function already update file: %s",path))
+    -- log(fmt("the handle function already update file: %s",path))
   end
 end
 
@@ -98,7 +97,7 @@ local langtree_input = function(input)
   local cannot_parse = {}
   for _,item in ipairs(input) do 
     if parse_results[item.file] and parse_results[item.file].filetick==item.filetick then
-      log(fmt('parse existed file: %s',item.file))
+      -- log(fmt('parse existed file: %s',item.file))
       goto continue
     end
 
@@ -136,14 +135,14 @@ local parse = function(input)
     output[item.file][make_pos_key(item.position)] = 'eror'
     table.insert(fail_parse_keys,make_file_pos_key(item.file,item.position))
   end
-  log('fail_parse_files',fail_parse_keys)
+  -- log('fail_parse_files',fail_parse_keys)
 
   for _,item in ipairs(input) do
     local file_pos_key = make_file_pos_key(item.file,item.position)
     if not fail_parse_keys[file_pos_key] then
       local ok,value = pcall(update_parse_results,item)
       if not ok then
-        log("cannot parse item",item)
+        -- log("cannot parse item",item)
         set_file_pos_result(item.file,item.position,'parse_error')
       else
         set_file_pos_result(item.file,item.position,value)
@@ -159,25 +158,9 @@ local parse = function(input)
   return output
 end
 
-local handle = function(id,raw_input,event)
-  if raw_input and #raw_input == 1 and type(raw_input[1])=='string' and #raw_input[1]>0 then
-    local data = decoding(raw_input[1])
-    if data then
-      for tick,input in pairs(data) do
-        local ret = parse(input)
-        if id and event=='stdin' then
-          vim.fn.chansend(id,encoding(ret,tick))
-        end
-      end
-    end
-  else
-    log('pass invalid input:',raw_input)
-  end
-end
-
 ------------------------- test functions
 local fake_stdin_from_t = function(t)
-  t= encoding(t,123)
+  t = coding_util.encoding(t,123)
   return {table.concat(t,'\n')}
 end
 
@@ -199,12 +182,23 @@ M.test = function ()
   input[#input+1] = curr
   local t = fake_stdin_from_t(input)
   log('test input: ',type(t), #t, t[1])
-  handle(nil,t,nil)
+  M.handle(nil,t,nil)
 end
+
+M.cb = function (data,id,_,event)
+  for tick,input in pairs(data) do
+    local ret = parse(input)
+    if id and event=='stdin' then
+      vim.fn.chansend(id,coding_util.encoding(ret,tick,true))
+    end
+  end
+end
+
+M.handle = coding_util.wrap_for_stdin_handle(M.cb)
 
 -------------------------- real remote functions
 M.wait_stdin = function ()
-  vim.fn.stdioopen({on_stdin = handle})
+  vim.fn.stdioopen({on_stdin = M.handle})
 end
 
 return M

@@ -3,8 +3,7 @@ local log = require('core.utils').log
 local fmt = string.format
 local sel = require('scratch.serialize')
 
-local encoding = require('scratch.stream_coding').encoding
-local decoding = require('scratch.stream_coding').decoding
+local coding_util = require('scratch.stream_coding')
 
 local make_file_pos_key = function(file,position)
   return fmt('file:%s,row:%s,scol:%s',file,position[1],position[2])
@@ -54,12 +53,12 @@ end
 function process:send(input)
   -- NOTE: what is a (send/session) tick? it corresponds a session with the background ts parser
   -- a session is { input = , output = }
-  -- with the encoding, you can call send function very frequently, don't worry about lossing anything
+  -- with the ticket, you can call send function very frequently, don't worry about lossing anything
   local tick = vim.loop.hrtime()
   for i, item in ipairs(input) do
     local file_pos_key = make_file_pos_key(item.file,item.position)
     if self.file_pos_to_latest_ticket[file_pos_key] and self.file_pos_to_latest_ticket[file_pos_key]~=tick then
-      log(fmt('update the old ticket %d to newest %d',self.file_pos_to_latest_ticket[file_pos_key],tick))
+      -- log(fmt('update the old ticket %d to newest %d',self.file_pos_to_latest_ticket[file_pos_key],tick))
       -- can do something interesting here: when a file has been requested for multiple times(history ticks), it's hot!
     end
     self.file_pos_to_latest_ticket[file_pos_key] = tick  -- always the latest tick by overriding
@@ -67,7 +66,7 @@ function process:send(input)
 
   self:init_ticket(tick,input)
 
-  local send_input = encoding(input,tick)
+  local send_input = coding_util.encoding(input,tick)
   uv.write(self.stdin, send_input)
   return tick
 end
@@ -88,17 +87,13 @@ function process:done()
 end
 
 function process.on_stdout(p)
-  return vim.schedule_wrap(function(err,data)
-    if data then
-      data = decoding(data)
-      if data then
-        for tick,ret in pairs(data) do
-          tick = tonumber(tick)
-          p.tickets[tick].output = ret
-        end
-      end
+  local cb = function (data)
+    for tick,ret in pairs(data) do
+      tick = tonumber(tick)
+      p.tickets[tick].output = ret
     end
-  end) 
+  end
+  return coding_util.wrap_for_on_stdout(cb)
 end
 
 function process.on_exit(p)
@@ -174,7 +169,6 @@ function M:send(input)
   for i = 1,#self.childs do
     self.childs[i]:send(data[i])
   end
-  log('file_to_child_id: ',self.file_to_child_id)
 end
 
 function M:retrieve(file,position)

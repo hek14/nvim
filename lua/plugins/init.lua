@@ -1,8 +1,8 @@
 local plugins = {
   {
-    "hek14/easyformat.nvim",
-    ft = {'python','lua'},
-    config = function ()
+    'hek14/easyformat.nvim',
+    ft = { 'python', 'lua' },
+    config = function()
       vim.env['PATH'] = vim.fn.expand('~/.local/share/nvim/mason/bin:') .. vim.env['PATH']
       local configs = require('easyformat.config')
       configs.timeout = 300
@@ -17,130 +17,148 @@ local plugins = {
         stdin = false,
         do_not_need_stdout = true,
       }
+      configs.lua = {
+        cmd = 'stylua',
+        args = {},
+        find = '.stylua.toml',
+        fname = true,
+        stdin = false,
+        do_not_need_stdout = true,
+      }
       require('easyformat').setup({
         fmt_on_save = false,
       })
-    end
+    end,
   },
   {
-    "SmiteshP/nvim-gps",
+    'SmiteshP/nvim-gps',
     lazy = false,
-    config = function ()
-      require("nvim-gps").setup()
-      vim.keymap.set('n',',w',function ()
+    config = function()
+      require('nvim-gps').setup()
+      vim.keymap.set('n', ',w', function()
         vim.pretty_print(require('nvim-gps').get_location())
       end)
-    end
+    end,
   },
   {
-    "sbulav/nredir.nvim",
-    cmd = 'Nredir'
+    'sbulav/nredir.nvim',
+    cmd = 'Nredir',
   },
   {
-    "jackMort/ChatGPT.nvim",
-    cmd = {'ChatGPT','ChatGPTActAs'},
+    'jackMort/ChatGPT.nvim',
+    cmd = { 'ChatGPT', 'ChatGPTActAs' },
     config = function()
-      require("chatgpt").setup({})
+      require('chatgpt').setup({})
     end,
     dependencies = {
-      "MunifTanjim/nui.nvim",
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim"
-    }
+      'MunifTanjim/nui.nvim',
+      'nvim-lua/plenary.nvim',
+      'nvim-telescope/telescope.nvim',
+    },
   },
-  { "nvim-lua/plenary.nvim" },
-  { 
-    "bfredl/nvim-luadev",
+  { 'nvim-lua/plenary.nvim' },
+  {
+    'bfredl/nvim-luadev',
     cmd = 'Luadev',
-    keys = {'<Plug>(Luadev-RunLine)','<Plug>(Luadev-Run)','<Plug>(Luadev-RunWord)','<Plug>(Luadev-Complete)'},
+    keys = {
+      '<Plug>(Luadev-RunLine)',
+      '<Plug>(Luadev-Run)',
+      '<Plug>(Luadev-RunWord)',
+      '<Plug>(Luadev-Complete)',
+    },
     init = function()
-      local map = require("core.utils").map
-      map('n','<C-x>l','<Plug>(Luadev-RunLine)',{remap=true})
-      map('n','<C-x>r','<Plug>(Luadev-Run)',{remap=true})
-      map('x','<C-x>r','<Plug>(Luadev-Run)',{remap=true})
-      map('n','<C-x>w','<Plug>(Luadev-RunWord)',{remap=true})
-      map('i','<C-x>c','<Plug>(Luadev-Complete)',{remap=true})
-    end
+      local map = require('core.utils').map
+      map('n', '<C-x>l', '<Plug>(Luadev-RunLine)', { remap = true })
+      map('n', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
+      map('x', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
+      map('n', '<C-x>w', '<Plug>(Luadev-RunWord)', { remap = true })
+      map('i', '<C-x>c', '<Plug>(Luadev-Complete)', { remap = true })
+    end,
   },
-  { "nvim-tree/nvim-web-devicons" },
+  { 'nvim-tree/nvim-web-devicons' },
   {
-    'glepnir/nerdicons.nvim', 
-    cmd = 'NerdIcons', 
-    config = function() 
-      require('nerdicons').setup({}) 
-    end
+    'glepnir/nerdicons.nvim',
+    cmd = 'NerdIcons',
+    config = function()
+      require('nerdicons').setup({})
+    end,
   },
   {
-    "norcalli/nvim-colorizer.lua",
+    'norcalli/nvim-colorizer.lua',
     cmd = 'ColorizerToggle',
-    config = function ()
-      require'colorizer'.setup()
-    end
+    config = function()
+      require('colorizer').setup()
+    end,
   },
   {
     'RRethy/vim-tranquille',
-    lazy = false, 
-    config = function ()
-      require('core.utils').map('n','g/','<Plug>(tranquille_search)',{ noremap = true, silent = true }) 
-    end
+    lazy = false,
+    config = function()
+      require('core.utils').map(
+        'n',
+        'g/',
+        '<Plug>(tranquille_search)',
+        { noremap = true, silent = true }
+      )
+    end,
   },
   {
-    "lmburns/lf.nvim",
-    cmd = "Lf",
-    dependencies = { "nvim-lua/plenary.nvim", "akinsho/toggleterm.nvim" },
+    'lmburns/lf.nvim',
+    cmd = 'Lf',
+    dependencies = { 'nvim-lua/plenary.nvim', 'akinsho/toggleterm.nvim' },
     opts = {
       winblend = 0,
-      highlights = { NormalFloat = { guibg = "NONE" } },
-      border = "double", -- border kind: single double shadow curved
+      highlights = { NormalFloat = { guibg = 'NONE' } },
+      border = 'double', -- border kind: single double shadow curved
       height = 0.70,
       width = 0.85,
       escape_quit = true,
     },
     keys = {
-      { "<cmd>Lf<cr>", desc = "lfcd" },
+      { '<cmd>Lf<cr>', desc = 'lfcd' },
     },
   },
-  { 
-    'echasnovski/mini.sessions', 
+  {
+    'echasnovski/mini.sessions',
     version = false,
     lazy = false,
-    config = function ()
+    config = function()
       require('mini.sessions').setup()
-    end
+    end,
   },
   {
-    'echasnovski/mini.surround', 
-    keys = {'sa','sd','sr','sf','sF','sh','sn'},
+    'echasnovski/mini.surround',
+    keys = { 'sa', 'sd', 'sr', 'sf', 'sF', 'sh', 'sn' },
     version = false,
-    config = function ()
+    config = function()
       require('mini.surround').setup()
-    end
+    end,
   },
   {
-    "lukas-reineke/indent-blankline.nvim",
-    event = "VimEnter",
-    config = function ()
+    'lukas-reineke/indent-blankline.nvim',
+    event = 'VimEnter',
+    config = function()
       local default = {
         indentLine_enabled = 1,
-        char = "▏",
+        char = '▏',
         filetype_exclude = {
-          "help",
-          "terminal",
-          "alpha",
-          "lspinfo",
-          "TelescopePrompt",
-          "TelescopeResults",
+          'help',
+          'terminal',
+          'alpha',
+          'lspinfo',
+          'TelescopePrompt',
+          'TelescopeResults',
         },
-        buftype_exclude = { "terminal" },
+        buftype_exclude = { 'terminal' },
         show_trailing_blankline_indent = false,
         show_first_indent_level = false,
       }
-      require("indent_blankline").setup(default)
-    end
+      require('indent_blankline').setup(default)
+    end,
   },
   {
-    "luukvbaal/statuscol.nvim",
-    enabled = function ()
+    'luukvbaal/statuscol.nvim',
+    enabled = function()
       local v = vim.fn.has('nvim-0.9')
       if v == 1 then
         return true
@@ -149,66 +167,70 @@ local plugins = {
       end
     end,
     event = 'BufRead',
-    config = function() 
-      require("statuscol").setup({setopt = true}) 
-    end
-  },
-  {
-    "simrat39/symbols-outline.nvim",
-    cmd = { "SymbolsOutline" },
     config = function()
-      opts = {
-        keymaps = {
-          fold = "f",
-          unfold = "F",
-        }
-      }
-      require("symbols-outline").setup(opts)
-    end
-  },
-  {
-    "folke/trouble.nvim",
-    config = function()
-      require("trouble").setup({})
+      require('statuscol').setup({ setopt = true })
     end,
   },
   {
-    "max397574/better-escape.nvim",
-    event = "InsertCharPre",
-    config = function ()
+    'simrat39/symbols-outline.nvim',
+    cmd = { 'SymbolsOutline' },
+    config = function()
+      opts = {
+        keymaps = {
+          fold = 'f',
+          unfold = 'F',
+        },
+      }
+      require('symbols-outline').setup(opts)
+    end,
+  },
+  {
+    'folke/trouble.nvim',
+    config = function()
+      require('trouble').setup({})
+    end,
+  },
+  {
+    'max397574/better-escape.nvim',
+    event = 'InsertCharPre',
+    config = function()
       local default = {
-        mapping = {'jk'},
+        mapping = { 'jk' },
         timeout = 300,
       }
-      require("better_escape").setup(default)
-    end
+      require('better_escape').setup(default)
+    end,
   },
   -- misc plugins
   {
-    "windwp/nvim-autopairs",
+    'windwp/nvim-autopairs',
     config = true,
     event = 'InsertEnter',
   },
   {
-    "numToStr/Comment.nvim",
-    keys = { "gcc" },
+    'numToStr/Comment.nvim',
+    keys = { 'gcc' },
     config = true,
     init = function()
-      local map = require("core.utils").map
-      map("n", "<leader>/", ":lua require('Comment.api').toggle.linewise.current()<CR>")
-      map("v", "<leader>/", ":lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>")
+      local map = require('core.utils').map
+      map('n', '<leader>/', ":lua require('Comment.api').toggle.linewise.current()<CR>")
+      map('v', '<leader>/', ":lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>")
     end,
   },
   -- file managing , picker etc
   {
     'ThePrimeagen/harpoon',
     keys = {
-      { "<leader>ma", "<cmd>lua require('harpoon.mark').add_file()<cr>", desc = "harpoon add" },
-      { "<leader>mt", "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>", desc = "harpoon toggle" },
+      { '<leader>ma', "<cmd>lua require('harpoon.mark').add_file()<cr>", desc = 'harpoon add' },
+      {
+        '<leader>mt',
+        "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>",
+        desc = 'harpoon toggle',
+      },
     },
   },
   {
-    "sakhnik/nvim-gdb",
+    'sakhnik/nvim-gdb',
     init = function()
       vim.g.nvimgdb_disable_start_keymaps = true
     end,
@@ -223,34 +245,33 @@ local plugins = {
     end,
   },
   {
-    "Pocco81/TrueZen.nvim",
-    cmd = { "TZAtaraxis", "TZMinimalist", "TZFocus" },
+    'Pocco81/TrueZen.nvim',
+    cmd = { 'TZAtaraxis', 'TZMinimalist', 'TZFocus' },
     init = function()
-      require("core.utils").map("n", "gq", "<cmd>TZFocus<CR>")
+      require('core.utils').map('n', 'gq', '<cmd>TZFocus<CR>')
       -- require("core.utils").map("i", "<C-q>", "<cmd>TZFocus<CR>")
     end,
   },
   {
-    "ggandor/leap.nvim",
+    'ggandor/leap.nvim',
     event = 'BufRead',
     config = function()
       require('leap').setup({})
       local map = require('core.utils').map
-      map({'n', 'x', 'o'}, '<C-f>', '<Plug>(leap-forward-to)')
-      map({'n', 'x', 'o'}, '<C-b>', '<Plug>(leap-backward-to)')
-      map({'n','x'},'gs','<Plug>(leap-from-window)')
-    end
+      map({ 'n', 'x', 'o' }, '<C-f>', '<Plug>(leap-forward-to)')
+      map({ 'n', 'x', 'o' }, '<C-b>', '<Plug>(leap-backward-to)')
+      map({ 'n', 'x' }, 'gs', '<Plug>(leap-from-window)')
+    end,
   },
   -- 1. populate the quickfix
   {
-    "mhinz/vim-grepper",
+    'mhinz/vim-grepper',
     lazy = false,
     config = function()
-      vim.g.grepper =
-      {
-        tools = { "rg", "grep" },
+      vim.g.grepper = {
+        tools = { 'rg', 'grep' },
         searchreg = 1,
-        next_tool = "<leader>gw",
+        next_tool = '<leader>gw',
       }
       vim.cmd([[
       nnoremap <leader>gw :Grepper<cr>
@@ -260,7 +281,7 @@ local plugins = {
     end,
   },
   {
-    "kevinhwang91/nvim-bqf",
+    'kevinhwang91/nvim-bqf',
     ft = 'qf',
     -- config = function()
     --   vim.cmd([[
@@ -271,56 +292,55 @@ local plugins = {
     -- end,
   },
   {
-      "stefandtw/quickfix-reflector.vim",
-      -- this plugin conflicts with the above nvim-bqf, it will ca nvim-bqf not working, there is two solutions:
-      -- soluction 1: defer the nvim-bqf loading just like above
-      -- solution 2: modify the quickfix-reflector.vim init_buffer like below:
-      -- function! s:PrepareBuffer()
-      --   try
-      --     lua require('bqf').enable()
-      --   catch
-      --     echom "nvim-bqf is not installed"
-      --   endtry
-      --   if g:qf_modifiable == 1
-      --     setlocal modifiable
-      --   endif
-      --   let s:qfBufferLines = getline(1, '$')
-      -- endfunction
-  }, 
+    'stefandtw/quickfix-reflector.vim',
+    -- this plugin conflicts with the above nvim-bqf, it will ca nvim-bqf not working, there is two solutions:
+    -- soluction 1: defer the nvim-bqf loading just like above
+    -- solution 2: modify the quickfix-reflector.vim init_buffer like below:
+    -- function! s:PrepareBuffer()
+    --   try
+    --     lua require('bqf').enable()
+    --   catch
+    --     echom "nvim-bqf is not installed"
+    --   endtry
+    --   if g:qf_modifiable == 1
+    --     setlocal modifiable
+    --   endif
+    --   let s:qfBufferLines = getline(1, '$')
+    -- endfunction
+  },
   {
-    "mbbill/undotree",
-    cmd = "UndotreeToggle",
+    'mbbill/undotree',
+    cmd = 'UndotreeToggle',
     init = function()
-      require("core.utils").map("n", "<C-x>u", ":UndotreeToggle | UndotreeFocus<CR>")
+      require('core.utils').map('n', '<C-x>u', ':UndotreeToggle | UndotreeFocus<CR>')
     end,
   },
   {
-    "dstein64/vim-startuptime",
+    'dstein64/vim-startuptime',
     lazy = false,
   },
-  { 
-    "tpope/vim-scriptease", 
+  {
+    'tpope/vim-scriptease',
     cmd = 'Messages',
   },
-  { "MunifTanjim/nui.nvim" },
+  { 'MunifTanjim/nui.nvim' },
   {
-    "rcarriga/nvim-notify",
+    'rcarriga/nvim-notify',
     enabled = false,
     config = function()
-      require('notify').setup(
-      {
-        background_colour = "#000000",
+      require('notify').setup({
+        background_colour = '#000000',
       })
-      vim.notify = require("notify")
+      vim.notify = require('notify')
     end,
   },
   {
-    "iamcco/markdown-preview.nvim",
+    'iamcco/markdown-preview.nvim',
     build = function()
-      vim.fn["mkdp#util#install"](0)
+      vim.fn['mkdp#util#install'](0)
     end,
     init = function()
-      vim.g.mkdp_filetypes = { "markdown" }
+      vim.g.mkdp_filetypes = { 'markdown' }
       vim.cmd([[
       function! Clippy_open_browser(url) abort
       echom('opening ' . a:url)
@@ -328,72 +348,101 @@ local plugins = {
       call system('clippy openurl ' . a:url)
       endfunction
       ]])
-      vim.g.mkdp_browserfunc = "Clippy_open_browser"
-      vim.g.mkdp_port = "9999"
+      vim.g.mkdp_browserfunc = 'Clippy_open_browser'
+      vim.g.mkdp_port = '9999'
     end,
-    ft = { "markdown" },
+    ft = { 'markdown' },
   },
   {
-    "metakirby5/codi.vim",
-    cmd = {"Codi","CodiNew","CodiSelect","CodiExpand"},
+    'metakirby5/codi.vim',
+    cmd = { 'Codi', 'CodiNew', 'CodiSelect', 'CodiExpand' },
   },
   {
-    "nvim-neotest/neotest",
+    'nvim-neotest/neotest',
     dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "antoinemadec/FixCursorHold.nvim",
-      "nvim-neotest/neotest-python",
-      "nvim-neotest/neotest-plenary",
-      "nvim-neotest/neotest-vim-test"
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+      'antoinemadec/FixCursorHold.nvim',
+      'nvim-neotest/neotest-python',
+      'nvim-neotest/neotest-plenary',
+      'nvim-neotest/neotest-vim-test',
     },
-    init = function ()
-      vim.api.nvim_create_user_command("TestNearest", ":lua require('neotest').run.run()", {force=true})
-      vim.api.nvim_create_user_command("TestFile", ":lua require('neotest').run.run(vim.fn.expand('%'))", {force=true})
-      vim.api.nvim_create_user_command("TestDebug", ":lua require('neotest').run.run({strategy = 'dap'})", {force=true})
-      vim.api.nvim_create_user_command("TestStop", ":lua require('neotest').run.stop()", {force=true})
+    init = function()
+      vim.api.nvim_create_user_command(
+        'TestNearest',
+        ":lua require('neotest').run.run()",
+        { force = true }
+      )
+      vim.api.nvim_create_user_command(
+        'TestFile',
+        ":lua require('neotest').run.run(vim.fn.expand('%'))",
+        { force = true }
+      )
+      vim.api.nvim_create_user_command(
+        'TestDebug',
+        ":lua require('neotest').run.run({strategy = 'dap'})",
+        { force = true }
+      )
+      vim.api.nvim_create_user_command(
+        'TestStop',
+        ":lua require('neotest').run.stop()",
+        { force = true }
+      )
     end,
-    config = function ()
-      require("neotest").setup({
+    config = function()
+      require('neotest').setup({
         adapters = {
-          require("neotest-python")({
+          require('neotest-python')({
             dap = { justMyCode = false },
           }),
-          require("neotest-plenary"),
-          require("neotest-vim-test")({
-            ignore_file_types = { "python", "vim", "lua" },
+          require('neotest-plenary'),
+          require('neotest-vim-test')({
+            ignore_file_types = { 'python', 'vim', 'lua' },
           }),
         },
       })
-    end
+    end,
   },
   {
-    "ahmedkhalf/project.nvim",
+    'ahmedkhalf/project.nvim',
     name = 'project.nvim',
     lazy = false,
-    config = function ()
-      require("project_nvim").setup {
+    config = function()
+      require('project_nvim').setup({
         manual_mode = false,
-        detection_methods = { "pattern" }, 
-        patterns = { ".git", ".project", 'pyproject.toml', 'pyrightconfig.json', "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json", "main.py", "trainer*.py"},
+        detection_methods = { 'pattern' },
+        patterns = {
+          '.git',
+          '.project',
+          'pyproject.toml',
+          'pyrightconfig.json',
+          '_darcs',
+          '.hg',
+          '.bzr',
+          '.svn',
+          'Makefile',
+          'package.json',
+          'main.py',
+          'trainer*.py',
+        },
         exclude_dirs = {},
         show_hidden = false,
         silent_chdir = true,
-        datapath = vim.fn.stdpath("data"),
-      }
+        datapath = vim.fn.stdpath('data'),
+      })
       -- NOTE: important: just change root per window
-      vim.cmd[[autocmd WinEnter * ++nested lua require("project_nvim.project").on_buf_enter()]]
-    end
+      vim.cmd([[autocmd WinEnter * ++nested lua require("project_nvim.project").on_buf_enter()]])
+    end,
   },
   {
-    "skywind3000/asynctasks.vim",
+    'skywind3000/asynctasks.vim',
     cmd = 'AsyncTask',
-    init = function ()
+    init = function()
       vim.g.asyncrun_open = 6
     end,
-    dependencies = { 
-      { 
-        "skywind3000/asyncrun.vim", 
+    dependencies = {
+      {
+        'skywind3000/asyncrun.vim',
         -- << NOTE: macros
         -- $(VIM_FILEPATH)  - File name of current buffer with full path
         -- $(VIM_FILENAME)  - File name of current buffer without path
@@ -403,7 +452,7 @@ local plugins = {
         -- $(VIM_PATHNOEXT) - Current file name with full path but without extension
         -- $(VIM_CWD)       - Current directory
         -- $(VIM_RELDIR)    - File path relativize to current directory
-        -- $(VIM_RELNAME)   - File name relativize to current directory 
+        -- $(VIM_RELNAME)   - File name relativize to current directory
         -- $(VIM_ROOT)      - Project root directory
         -- $(VIM_CWORD)     - Current word under cursor
         -- $(VIM_CFILE)     - Current filename under cursor
@@ -415,127 +464,132 @@ local plugins = {
         -- $(VIM_PRONAME)   - Name of current project root directory
         -- $(VIM_DIRNAME)   - Name of current directory
         -- >> END
-        dependencies = { 
-          "preservim/vimux",
+        dependencies = {
+          'preservim/vimux',
           init = function()
-            vim.g.VimuxHeight = "30"
-          end
+            vim.g.VimuxHeight = '30'
+          end,
         },
         cmd = 'AsyncRun',
-        init = function ()
-          local ft_map = require("core.autocmds").ft_map
-          ft_map('python','n',',t','<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>')
-        end
+        init = function()
+          local ft_map = require('core.autocmds').ft_map
+          ft_map(
+            'python',
+            'n',
+            ',t',
+            '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>'
+          )
+        end,
       },
     },
   },
   {
-    "folke/persistence.nvim",
+    'folke/persistence.nvim',
     enabled = false, -- use very few times, but consume too much time at startup
-    event = "BufReadPre", -- this will only start session saving when an actual file was opened
-    init = function ()
+    event = 'BufReadPre', -- this will only start session saving when an actual file was opened
+    init = function()
       -- this mapping should be in the init module, to that before the loading of whick-key, otherwise it will not work
       local map = require('core.utils').map
-      map("n", "<space>qs", [[<cmd>lua require("persistence").load()<cr>]])
-      map("n", "<space>ql", [[<cmd>lua require("persistence").load({ last = true })<cr>]])
-      map("n", "<space>qd", [[<cmd>lua require("persistence").stop()<cr>]])
+      map('n', '<space>qs', [[<cmd>lua require("persistence").load()<cr>]])
+      map('n', '<space>ql', [[<cmd>lua require("persistence").load({ last = true })<cr>]])
+      map('n', '<space>qd', [[<cmd>lua require("persistence").stop()<cr>]])
     end,
     config = function()
-      require("persistence").setup{
-        dir = vim.fn.expand(vim.fn.stdpath("data") .. "/sessions/"),
-        options = { "buffers", "curdir", "tabpages", "winsize" }
-      }
+      require('persistence').setup({
+        dir = vim.fn.expand(vim.fn.stdpath('data') .. '/sessions/'),
+        options = { 'buffers', 'curdir', 'tabpages', 'winsize' },
+      })
     end,
   },
   {
-    "folke/todo-comments.nvim",
+    'folke/todo-comments.nvim',
     -- how to use it?
     -- using TODO: (the last colon is necessary)
     event = 'BufRead',
-    dependencies = "nvim-lua/plenary.nvim",
+    dependencies = 'nvim-lua/plenary.nvim',
     config = function()
       -- HACK: #104 Invalid in command-line window
-      local hl = require("todo-comments.highlight")
+      local hl = require('todo-comments.highlight')
       local highlight_win = hl.highlight_win
       hl.highlight_win = function(win, force)
         pcall(highlight_win, win, force)
       end
-      require("todo-comments").setup {
+      require('todo-comments').setup({
         keywords = {
           FIX = {
-            icon = " ", -- icon used for the sign, and in search results
-            color = "error", -- can be a hex color, or a named color (see below)
-            alt = { "FIXME", "BUG", "FIXIT", "ISSUE", "MAYBE" }, -- a set of other keywords that all map to this FIX keywords
+            icon = ' ', -- icon used for the sign, and in search results
+            color = 'error', -- can be a hex color, or a named color (see below)
+            alt = { 'FIXME', 'BUG', 'FIXIT', 'ISSUE', 'MAYBE' }, -- a set of other keywords that all map to this FIX keywords
             signs = true, -- configure signs for some keywords individually
           },
-        }
-      }
-    end
+        },
+      })
+    end,
   },
   {
     'sindrets/diffview.nvim',
     cmd = 'DiffviewOpen',
     dependencies = 'nvim-lua/plenary.nvim',
   },
-  {                                                                
-    "nvim-pack/nvim-spectre",                                      
+  {
+    'nvim-pack/nvim-spectre',
     keys = {
-      {"<leader>S","<cmd>lua require('spectre').open()<CR>"},
-      {"<leader>sc","<cmd>lua require('spectre').open_file_search()<CR>"},
-      {"<leader>sw","<cmd>lua require('spectre').open_visual({select_word=true})<CR>"},
-      {"<leader>s","<cmd>lua require('spectre').open_visual()<CR>"},
+      { '<leader>S', "<cmd>lua require('spectre').open()<CR>" },
+      { '<leader>sc', "<cmd>lua require('spectre').open_file_search()<CR>" },
+      { '<leader>sw', "<cmd>lua require('spectre').open_visual({select_word=true})<CR>" },
+      { '<leader>s', "<cmd>lua require('spectre').open_visual()<CR>" },
     },
     -- NOTE: to make this work, you should have `gsed` in the $PATH `ln -s ~/.nix-profile/bin/sed ~/.local/bin/gsed`
-    config = function ()                                           
-      require("spectre").setup({ replace_engine = { sed = { cmd = "sed" } } })
-    end
+    config = function()
+      require('spectre').setup({ replace_engine = { sed = { cmd = 'sed' } } })
+    end,
   },
   {
     't9md/vim-choosewin',
-    event = "VimEnter",
-    config = function ()
+    event = 'VimEnter',
+    config = function()
       vim.g.choosewin_overlay_enable = 1
-      require('core.utils').map('n','-','<Plug>(choosewin)', {noremap=false})
-    end
+      require('core.utils').map('n', '-', '<Plug>(choosewin)', { noremap = false })
+    end,
   },
   {
     'alexghergh/nvim-tmux-navigation',
     event = 'VeryLazy',
     config = function()
-      require'nvim-tmux-navigation'.setup {
+      require('nvim-tmux-navigation').setup({
         disable_when_zoomed = true, -- defaults to false
         keybindings = {
-          left = "<C-LEFT>",
-          down = "<C-DOWN>",
-          up = "<C-UP>",
-          right = "<C-RIGHT>",
-          last_active = "<C-\\>",
-          next = "<C-Space>",
-        }
-      }
-    end
+          left = '<C-LEFT>',
+          down = '<C-DOWN>',
+          up = '<C-UP>',
+          right = '<C-RIGHT>',
+          last_active = '<C-\\>',
+          next = '<C-Space>',
+        },
+      })
+    end,
   },
 }
 local specific_plugins = {}
-local is_mac = vim.loop.os_uname().sysname=="Darwin"
+local is_mac = vim.loop.os_uname().sysname == 'Darwin'
 if is_mac then
   specific_plugins = {
-    { "kdheepak/cmp-latex-symbols"},
+    { 'kdheepak/cmp-latex-symbols' },
     {
-      "lervag/vimtex",
+      'lervag/vimtex',
       ft = 'tex',
       init = function()
         vim.g.vimtex_motion_enabled = 0
       end,
       config = function()
-        vim.g.vimtex_view_method = "skim"
+        vim.g.vimtex_view_method = 'skim'
         vim.cmd([[
         let maplocalleader = ","
         ]])
       end,
     },
     {
-      "rhysd/vim-grammarous",
+      'rhysd/vim-grammarous',
       enabled = false, -- very hard to : cannot ignore the latex keywords
       init = function()
         vim.g['grammarous#languagetool_cmd'] = 'languagetool -l en-US'
@@ -543,5 +597,5 @@ if is_mac then
     },
   }
 end
-plugins = vim.list_extend(plugins,specific_plugins)
+plugins = vim.list_extend(plugins, specific_plugins)
 return plugins

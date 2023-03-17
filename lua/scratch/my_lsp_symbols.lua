@@ -247,7 +247,7 @@ M.references = function(opts)
     local start = vim.loop.hrtime()
     treesitter_job:send(inputs_for_treesitter)
     treesitter_job:with_output(function()
-      print(string.format('treesitter_job reference spent time: %s ms',(vim.loop.hrtime()-start)/1000000))
+      print(string.format('treesitter_job reference %d symbols spent time: %s ms',#locations,(vim.loop.hrtime()-start)/1000000))
       for i, loc in ipairs(locations) do
         loc.ts_info = treesitter_job:retrieve(loc.filename, {loc.lnum-1,loc.col-1})
       end

@@ -18,55 +18,45 @@ local sel = require('scratch.serialize')
 local log = require('core.utils').log
 local fmt = string.format
 
+local header = 'STREAM_CODE_START'
+local ender = 'TRATS_EDOC_MAERTS'
+
 local encoding = function(t,tick, as_str)
-  -- input: table1
-  -- return: "START_12345_${table1}#_12345_END"
   local content = sel.pickle(t)
 
   if as_str then
     -- method 1: a string: the receiver will get a table of string (typically split by '\n')
     -- but if the string is very long, maybe each item will not ended with '\n'
-    return fmt('START_%d_$',tick) .. content .. fmt('#_%d_END',tick)
+    return fmt('%s%d', header, tick) .. content .. fmt('%d%s', tick, ender)
   else -- as table
     -- method 2: a table of string: the receiver will get the whole string
     content = vim.split(content,'\n')
-    table.insert(content,1,fmt('START_%d_$',tick))
-    table.insert(content,#content+1,fmt('#_%d_END',tick))
+    table.insert(content,1,fmt('%s%d', header, tick))
+    table.insert(content,#content+1,fmt('%d%s', tick, ender))
     return content
   end
 end
 
 local decoding = function (s)
-  -- input: "START_12345_${table1}#_12345_ENDSTART_45678_${table2}#_45678_END"
-  -- return: { '12345' = table1, '45678' = table2 }
-  local check_begin = function(ss)
-    return string.sub(ss,1,5) == 'START' 
-  end
-
-  if not check_begin(s) then log('error: start') log(s) return end
-
   local t = {}
-  local start_dollar, end_dollar
-  local start_tick,   end_tick
-  local start_mark,   end_mark
   while true do
-    if not check_begin(s) then log('error start middle') return end
+    local left_start, left_end = string.find(s, fmt([[%s[0-9]+]],header))
+    local right_start, right_end = string.find(s, fmt([[[0-9]+%s]],ender)) -- only the first match!
 
-    start_mark = string.find(s,'START')
-    start_dollar = string.find(s,'%$')
-    start_tick = string.sub(s, 7, start_dollar-2)
+    local start_tick = string.sub(s,left_start+#header,left_end)
+    local end_tick = string.sub(s,right_start,right_end-#ender)
 
-    end_mark = string.find( s, 'END')
-    end_dollar =  string.find( s, '#')
-    end_tick = string.sub(s,end_dollar+2, end_mark-2) 
+    if start_tick~=end_tick then
+      log('start_tick~=end_tick',start_tick,end_tick)
+      log('s:',s)
+      return
+    end
 
-    if start_tick~=end_tick then log('error start_tick~=end_tick') return end
-
-    local tbl_str = string.sub(s,start_dollar+1,end_dollar-1)
+    local tbl_str = string.sub(s, left_end+1,right_start-1)
     local tbl = sel.unpickle(tbl_str)
     t[start_tick] = tbl
 
-    s = string.sub(s,end_mark+3)
+    s = string.sub(s,right_end+1)
     if #s==0 then
       break
     end
@@ -91,10 +81,10 @@ local wrap_for_on_stdout = function(cb)
     end
     -- NOTE: concat the end with the start(remove the \n)
     last_data = last_data .. raw_input
-    if string.match(last_data,'END$') then
+    if string.match(last_data,ender) then
       local ok, data = pcall(decoding,last_data)
       if not ok or data==nil then
-        log('decoding err: ',data)
+        log('stdout decoding err: ',data)
         return
       end
       cb(data,err,raw_input)
@@ -119,10 +109,10 @@ local wrap_for_stdin_handle = function(cb)
     if valid_raw_input(raw_input) then
       raw_input = raw_input[1] -- the str itself
       last_data = last_data .. raw_input
-      if string.match(last_data,"END$") then
+      if string.match(last_data,ender) then
         local ok, data = pcall(decoding,last_data)
         if not ok or data==nil then
-          log('decoding err: ',data)
+          log('stdin decoding err: ',data)
           return
         end
         cb(data,id,raw_input,event)

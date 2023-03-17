@@ -187,7 +187,6 @@ local function gen_lsp_and_ts_references(opts)
     end
     text = text:gsub(".* | ", "")
     table.insert(input, text)
-    log("in make_display, entry: ",entry)
     return displayer(input)
   end
 
@@ -221,7 +220,6 @@ M.references = function(opts)
   }
 
   vim.lsp.buf_request(opts.bufnr, "textDocument/references", params, function(err, result, ctx, _)
-    log('my references get err: ', err, result, ctx)
     if err then
       vim.api.nvim_err_writeln("Error when finding references: " .. err.message)
       return

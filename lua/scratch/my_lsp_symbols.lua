@@ -7,6 +7,10 @@ local make_entry = require "telescope.make_entry"
 local pickers = require "telescope.pickers"
 local utils = require "telescope.utils"
 local entry_display = require "telescope.pickers.entry_display"
+local action_set = require 'telescope.actions.set'
+local action_state = require 'telescope.actions.state'
+local actions = require 'telescope.actions'
+local scan = require 'plenary.scandir'
 local log = require('core.utils').log
 local treesitter_job = require('scratch.bridge_ts_parse')
 
@@ -18,11 +22,12 @@ local function inject_ts_to_lsp_symbols(locations,f)
   return function(prompt)
     local tx, rx = channel.oneshot()
     cancel()
-    cancel = treesitter_job:with_output(tx)
+    cancel = treesitter_job:with_output(tx,0.9)
     local res = rx()
     if res then
+      log("done: ",treesitter_job:done())
       for i, loc in ipairs(locations) do
-        loc.ts_info = treesitter_job:retrieve(f, {loc.lnum-1,loc.col-1})
+        loc.ts_info = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
       end
     end
     return locations
@@ -209,6 +214,41 @@ local function gen_lsp_and_ts_references(opts)
 end
 
 
+local refresh
+refresh = function(locations,prompt_bufnr,opts)
+  local current_picker = action_state.get_current_picker(prompt_bufnr)
+  local current_input = action_state.get_current_line()
+  actions._close(prompt_bufnr, current_picker.initial_mode == 'insert')
+
+  local fucked_up = 0
+  for i, loc in ipairs(locations) do
+    loc.ts_info = treesitter_job:retrieve(loc.filename, {loc.lnum-1,loc.col-1})
+    if loc.ts_info == 'processing' then
+      fucked_up = fucked_up + 1
+    end
+  end
+  pickers
+  .new(opts, {
+    prompt_title = "LSP References",
+    finder = finders.new_table {
+      results = locations,
+      entry_maker = gen_lsp_and_ts_references(opts)
+    },
+    attach_mappings = function(_, map)
+      map("i", "<C-r>", function(_prompt_bufnr)
+        refresh(locations, _prompt_bufnr, opts)
+      end)
+      return true
+    end,
+    default_text = current_input,
+    previewer = conf.qflist_previewer(opts),
+    sorter = conf.generic_sorter(opts),
+    push_cursor_on_edit = true,
+    push_tagstack_on_edit = true,
+  })
+  :find()
+end
+
 M.references = function(opts)
   opts = opts or {bufnr = vim.api.nvim_get_current_buf(), winnr = vim.api.nvim_get_current_win()}
   local filepath = vim.api.nvim_buf_get_name(opts.bufnr)
@@ -230,6 +270,7 @@ M.references = function(opts)
       log('no references')
       return
     end
+    local start = vim.loop.hrtime()
     local inputs_for_treesitter = {}
     local ft = vim.api.nvim_buf_get_option(opts.bufnr,'filetype')
     for i,item in ipairs(locations) do
@@ -243,6 +284,20 @@ M.references = function(opts)
 
     local start = vim.loop.hrtime()
     treesitter_job:send(inputs_for_treesitter)
+
+    -- pickers
+    -- .new(opts, {
+    --   prompt_title = "LSP References with treesitter_job",
+    --   finder = finders.new_dynamic {
+    --     entry_maker = gen_lsp_and_ts_references(opts),
+    --     fn = inject_ts_to_lsp_symbols(locations),
+    --   },
+    --   previewer = conf.qflist_previewer(opts),
+    --   sorter = conf.generic_sorter(opts),
+    --   push_cursor_on_edit = true,
+    --   push_tagstack_on_edit = true,
+    -- }):find()
+
     treesitter_job:with_output(function()
       print(string.format('treesitter_job reference %d symbols spent time: %s ms',#locations,(vim.loop.hrtime()-start)/1000000))
       for i, loc in ipairs(locations) do
@@ -255,13 +310,19 @@ M.references = function(opts)
           results = locations,
           entry_maker = gen_lsp_and_ts_references(opts)
         },
+        attach_mappings = function(_, map)
+          map("i", "<C-r>", function(_prompt_bufnr)
+            refresh(locations, _prompt_bufnr, opts)
+          end)
+          return true
+        end,
         previewer = conf.qflist_previewer(opts),
         sorter = conf.generic_sorter(opts),
         push_cursor_on_edit = true,
         push_tagstack_on_edit = true,
       })
       :find()
-    end)
+    end, 0.3)
   end)
 end
 

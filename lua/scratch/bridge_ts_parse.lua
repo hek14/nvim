@@ -14,10 +14,11 @@ end
 
 local process = {}
 process.__index = process
-function process:new(stdin,stdout,handle)
+function process:new(stdin,stdout,stderr,handle)
   return setmetatable({
     stdin = stdin,
     stdout = stdout,
+    stderr = stderr,
     handle = handle,
     file_pos_to_latest_ticket = {},
     tickets = {}
@@ -43,7 +44,7 @@ end
 function process:retrieve(file,position)
   local session_tick = self.file_pos_to_latest_ticket[make_file_pos_key(file,position)] -- don't worry, this is the latest ticket
   if not session_tick then
-    return 'unkown'
+    return 'unknown'
   end
 
   if self.tickets[session_tick] and self.tickets[session_tick].output then
@@ -77,17 +78,15 @@ end
 
 function process:done()
   local ticket_cnt = #vim.tbl_keys(self.tickets)
+  if ticket_cnt == 0 then return 1 end
+
   local ticket_done_cnt = 0
   for k,v in pairs(self.tickets) do
     if v.output~=nil then
       ticket_done_cnt = ticket_done_cnt + 1
     end
   end
-  if ticket_cnt > 0 and ticket_cnt == ticket_done_cnt then
-    return true,1
-  else
-    return false,ticket_done_cnt/ticket_cnt
-  end
+  return ticket_done_cnt/ticket_cnt
 end
 
 function process.on_stdout(p)
@@ -100,6 +99,13 @@ function process.on_stdout(p)
   return coding_util.wrap_for_on_stdout(cb)
 end
 
+
+function process.on_err(p)
+  return function (err,_)
+    print(fmt('process: %s failed with: %s',p.pid,err))
+  end
+end
+
 function process.on_exit(p)
   local function safe_close(handle)
     if handle and not uv.is_closing(handle) then
@@ -108,9 +114,11 @@ function process.on_exit(p)
   end
   return vim.schedule_wrap(function(code)
     uv.read_stop(p.stdout)
+    uv.read_stop(p.stderr)
     safe_close(p.handle)
     safe_close(p.stdin)
     safe_close(p.stdout)
+    safe_close(p.stderr)
   end)
 end
 
@@ -124,17 +132,19 @@ local M = {
 function M:spawn()
   local stdin = uv.new_pipe(false)
   local stdout = uv.new_pipe(false)
+  local stderr = uv.new_pipe(false)
   local handle,pid_or_err
   local opts = {
     args = {'--headless','-u','NORC','-i','NONE','-n','--cmd', 'lua require("scratch.remote_ts_parse").wait_stdin()'},
-    stdio = { stdin, stdout, nil },
+    stdio = { stdin, stdout, stderr },
     cwd = vim.fn.stdpath('config'),
   }
 
-  local child_process = process:new(stdin,stdout,handle)
+  local child_process = process:new(stdin,stdout,stderr,handle)
   handle, pid_or_err = uv.spawn("nvim", opts, process.on_exit(child_process))
   child_process.pid = pid_or_err
   uv.read_start(stdout,process.on_stdout(child_process))
+  uv.read_start(stderr,process.on_err(child_process))
   table.insert(M.childs,child_process)
   return child_process
 end
@@ -170,15 +180,36 @@ function M:send(input)
       end
     end
   end
+
+  local index = {}
   for i = 1,#self.childs do
-    self.childs[i]:send(data[i])
+    index[i] = 1
+  end
+  local max_batch = 50
+
+  local all_sent = 0
+  while all_sent < #self.childs do
+    for i = 1,#self.childs do
+      if #data[i] > max_batch then
+        if index[i] <= #data[i] then
+          local batch = vim.list_slice(data[i], index[i], index[i]+max_batch-1)
+          index[i] = index[i] + max_batch
+          self.childs[i]:send(batch)
+        else
+          all_sent = all_sent + 1
+        end
+      else
+        self.childs[i]:send(data[i])
+        all_sent = all_sent + 1
+      end
+    end
   end
 end
 
 function M:retrieve(file,position)
   -- NOTE: this function can be used async: it's alright if the parse result is not already 
   local child = self.childs[self.file_to_child_id[file]]
-  if not child then return 'unkown' end
+  if not child then return 'unknown' end
   return child:retrieve(file,position)
 end
 
@@ -191,21 +222,25 @@ end
 function M:done()
   local cnt = 0
   for i, c in ipairs(self.childs) do
-    if c:done() then
-      cnt = cnt + 1
-    end
+    cnt = cnt + c:done()
   end
-  return cnt == #self.childs
+  return cnt == #self.childs, cnt
 end
 
-function M:with_output(cb)
+function M:with_output(cb,ratio)
   local timer = uv.new_timer() -- start a new timer to check if done
   local running = true
   timer:start(0,10,vim.schedule_wrap(function()
     if not running then return end
-    local done = self:done()
+    local done,done_ratio
+    if not ratio then
+      done = self:done()
+    else
+      _, done_ratio = self:done()
+      done = done_ratio > ratio
+    end
     if done then
-      cb(true)
+      cb(ratio and done_ratio or done)
       if not timer:is_closing() then
         running = false
         timer:stop()

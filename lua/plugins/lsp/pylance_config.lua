@@ -1,5 +1,6 @@
 -- https://github.com/microsoft/pylance-release
 
+vim.env['PATH'] = vim.fn.stdpath('config') .. '/bin:' .. vim.env['PATH']
 local util = require("lspconfig.util")
 local bin_name = "pylance-langserver"
 local found_exe = vim.fn.executable('pylance-langserver')

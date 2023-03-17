@@ -33,10 +33,9 @@ M.close_buffer = function(force)
 
   -- if not force, change to prev buf and then close current
   -- local close_cmd = force and ":bd!" or ":e #| bd" .. vim.fn.bufnr()
-  local last_buf = vim.fn.bufnr('#')
-  local listed = vim.api.nvim_buf_get_option(last_buf,'buflisted')
   local close_cmd
-  if listed then
+  local last_buf = vim.fn.bufnr('#')
+  if vim.api.nvim_buf_is_valid(last_buf) and vim.api.nvim_buf_get_option(last_buf,'buflisted') then
     close_cmd = force and ":bd!" or ":b# | bd" .. vim.fn.bufnr()
   else
     close_cmd = force and ":bd!" or ":bp | bd" .. vim.fn.bufnr()

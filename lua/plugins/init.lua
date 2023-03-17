@@ -1,5 +1,28 @@
 local plugins = {
   {
+    "hek14/easyformat.nvim",
+    ft = {'python','lua'},
+    config = function ()
+      vim.env['PATH'] = vim.fn.expand('~/.local/share/nvim/mason/bin:') .. vim.env['PATH']
+      local configs = require('easyformat.config')
+      configs.timeout = 300
+      configs.use_default({
+        'lua',
+      })
+      configs.python = {
+        cmd = 'black',
+        args = {},
+        find = false,
+        fname = true,
+        stdin = false,
+        do_not_need_stdout = true,
+      }
+      require('easyformat').setup({
+        fmt_on_save = false,
+      })
+    end
+  },
+  {
     "SmiteshP/nvim-gps",
     lazy = false,
     config = function ()

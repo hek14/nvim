@@ -21,20 +21,13 @@ local fmt = string.format
 local header = 'STREAM_CODE_START'
 local ender = 'TRATS_EDOC_MAERTS'
 
-local encoding = function(t,tick, as_str)
+local encoding = function(t,tick)
   local content = sel.pickle(t)
-
-  if as_str then
-    -- method 1: a string: the receiver will get a table of string (typically split by '\n')
-    -- but if the string is very long, maybe each item will not ended with '\n'
-    return fmt('%s%d', header, tick) .. content .. fmt('%d%s', tick, ender)
-  else -- as table
-    -- method 2: a table of string: the receiver will get the whole string
-    content = vim.split(content,'\n')
-    table.insert(content,1,fmt('%s%d', header, tick))
-    table.insert(content,#content+1,fmt('%d%s', tick, ender))
-    return content
-  end
+  -- method 2: a table of string: the receiver will get the whole string
+  content = vim.split(content,'\n')
+  table.insert(content,1,fmt('%s%d', header, tick))
+  table.insert(content,#content+1,fmt('%d%s', tick, ender))
+  return content
 end
 
 local decoding = function (s)
@@ -53,7 +46,10 @@ local decoding = function (s)
     end
 
     local tbl_str = string.sub(s, left_end+1,right_start-1)
-    local tbl = sel.unpickle(tbl_str)
+    local ok,tbl = pcall(sel.unpickle,tbl_str)
+    if not ok then
+      assert(ok, 'unpickle error')
+    end
     t[start_tick] = tbl
 
     s = string.sub(s,right_end+1)
@@ -81,10 +77,12 @@ local wrap_for_on_stdout = function(cb)
     end
     -- NOTE: concat the end with the start(remove the \n)
     last_data = last_data .. raw_input
-    if string.match(last_data,ender) then
+    if string.match(last_data,fmt([[%s$]],ender)) then
       local ok, data = pcall(decoding,last_data)
       if not ok or data==nil then
         log('stdout decoding err: ',data)
+        log('current data: ',last_data)
+        assert(ok, 'decoding error')
         return
       end
       cb(data,err,raw_input)
@@ -109,10 +107,12 @@ local wrap_for_stdin_handle = function(cb)
     if valid_raw_input(raw_input) then
       raw_input = raw_input[1] -- the str itself
       last_data = last_data .. raw_input
-      if string.match(last_data,ender) then
+      if string.match(last_data,fmt([[%s$]],ender)) then
         local ok, data = pcall(decoding,last_data)
         if not ok or data==nil then
           log('stdin decoding err: ',data)
+          log('current data: ',last_data)
+          vim.fn.chansend(vim.v.stderr,"backend process error!")
           return
         end
         cb(data,id,raw_input,event)

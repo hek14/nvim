@@ -42,6 +42,10 @@ end
 
 function process:retrieve(file,position)
   local session_tick = self.file_pos_to_latest_ticket[make_file_pos_key(file,position)] -- don't worry, this is the latest ticket
+  if not session_tick then
+    return 'unkown'
+  end
+
   if self.tickets[session_tick] and self.tickets[session_tick].output then
     local pos_key = make_pos_key(position)
     return self.tickets[session_tick].output[file][pos_key]
@@ -174,6 +178,7 @@ end
 function M:retrieve(file,position)
   -- NOTE: this function can be used async: it's alright if the parse result is not already 
   local child = self.childs[self.file_to_child_id[file]]
+  if not child then return 'unkown' end
   return child:retrieve(file,position)
 end
 

@@ -11,6 +11,14 @@ local coding_util = require('scratch.stream_coding')
 local get_data = require('scratch.ts_util').get_data
 local watch_util = require('scratch.file_watcher')
 
+local profiler = function (what)
+  local start = vim.loop.hrtime()
+  return { 
+    finish = function ()
+      log(string.format('%s spent time: %s ms',what or "",(vim.loop.hrtime()-start)/1000000)) 
+    end}
+end
+
 -- states
 local parse_results = {}
 
@@ -72,11 +80,18 @@ end
 local update_parse_results = function(item)
   local existed_result = get_file_pos_result(item.file,item.position)
   if existed_result then 
+    -- log('just using the cached value')
     return existed_result 
   end
 
-  local new_res = get_data(parse_results[item.file].bufnr,item.position) or 'ts_error'
-  return new_res
+  local new_res = get_data(parse_results[item.file].bufnr,item.position)
+  if not new_res then
+    return 'error'
+  elseif new_res == "" then
+    return 'root'
+  else
+    return new_res
+  end
 end
 
 
@@ -120,6 +135,7 @@ end
 
 
 local parse = function(input)
+  -- local parse_p = profiler('parse')
   watch_input(input)
   local output = {}
   -- corresponding to the input, only copy a sub-set of parse_results(current input), don't send all of them back for performance
@@ -139,7 +155,7 @@ local parse = function(input)
 
   for _,item in ipairs(input) do
     local file_pos_key = make_file_pos_key(item.file,item.position)
-    if not fail_parse_keys[file_pos_key] then
+    if not vim.tbl_contains(fail_parse_keys, file_pos_key) then
       local ok,value = pcall(update_parse_results,item)
       if not ok then
         -- log("cannot parse item",item)
@@ -155,6 +171,7 @@ local parse = function(input)
       output[item.file][make_pos_key(item.position)] = get_file_pos_result(item.file,item.position)
     end
   end
+  -- parse_p.finish()
   return output
 end
 
@@ -189,7 +206,7 @@ M.cb = function (data,id,_,event)
   for tick,input in pairs(data) do
     local ret = parse(input)
     if id and event=='stdin' then
-      vim.fn.chansend(id,coding_util.encoding(ret,tick,true))
+      vim.fn.chansend(id,coding_util.encoding(ret,tick,false))
     end
   end
 end

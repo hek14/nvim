@@ -27,7 +27,7 @@ local icons = {
 -- }
 setmetatable(icons,{
   __index = function ()
-    return ' '
+    return '  '
   end
 })
 

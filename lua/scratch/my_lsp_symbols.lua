@@ -297,7 +297,13 @@ M.references = function(opts)
     --   push_cursor_on_edit = true,
     --   push_tagstack_on_edit = true,
     -- }):find()
-
+    
+    local ratio
+    if #inputs_for_treesitter > 100 then
+      ratio = 0.5
+    else
+      ratio = nil
+    end
     treesitter_job:with_output(function()
       print(string.format('treesitter_job reference %d symbols spent time: %s ms',#locations,(vim.loop.hrtime()-start)/1000000))
       for i, loc in ipairs(locations) do
@@ -322,7 +328,7 @@ M.references = function(opts)
         push_tagstack_on_edit = true,
       })
       :find()
-    end, 0.3)
+    end, ratio)
   end)
 end
 

@@ -101,8 +101,10 @@ end
 
 
 function process.on_err(p)
-  return function (err,_)
-    print(fmt('process: %s failed with: %s',p.pid,err))
+  return function (err,what)
+    if err then
+      print(fmt('process: %s failed with: %s, %s',p.pid,err,what))
+    end
   end
 end
 

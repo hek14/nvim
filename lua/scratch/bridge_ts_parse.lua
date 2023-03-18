@@ -44,7 +44,7 @@ end
 function process:retrieve(file,position)
   local session_tick = self.file_pos_to_latest_ticket[make_file_pos_key(file,position)] -- don't worry, this is the latest ticket
   if not session_tick then
-    return 'unknown'
+    return 'not sent'
   end
 
   if self.tickets[session_tick] and self.tickets[session_tick].output then
@@ -184,34 +184,34 @@ function M:send(input)
   end
 
   local index = {}
+  local total_data_cnt = 0
   for i = 1,#self.childs do
     index[i] = 1
+    total_data_cnt = total_data_cnt + #data[i]
   end
   local max_batch = 50
 
   local all_sent = 0
-  while all_sent < #self.childs do
+  while all_sent < total_data_cnt do
     for i = 1,#self.childs do
-      if #data[i] > max_batch then
-        if index[i] <= #data[i] then
-          local batch = vim.list_slice(data[i], index[i], index[i]+max_batch-1)
-          index[i] = index[i] + max_batch
+      if index[i] <= #data[i] then
+        local batch = vim.list_slice(data[i], index[i], index[i]+max_batch-1)
+        index[i] = index[i] + max_batch
+        if #batch > 0 then
+          -- log(fmt("child %s sent %s|%s",i,index[i]-1,#data[i]))
           self.childs[i]:send(batch)
-        else
-          all_sent = all_sent + 1
+          all_sent = all_sent + #batch
         end
-      else
-        self.childs[i]:send(data[i])
-        all_sent = all_sent + 1
       end
     end
   end
+  -- log('all sent: ',all_sent,'total todo: ',total_data_cnt)
 end
 
 function M:retrieve(file,position)
   -- NOTE: this function can be used async: it's alright if the parse result is not already 
   local child = self.childs[self.file_to_child_id[file]]
-  if not child then return 'unknown' end
+  if not child then return 'no child' end
   return child:retrieve(file,position)
 end
 

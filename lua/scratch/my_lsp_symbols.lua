@@ -227,6 +227,7 @@ refresh = function(locations,prompt_bufnr,opts)
       fucked_up = fucked_up + 1
     end
   end
+  print(string.format('total: %d, fucked remaining: %d',#locations,#fucked_up))
   pickers
   .new(opts, {
     prompt_title = "LSP References",

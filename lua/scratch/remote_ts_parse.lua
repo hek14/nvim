@@ -206,7 +206,7 @@ M.cb = function (data,id,_,event)
   for tick,input in pairs(data) do
     local ret = parse(input)
     if id and event=='stdin' then
-      vim.fn.chansend(id,coding_util.encoding(ret,tick,false))
+      vim.fn.chansend(id,coding_util.encoding(ret,tick))
     end
   end
 end

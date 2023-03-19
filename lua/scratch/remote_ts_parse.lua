@@ -48,7 +48,7 @@ end
 
 
 local on_file_modified = function(path,filetick_now)
-  -- log('should called: on_file_modified with: ',path, filetick_now, #watch_util.timers)
+  log('update path and parse the buffer: ',path, filetick_now)
   if parse_results[path].filetick ~= filetick_now then -- maybe the send function already update it
     local item = {file = path, filetick = filetick_now, filetype = parse_results[path].filetype}
     local ok, err = pcall(reload_and_reparse_file,item)

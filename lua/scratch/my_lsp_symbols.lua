@@ -12,6 +12,7 @@ local action_state = require 'telescope.actions.state'
 local actions = require 'telescope.actions'
 local scan = require 'plenary.scandir'
 local log = require('core.utils').log
+local fmt = string.format
 local treesitter_job = require('scratch.bridge_ts_parse')
 
 local function inject_ts_to_lsp_symbols(locations,f)
@@ -25,10 +26,10 @@ local function inject_ts_to_lsp_symbols(locations,f)
     cancel()
     cancel = treesitter_job:with_output(tx,ratio)
     ratio = ratio + 0.1 <= 1.0 and ratio + 0.1 or 1.0
-    log('ratio: ',ratio,vim.loop.hrtime())
+    log(fmt('ratio: %s',ratio))
     local res = rx()
     if res then
-      log("done: ",treesitter_job:done())
+      log(fmt("done: %s",treesitter_job:done()))
       for i, loc in ipairs(locations) do
         loc.ts_info = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
       end

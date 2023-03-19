@@ -704,4 +704,148 @@ vim.cmd [[
   endfunction
 ]]
 
+function M._echo_multiline(msg)
+  for _, s in ipairs(vim.fn.split(msg, "\n")) do
+    vim.cmd("echom '" .. s:gsub("'", "''") .. "'")
+  end
+end
+
+function M.info(msg)
+  vim.cmd("echohl Directory")
+  M._echo_multiline(msg)
+  vim.cmd("echohl None")
+end
+
+function M.warn(msg)
+  vim.cmd("echohl WarningMsg")
+  M._echo_multiline(msg)
+  vim.cmd("echohl None")
+end
+
+function M.err(msg)
+  vim.cmd("echohl ErrorMsg")
+  M._echo_multiline(msg)
+  vim.cmd("echohl None")
+end
+
+function M.get_visual_selection(nl_literal)
+  -- this will exit visual mode
+  -- use 'gv' to reselect the text
+  local _, csrow, cscol, cerow, cecol
+  local mode = vim.fn.mode()
+  if mode == "v" or mode == "V" or mode == "" then
+    -- if we are in visual mode use the live position
+    _, csrow, cscol, _ = unpack(vim.fn.getpos("."))
+    _, cerow, cecol, _ = unpack(vim.fn.getpos("v"))
+    if mode == "V" then
+      -- visual line doesn't provide columns
+      cscol, cecol = 0, 999
+    end
+    -- exit visual mode
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("<Esc>",
+        true, false, true), "n", true)
+  else
+    -- otherwise, use the last known visual position
+    _, csrow, cscol, _ = unpack(vim.fn.getpos("'<"))
+    _, cerow, cecol, _ = unpack(vim.fn.getpos("'>"))
+  end
+  -- swap vars if needed
+  if cerow < csrow then csrow, cerow = cerow, csrow end
+  if cecol < cscol then cscol, cecol = cecol, cscol end
+  local lines = vim.fn.getline(csrow, cerow)
+  -- local n = cerow-csrow+1
+  local n = #lines
+  if n <= 0 then return "" end
+  lines[n] = string.sub(lines[n], 1, cecol)
+  lines[1] = string.sub(lines[1], cscol)
+  return table.concat(lines, nl_literal and "\\n" or "\n")
+end
+
+
+M.sudo_exec = function(cmd, print_output)
+  vim.fn.inputsave()
+  local password = vim.fn.inputsecret("Password: ")
+  vim.fn.inputrestore()
+  if not password or #password == 0 then
+    M.warn("Invalid password, sudo aborted")
+    return false
+  end
+  local out = vim.fn.system(string.format("sudo -p '' -S %s", cmd), password)
+  if vim.v.shell_error ~= 0 then
+    print("\r\n")
+    M.err(out)
+    return false
+  end
+  if print_output then print("\r\n", out) end
+  return true
+end
+
+M.sudo_write = function(tmpfile, filepath)
+  if not tmpfile then tmpfile = vim.fn.tempname() end
+  if not filepath then filepath = vim.fn.expand("%") end
+  if not filepath or #filepath == 0 then
+    M.err("E32: No file name")
+    return
+  end
+  -- `bs=1048576` is equivalent to `bs=1M` for GNU dd or `bs=1m` for BSD dd
+  -- Both `bs=1M` and `bs=1m` are non-POSIX
+  local cmd = string.format("dd if=%s of=%s bs=1048576",
+    vim.fn.shellescape(tmpfile),
+    vim.fn.shellescape(filepath))
+  -- no need to check error as this fails the entire function
+  vim.api.nvim_exec(string.format("write! %s", tmpfile), true)
+  if M.sudo_exec(cmd) then
+    M.info(string.format([[\r\n"%s" written]], filepath))
+    vim.cmd("e!")
+  end
+  vim.fn.delete(tmpfile)
+end
+
+
+M.unload_modules = function(patterns)
+  for _, p in ipairs(patterns) do
+    if not p.mod and type(p[1]) == "string" then
+      p = { mod = p[1], fn = p.fn }
+    end
+    local unloaded = false
+    for m, _ in pairs(package.loaded) do
+      if m:match(p.mod) then
+        unloaded = true
+        package.loaded[m] = nil
+        print(string.format("UNLOADED module '%s'", m))
+      end
+    end
+    if unloaded and p.fn then
+      p.fn()
+      print(string.format("RELOADED module '%s'", p.mod))
+    end
+  end
+end
+
+M.reload_config = function()
+  M.unload_modules({
+    { "^core.options$",      fn = function() require("core.options") end },
+    { "^core.autocmds$",     fn = function() require("core.autocmds") end },
+    { "^core.keymap$",       fn = function() require("core.keymap") end },
+    { "^core.utils$",        fn = function() require("core.utils") end },
+  })
+  -- re-source all language specific settings, scans all runtime files under
+  -- '/usr/share/nvim/runtime/(indent|syntax)' and 'after/ftplugin'
+  local ft = vim.bo.filetype
+  vim.tbl_filter(function(s)
+    for _, e in ipairs({ "vim", "lua" }) do
+      if ft and #ft > 0 and s:match(("/%s.%s"):format(ft, e)) then
+        local file = vim.fn.expand(s:match("[^: ]*$"))
+        vim.cmd("source " .. file)
+        M.warn("RESOURCED " .. vim.fn.fnamemodify(file, ":."))
+        return s
+      end
+    end
+    return nil
+  end, vim.fn.split(vim.fn.execute("scriptnames"), "\n"))
+  -- remove last search highlight
+  vim.cmd("nohl")
+end
+
 return M

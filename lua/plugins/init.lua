@@ -9,13 +9,18 @@ local plugins = {
       configs.use_default({
         'lua',
       })
+      -- configs.python = {
+      --   cmd = 'black',
+      --   args = {},
+      --   find = false,
+      --   fname = true,
+      --   stdin = false,
+      --   do_not_need_stdout = true,
+      -- }
       configs.python = {
         cmd = 'black',
-        args = {},
-        find = false,
-        fname = true,
-        stdin = false,
-        do_not_need_stdout = true,
+        args = {'-'},
+        stdin = true,
       }
       configs.lua = {
         cmd = 'stylua',
@@ -105,7 +110,16 @@ local plugins = {
   {
     'lmburns/lf.nvim',
     cmd = 'Lf',
-    dependencies = { 'nvim-lua/plenary.nvim', 'akinsho/toggleterm.nvim' },
+    dependencies = { 
+      'nvim-lua/plenary.nvim', 
+      {
+        'akinsho/toggleterm.nvim',
+        cmd = 'ToggleTerm',
+        config = function ()
+          require("toggleterm").setup()
+        end
+      }
+    },
     opts = {
       winblend = 0,
       highlights = { NormalFloat = { guibg = 'NONE' } },

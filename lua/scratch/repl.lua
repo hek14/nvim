@@ -1,3 +1,9 @@
+-- refer to https://github.com/ibhagwan/nvim-lua/blob/main/lua/plugins/term/repl.lua
+-- and /Users/hk/contrib/tj_dots/xdg_config/nvim/lua/tj/repl.lua
+-- and /Users/hk/contrib/tj_dots/xdg_config/nvim/lua/scripts/repl.lua
+-- and /Users/hk/contrib/tj_dots/xdg_config/nvim/after/plugin/repl.lua
+
+
 local function ft_repl_cmd(ft)
   local repl_map = {
     ["lua"] = { "luap", "lua" },
@@ -69,7 +75,7 @@ end, { desc = "REPL send to terminal (line)" })
 vim.keymap.set({ "v" }, "gx", function()
   local mode = vim.fn.mode()
   if mode == "v" or mode == "V" or mode == "" then
-    local text = require "utils".get_visual_selection()
+    local text = require "core.utils".get_visual_selection()
     term_exec(text)
   end
 end, { desc = "REPL send to terminal (motion)" })

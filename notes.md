@@ -293,3 +293,29 @@ whether to use the "," mapping or the longer one.  To avoid this add the
 <nowait> argument.  Then the mapping will be used when it matches, Vim does
 not wait for more characters to be typed.  However, if the characters were
 already typed they are used.
+
+# termopen and chansend
+首先理解一下为什么termopen返回值会是一个channel-ID
+因为terminal在nvim中本质上就是一个buffer, 并不是真正的terminal,
+`:term` 打开一个terminal之后通过ps aux可以看到一个新的zsh进程.
+它本质上会spawn一个外部进程, 而这个buffer的作用就是send stdin, read stdout. 
+在一个terminal buffer `lua =vim.b.terminal_job_id` 可以看到它的channel-ID,
+通过`lua =vim.b.terminal_job_pid` 可以看到它的pid.
+example:
+1. `:terminal`
+2. focus into that buffer and `:lua =vim.b.terminal_job_id` -> channel-ID
+3. send something: `lua vim.fn.chansend(channel-ID,{'python\r\n'})`
+
+# mannually block
+```lua
+vim.wait(100, function()
+  return false
+end)
+```
+or `vim.loop.sleep(100)`
+
+# get the last changed/yanked position
+```lua
+local pos1 = vim.fn.getpos "'["
+local pos2 = vim.fn.getpos "']"
+```

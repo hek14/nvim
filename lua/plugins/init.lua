@@ -97,7 +97,7 @@ local plugins = {
   },
   {
     'RRethy/vim-tranquille',
-    lazy = false,
+    event = 'BufEnter',
     config = function()
       require('core.utils').map(
         'n',
@@ -328,10 +328,6 @@ local plugins = {
     init = function()
       require('core.utils').map('n', '<C-x>u', ':UndotreeToggle | UndotreeFocus<CR>')
     end,
-  },
-  {
-    'dstein64/vim-startuptime',
-    lazy = false,
   },
   {
     'tpope/vim-scriptease',

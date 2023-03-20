@@ -241,9 +241,20 @@ refresh = function(locations,prompt_bufnr,opts)
       results = locations,
       entry_maker = gen_lsp_and_ts_references(opts)
     },
+    -- attach_mappings = function(_, map)
+    --   map("i", "<C-r>", function(_prompt_bufnr)
+    --     refresh(locations, _prompt_bufnr, opts)
+    --   end)
+    --   return true
+    -- end,
     attach_mappings = function(_, map)
+      -- NOTE: why use this? because the dynamic finder will resolve the results once the prompt_buffer is changed, so we can simulate the user input to force the dynamic update
       map("i", "<C-r>", function(_prompt_bufnr)
-        refresh(locations, _prompt_bufnr, opts)
+        print("<C-r>called!!")
+        local dumb = 'nothing'
+        vim.api.nvim_feedkeys(dumb,'n',false)
+        local del_key = string.rep('<BS>',#dumb)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(del_key,true,false,true),'n',false)
       end)
       return true
     end,
@@ -299,6 +310,17 @@ M.references = function(opts)
         entry_maker = gen_lsp_and_ts_references(opts),
         fn = inject_ts_to_lsp_symbols(locations),
       },
+      attach_mappings = function(_, map)
+        -- NOTE: why use this? because the dynamic finder will resolve the results once the prompt_buffer is changed, so we can simulate the user input to force the dynamic update
+        map("i", "<C-r>", function(_prompt_bufnr)
+          print("<C-r>called!!")
+          local dumb = 'nothing'
+          vim.api.nvim_feedkeys(dumb,'n',false)
+          local del_key = string.rep('<BS>',#dumb)
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(del_key,true,false,true),'n',false)
+        end)
+        return true
+      end,
       previewer = conf.qflist_previewer(opts),
       sorter = conf.generic_sorter(opts),
       push_cursor_on_edit = true,

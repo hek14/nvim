@@ -245,7 +245,7 @@ function M:done()
   for i, c in ipairs(self.childs) do
     cnt = cnt + c:done()
   end
-  return cnt == #self.childs, cnt
+  return cnt == #self.childs, cnt/#self.childs
 end
 
 function M:with_output(cb,ratio)

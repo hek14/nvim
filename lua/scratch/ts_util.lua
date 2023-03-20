@@ -142,4 +142,42 @@ function M.get_data(bufnr,position)
   return context_str, flat_nodes
 end
 
+
+function M.goto_last_context(level)
+  local start_line = function(node) 
+    local row,_,_,_ = node:range()
+    return row + 1
+  end
+
+  local start_col = function(node) 
+    local _,col,_,_ = node:range()
+    return col
+  end
+
+  level = level and level or vim.v.count1
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local _,data = M.get_data(0,{cursor[1]-1,cursor[2]})
+  local index = #data-level+1
+  local target = data[index]
+  local curr = vim.api.nvim_win_get_cursor(0)
+  while target~=nil do
+    if start_line(target)<curr[1] then
+      break
+    elseif start_line(target)==curr[1] and start_col(target)<curr[2] then
+      break
+    end
+    index = index-1
+    target = data[index]
+  end
+
+  if target == nil then
+    return
+  end
+
+  vim.cmd("normal! m'")
+  vim.api.nvim_win_set_cursor(0,{start_line(target), start_col(target)})
+  vim.cmd("normal! zv")
+end
+
+
 return M

@@ -56,7 +56,9 @@ local M = {
       end,
     },
     {
-      'SmiteshP/nvim-navic',
+      'hek14/nvim-navic',
+      name = 'navic',
+      branch = 'refactor',
       config = function ()
         require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
       end
@@ -67,7 +69,7 @@ local M = {
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
       enabled = false,
-      dependencies = { 'SmiteshP/nvim-navic', 'nvim-tree/nvim-web-devicons' },
+      dependencies = { 'navic', 'nvim-tree/nvim-web-devicons' },
       name = "barbecue",
       opts = {},
     },

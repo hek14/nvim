@@ -205,6 +205,25 @@ function M:send(input)
       end
     end
   end
+  local timer = vim.loop.new_timer()
+  local start = vim.loop.hrtime()
+  local running = true
+  timer:start(50,50,function()
+    if not running then return end
+
+    local now = vim.loop.hrtime()
+    local done = self:done()
+    if done and not timer:is_closing() then
+      timer:stop()
+      timer:close()
+      running = false
+      log(fmt('M:send() %d items already done after: %dms ',#input,(now-start)/1e6))
+    else
+      if (now-start)/1e6 > 300 then
+        log(fmt('[bridge_ts_parser]: not done yet even after %dms',(now-start)/1e6))
+      end
+    end
+  end)
   -- log('all sent: ',all_sent,'total todo: ',total_data_cnt)
 end
 

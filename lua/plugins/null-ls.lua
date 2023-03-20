@@ -1,5 +1,6 @@
 local M = {
-  "jose-elias-alvarez/null-ls.nvim"
+  "jose-elias-alvarez/null-ls.nvim",
+  enabled = false,
 }
 function M.setup(options)
   local formatting = require("null-ls").builtins.formatting

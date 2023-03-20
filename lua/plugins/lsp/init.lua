@@ -313,7 +313,7 @@ function M.config()
     require('plugins.lsp.pylance_config')
     require('lspconfig').pylance.setup(pyright_opts)
   end
-  require("plugins.null-ls").setup()
+  -- require("plugins.null-ls").setup()
   require("plugins.lsp.diagnostics").setup()
 end
 return M

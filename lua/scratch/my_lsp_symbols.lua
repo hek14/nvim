@@ -15,7 +15,7 @@ local log = require('core.utils').log
 local fmt = string.format
 local treesitter_job = require('scratch.bridge_ts_parse')
 
-local function inject_ts_to_lsp_symbols(locations,f)
+local function inject_ts_to_lsp_symbols(locations,f,start)
   local cancel = function() end
   local ratio = 0.2
   for i, loc in ipairs(locations) do
@@ -26,13 +26,13 @@ local function inject_ts_to_lsp_symbols(locations,f)
     cancel()
     cancel = treesitter_job:with_output(tx,ratio)
     ratio = ratio + 0.1 <= 1.0 and ratio + 0.1 or 1.0
-    log(fmt('ratio: %s',ratio))
     local res = rx()
     if res then
-      log(fmt("done: %s",treesitter_job:done()))
       for i, loc in ipairs(locations) do
         loc.ts_info = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
       end
+      local done,done_ratio = treesitter_job:done()
+      log(fmt("my telescope LSP-TS %s done after: %dms",done_ratio,(vim.loop.hrtime()-start)/1e6))
     end
     return locations
   end
@@ -118,6 +118,7 @@ end
 
 
 M.lsp_symbols = function(opts)
+  local start = vim.loop.hrtime()
   opts = opts or {}
   local params = vim.lsp.util.make_position_params(opts.winnr)
   vim.lsp.buf_request(opts.bufnr, "textDocument/documentSymbol", params, function(err, result, _, _)
@@ -164,7 +165,7 @@ M.lsp_symbols = function(opts)
       prompt_title = "LSP Document Symbols",
       finder = finders.new_dynamic {
         entry_maker = gen_lsp_and_ts_symbols(opts),
-        fn = inject_ts_to_lsp_symbols(locations,f),
+        fn = inject_ts_to_lsp_symbols(locations,f,start),
       },
       previewer = conf.qflist_previewer(opts),
       sorter = conf.prefilter_sorter {
@@ -268,6 +269,7 @@ refresh = function(locations,prompt_bufnr,opts)
 end
 
 M.references = function(opts)
+  local start = vim.loop.hrtime()
   opts = opts or {bufnr = vim.api.nvim_get_current_buf(), winnr = vim.api.nvim_get_current_win()}
   local filepath = vim.api.nvim_buf_get_name(opts.bufnr)
   local lnum = vim.api.nvim_win_get_cursor(opts.winnr)[1]
@@ -308,7 +310,7 @@ M.references = function(opts)
       prompt_title = "LSP References with treesitter_job",
       finder = finders.new_dynamic {
         entry_maker = gen_lsp_and_ts_references(opts),
-        fn = inject_ts_to_lsp_symbols(locations),
+        fn = inject_ts_to_lsp_symbols(locations,nil,start),
       },
       attach_mappings = function(_, map)
         -- NOTE: why use this? because the dynamic finder will resolve the results once the prompt_buffer is changed, so we can simulate the user input to force the dynamic update

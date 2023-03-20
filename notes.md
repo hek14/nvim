@@ -242,13 +242,16 @@ end
 
 # closure usage
 why using closure? -- enclose some state
-closure有一个妙用, 比方说一个callback function 调用方固定了其输入参数只有一个, bufnr, 但是我想传入其他任意的参数怎么办呢?
-方法是利用closure wrapper
+closure can be seen as some kind of `function instantiate`, 因为利用closure return的function,
+除了它本身的输入参数之外, 还将closure的variable作为state. 这样可以在wrapper调用的时候存储一些信息 
+closure有一个妙用, 比方说一个callback function 调用方固定了其输入参数只有一个: bufnr
+但是我想传入其他任意的参数怎么办呢? 方法是利用closure wrapper
 来自 ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/builtin/__lsp.lua:
 ```lua
 local function get_workspace_symbols_requester(bufnr, opts)
   local cancel = function() end
 
+  --  bufnr, opts, cancel are the enclosed states of the returned function
   return function(prompt)
     local tx, rx = channel.oneshot()
     cancel()

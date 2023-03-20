@@ -243,7 +243,8 @@ end
 # closure usage
 why using closure? -- enclose some state
 closure can be seen as some kind of `function instantiate`, 因为利用closure return的function,
-除了它本身的输入参数之外, 还将closure的variable作为state. 这样可以在wrapper调用的时候存储一些信息 
+除了它本身的输入参数之外, 还将closure的variable作为state. 这样可以在wrapper调用的时候存储一些信息.
+可以认为是这个函数的实例化.
 closure有一个妙用, 比方说一个callback function 调用方固定了其输入参数只有一个: bufnr
 但是我想传入其他任意的参数怎么办呢? 方法是利用closure wrapper
 来自 ~/.local/share/nvim/lazy/telescope.nvim/lua/telescope/builtin/__lsp.lua:
@@ -322,3 +323,101 @@ or `vim.loop.sleep(100)`
 local pos1 = vim.fn.getpos "'["
 local pos2 = vim.fn.getpos "']"
 ```
+
+# to understand plenary async
+demo code: `~/.config/nvim/lua/scratch/test_plenary_async.lua`
+## async.wrap
+```lua
+M.wrap = function(func, argc)
+  local function leaf(...)
+    local nargs = select("#", ...)
+
+    if nargs == argc then
+      return func(...)
+    else
+      return co.yield(func, argc, ...)
+    end
+  end
+  return leaf
+end
+```
+这里将被wrap的function co.yield 出去了, 就要提到对于function的理解了:
+A function is just a chunk of codes/logic/statements about how to do something, 
+将function看成是一种特殊的callable data就行了
+那么这个 co.yield 的含义就明显了: 
+call leaf() will actually do nothing in this coroutine, 
+只是将 func(how to do it), argc(func所需参数个数), ...(调用的具体参数) yield出去,
+让主coroutine拿到, 至于拿到之后怎么处理那是外部协程的事情.
+
+## async.void and async.run (execute function)
+```lua
+local execute = function(async_function, callback, ...)
+  local thread = co.create(async_function)
+  local step
+  step = function(...)
+    callback_or_next(step, thread, callback, co.resume(thread, ...))
+  end
+  step(...)
+end
+M.void = function(func)
+  return function(...)
+    execute(func, nil, ...)
+  end
+end
+```
+```lua
+local wrapped = a.wrap(function(inc, callback)
+  stat = stat + inc
+  callback()
+end, 2)
+local voided = a.void(function(arg)
+  wrapped(1)
+  wrapped(2)
+  wrapped(3)
+  stat = stat + 1
+  saved_arg = arg
+end)
+voided "hello"
+```
+如何理解这段代码呢? -- 理解代码的最好方式就是用自己的方式改写, 改写的方式可以是将一些表达提取出来
+单独弄成变量. 例如:
+```lua
+local voided = a.void(function(arg)...)
+M.void = function(func)
+  local first_arg = func
+  return function(...) -- closure, this returned function has state: `first_arg` 
+    execute(first_arg,nil,...)
+  end
+end
+```
+这里的
+```lua
+function(arg)
+  wrapped(1)
+  wrapped(2)
+  wrapped(3)
+  stat = stat + 1
+  saved_arg = arg
+end
+```
+就是我们想要创建的协程(或者说another context), execute函数是我们的主协程. 
+在execute函数中, 我们首先创建了一个协程:
+```lua
+local thread = co.create(async_function)
+```
+然后定义了一个step函数. 这个step函数可以按照我的方式改写成: 
+```lua
+local func, argc, args = co.resume(thread,...)
+callback_or_next(step, thread, callback, func, argc, args)
+```
+为什么? 因为这个被创建的协程里头, 真正yield的点都被async.wrap起来了
+async.wrap返回的leaf函数的特点就是: 如果传入参数个数和定义这个async.wrap时的参数个数相等,
+那么直接在副协程里把func给call了. 如果不等的话, 就会把func(how to do),argc(参数个数),
+args(具体参数)给yield出去, 让主协程去做, 让主协程做的好处在于, func里面就能操纵主协程里面
+的变量了, 例如这里wrapped里面`stat = stat + inc`, 所以本质上这个wrapped函数就是主协程的callback,
+在副协程yield的时候执行.
+副协程还是要继续要, 怎么做呢? 将step作为callback传给被wrap的函数的最后一个参数, 而被wrap的函数也
+非常默契的在最后`callback()`了. 等同于调用step()
+
+**函数就是一种特殊的data, 甚至可以看成是一个引用, 什么引用? 指向一块代码(开头)的引用/地址而已
+call a func就是回到某一段代码的开端, 继续执行**

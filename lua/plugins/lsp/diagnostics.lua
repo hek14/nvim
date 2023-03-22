@@ -30,6 +30,12 @@ end
 
 
 local filter_rule_fn_lua = function (diagnostic,old_index,symbols)
+  if string.match(diagnostic.message, 'Undefined global.*') then
+    return false
+  end
+  if string.match(diagnostic.message, 'Undefined field.*') then
+    return false
+  end
   if string.match(diagnostic.message, 'Unused local.*') then
     return false
   end

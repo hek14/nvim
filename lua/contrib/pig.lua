@@ -364,6 +364,27 @@ M.next_ref_handler = function(label, result, ctx, config)
   return true
 end
 
+local filter_locations_by_treesitter = function(locations) 
+  if not locations or #locations <= 1 then return locations end
+  local is_function = false
+  local index = 1
+  for i, loc in ipairs(locations) do
+    local range = loc.range or loc.targetRange or loc.targetSelectionRange 
+    local bufnr = vim.uri_to_bufnr(loc.uri or loc.targetUri)
+    local caps = vim.treesitter.get_captures_at_pos(bufnr,range.start.line,range.start.character)
+    for _,cap in ipairs(caps) do
+      if cap.capture:match('function') then
+        is_function = true
+        index = i
+      end
+    end
+  end
+  if is_function then
+    locations = { locations[index] }
+  end
+  return locations
+end
+
 local extension_to_filetype = {
   ['lua'] = 'lua',
   ['py'] = 'python',
@@ -373,6 +394,9 @@ M.location_handler = function(label, result, ctx, config)
   local ft = vim.api.nvim_buf_get_option(ctx.bufnr, 'ft')
   local locations = vim.tbl_islist(result) and result or {result}
   local sorted_locations = sort_locations(locations)
+  if label == 'definition' then
+    sorted_locations = filter_locations_by_treesitter(locations)
+  end
   local groups = group_by_uri(sorted_locations)
   local inputs_for_treesitter = {}
   for i, g in ipairs(groups) do

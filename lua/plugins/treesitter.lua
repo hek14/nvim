@@ -23,7 +23,8 @@ local M = {
   end,
   dependencies = {
     {"nvim-treesitter/nvim-treesitter-textobjects"},
-    {"nvim-treesitter/nvim-treesitter-refactor"}, {"p00f/nvim-ts-rainbow"},
+    {"nvim-treesitter/nvim-treesitter-refactor"}, 
+    {"HiPhish/nvim-ts-rainbow2"},
     {"theHamsta/nvim-treesitter-pairs"},
     {
       "nvim-treesitter/playground",
@@ -81,8 +82,6 @@ function M.config()
     rainbow = {
       enable = true,
       -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
-      extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
-      max_file_lines = nil -- Do not enable for files with more than n lines, int
     },
     pairs = {
       enable = true,

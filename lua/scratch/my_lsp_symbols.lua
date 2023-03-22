@@ -22,17 +22,27 @@ local function inject_ts_to_lsp_symbols(locations,f,start)
     loc.ts_info = ""
   end
   return function(prompt)
+    log(fmt('prompt: %s',prompt))
     local tx, rx = channel.oneshot()
     cancel()
     cancel = treesitter_job:with_output(tx,ratio)
     ratio = ratio + 0.1 <= 1.0 and ratio + 0.1 or 1.0
-    local res = rx()
-    if res then
+    local res = rx(function(done_ratio)
+      -- if already sent, this function will be called just in here: coroutine
+      -- if not sent yet, this function will be registered into sender and called in the main by sender(callback of with_output)
+      local thread = coroutine.running()
+      if thread then
+        log('called from ',thread)
+      else
+        log('called from main')
+      end
       for i, loc in ipairs(locations) do
         loc.ts_info = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
       end
-      local done,done_ratio = treesitter_job:done()
       log(fmt("my telescope LSP-TS %s done after: %dms",done_ratio,(vim.loop.hrtime()-start)/1e6))
+    end)
+    if res then
+      cancel() -- avoid the sender get called multiple times
     end
     return locations
   end
@@ -159,31 +169,43 @@ M.lsp_symbols = function(opts)
     end
 
     treesitter_job:send(inputs_for_treesitter)
-    treesitter_job:with_output(function ()
-      opts.path_display = { "hidden" }
-      for i, loc in ipairs(locations) do
-        loc.ts_info = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
-      end
-      pickers
-      .new(opts, {
-        prompt_title = "LSP Document Symbols",
-        finder = finders.new_table {
-          results = locations,
-          entry_maker = gen_lsp_and_ts_symbols(opts)
+    pickers
+    .new(opts, {
+      prompt_title = "LSP Document Symbols",
+      finder = finders.new_dynamic {
+          entry_maker = gen_lsp_and_ts_symbols(opts),
+          fn = inject_ts_to_lsp_symbols(locations,f,start),
         },
-        -- finder = finders.new_dynamic {
-          --   entry_maker = gen_lsp_and_ts_symbols(opts),
-          --   fn = inject_ts_to_lsp_symbols(locations,f,start),
-          -- },
-          previewer = conf.qflist_previewer(opts),
-          sorter = conf.prefilter_sorter {
-            tag = "symbol_type",
-            sorter = conf.generic_sorter(opts),
-          },
-          push_cursor_on_edit = true,
-          push_tagstack_on_edit = true,
-        }):find()
-    end)
+        previewer = conf.qflist_previewer(opts),
+        sorter = conf.prefilter_sorter {
+          tag = "symbol_type",
+          sorter = conf.generic_sorter(opts),
+        },
+        push_cursor_on_edit = true,
+        push_tagstack_on_edit = true,
+      }):find()
+
+    -- treesitter_job:with_output(function ()
+    --   opts.path_display = { "hidden" }
+    --   for i, loc in ipairs(locations) do
+    --     loc.ts_info = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
+    --   end
+    --   pickers
+    --   .new(opts, {
+    --     prompt_title = "LSP Document Symbols",
+    --     finder = finders.new_table {
+    --       results = locations,
+    --       entry_maker = gen_lsp_and_ts_symbols(opts)
+    --     },
+    --       previewer = conf.qflist_previewer(opts),
+    --       sorter = conf.prefilter_sorter {
+    --         tag = "symbol_type",
+    --         sorter = conf.generic_sorter(opts),
+    --       },
+    --       push_cursor_on_edit = true,
+    --       push_tagstack_on_edit = true,
+    --     }):find()
+    -- end)
   end)
 end
 
@@ -314,56 +336,56 @@ M.references = function(opts)
     local start = vim.loop.hrtime()
     treesitter_job:send(inputs_for_treesitter)
 
-    -- pickers
-    -- .new(opts, {
-    --   prompt_title = "LSP References with treesitter_job",
-    --   finder = finders.new_dynamic {
-    --     entry_maker = gen_lsp_and_ts_references(opts),
-    --     fn = inject_ts_to_lsp_symbols(locations,nil,start),
-    --   },
-    --   attach_mappings = function(_, map)
-    --     -- NOTE: why use this? because the dynamic finder will resolve the results once the prompt_buffer is changed, so we can simulate the user input to force the dynamic update
-    --     map("i", "<C-r>", function(_prompt_bufnr)
-    --       print("<C-r>called!!")
-    --       local dumb = 'nothing'
-    --       vim.api.nvim_feedkeys(dumb,'n',false)
-    --       local del_key = string.rep('<BS>',#dumb)
-    --       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(del_key,true,false,true),'n',false)
-    --     end)
-    --     return true
-    --   end,
-    --   previewer = conf.qflist_previewer(opts),
-    --   sorter = conf.generic_sorter(opts),
-    --   push_cursor_on_edit = true,
-    --   push_tagstack_on_edit = true,
-    -- }):find()
+    pickers
+    .new(opts, {
+      prompt_title = "LSP References with treesitter_job",
+      finder = finders.new_dynamic {
+        entry_maker = gen_lsp_and_ts_references(opts),
+        fn = inject_ts_to_lsp_symbols(locations,nil,start),
+      },
+      attach_mappings = function(_, map)
+        -- NOTE: why use this? because the dynamic finder will resolve the results once the prompt_buffer is changed, so we can simulate the user input to force the dynamic update
+        map("i", "<C-r>", function(_prompt_bufnr)
+          print("<C-r>called!!")
+          local dumb = 'nothing'
+          vim.api.nvim_feedkeys(dumb,'n',false)
+          local del_key = string.rep('<BS>',#dumb)
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(del_key,true,false,true),'n',false)
+        end)
+        return true
+      end,
+      previewer = conf.qflist_previewer(opts),
+      sorter = conf.generic_sorter(opts),
+      push_cursor_on_edit = true,
+      push_tagstack_on_edit = true,
+    }):find()
 
-    local ratio
-    treesitter_job:with_output(function()
-      print(string.format('treesitter_job reference %d symbols spent time: %s ms',#locations,(vim.loop.hrtime()-start)/1000000))
-      for i, loc in ipairs(locations) do
-        loc.ts_info = treesitter_job:retrieve(loc.filename, {loc.lnum-1,loc.col-1})
-      end
-      pickers
-      .new(opts, {
-        prompt_title = "LSP References",
-        finder = finders.new_table {
-          results = locations,
-          entry_maker = gen_lsp_and_ts_references(opts)
-        },
-        attach_mappings = function(_, map)
-          map("i", "<C-r>", function(_prompt_bufnr)
-            refresh(locations, _prompt_bufnr, opts)
-          end)
-          return true
-        end,
-        previewer = conf.qflist_previewer(opts),
-        sorter = conf.generic_sorter(opts),
-        push_cursor_on_edit = true,
-        push_tagstack_on_edit = true,
-      })
-      :find()
-    end, ratio)
+    -- local ratio
+    -- treesitter_job:with_output(function()
+    --   print(string.format('treesitter_job reference %d symbols spent time: %s ms',#locations,(vim.loop.hrtime()-start)/1000000))
+    --   for i, loc in ipairs(locations) do
+    --     loc.ts_info = treesitter_job:retrieve(loc.filename, {loc.lnum-1,loc.col-1})
+    --   end
+    --   pickers
+    --   .new(opts, {
+    --     prompt_title = "LSP References",
+    --     finder = finders.new_table {
+    --       results = locations,
+    --       entry_maker = gen_lsp_and_ts_references(opts)
+    --     },
+    --     attach_mappings = function(_, map)
+    --       map("i", "<C-r>", function(_prompt_bufnr)
+    --         refresh(locations, _prompt_bufnr, opts)
+    --       end)
+    --       return true
+    --     end,
+    --     previewer = conf.qflist_previewer(opts),
+    --     sorter = conf.generic_sorter(opts),
+    --     push_cursor_on_edit = true,
+    --     push_tagstack_on_edit = true,
+    --   })
+    --   :find()
+    -- end, ratio)
   end)
 end
 

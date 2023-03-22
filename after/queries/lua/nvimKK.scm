@@ -19,6 +19,12 @@
 	(expression_list
 		value: (function_definition))) @scope-root)
 
+((assignment_statement
+	(variable_list
+		name: (dot_index_expression) @table-function)
+	(expression_list
+		value: (function_call))) @scope-root)
+
 ; Methods
 ((field
 	name: (identifier) @method-name

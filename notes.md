@@ -421,3 +421,32 @@ args(具体参数)给yield出去, 让主协程去做, 让主协程做的好处�
 
 **函数就是一种特殊的data, 甚至可以看成是一个引用, 什么引用? 指向一块代码(开头)的引用/地址而已
 call a func就是回到某一段代码的开端, 继续执行**
+
+# how to temporally disable a autocmd
+```lua
+vim.opt.eventignore:append({ 'FileType' })
+fn.bufload(bufnr)
+--restore eventignore
+vim.opt.eventignore:remove({ 'FileType' })
+```
+
+# how to debounce to avoid a function called very frequently?
+```lua
+local running = false
+function to_debounce()
+  if not running then
+    running = true -- NOTE: this is the point: set to true outside(not inside) of the timer
+    local timer = vim.loop.new_timer()
+    timer:start(debounce,0,vim.schedule_wrap(function()
+      running = false -- NOTE:reset false, so running will remain true for `debounce`ms
+    end)
+  end
+end
+```
+
+# defer_fn/schedule_wrap 的一个特点/使用误区
+被defer_fnwrap的function执行的理论时间是: 起始时间(vim.defer_fn call的时间)+defer的量.
+但是实际main loop 开始check的时候, 如果有积压的过时的deferred tasks, 它们不会再按照之前schedule的
+时间执行, 而是被一股脑扔出去, 只保留先后顺序, 不再保留彼此之间的interval
+这个really confusing, 但是也能理解: main loop不想欠东西, 有积压的就一并送出去
+详细的例子和注释见: ~/.config/nvim/lua/scratch/defer_fn_complex.lua

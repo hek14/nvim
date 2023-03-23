@@ -559,6 +559,25 @@ M.smart_current_dir = function()
 end
 
 
+function M.get_all_window_buffer_filetype()
+  local window_buffer_filetype = {}
+  local window_tables = vim.api.nvim_list_wins()
+
+  for _, window_id in ipairs(window_tables) do
+    if vim.api.nvim_win_is_valid(window_id) then
+      local bufnr = vim.api.nvim_win_get_buf(window_id)
+      table.insert(window_buffer_filetype, {
+        winnr = window_id,
+        bufnr = bufnr,
+        filetype = vim.api.nvim_buf_get_option(bufnr, "filetype"),
+      })
+    end
+  end
+
+  return window_buffer_filetype
+end
+
+
 M.close_float_window = function()
     for _, win in ipairs(vim.api.nvim_list_wins()) do
         local config = vim.api.nvim_win_get_config(win)

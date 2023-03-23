@@ -93,8 +93,54 @@ local function others()
   map("n", "<right>", "5<C-w>>")
   map("n", "<C-q>", [[:noh <Bar> :lua require('core.utils').close_float_window()<CR>]])
   map("n", "<Esc>", [[:noh<CR>]])
-  map("n", "<leader>mc", "<cmd>Messages clear<CR>")
-  map("n","<leader>mm","<Cmd>Messages<CR>")
+  map("n", "<leader>mc", function ()
+    local win_infos = require('core.utils').get_all_window_buffer_filetype()
+    local current_win = vim.api.nvim_get_current_win()
+    local messages_win
+    local found_message
+    for i, info in ipairs(win_infos) do
+      local ok,is_message = pcall(vim.api.nvim_buf_get_var,info.bufnr,'is_message')
+      -- I set this buf local var in plugin/scriptease.vim
+      if ok and is_message then
+        found_message = true
+        messages_win = info.winnr
+        break
+      end
+    end
+    if found_message then
+      pcall(vim.api.nvim_win_close,messages_win,true)
+      vim.cmd [[ Messages clear ]]
+      vim.cmd [[ Messages ]]
+      if messages_win~=current_win then
+        vim.api.nvim_set_current_win(current_win)
+      end
+    else
+      vim.cmd [[ Messages clear ]]
+    end
+  end)
+  map("n","<leader>mm",function ()
+    local win_infos = require('core.utils').get_all_window_buffer_filetype()
+    local current_win = vim.api.nvim_get_current_win()
+    local messages_win
+    local found_message
+    for i, info in ipairs(win_infos) do
+      local ok,is_message = pcall(vim.api.nvim_buf_get_var,info.bufnr,'is_message')
+      -- I set this buf local var in plugin/scriptease.vim
+      if ok and is_message then
+        found_message = true
+        messages_win = info.winnr
+        break
+      end
+    end
+    if found_message then
+      vim.cmd [[ Messages ]]
+      if messages_win~=current_win then
+        vim.api.nvim_set_current_win(current_win)
+      end
+    else
+      vim.cmd [[ Messages ]]
+    end   
+  end)
 
   ft_map({'lua','vim'}, "n", "<leader>so", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
   map("n","<leader>ls",":SymbolsOutline<CR>")

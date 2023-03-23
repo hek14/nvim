@@ -54,33 +54,15 @@ function M.goto_adjacent_usage(delta)
   ts_utils.goto_node(usages[target_index])
 end
 
-function M.get_all_window_buffer_filetype()
-    local window_buffer_filetype = {}
-    local window_tables = vim.api.nvim_list_wins()
-
-    for _, window_id in ipairs(window_tables) do
-        if vim.api.nvim_win_is_valid(window_id) then
-            local buffer_id = vim.api.nvim_win_get_buf(window_id)
-            table.insert(window_buffer_filetype, {
-                window_id = window_id,
-                buffer_id = buffer_id,
-                buffer_filetype = vim.api.nvim_buf_get_option(buffer_id, "filetype"),
-            })
-        end
-    end
-
-    return window_buffer_filetype
-end
-
 function M.scroll_docs_to_up(map)
   return function()
-    for _, opts in ipairs(M.get_all_window_buffer_filetype()) do
-      if vim.tbl_contains(vim.tbl_values({"lsp-hover","lsp-signature-help"}), opts.buffer_filetype) then
-        local window_height = vim.api.nvim_win_get_height(opts.window_id)
-        local cursor_line = vim.api.nvim_win_get_cursor(opts.window_id)[1]
-        local buffer_total_line = vim.api.nvim_buf_line_count(opts.buffer_id)
+    for _, opts in ipairs(require('core.utils').get_all_window_buffer_filetype()) do
+      if vim.tbl_contains(vim.tbl_values({"lsp-hover","lsp-signature-help"}), opts.filetype) then
+        local window_height = vim.api.nvim_win_get_height(opts.winnr)
+        local cursor_line = vim.api.nvim_win_get_cursor(opts.winnr)[1]
+        local buffer_total_line = vim.api.nvim_buf_line_count(opts.bufnr)
         ---@diagnostic disable-next-line: redundant-parameter
-        local win_first_line = vim.fn.line("w0", opts.window_id)
+        local win_first_line = vim.fn.line("w0", opts.winnr)
 
         if buffer_total_line <= window_height or cursor_line == 1 then
           vim.api.nvim_echo({ { "Can't scroll up", "MoreMsg" } }, false, {})
@@ -91,14 +73,14 @@ function M.scroll_docs_to_up(map)
 
         if cursor_line > win_first_line then
           if win_first_line - 5 > 1 then
-            vim.api.nvim_win_set_cursor(opts.window_id, { win_first_line - 5, 0 })
+            vim.api.nvim_win_set_cursor(opts.winnr, { win_first_line - 5, 0 })
           else
-            vim.api.nvim_win_set_cursor(opts.window_id, { 1, 0 })
+            vim.api.nvim_win_set_cursor(opts.winnr, { 1, 0 })
           end
         elseif cursor_line - 5 < 1 then
-          vim.api.nvim_win_set_cursor(opts.window_id, { 1, 0 })
+          vim.api.nvim_win_set_cursor(opts.winnr, { 1, 0 })
         else
-          vim.api.nvim_win_set_cursor(opts.window_id, { cursor_line - 5, 0 })
+          vim.api.nvim_win_set_cursor(opts.winnr, { cursor_line - 5, 0 })
         end
 
         vim.opt.scrolloff = 21
@@ -115,13 +97,13 @@ end
 
 function M.scroll_docs_to_down(map)
   return function()
-    for _, opts in ipairs(M.get_all_window_buffer_filetype()) do
-      if vim.tbl_contains(vim.tbl_values({"lsp-hover","lsp-signature-help"}), opts.buffer_filetype) then
-        local window_height = vim.api.nvim_win_get_height(opts.window_id)
-        local cursor_line = vim.api.nvim_win_get_cursor(opts.window_id)[1]
-        local buffer_total_line = vim.api.nvim_buf_line_count(opts.buffer_id)
+    for _, opts in ipairs(require('core.utils').get_all_window_buffer_filetype()) do
+      if vim.tbl_contains(vim.tbl_values({"lsp-hover","lsp-signature-help"}), opts.filetype) then
+        local window_height = vim.api.nvim_win_get_height(opts.winnr)
+        local cursor_line = vim.api.nvim_win_get_cursor(opts.winnr)[1]
+        local buffer_total_line = vim.api.nvim_buf_line_count(opts.bufnr)
         ---@diagnostic disable-next-line: redundant-parameter
-        local window_last_line = vim.fn.line("w$", opts.window_id)
+        local window_last_line = vim.fn.line("w$", opts.winnr)
 
         if buffer_total_line <= window_height or cursor_line == buffer_total_line then
           vim.api.nvim_echo({ { "Can't scroll down", "MoreMsg" } }, false, {})
@@ -132,14 +114,14 @@ function M.scroll_docs_to_down(map)
 
         if cursor_line < window_last_line then
           if window_last_line + 5 < buffer_total_line then
-            vim.api.nvim_win_set_cursor(opts.window_id, { window_last_line + 5, 0 })
+            vim.api.nvim_win_set_cursor(opts.winnr, { window_last_line + 5, 0 })
           else
-            vim.api.nvim_win_set_cursor(opts.window_id, { buffer_total_line, 0 })
+            vim.api.nvim_win_set_cursor(opts.winnr, { buffer_total_line, 0 })
           end
         elseif cursor_line + 5 >= buffer_total_line then
-          vim.api.nvim_win_set_cursor(opts.window_id, { buffer_total_line, 0 })
+          vim.api.nvim_win_set_cursor(opts.winnr, { buffer_total_line, 0 })
         else
-          vim.api.nvim_win_set_cursor(opts.window_id, { cursor_line + 5, 0 })
+          vim.api.nvim_win_set_cursor(opts.winnr, { cursor_line + 5, 0 })
         end
 
         vim.opt.scrolloff = 21

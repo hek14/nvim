@@ -587,17 +587,6 @@ M.close_float_window = function()
     end
 end
 
-M.my_print = function (...)
-    local objects = {}
-    for i = 1, select('#', ...) do
-        local v = select(i, ...)
-        table.insert(objects, vim.inspect(v))
-    end
-
-    print(table.concat(objects, '\n'))
-    return ...
-end
-
 M.range_search = function(pattern,_start,_end)
   if pattern == nil then
     pattern = vim.fn.input('Search pattern: ',vim.fn.expand('<cword>'))

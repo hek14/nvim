@@ -1,10 +1,10 @@
 return {
-  "glepnir/lspsaga.nvim",
-  enabled = false,
+  dir = '~/contrib/lspsaga.nvim',
+  enabled = true,
   event = "BufRead",
   config = function()
     require("lspsaga").setup({
-      symbol_in_winbar = { enable = true },
+      symbol_in_winbar = { enable = false },
       finder = {
         keys = {
           jump_to = 'p',

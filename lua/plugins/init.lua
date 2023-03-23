@@ -331,6 +331,7 @@ local plugins = {
   },
   {
     'tpope/vim-scriptease',
+    enabled = false,
     cmd = 'Messages',
   },
   { 'MunifTanjim/nui.nvim' },

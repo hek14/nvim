@@ -431,6 +431,7 @@ vim.opt.eventignore:remove({ 'FileType' })
 ```
 
 # how to debounce to avoid a function called very frequently?
+可以用下面的, 也可以用telescope/debounce.lua中的
 ```lua
 local running = false
 function to_debounce()

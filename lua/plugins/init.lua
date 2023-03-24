@@ -37,12 +37,15 @@ local plugins = {
   },
   {
     'SmiteshP/nvim-gps',
-    lazy = false,
+    keys = {
+      {
+        ',w',function()
+          vim.pretty_print(require('nvim-gps').get_location())
+        end
+      }
+    },
     config = function()
       require('nvim-gps').setup()
-      vim.keymap.set('n', ',w', function()
-        vim.pretty_print(require('nvim-gps').get_location())
-      end)
     end,
   },
   {
@@ -416,8 +419,14 @@ local plugins = {
   },
   {
     'ahmedkhalf/project.nvim',
+    keys = {
+      { "<leader>fp", function ()
+        require('telescope').load_extension('projects')
+        require'telescope'.extensions.projects.projects{}
+        -- vim.cmd [[ Telescope projects ]] 
+      end
+    }},
     name = 'project.nvim',
-    lazy = false,
     config = function()
       require('project_nvim').setup({
         manual_mode = false,
@@ -443,6 +452,14 @@ local plugins = {
       })
       -- NOTE: important: just change root per window
       vim.cmd([[autocmd WinEnter * ++nested lua require("project_nvim.project").on_buf_enter()]])
+      vim.wait(5, function ()
+        return false
+      end)
+      -- NOTE: why do this here? 
+      -- the projects are read in the source code: project.lua -> M.init() -> history.read_projects_from_history() -> uv.fs_read(history_file), this is a async callback!
+      -- which means it will not be executed immediately, so when we first call [[Telescope projects]]
+      -- it will call this config part first, `config` will load project and *schedule* the read_projects_from_history, but the project lists are empty right now. 
+      -- we can use vim.wait to sync the callback, see notes.md
     end,
   },
   {

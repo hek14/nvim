@@ -311,13 +311,63 @@ example:
 2. focus into that buffer and `:lua =vim.b.terminal_job_id` -> channel-ID
 3. send something: `lua vim.fn.chansend(channel-ID,{'python\r\n'})`
 
-# mannually block
+# vim.wait is not the same with vim.loop.sleep !!!
+vim.wait 有一个作用是: sync scheduled tasks, vim.loop.sleep则没有这个作用
+原理是: vim.wait只会block当前的context, 从当前context抽离,
+但是"vim.wait allowing other events to process".
+所以main loop就能check此前schedule过的tasks
+而vim.loop.sleep 会让 main loop stop any processing, 包括autocmd,
+包括其他脚本schedule的callback, 需要用sleep的case很少.
+## example 1
 ```lua
-vim.wait(100, function()
+vim.defer_fn(function ()
+  print('2',vim.loop.now()) 
+end,1000) -- tell main loop to schedule a task in future
+print('1',vim.loop.now())
+vim.wait(3000,function () 
+  -- stop the current context(source file),
+  -- then main loop will check other contexts
+  -- one of these contexts is execute scheduled/due tasks at current timestamp
+  -- the above task is due, so it will be executed
+  return false
+end) 
+-- 换成vim.loop.sleep(3000), 效果会是: 1 3 2
+print('3',vim.loop.now())
+-- the result is: 1 2 3
+```
+原理是啥? 
+我们知道: vim.schedule_wrap/defer_fn是挂一个deferred task, 
+这个task必须等current context结束之后才被check并执行. 这个原则把握住. 
+所谓的当前context是什么? 就是`:so %` -> source/execute current file
+使用`vim.wait`会block当前`execute current file`这个context, 从而
+main loop能够处理其他的context, 这些其他的context中就包括了: 
+execute any scheduled(and due) tasks, 所以defer_fn的task被执行了.
+
+## example 2
+use vim.wait to sync uv.fs_read
+```lua
+local uv = vim.loop
+print('start read at: ',vim.loop.now())
+uv.fs_open('/home/heke/codes_med33/Phase_Correlation/test_rotate.py', 'r', 438, function(_,fd)
+  if fd ~= nil then
+    uv.fs_fstat(fd, function(_, stat)
+      if stat ~= nil then
+        uv.fs_read(fd, stat.size, -1, function(_, data)
+          uv.fs_close(fd, function(_, _) end)
+          print('fs_read finish at: ',vim.loop.now())
+          -- vim.pretty_print(data)
+        end)
+      end
+    end)
+  end
+end)
+print('main context continue, before wait',vim.loop.now())
+-- vim.loop.sleep(5)
+vim.wait(5,function ()
   return false
 end)
+print('after wait: ',vim.loop.now())
 ```
-or `vim.loop.sleep(100)`
 
 # get the last changed/yanked position
 ```lua

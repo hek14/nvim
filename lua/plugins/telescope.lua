@@ -19,7 +19,6 @@ local M = {
     { "<leader>fw", "<Cmd>Telescope live_grep_args<CR>"},
     { "<leader>f/", "<cmd>lua require('core.utils').grep_last_search()<CR>" },
     { "<leader><leader>w", "<Cmd>lua require('telescope.builtin').grep_string()<CR>"},
-    { "<leader>fp", "<cmd>Telescope projects<CR>"},
     { "<leader>z", ":Telescope zoxide list<CR>" },
     { "<leader>sd", function ()
       require('telescope.builtin').live_grep({
@@ -30,9 +29,6 @@ local M = {
   dependencies = {
     {
       "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
-    },
-    {
-      "project.nvim"
     },
     {
       'nvim-telescope/telescope-live-grep-args.nvim',
@@ -231,7 +227,7 @@ function M.config()
   -- options.defaults = require('telescope.themes').get_ivy(options.defaults)
   telescope.setup(options)
   local extensions = {
-    "bookmarks", "projects", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf","conda"
+    "bookmarks", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf","conda"
   }
   for _, ext in ipairs(extensions) do telescope.load_extension(ext) end
 end

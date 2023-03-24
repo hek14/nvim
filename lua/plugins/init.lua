@@ -580,33 +580,26 @@ local plugins = {
       })
     end,
   },
+  { 'kdheepak/cmp-latex-symbols' },
+  {
+    'lervag/vimtex',
+    ft = 'tex',
+    init = function()
+      vim.g.vimtex_motion_enabled = 0
+    end,
+    config = function()
+      vim.g.vimtex_view_method = 'skim'
+      vim.cmd([[
+      let maplocalleader = ","
+      ]])
+    end,
+  },
+  {
+    'rhysd/vim-grammarous',
+    enabled = false, -- very hard to : cannot ignore the latex keywords
+    init = function()
+      vim.g['grammarous#languagetool_cmd'] = 'languagetool -l en-US'
+    end,
+  },
 }
-local specific_plugins = {}
-local is_mac = vim.loop.os_uname().sysname == 'Darwin'
-if is_mac then
-  specific_plugins = {
-    { 'kdheepak/cmp-latex-symbols' },
-    {
-      'lervag/vimtex',
-      ft = 'tex',
-      init = function()
-        vim.g.vimtex_motion_enabled = 0
-      end,
-      config = function()
-        vim.g.vimtex_view_method = 'skim'
-        vim.cmd([[
-        let maplocalleader = ","
-        ]])
-      end,
-    },
-    {
-      'rhysd/vim-grammarous',
-      enabled = false, -- very hard to : cannot ignore the latex keywords
-      init = function()
-        vim.g['grammarous#languagetool_cmd'] = 'languagetool -l en-US'
-      end,
-    },
-  }
-end
-plugins = vim.list_extend(plugins, specific_plugins)
 return plugins

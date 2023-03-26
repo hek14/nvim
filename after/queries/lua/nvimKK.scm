@@ -34,6 +34,9 @@
 	name: (string) @string-method
 	value: (function_definition)) @scope-root)
 
+((function_declaration
+   name: (method_index_expression) @method-name) @scope-root)
+
 ; Tables
 ((assignment_statement
 	(variable_list

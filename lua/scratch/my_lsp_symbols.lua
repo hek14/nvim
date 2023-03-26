@@ -22,7 +22,6 @@ local function inject_ts_to_lsp_symbols(locations,f,start)
     loc.ts_info = ""
   end
   return function(prompt)
-    log(fmt('prompt: %s',prompt))
     local tx, rx = channel.oneshot()
     cancel()
     cancel = treesitter_job:with_output(tx,ratio)
@@ -39,7 +38,7 @@ local function inject_ts_to_lsp_symbols(locations,f,start)
       for i, loc in ipairs(locations) do
         loc.ts_info = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
       end
-      log(fmt("my telescope LSP-TS %s done after: %dms",done_ratio,(vim.loop.hrtime()-start)/1e6))
+      -- log(fmt("my telescope LSP-TS %s done after: %dms",done_ratio,(vim.loop.hrtime()-start)/1e6))
     end)
     if res then
       cancel() -- avoid the sender get called multiple times

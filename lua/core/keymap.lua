@@ -267,7 +267,7 @@ end
 
 others()
 colemak()
-vim.cmd [[
-  nnoremap n gj
-  nnoremap e gk
-]]
+map("n", "H","^")
+map("n", "I","g_")
+map("x", "H","^")
+map("x", "I","g_")

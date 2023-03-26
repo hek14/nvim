@@ -14,6 +14,15 @@ local find_the_last_underline_before_loc = function(str,before_loc)
 end
 
 M.get_sub_word = function ()
+  vim.cmd [[set iskeyword-=_]]
+  vim.schedule(function ()
+    vim.cmd [[set iskeyword+=_]] 
+  end)
+  local word = vim.fn.expand('<cword>')
+  return word
+end
+
+M.get_sub_word_2 = function ()
   local word = vim.fn.expand('<cword>')
   local loc = vim.api.nvim_win_get_cursor(0)
   local col = loc[2]

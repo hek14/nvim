@@ -72,9 +72,11 @@ for capture_ID, node, metadata in query:iter_captures(tree:root(), bufnr, first,
 end
 ```
 # others
-`vim.treesitter.get_captures_at_pos(bufnr, row, col)` to get the capture information
+- `vim.treesitter.get_captures_at_pos(bufnr, row, col)` to get the capture information
 what is capture???
 see `/Users/hk/github/nvim-treesitter/queries/lua/highlights.scm` for example
 一个位置可能同时match多个结构(pattern), 而且不同的scm文件会定义自己的patterns,
 每一个匹配会给当前位置一个capture(就是@符号后面的name), 比方`@field`, `@variable`
 这就是capture
+
+- `require('nvim-treesitter.parsers').ft_to_lang`

@@ -43,6 +43,27 @@ local new_watcher = function(path,cb_modified,cb_err)
   return timer,cancel
 end
 
+local new_watcher_try = function(path,cb_modified,cb_err)
+  -- BUG: only file changes made externally can trigger the event callback?
+  local event = vim.loop.new_fs_event()
+  if event == nil then
+    return
+  end
+  event:start(path, {}, vim.schedule_wrap(function(err, _, events)
+    if err ~= nil then
+      cb_err(path)
+      return
+    end
+    if events["change"] then
+      cb_modified(path,vim.loop.fs_stat(path).mtime.nsec)
+    end
+  end))
+  local cancel = function ()
+    event:stop()
+  end
+  return event,cancel
+end
+
 M.remove_watcher = function(path)
   if file_watchers[path] then 
     file_watchers[path].cancel()
@@ -63,9 +84,10 @@ M.add_watcher = function(path,cb_modified,cb_err)
   end
   local timer,cancel = new_watcher(path,cb_modified,cb_err or default_cb_err)
   file_watchers[path] = {timer=timer,cancel=cancel,id=timer_id}
+  timer_id = timer_id + 1
   -- log('add, current watchers: ')
 end
 
-M.timers = file_watchers
+M.internal = file_watchers
 
 return M

@@ -369,6 +369,19 @@ end)
 print('after wait: ',vim.loop.now())
 ```
 
+## example 3: fix project.nvim load problem in lazy
+在lazy.nvim中, 如果指定一个plugin是通过`keys = {{',x',function() end}}`方式加载,
+那么首次加载时真实发生的事情是: 首先加载该插件, 然后run它的`config = function() xxx end`
+最后run刚才keys中`,x`指定的那个function, 后续所有的`,x`则不会再运行config部分.
+问题是有一些插件在它们的`require("xxx").setup()`中会使用`vim.schedule`, 那么奇怪的事情会
+发生: 第一次`,x`会失效, 这是因为: 第一次加载时, `config = function() end` 和
+`,x`指定的那个函数被连着运行, 当成一个context, 而config部分调用的setup被当成了deferred
+task, 它会在keys部分运行完之后, 即整个context结束之后才能开始运行. 
+此时需要`vim.wait`放在config中来插在config和keys中间, 让main loop 暂时config部分,
+把刚才`require('xxx').setup`这个scheduled task做完.再回到config -> keys.
+我写了一个testplugin('~/contrib/testplugin') 来方便展示. 困扰很久的`project.nvim` lazy load
+的问题也是这么解决的(commit SHA: 5ab3d7edf2052324071609724309403e61e91882)
+
 # get the last changed/yanked position
 ```lua
 local pos1 = vim.fn.getpos "'["
@@ -502,3 +515,45 @@ end
 时间执行, 而是被一股脑扔出去, 只保留先后顺序, 不再保留彼此之间的interval
 这个really confusing, 但是也能理解: main loop不想欠东西, 有积压的就一并送出去
 详细的例子和注释见: ~/.config/nvim/lua/scratch/defer_fn_complex.lua
+
+# vim.fn.search('nvim')
+
+# use vim in pipeline
+- `ls -1 | nvim -`
+- `nvim - <<(ls -1)`
+- `nvim - <<<"here string"`
+这里`nvim -`是指定nvim to read from stdin instead of reading a file.
+`<<(command)` 同样的作用
+而 `|` 则是重定向stdout of last command to the latter command's stdin 
+`<<<"here string"`则是将一个string作为stdin
+
+# filter -- use external program to insert text
+`:help filter`
+filter的standard input从motion/range/visual来, 然后将其standard output
+transform到当前buffer.
+- example 1: 
+打开任意一个buffer, 输入以下文本, 选中, 然后`:'<,'>!python` 
+```python
+for i in range(0,10):
+  print(f"map_{i}")
+```
+这个trick用来输入一些很有规律的文本时很有用
+- example 2:
+select the `import xxx`statements, and then `:'<,'>!sort`就能sort import语句了
+
+# 制作comment文本框
+```text
+# this is a comment line
+```
+以上文本想变成下面:
+```text
+************************
+# this is a comment line this
+************************
+```
+可以这么干: 复制两遍, 然后select a line, `r*` 关键就是利用visual mode下的`r`replace
+
+# submatch and `&`
+在替换的时候, 可以:
+- `s/xyz/&_list/g` 用&来替代匹配中的部分
+- `s/xyz/\=submatch(0) . "_list"/g` 这里用\=submatch来进行同样的操作 

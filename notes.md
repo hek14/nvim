@@ -557,3 +557,9 @@ select the `import xxx`statements, and then `:'<,'>!sort`就能sort import语句
 在替换的时候, 可以:
 - `s/xyz/&_list/g` 用&来替代匹配中的部分
 - `s/xyz/\=submatch(0) . "_list"/g` 这里用\=submatch来进行同样的操作 
+
+# add match pattern highlight
+`:help match-highlight`
+`:match Visual /pattern/`
+how to clear the last highlight: 
+`:match none`

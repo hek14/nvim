@@ -419,6 +419,7 @@ local plugins = {
   },
   {
     'ahmedkhalf/project.nvim',
+    event = "VeryLazy",
     keys = {
       { "<leader>fp", function ()
         require('telescope').load_extension('projects')

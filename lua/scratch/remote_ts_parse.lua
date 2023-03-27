@@ -38,10 +38,13 @@ local reload_and_reparse_file = function(item)
   local bufnr = vim.fn.bufnr(item.file) -- will return the existed bufnr if opened before
 
   -- NOTE: should set the filetype manually for treesitter parse, because we use noautocmd
-  pcall(vim.api.nvim_buf_set_option,bufnr,'filetype',item.filetype)
+  local ok, _ = pcall(vim.api.nvim_buf_set_option,bufnr,'filetype',item.filetype)
+  if not ok then
+    log("cannot set filetyte")
+  end
   local filelang = ts_parsers.ft_to_lang(item.filetype)
   local parser = ts_parsers.get_parser(bufnr, filelang)
-  parser:parse() -- NOTE: very important to attach a parser to this bufnr
+  local tree = parser:parse() -- NOTE: very important to attach a parser to this bufnr
   -- log('file reloaded! ',item.file)
   reset_file_data(item.file,item.filetick,bufnr,item.filetype)
 end
@@ -158,7 +161,7 @@ local parse = function(input)
     if not vim.tbl_contains(fail_parse_keys, file_pos_key) then
       local ok,value = pcall(update_parse_results,item)
       if not ok then
-        -- log("cannot parse item",item)
+        log("cannot parse item",value)
         set_file_pos_result(item.file,item.position,'parse_error')
       else
         set_file_pos_result(item.file,item.position,value)

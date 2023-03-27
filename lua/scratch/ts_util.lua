@@ -55,9 +55,63 @@ local function default_transform(capture_name, capture_text)
   }
 end
 
+function M.get_root_for_position(line, col, root_lang_tree)
+  if not root_lang_tree then
+    if not ts_parsers.has_parser() then
+      return
+    end
+
+    root_lang_tree = ts_parsers.get_parser()
+  end
+
+  local lang_tree = root_lang_tree:language_for_range { line, col, line, col }
+
+  for _, tree in ipairs(lang_tree:trees()) do
+    local root = tree:root()
+
+    if root and vim.treesitter.is_in_node_range(root, line, col) then
+      return root, tree, lang_tree
+    end
+  end
+
+  -- This isn't a likely scenario, since the position must belong to a tree somewhere.
+  return nil, nil, lang_tree
+end
+
+function M.get_node_at_cursor(buf, cursor_range, ignore_injected_langs)
+  local root_lang_tree = ts_parsers.get_parser(buf)
+  if not root_lang_tree then
+    return
+  end
+
+  local root
+  if ignore_injected_langs then
+    for _, tree in ipairs(root_lang_tree:trees()) do
+      local tree_root = tree:root()
+      if tree_root and vim.treesitter.is_in_node_range(tree_root, cursor_range[1], cursor_range[2]) then
+        root = tree_root
+        break
+      end
+    end
+  else
+    root = M.get_root_for_position(cursor_range[1], cursor_range[2], root_lang_tree)
+  end
+
+  if not root then
+    return
+  end
+
+  return root:named_descendant_for_range(cursor_range[1], cursor_range[2], cursor_range[1], cursor_range[2])
+end
+
 function M.get_data(bufnr,position)
-  local node = vim.treesitter.get_node_at_pos(bufnr,position[1],position[2])
+  -- local node = vim.treesitter.get_node_at_pos(bufnr,position[1],position[2])
+  local node = M.get_node_at_cursor(bufnr,position)
   local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+  if ft == 'tex' then
+    -- FIX: important fix for latex
+    ft = 'latex'
+  end
   local node_data = {}
   local nodes = {}
   local function add_node_data(pos, capture_name, capture_node)

@@ -511,9 +511,9 @@ M.clear_log = function ()
   vim.fn.system('echo > ' .. log_path)
 end
 
+local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/kk_debug.log"
 M.log = function (...)
   local start = vim.loop.hrtime()
-  local log_path = vim.fn.expand("$HOME") .. "/.cache/nvim/kk_debug.log"
   local str = "שׁ "
   local lineinfo = ''
 

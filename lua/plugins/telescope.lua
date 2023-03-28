@@ -144,7 +144,8 @@ function M.config()
       },
     },
     defaults = {
-      layout_strategy = vim.loop.os_uname().sysname=='Linux' and 'vertical' or 'horizontal',
+      -- layout_strategy = vim.loop.os_uname().sysname=='Linux' and 'vertical' or 'horizontal',
+      layout_strategy = 'vertical',
       layout_config = { height = 0.8 },
       mappings = {
         i = {

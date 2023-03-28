@@ -604,6 +604,7 @@ local plugins = {
     ft = 'tex',
     init = function()
       vim.g.vimtex_motion_enabled = 0
+      vim.g.vimtex_text_obj_enabled = 0
     end,
     config = function()
       vim.g.vimtex_view_method = 'skim'

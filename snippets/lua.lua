@@ -1,5 +1,14 @@
 return {
   -- e.g. local bar = require("foo.bar")
+  s('pp',fmt([[
+  vim.pretty_print("{}: ",{}{})
+  ]],{
+    f(function(args,_,_)
+      return args[1][1]
+    end,{1}),
+    i(1,'variable'),
+    i(0)
+  })),
   s(
     'require',
     fmt([[local {} = require("{}")]], {

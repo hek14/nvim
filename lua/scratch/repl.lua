@@ -48,7 +48,7 @@ local function ft_repl_cmd(ft)
 end
 
 local function term_exec(cmd, id)
-  if not id or id < 1 then id = 1 end
+  if not id or id < 1 then id = 1 end -- NOTE: default terminal 1
   local terminal = require("toggleterm")
   local terms = require("toggleterm.terminal").get_all()
   local term_init = false
@@ -74,9 +74,14 @@ end, { desc = "REPL send to terminal (line)" })
 
 vim.keymap.set({ "v" }, "gx", function()
   local mode = vim.fn.mode()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local filetype = vim.api.nvim_buf_get_option(bufnr,'filetype')
   if mode == "v" or mode == "V" or mode == "" then
     local text = require "core.utils".get_visual_selection()
     term_exec(text)
+    if filetype == 'python' then
+      term_exec("\n")
+    end
   end
 end, { desc = "REPL send to terminal (motion)" })
 

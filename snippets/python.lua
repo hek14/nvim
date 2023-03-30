@@ -21,13 +21,22 @@ local search_line = function(line)
 end
 
 return {
+  s('##',fmt([[
+  {}
+  # {}
+  ]],{
+    f(function(args,_,user_args)
+      return string.rep('#',#args[1][1]+2)
+    end,{1}),
+    i(1,"section"),
+  })),
   s('pp',fmt([[
   print("{}: ",{}{})
   ]],{
-    i(1,'variable'),
     f(function(args,_,_)
       return args[1][1]
     end,{1}),
+    i(1,'variable'),
     i(0)
   })),
   s("cpu",{

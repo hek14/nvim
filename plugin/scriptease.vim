@@ -10,6 +10,10 @@ function! scriptease#capture(excmd) abort
   return out
 endfunction
 
+function! s:filereadable(path) abort
+  return s:fcall('filereadable', a:path)
+endfunction
+
 function! scriptease#messages_command(bang, count, arg) abort
   let command = (a:count > -1 ? a:count : '') . 'messages'
   if !empty(a:arg)

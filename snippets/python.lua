@@ -1,3 +1,4 @@
+---@diagnostic disable:  undefined-global
 local rep = require("luasnip.extras").rep
 local line_replace = function(args,_,user_arg_1)
   local og_line = args[1][1]

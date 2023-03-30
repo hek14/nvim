@@ -1,3 +1,4 @@
+---@diagnostic disable:  undefined-global
 return {
   -- e.g. local bar = require("foo.bar")
   s('pp',fmt([[

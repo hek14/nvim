@@ -1,3 +1,4 @@
+---@diagnostic disable:  undefined-global
 local date = function() return {os.date('%Y-%m-%d')} end
 return {
   s("date",{

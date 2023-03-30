@@ -24,10 +24,10 @@ return {
   s('pp',fmt([[
   print("{}: ",{}{})
   ]],{
-    i(1,'variable'),
     f(function(args,_,_)
       return args[1][1]
     end,{1}),
+    i(1,'variable'),
     i(0)
   })),
   s("cpu",{

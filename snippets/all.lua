@@ -1,14 +1,5 @@
 local date = function() return {os.date('%Y-%m-%d')} end
 return {
-  s('pp',fmt([[
-  vim.pretty_print("{}: ",{}{})
-  ]],{
-    i(1,'variable'),
-    f(function(args,_,_)
-      return args[1][1]
-    end,{1}),
-    i(0)
-  })),
   s("date",{
     f(date,{})
   }),

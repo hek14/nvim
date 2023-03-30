@@ -21,6 +21,15 @@ local search_line = function(line)
 end
 
 return {
+  s('##',fmt([[
+  {}
+  # {}
+  ]],{
+    f(function(args,_,user_args)
+      return string.rep('#',#args[1][1]+2)
+    end,{1}),
+    i(1,"section"),
+  })),
   s('pp',fmt([[
   print("{}: ",{}{})
   ]],{

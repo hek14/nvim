@@ -61,6 +61,7 @@ local function others()
 
   map("n", ',s',require('core.utils').ScopeSearch)
   map("x", ',s',require('core.utils').ScopeSearch)
+  map('n', ',l',require('scratch.telescope_list_sections').list_section)
 
   map("n", "<leadr>ts", [[ :keeppatterns<Bar>:%s/\s\+$//e<CR> ]] )
   cmd [[ command! DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]

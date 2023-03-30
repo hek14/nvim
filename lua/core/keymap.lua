@@ -73,6 +73,10 @@ local function others()
   map("t", "<C-w>n", "<C-\\><C-n><C-w>j")
   map("t", "<C-w>e", "<C-\\><C-n><C-w>k")
   map("t", "<C-w>i", "<C-\\><C-n><C-w>l")
+  vim.cmd [[tmap <C-up> jj<C-up>]]
+  vim.cmd [[tmap <C-down> jj<C-down>]]
+  vim.cmd [[tmap <C-left> jj<C-left>]]
+  vim.cmd [[tmap <C-right> jj<C-right>]]
   map("t", "<S-Space>", "<Space>",{noremap=true})
   map("t", "jj" , "<C-\\><C-n>")
   local keycode = function (key)

@@ -186,4 +186,16 @@ M.ft_map = function(ft,mode,lhs,rhs,opts)
     pattern=ft})
 end
 
+M.au('TermOpen',{
+  pattern = 'term://*toggleterm#*',
+  callback = function ()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local bufname = vim.api.nvim_buf_get_name(bufnr)
+    local id = string.match(bufname,'#%d+$')
+    id = string.sub(id,2)
+    local value = '%#Visual' .. string.format([[#  id: %s]],id) .. '%X'
+    local status_ok, _ = pcall(vim.api.nvim_set_option_value, "winbar", value, { scope = "local" })
+  end
+})
+
 return M

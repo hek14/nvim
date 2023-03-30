@@ -48,7 +48,7 @@ local function ft_repl_cmd(ft)
 end
 
 local function term_exec(cmd, id)
-  if not id or id < 1 then id = 1 end
+  if not id or id < 1 then id = 1 end -- NOTE: default terminal 1
   local terminal = require("toggleterm")
   local terms = require("toggleterm.terminal").get_all()
   local term_init = false

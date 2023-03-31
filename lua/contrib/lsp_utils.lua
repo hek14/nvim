@@ -23,6 +23,16 @@ local function before(r1, r2)
   return false
 end
 
+local index_of = function (t,v)
+  local found
+  for i, elem in ipairs(t) do
+    if vim.deep_equal(elem, v) then
+      found = i
+      break
+    end
+  end
+  return found
+end
 
 local function goto_adjent_reference_fallback(opt)
   vim.api.nvim_echo({{"builtin keywords"}},true,{})
@@ -44,7 +54,7 @@ function M.goto_adjacent_usage(delta)
   local def_node, scope = ts_locals.find_definition(node_at_point, bufnr)
   local usages = ts_locals.find_usages(def_node, scope, bufnr)
 
-  local index = utils.index_of(usages, node_at_point)
+  local index = index_of(usages, node_at_point)
   if not index then
     goto_adjent_reference_fallback(opt)
     return

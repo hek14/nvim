@@ -10,6 +10,15 @@ function! scriptease#capture(excmd) abort
   return out
 endfunction
 
+function! s:fcall(fn, path, ...) abort
+  let ns = matchstr(a:path, '^\a\a\+\ze:')
+  if len(ns) && exists('*' . ns . '#' . a:fn)
+    return call(ns . '#' . a:fn, [a:path] + a:000)
+  else
+    return call(a:fn, [a:path] + a:000)
+  endif
+endfunction
+
 function! s:filereadable(path) abort
   return s:fcall('filereadable', a:path)
 endfunction

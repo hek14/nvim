@@ -181,7 +181,8 @@ relations with bufnr:
 8. 以'2023.2.30'版本为例: 
 8.1. 定位报错的message, 这个要首先通过`node server.bundle.js --stdio`看原本的message, 然后搜索里面的部分关键词 
 2023.2.30版本 [25872-26003]行其实就是`node server.bundle.js --stdio`报的那些错, 
-8.2. 找到一个这样的结构:
+NOTE: 通过搜索 `^ *".*" *+`, 找到大量连着的这个pattern, 就是这个报错message所在的位置.
+8.2. '/for (const' 找到一个这样的结构:
 ```node.js
           (function () {
             const _0x3bbf32 = _0x561cbb;
@@ -203,6 +204,7 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.2.43: line 23401
 2023.3.11: line 23431
 2023.3.20: line 26940
+2023.3.40: line 23878
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`

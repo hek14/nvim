@@ -1,5 +1,9 @@
 local plugins = {
   {
+    'tpope/vim-fugitive',
+    cmd = {'Git', 'Gedit','Gdiffsplit','Gread','Gwrite','Ggrep','GMove','GDelete','GBrowse'}
+  },
+  {
     'hek14/easyformat.nvim',
     ft = { 'python', 'lua' },
     config = function()

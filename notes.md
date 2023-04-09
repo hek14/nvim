@@ -83,7 +83,7 @@ https://www.nerdfonts.com/font-downloads
 1. https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
 2. https://github.com/lucasvianav/nvim: nice hacking about lspconfig handlers
 3. https://github.com/leaxoy/dotfiles/tree/main/.config/nvim
-4. https://github.com/glepnir/nvim.git
+4. https://github.com/glepnir/nvim
 5. https://github.com/ziontee113/nvim-config: nice youtube vlog
 6. https://github.com/s1n7ax/dotnvim: Power of LuaSnip with TreeSitter in Neovim
 7. https://github.com/folke/dot/tree/master/config/nvim
@@ -564,3 +564,7 @@ select the `import xxx`statements, and then `:'<,'>!sort`就能sort import语句
 `:match Visual /pattern/`
 how to clear the last highlight: 
 `:match none`
+
+# git
+## git mergetool
+https://gist.github.com/karenyyng/f19ff75c60f18b4b8149/e6ae1d38fb83e05c4378d8e19b014fd8975abb39#table-of-content

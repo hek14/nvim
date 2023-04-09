@@ -1,7 +1,6 @@
 return {
   'hek14/lspsaga.nvim',
-  branch = 'performance',
-  -- dir = '~/contrib/lspsaga.nvim',
+  branch = 'main',
   enabled = true,
   event = "BufRead",
   config = function()

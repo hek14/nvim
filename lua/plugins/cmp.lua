@@ -164,7 +164,16 @@ function M.config()
     sources = {
       { name = "luasnip", priority = 200 },
       { name = "path" , priority = 200 },
-      { name = "nvim_lsp", priority = 100 },
+      { 
+        name = "nvim_lsp", 
+        priority = 100, 
+        entry_filter = function(entry, ctx)
+          -- NOTE: example of filtering source
+          local cond = require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
+          cond = cond and require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Snippet'
+          return cond
+        end
+      },
       { name = 'nvim_lsp_signature_help', priority = 100 },
       { name = "nvim_lua", priority = 50 },
       { name = "latex_symbols", priority = 1 },

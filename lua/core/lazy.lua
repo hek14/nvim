@@ -38,7 +38,7 @@ local disabled_built_ins = {
   "vimballPlugin",
   "zip",
   "zipPlugin",
-  -- "matchparen",
+  "matchparen",
 }
 
 -- NOTE: no need to manually do the following:

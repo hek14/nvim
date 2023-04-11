@@ -205,6 +205,7 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.3.11: line 23431
 2023.3.20: line 26940
 2023.3.40: line 23878
+2023.4.10: line 23850
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`

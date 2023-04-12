@@ -179,14 +179,15 @@ local plugins = {
   },
   {
     'luukvbaal/statuscol.nvim',
-    enabled = function()
-      local v = vim.fn.has('nvim-0.9')
-      if v == 1 then
-        return true
-      else
-        return false
-      end
-    end,
+    enabled = false,
+    -- enabled = function()
+    --   local v = vim.fn.has('nvim-0.9')
+    --   if v == 1 then
+    --     return true
+    --   else
+    --     return false
+    --   end
+    -- end,
     event = 'BufRead',
     config = function()
       require('statuscol').setup({ setopt = true })

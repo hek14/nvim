@@ -30,6 +30,11 @@ M.au('VimLeavePre',{
 -- })
 M.au("BufRead",{command="set foldlevel=99"})
 
+M.au("BufRead",{
+  command = 'set ro',
+  pattern = '*dyj*code'
+})
+
 -- -- how to find which pattern triggeres the autocmd? example here:
 -- M.au("FileType",{,pattern="*",callback = function ()
 --   local data = {

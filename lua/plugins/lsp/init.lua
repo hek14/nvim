@@ -164,14 +164,14 @@ function M.config()
     end
 
     if vim.tbl_contains({"pylance"}, client.name) then
-      client.server_capabilities.semanticTokensProvider = {
-        legend = {
-          tokenTypes = {},
-          tokenModifiers = {},
-        },
-        full = true,
-        range = true,
-      }
+--      client.server_capabilities.semanticTokensProvider = {
+--        legend = {
+--          tokenTypes = {},
+--          tokenModifiers = {},
+--        },
+--        full = true,
+--        range = true,
+--      }
     end
     -- client.server_capabilities.document_formatting = true
     -- client.server_capabilities.document_range_formatting = true

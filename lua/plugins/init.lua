@@ -196,7 +196,7 @@ local plugins = {
     'simrat39/symbols-outline.nvim',
     cmd = { 'SymbolsOutline' },
     config = function()
-      opts = {
+      local opts = {
         keymaps = {
           fold = 'f',
           unfold = 'F',
@@ -579,6 +579,7 @@ local plugins = {
   },
   {
     't9md/vim-choosewin',
+    enabled = false,
     event = 'VimEnter',
     config = function()
       vim.g.choosewin_overlay_enable = 1

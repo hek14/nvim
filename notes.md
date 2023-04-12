@@ -79,6 +79,12 @@ https://www.nerdfonts.com/font-downloads
   6.2. fdfind
   6.3. zoxide
 
+# build neovim from source
+## dependencies
+`apt-get install libtool-bin`
+## make
+`CMAKE_BUILD_TYPE=RelWithDebInfo`
+
 # refer to following dotfiles:
 1. https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
 2. https://github.com/lucasvianav/nvim: nice hacking about lspconfig handlers

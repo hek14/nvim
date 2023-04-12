@@ -106,6 +106,7 @@ https://www.nerdfonts.com/font-downloads
 18. https://github.com/ibhagwan/nvim-lua: the author of fzf-lua
 - and his dots: https://github.com/ibhagwan/dots
 - commented and documented about configs, really picky about plugins
+19. https://github.com/XXiaoA/nvimrc
 
 # to try others' dotfiles
 ```shell

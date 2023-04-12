@@ -11,6 +11,8 @@ for _, module in ipairs(modules) do
   require(module)
 end
 
+-- vim.loader.disable()
+
 _G.treesitter_job = require('scratch.bridge_ts_parse')
 treesitter_job:batch(3)
 -- TODO: python repl follow the current buffer? continue to develop ~/.config/nvim/lua/scratch/repl.lua

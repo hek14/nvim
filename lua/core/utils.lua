@@ -545,6 +545,7 @@ end
 
 M.source_curr_file = function()
   if vim.bo.ft == "lua" then
+    vim.loader.reset()
     vim.cmd [[luafile %]]
   elseif vim.bo.ft == "vim" then
     vim.cmd [[so %]]

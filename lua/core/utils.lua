@@ -275,6 +275,7 @@ end
 
 
 M.reload_plugin = function(plugins)
+  vim.loader.reset()
   local function _reload_plugin(plugin)
     local loaded = package.loaded[plugin]
     if loaded then
@@ -815,6 +816,7 @@ end
 
 
 M.unload_modules = function(patterns)
+  vim.loader.reset()
   for _, p in ipairs(patterns) do
     if not p.mod and type(p[1]) == "string" then
       p = { mod = p[1], fn = p.fn }
@@ -858,5 +860,6 @@ M.reload_config = function()
   -- remove last search highlight
   vim.cmd("nohl")
 end
+
 
 return M

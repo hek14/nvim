@@ -1,5 +1,5 @@
 -- what is userdata: they are C values stored in lua
--- how to inspect userdata: vim.pretty_print(getmetatable(object))
+-- how to inspect userdata: vim.print(getmetatable(object))
 -- telescope
 local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"
@@ -68,7 +68,7 @@ function M.goto_python_main(buffer)
   local iter = my_ts.get_query_matches(buffer,'python',query)
   local locations = {}
   for who,match,metadata in iter do
-    -- vim.pretty_print(metadata)
+    -- vim.print(metadata)
     table.insert(locations, {
       start = {metadata[1].range[1]+1,metadata[1].range[2]}
     })
@@ -176,7 +176,7 @@ def test_{}():
 ]],{
       sn(1,t{class_name}),
       d(2,function (_, _, _, user_args_1)
-        vim.pretty_print("user_args_1: ",user_args_1)
+        vim.print("user_args_1: ",user_args_1)
         local nodes = {}
         for kk,arg in ipairs(user_args_1) do
           if kk < #user_args_1 then 

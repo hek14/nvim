@@ -176,7 +176,7 @@ M.map = function(mode, keys, rhs, opt)
     else
       local info = debug.getinfo(3,'Sln')
       vim.notify("sub_mode should be table or string",vim.log.levels.ERROR)
-      vim.pretty_print('sub_mode: ',sub_mode, info)
+      vim.print('sub_mode: ',sub_mode, info)
       return
     end
   end
@@ -651,7 +651,7 @@ M.ScopeSearch = function()
   local node = data[index]
   while node~=nil do
     if vim.tbl_contains({'Module','Class','Method','Function'},lsp_num_to_str[node.kind]) then
-      vim.pretty_print(node.name)
+      vim.print(node.name)
       break
     else
       index = index - 1

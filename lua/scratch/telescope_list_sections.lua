@@ -35,7 +35,7 @@ function M.list_section()
     end
   end
 
-  vim.pretty_print("lines_with_numbers: ",lines_with_numbers)
+  vim.print("lines_with_numbers: ",lines_with_numbers)
   if vim.tbl_isempty(lines_with_numbers) then 
     print('no sections')
     return

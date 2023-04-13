@@ -73,7 +73,7 @@ M.my_better_substitute = function()
     local split = require("core.utils").stringSplit
     result = split(result,'\n')
     result[#result] = nil -- remove the last empty \n line
-    -- vim.pretty_print(result)
+    -- vim.print(result)
     vim.api.nvim_buf_set_lines(buffer,parent_start_row,parent_end_row+1,false,result)
   end
   vim.ui.input({ prompt = 'replace with: '},on_confirm)

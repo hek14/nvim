@@ -214,7 +214,7 @@ local function my_buf_highlight_references(bufnr, _references)
   local color_used_read = fmt('kk_highlight_%s_read',math.fmod(color_index,#colors) + 1)
   color_index = color_index + 1
   if reference_mark_group[bufnr]==nil then
-    vim.pretty_print(reference_mark_group)
+    vim.print(reference_mark_group)
     error("reference_mark_group")
     return
   end
@@ -484,7 +484,7 @@ M.on_attach = function(_bufnr)
   end})
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>i',"",{callback=function()
-    vim.pretty_print('inspect reference_mark_group: ',reference_mark_group[_bufnr])
+    vim.print('inspect reference_mark_group: ',reference_mark_group[_bufnr])
   end})
 
   vim.api.nvim_buf_set_keymap(_bufnr,'n','<leader>dn','',{callback=function ()

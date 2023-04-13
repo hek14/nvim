@@ -8,7 +8,7 @@ local func = function(p, uv)
     p('main_loop_callback ended, spent: ',(uv.hrtime()-start)/1000000)
   end))
   local t = vim.api.nvim_buf_get_lines(0,0,-1,false)
-  vim.pretty_print('t_in_main: ',t)
+  vim.print('t_in_main: ',t)
   local t_str = serialize_util.pickle(t)
   local args = {500, 'string', nil, false, 5, "helloworld", t_str, main_loop_callback}
   local unpack = unpack or table.unpack

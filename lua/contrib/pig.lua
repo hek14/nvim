@@ -491,7 +491,7 @@ M.location_handler = function(label, result, ctx, config)
                   --     v = 3 -- will not work, should use t[k] = 3
                   --   end
                   -- end
-                  -- vim.pretty_print(t)
+                  -- vim.print(t)
                 else 
                   if type(v)=="table" then
                     local new_path = vim.deepcopy(path)

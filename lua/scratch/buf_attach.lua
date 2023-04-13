@@ -9,7 +9,7 @@ vim.api.nvim_buf_attach(0, false, {
     end
 
     local lines = vim.api.nvim_buf_get_lines(0, first_line, last_line, false)
-    vim.pretty_print({first_line = first_line , last_line = last_line, lines=lines})
+    vim.print({first_line = first_line , last_line = last_line, lines=lines})
 
     vim.schedule(function()
       vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)

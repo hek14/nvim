@@ -1,5 +1,5 @@
 -- NOTE: this is a usage example of remote_ts_parse and bridge_ts_parse
-local print = vim.pretty_print
+local print = vim.print
 local t = require('scratch.large_input_t')
 local t2 = require('scratch.two_input_t')
 local t3 = require('scratch.a_input_t')

@@ -2,7 +2,7 @@ local a = {x={x1=1,x2=3},y={y1={1,2,3}},7,z=99}
 local b = {x={x2=4},y={2,y1={4,5,6}},5}
 
 -- local c = vim.tbl_deep_extend('force',a,b)
--- vim.pretty_print(c)
+-- vim.print(c)
 
 local function deep_extend_mine_recursive(default,override)
   if type(override)~="table" or type(default)~='table' then
@@ -52,10 +52,10 @@ local deep_extend_mine_non_recursive = function(default,override)
       end
       ::continue::
     end
-    vim.pretty_print("result now", result)
+    vim.print("result now", result)
   end
   return result
 end
 
 local result = deep_extend_mine_non_recursive(a,b)
--- vim.pretty_print(result)
+-- vim.print(result)

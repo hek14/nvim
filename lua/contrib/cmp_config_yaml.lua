@@ -96,7 +96,7 @@ source.complete = function(self, request, callback)
               end
               local ok,content = pcall(vim.fn.json_decode,one_json)
               if not ok then
-                vim.pretty_print("ERROR: " .. content)
+                vim.print("ERROR: " .. content)
                 return
               end
               local items = json_to_keys(content)

@@ -14,7 +14,7 @@ function M.peek_type(cursor)
       return
     end
     local msg = result.contents.value
-    vim.pretty_print('msg: ',msg)
+    vim.print('msg: ',msg)
     local curr_expr = vim.fn.expand('<cexpr>')
     local curr_word = vim.fn.expand('<cword>')
     local ok,_ = pcall(function ()

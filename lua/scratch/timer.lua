@@ -38,6 +38,6 @@ local chunks = {
   { kind .. ': ', hlgroup },
   { 'whatTHE' }
 }
--- vim.pretty_print(chunks)
+-- vim.print(chunks)
 
 vim.api.nvim_echo(chunks, false, {})

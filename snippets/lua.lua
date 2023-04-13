@@ -2,7 +2,7 @@
 return {
   -- e.g. local bar = require("foo.bar")
   s('pp',fmt([[
-  vim.pretty_print("{}: ",{}{})
+  vim.print("{}: ",{}{})
   ]],{
     f(function(args,_,_)
       return args[1][1]

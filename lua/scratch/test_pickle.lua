@@ -1,5 +1,5 @@
 -- wrap with tick!!!!
-local print = vim.pretty_print
+local print = vim.print
 local fmt = string.format
 local M = {}
 M.t = require("scratch.large_input_t")

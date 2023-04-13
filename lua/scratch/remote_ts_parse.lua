@@ -185,7 +185,7 @@ local fake_stdin_from_t = function(t)
 end
 
 M.test = function ()
-  log = vim.pretty_print
+  log = vim.print
   local buf = vim.api.nvim_get_current_buf()
   local file = vim.fn.expand('%:p')
   local filetick = 0

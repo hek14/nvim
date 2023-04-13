@@ -44,7 +44,7 @@ local plugins = {
     keys = {
       {
         ',w',function()
-          vim.pretty_print(require('nvim-gps').get_location())
+          vim.print(require('nvim-gps').get_location())
         end
       }
     },

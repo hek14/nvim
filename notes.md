@@ -364,7 +364,7 @@ uv.fs_open('/home/heke/codes_med33/Phase_Correlation/test_rotate.py', 'r', 438, 
         uv.fs_read(fd, stat.size, -1, function(_, data)
           uv.fs_close(fd, function(_, _) end)
           print('fs_read finish at: ',vim.loop.now())
-          -- vim.pretty_print(data)
+          -- vim.print(data)
         end)
       end
     end)

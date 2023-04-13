@@ -156,7 +156,17 @@ local plugins = {
     end,
   },
   {
+    'nvimdev/indentmini.nvim',
+    event = 'BufEnter',
+    config = function()
+      require('indentmini').setup({})
+    end,
+    -- this is no required but if you want indent blanklink line this is needed
+    dependencies = { 'nvim-treesitter/nvim-treesitter'}
+  },
+  {
     'lukas-reineke/indent-blankline.nvim',
+    enabled = false,
     event = 'VimEnter',
     config = function()
       local default = {

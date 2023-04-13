@@ -1,0 +1,1 @@
+require('scratch.solarized').colorscheme()

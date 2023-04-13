@@ -115,4 +115,6 @@ local material = {
   end,
 }
 
-return vscode_theme
+-- return vscode_theme
+vim.cmd.colorscheme('solarized')
+return {}

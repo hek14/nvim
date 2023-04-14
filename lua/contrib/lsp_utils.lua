@@ -74,7 +74,7 @@ function M.scroll_docs_to_up(map)
         ---@diagnostic disable-next-line: redundant-parameter
         local win_first_line = vim.fn.line("w0", opts.winnr)
 
-        if buffer_total_line <= window_height or cursor_line == 1 then
+        if buffer_total_line +1 <= window_height or cursor_line == 1 then
           vim.api.nvim_echo({ { "Can't scroll up", "MoreMsg" } }, false, {})
           return
         end
@@ -115,7 +115,7 @@ function M.scroll_docs_to_down(map)
         ---@diagnostic disable-next-line: redundant-parameter
         local window_last_line = vim.fn.line("w$", opts.winnr)
 
-        if buffer_total_line <= window_height or cursor_line == buffer_total_line then
+        if buffer_total_line +1 <= window_height or cursor_line == buffer_total_line then
           vim.api.nvim_echo({ { "Can't scroll down", "MoreMsg" } }, false, {})
           return
         end
@@ -145,5 +145,67 @@ function M.scroll_docs_to_down(map)
     vim.api.nvim_feedkeys(key, "n", true)
   end
 end
+
+function M.lsp_hover_filter(contents)
+    local cts = ""
+
+    -- signatures
+    if type(contents) == "string" then
+        cts = string.gsub(contents or "", "&nbsp;", " ")
+
+    -- hover
+    else
+        cts = string.gsub((contents or {}).value or "", "&nbsp;", " ")
+    end
+
+    cts = string.gsub(cts, "\\\n", "\n")
+    cts = string.gsub(cts, "\\_", "_")
+    return ("---\n%s\n---"):format(cts)
+end
+
+function M.lsp_hover(_, result, ctx, config)
+    result.contents = M.lsp_hover_filter(result.contents)
+
+    local bufnr, winner = vim.lsp.handlers.hover(_, result, ctx, config)
+
+    if bufnr and winner then
+        vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
+        return bufnr, winner
+    end
+end
+
+function M.lsp_signature_help(_, result, ctx, config)
+    if result.signatures[1].documentation.value then
+        result.signatures[1].documentation.value = M.lsp_hover_filter(result.signatures[1].documentation.value)
+    else
+        result.signatures[1].documentation = M.lsp_hover_filter(result.signatures[1].documentation)
+    end
+
+    -- vim.pretty_print(result.signatures.documentation.value)
+    local bufnr, winner = vim.lsp.handlers.signature_help(_, result, ctx, config)
+
+    local current_cursor_line = vim.api.nvim_win_get_cursor(0)[1]
+    local ok, window_height = pcall(vim.api.nvim_win_get_height, winner)
+
+    if not ok then
+        return
+    end
+
+    if current_cursor_line > window_height + 2 then
+        ---@diagnostic disable-next-line: param-type-mismatch
+        vim.api.nvim_win_set_config(winner, {
+            anchor = "SW",
+            relative = "cursor",
+            row = 0,
+            col = -1,
+        })
+    end
+
+    if bufnr and winner then
+        vim.api.nvim_buf_set_option(bufnr, "filetype", config.filetype)
+        return bufnr, winner
+    end
+end
+
 
 return M

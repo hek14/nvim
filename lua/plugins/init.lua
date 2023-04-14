@@ -96,6 +96,14 @@ local plugins = {
     end,
   },
   {
+    'glepnir/template.nvim', 
+    cmd = {'Template','TemProject'}, 
+    config = function()
+      require('template').setup({
+      })
+    end
+  },
+  {
     'norcalli/nvim-colorizer.lua',
     cmd = 'ColorizerToggle',
     config = function()

@@ -100,7 +100,11 @@ local plugins = {
     cmd = {'Template','TemProject'}, 
     config = function()
       require('template').setup({
+        temp_dir = '~/.config/nvim/template',
+        author = 'hek14',
+        email = '1023129548@qq.com',
       })
+      require('telescope').load_extension('find_template')
     end
   },
   {

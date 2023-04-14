@@ -4,6 +4,7 @@ local override_hl = function ()
   hi default LspReferenceRead ctermbg=237 guibg=#343d46
   hi default LspReferenceText ctermbg=237 guibg=#343d46
   hi default LspReferenceWrite ctermbg=237 guibg=#343d46 gui=Bold,Italic
+  hi! link IndentLine Comment
   ]])
 end
 
@@ -98,6 +99,11 @@ local vscode_theme = {
     vim.schedule(function ()
       require("visual_studio_code").setup({
         mode = "dark",
+        hooks = {
+          after = function()
+            vim.cmd [[highlight! link IndentLine Comment]]
+          end
+        }
       })
       override_hl()
     end)
@@ -115,6 +121,6 @@ local material = {
   end,
 }
 
--- return vscode_theme
-vim.cmd.colorscheme('solarized')
-return {}
+return vscode_theme
+-- vim.cmd.colorscheme('solarized')
+-- return {}

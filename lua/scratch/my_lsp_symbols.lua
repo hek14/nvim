@@ -171,6 +171,18 @@ M.lsp_symbols = function(opts)
     pickers
     .new(opts, {
       prompt_title = "LSP Document Symbols",
+      attach_mappings = function(_, map)
+        print('attach_mappings')
+        -- NOTE: why use this? because the dynamic finder will resolve the results once the prompt_buffer is changed, so we can simulate the user input to force the dynamic update
+        map("i", "<C-r>", function(_prompt_bufnr)
+          print("<C-r>called!!")
+          local dumb = 'nothing'
+          vim.api.nvim_feedkeys(dumb,'n',false)
+          local del_key = string.rep('<BS>',#dumb)
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(del_key,true,false,true),'n',false)
+        end)
+        return true
+      end,
       finder = finders.new_dynamic {
           entry_maker = gen_lsp_and_ts_symbols(opts),
           fn = inject_ts_to_lsp_symbols(locations,f,start),

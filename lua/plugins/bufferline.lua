@@ -31,6 +31,15 @@ function M.config()
       separator_style = "thin",
       always_show_bufferline = true,
       diagnostics = false, -- "or nvim_lsp"
+      name_formatter = function(buf)  
+        return buf.bufnr .. '|' .. buf.name
+        -- buf contains:
+        -- name                | str        | the basename of the active file
+        -- path                | str        | the full path of the active file
+        -- bufnr (buffer only) | int        | the number of the active buffer
+        -- buffers (tabs only) | table(int) | the numbers of the buffers in the tab
+        -- tabnr (tabs only)   | int        | the "handle" of the tab, can be converted to its ordinal number using: `vim.api.nvim_tabpage_get_number(buf.tabnr)`
+      end,
       custom_filter = function(buf_number)
         -- Func to filter out our managed/persistent split terms
         local present_type, type = pcall(function()

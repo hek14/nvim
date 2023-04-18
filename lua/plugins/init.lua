@@ -169,6 +169,7 @@ local plugins = {
   },
   {
     'nvimdev/indentmini.nvim',
+    enabled = false,
     event = 'BufEnter',
     config = function()
       require('indentmini').setup({

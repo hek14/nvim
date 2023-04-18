@@ -20,7 +20,7 @@ local solve_scope = function ()
   local bufnr = vim.api.nvim_get_current_buf()
   local position = vim.api.nvim_win_get_cursor(0)
   position[1] = position[1] - 1
-  return require('scratch.ts_util').get_data(bufnr,position)[2]
+  return require('scratch.ts_util').get_scope(bufnr,position)[2]
 end
 
 local function ask_scope()

@@ -104,7 +104,7 @@ function M.get_node_at_cursor(buf, cursor_range, ignore_injected_langs)
   return root:named_descendant_for_range(cursor_range[1], cursor_range[2], cursor_range[1], cursor_range[2])
 end
 
-function M.get_data(bufnr,position)
+function M.get_scope(bufnr,position)
   -- local node = vim.treesitter.get_node_at_pos(bufnr,position[1],position[2])
   local node = M.get_node_at_cursor(bufnr,position)
   local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
@@ -196,6 +196,27 @@ function M.get_data(bufnr,position)
   return context_str, flat_nodes
 end
 
+function M.get_type(bufnr,position)
+  -- position : index from zero, table of {row, col}
+  local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+  local node = vim.treesitter.get_node({bufnr=bufnr, pos=position})
+  if not node then
+    return false
+  end
+  local node_range = {node:range()}
+  local parent = get_main_node(node)
+  local parent_range = {parent:range()}
+  local q = vim.treesitter.query.get(ft,'locals')
+  for id, _node, _meta in q:iter_captures(parent, bufnr, parent_range[1],parent_range[3]+1) do
+    if q.captures[id]:match("definition") then
+      if vim.deep_equal( { _node:range() }, node_range ) then
+        return true
+      end
+    end
+  end
+  return false
+end
+
 
 function M.goto_last_context(level)
   local start_line = function(node) 
@@ -210,7 +231,7 @@ function M.goto_last_context(level)
 
   level = level and level or vim.v.count1
   local cursor = vim.api.nvim_win_get_cursor(0)
-  local _,data = M.get_data(0,{cursor[1]-1,cursor[2]})
+  local _,data = M.get_scope(0,{cursor[1]-1,cursor[2]})
   local index = #data-level+1
   local target = data[index]
   local curr = vim.api.nvim_win_get_cursor(0)

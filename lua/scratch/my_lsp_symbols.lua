@@ -20,6 +20,7 @@ local function inject_ts_to_lsp_symbols(locations,f,start)
   local ratio = 0.2
   for i, loc in ipairs(locations) do
     loc.ts_info = ""
+    loc.type = ""
   end
   return function(prompt)
     local tx, rx = channel.oneshot()
@@ -36,7 +37,9 @@ local function inject_ts_to_lsp_symbols(locations,f,start)
         log('called from main')
       end
       for i, loc in ipairs(locations) do
-        loc.ts_info = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
+        local res = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
+        loc.ts_info = res[1]
+        loc.type = res[2] and '   #write' or '   #read'
       end
       -- log(fmt("my telescope LSP-TS %s done after: %dms",done_ratio,(vim.loop.hrtime()-start)/1e6))
     end)
@@ -93,6 +96,7 @@ local function gen_lsp_and_ts_symbols(opts)
     return displayer {
       entry.symbol_name,
       entry.ts_info,
+      entry.type,
       -- { entry.symbol_type:lower(), type_highlight[entry.symbol_type] },
       msg,
     }
@@ -106,13 +110,14 @@ local function gen_lsp_and_ts_symbols(opts)
     if not hidden and filename then
       ordinal = filename .. " "
     end
-    -- ordinal = ordinal .. entry.ts_info .. symbol_name 
-    ordinal = ordinal .. symbol_name
+    ordinal = ordinal .. symbol_name .. entry.ts_info .. entry.type
+    -- ordinal = ordinal .. symbol_name
     return make_entry.set_default_entry_mt({
       value = entry,
       ordinal = ordinal,
       display = make_display,
       ts_info = entry.ts_info,
+      type = entry.type,
 
       filename = filename,
       lnum = entry.lnum,
@@ -127,7 +132,6 @@ end
 
 
 M.lsp_symbols = function(opts)
-  local start = vim.loop.hrtime()
   opts = opts or {}
   local params = vim.lsp.util.make_position_params(opts.winnr)
   vim.lsp.buf_request(opts.bufnr, "textDocument/documentSymbol", params, function(err, result, _, _)
@@ -224,15 +228,21 @@ end
 local function gen_lsp_and_ts_references(opts)
   opts = opts or {}
   local items = {
-    { width = 30 },
+    { width = opts.symbol_width or 40 },
     { remaining = true },
   }
-  local displayer = entry_display.create { separator = " ▏", items = items }
+  -- local displayer = entry_display.create { separator = " ▏", items = items }
+  local displayer = entry_display.create {
+    separator = " ",
+    hl_chars = { ["["] = "TelescopeBorder", ["]"] = "TelescopeBorder" },
+    items = items,
+  }
 
   local make_display = function(entry)
     local input = {}
-    table.insert(input, string.format("%s:%d:%d", utils.transform_path(opts, entry.filename), entry.lnum, entry.col))
-    table.insert(input,entry.ts_info)
+    -- table.insert(input, string.format("%s:%d:%d", utils.transform_path(opts, entry.filename), entry.lnum, entry.col))
+    table.insert(input, string.format("%s", utils.transform_path(opts, entry.filename)))
+    table.insert(input,entry.ts_info .. (entry.type and entry.type or ''))
     local text = entry.text
     if opts.trim_text then
       text = text:gsub("^%s*(.-)%s*$", "%1")
@@ -250,6 +260,7 @@ local function gen_lsp_and_ts_references(opts)
       ordinal = filename .. " " .. entry.text,
       display = make_display,
       ts_info = entry.ts_info,
+      type = entry.type,
 
       bufnr = entry.bufnr,
       filename = filename,
@@ -271,7 +282,7 @@ refresh = function(locations,prompt_bufnr,opts)
 
   local fucked_up = 0
   for i, loc in ipairs(locations) do
-    loc.ts_info = treesitter_job:retrieve(loc.filename, {loc.lnum-1,loc.col-1})
+    loc.ts_info = treesitter_job:retrieve(loc.filename, {loc.lnum-1,loc.col-1})[1]
     if loc.ts_info == 'processing' then
       fucked_up = fucked_up + 1
     end
@@ -311,7 +322,6 @@ refresh = function(locations,prompt_bufnr,opts)
 end
 
 M.references = function(opts)
-  local start = vim.loop.hrtime()
   opts = opts or {bufnr = vim.api.nvim_get_current_buf(), winnr = vim.api.nvim_get_current_win()}
   local filepath = vim.api.nvim_buf_get_name(opts.bufnr)
   local lnum = vim.api.nvim_win_get_cursor(opts.winnr)[1]
@@ -332,7 +342,6 @@ M.references = function(opts)
       log('no references')
       return
     end
-    local start = vim.loop.hrtime()
     local inputs_for_treesitter = {}
     local ft = vim.api.nvim_buf_get_option(opts.bufnr,'filetype')
     for i,item in ipairs(locations) do
@@ -344,7 +353,6 @@ M.references = function(opts)
       })
     end
 
-    local start = vim.loop.hrtime()
     treesitter_job:send(inputs_for_treesitter)
 
     pickers

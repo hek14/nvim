@@ -8,7 +8,8 @@ local log = require'core.utils'.log
 local sel = require('scratch.serialize')
 local fmt = string.format
 local coding_util = require('scratch.stream_coding')
-local get_data = require('scratch.ts_util').get_data
+local get_scope = require('scratch.ts_util').get_scope
+local get_type = require('scratch.ts_util').get_type
 local watch_util = require('scratch.file_watcher')
 
 local profiler = function (what)
@@ -87,13 +88,14 @@ local update_parse_results = function(item)
     return existed_result 
   end
 
-  local new_res = get_data(parse_results[item.file].bufnr,item.position)
+  local new_res = get_scope(parse_results[item.file].bufnr,item.position)
+  local is_definition = get_type(parse_results[item.file].bufnr,item.position)
   if not new_res then
-    return 'error'
+    return {'error',is_definition}
   elseif new_res == "" then
-    return 'root'
+    return {'root',is_definition}
   else
-    return new_res
+    return {new_res,is_definition}
   end
 end
 

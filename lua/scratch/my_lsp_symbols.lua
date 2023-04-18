@@ -135,6 +135,10 @@ M.lsp_symbols = function(opts)
       vim.api.nvim_err_writeln("Error when finding document symbols: " .. err.message)
       return
     end
+    if (not result) or (#result == 0) then
+      vim.api.nvim_err_writeln("No references")
+      return
+    end
 
     if not result or vim.tbl_isempty(result) then
       return
@@ -311,6 +315,10 @@ M.references = function(opts)
   vim.lsp.buf_request(opts.bufnr, "textDocument/references", params, function(err, result, ctx, _)
     if err then
       vim.api.nvim_err_writeln("Error when finding references: " .. err.message)
+      return
+    end
+    if (not result) or (#result == 0) then
+      vim.api.nvim_err_writeln("No references")
       return
     end
 

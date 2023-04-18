@@ -270,7 +270,7 @@ test_{}()
   ls.snip_expand(combine_shots)
 end
 
-vim.treesitter.set_query(
+vim.treesitter.query.set_query(
   "python",
   "class_name",
   [[ 

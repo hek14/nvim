@@ -61,7 +61,7 @@ local function others()
 
   map("n", ',s',require('core.utils').ScopeSearch)
   map("x", ',s',require('core.utils').ScopeSearch)
-  map('n', ',l',require('scratch.telescope_list_sections').list_section)
+  -- map('n', ',l',require('scratch.telescope_list_sections').list_section)
 
   map("n", "<leadr>ts", [[ :keeppatterns<Bar>:%s/\s\+$//e<CR> ]] )
   cmd [[ command! DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]
@@ -160,9 +160,6 @@ local function others()
       end
     end
   end,{})
-  map('n','<leader>pl',function ()
-    print(package.loaded['cmp'])
-  end,{silent=true})
 
   -- map("i", "<C-n>", "<C-O>o",{noremap = true})
   -- map("i", "<C-e>", "<C-O>O",{noremap = true})
@@ -209,7 +206,6 @@ local function others()
   -- map("c", '<C-e>','<End>')
   -- map("c", '<C-f>','<Right>')
   -- map("c", '<C-b>','<Left>')
-  -- map("c", '<C-d>','<C-f>') -- using Telescope <>
   map("c", '<C-p>','<Up>')
   map("c", '<C-n>','<Down>')
   -- NOTE: <C-g> and <C-t> to forward and backward when search

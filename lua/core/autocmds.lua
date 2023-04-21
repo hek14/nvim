@@ -105,7 +105,9 @@ M.au('BufEnter',{callback=function ()
 end})
 
 M.au("CmdwinLeave",{callback=function ()
-  require('cmp').close()
+  if package.loaded['cmp'] then
+    require('cmp').close()
+  end
 end})
 
 vim.g.old_current_word = ""

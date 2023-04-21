@@ -201,7 +201,7 @@ function M.get_type(bufnr,position)
   local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
   local node = vim.treesitter.get_node({bufnr=bufnr, pos=position})
   if not node then
-    return false
+    return 'error'
   end
   local node_range = {node:range()}
   local parent = get_main_node(node)
@@ -210,11 +210,11 @@ function M.get_type(bufnr,position)
   for id, _node, _meta in q:iter_captures(parent, bufnr, parent_range[1],parent_range[3]+1) do
     if q.captures[id]:match("definition") then
       if vim.deep_equal( { _node:range() }, node_range ) then
-        return true
+        return 'write'
       end
     end
   end
-  return false
+  return 'read'
 end
 
 

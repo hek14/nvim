@@ -38,7 +38,7 @@ local function inject_ts_to_lsp_symbols(locations,f,start)
       end
       for i, loc in ipairs(locations) do
         local res = treesitter_job:retrieve(f or loc.filename, {loc.lnum-1,loc.col-1})
-        loc.ts_info = res[1]
+        loc.ts_info = res[1] or ''
         loc.type = res[2] and '   #write' or '   #read'
       end
       -- log(fmt("my telescope LSP-TS %s done after: %dms",done_ratio,(vim.loop.hrtime()-start)/1e6))
@@ -246,7 +246,7 @@ local function gen_lsp_and_ts_references(opts)
     local input = {}
     -- table.insert(input, string.format("%s:%d:%d", utils.transform_path(opts, entry.filename), entry.lnum, entry.col))
     table.insert(input, string.format("%s", utils.transform_path(opts, entry.filename)))
-    table.insert(input,entry.ts_info .. (entry.type and entry.type or ''))
+    table.insert(input,(entry.ts_info or '') .. (entry.type and entry.type or ''))
     local text = entry.text
     if opts.trim_text then
       text = text:gsub("^%s*(.-)%s*$", "%1")

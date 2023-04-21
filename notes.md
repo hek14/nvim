@@ -9,52 +9,12 @@ you should *restart* to make this work.
 ```shell
 xset r rate 210 40
 ```
-
-
 # check default keymap
 `help index`
-# themes 
-```text
-  {
-    "mhartington/oceanic-next",
-    enabled = false,
-    config = function ()
-      vim.cmd[[ colorscheme OceanicNext ]]
-    end
-  },
-  {
-    "bluz71/vim-nightfly-guicolors",
-    enabled = false,
-    config = function ()
-      vim.cmd [[colorscheme nightfly]]
-    end
-  },
-  {
-    "sainnhe/edge",
-    enabled = false,
-    event = 'VimEnter',
-    config = function ()
-      vim.cmd [[ colorscheme edge ]]
-    end
-  },
-  {
-    "Mofiqul/vscode.nvim",
-    enabled = false,
-    lazy = false,
-    config = function ()
-      vim.o.background = 'dark'
-      local c = require('vscode.colors')
-      require('vscode').setup({
-        italic_comments = true,
-      })
-    end
-  },
-```
 # font website
 https://www.programmingfonts.org
 https://www.codingfont.com/
 https://www.nerdfonts.com/font-downloads
-
 # for newly installed:
 1. install nvim nightly
   1.1 wget -c xxx.tar.gz (from the github release page)
@@ -78,13 +38,11 @@ https://www.nerdfonts.com/font-downloads
   6.1. ripgrep
   6.2. fdfind
   6.3. zoxide
-
 # build neovim from source
 ## dependencies
 `apt-get install libtool-bin`
 ## make
 `CMAKE_BUILD_TYPE=RelWithDebInfo`
-
 # refer to following dotfiles:
 1. https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
 2. https://github.com/lucasvianav/nvim: nice hacking about lspconfig handlers
@@ -107,12 +65,11 @@ https://www.nerdfonts.com/font-downloads
 - and his dots: https://github.com/ibhagwan/dots
 - commented and documented about configs, really picky about plugins
 19. https://github.com/XXiaoA/nvimrc
-
+# never use this guy's plugin!!! https://github.com/akinsho, really buggy bufferline.nvim
 # to try others' dotfiles
 ```shell
 docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest bash -c "apt-get update -y && apt-get install git fzf ripgrep neovim -y && nvim"
 ```
-
 # refer to useful plugins
 1. https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
 2. https://github.com/ziontee113/syntax-tree-surfer: navigater/swap based on syntax tree(powered by treesitter)
@@ -124,22 +81,17 @@ docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest b
 8. https://github.com/cshuaimin/ssr.nvim: Structural search and replace for Neovim
 9. https://github.com/mg979/vim-visual-multi: multi-cursor plugin
 10. https://github.com/echasnovski/mini.nvim
-
 # Youtuber to follow
 1. jesse19skelton
 - https://www.youtube.com/@jesse19skelton -- nice videos about karabiner and  yabai [his github]()
 - https://www.youtube.com/watch?v=JL1lz77YbUE&ab_channel=JesseSkelton
 - https://www.notion.so/Yabai-8da3b829872d432fac43181b7ff628fc
-
 2. s1n7ax
 https://www.youtube.com/@s1n7ax/videos
-
 3. yukiUthman
 https://www.youtube.com/@yukiuthman8358
 https://www.youtube.com/watch?v=W8Mq--dqNow&ab_channel=YukiUthman : nice video about new_work threading!!!
 https://www.youtube.com/playlist?list=PLOe6AggsTaVvsguiM_LAbdkm7dFCxYxe3 : a whole video list !
-
-
 # for pyright completion stubs
 https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs
 example: how to use it for cv2 module completion:
@@ -147,34 +99,26 @@ example: how to use it for cv2 module completion:
 curl -sSL https://raw.githubusercontent.com/bschnurr/python-type-stubs/add-opencv/cv2/__init__.pyi \
   -o $(python -c 'import cv2, os; print(os.path.dirname(cv2.__file__))')/cv2.pyi
 ```
-
 # help fillchars 
 to change fold/endOfBuffer appearance
-
 # inspecting options and variables
 instead of using message buffer, just create a new buffer, and normal mode: `:put =bufnr()`, `put =@"` or insert mode: `CTRL_R=bufnr()`
-
 # really useful keymap fix for neovim in kitty/alacritty:
 1. video: https://www.youtube.com/watch?v=lHBD6pdJ-Ng
 2. config files: https://github.com/ziontee113/yt-tutorials/tree/nvim_key_combos_in_alacritty_and_kitty
 3. http://www.leonerd.org.uk/hacks/fixterms/
 4. https://en.wikipedia.org/wiki/List_of_Unicode_characters
-
 # nvim -V1
 `:verbose map m` don't work in normal case for mappings defined in lua, you should start nvim using `nvim -V1`
-
 # vim.loop
 https://teukka.tech/posts/2020-01-07-vimloop/
-
 # window ID and window number
 Window ID is unique and not changed. It's valid across tabs. Manipulate window should use win-ID more because it's unique.
 But window nubmer is only valid for the current Tab. `wincmd` can prefixed with window number.
 Convert between them:
 `win_id2win`
-
 relations with bufnr:
 `winbufnr` and `bufwinnr`
-
 # how to use pylance!!!
 1. 利用vscode安装pylance插件, 版本是: `2023.2.30`
 2. 进入到插件目录, 例如: `/Users/hk/.vscode/extensions/ms-python.vscode-pylance-2023.2.30`
@@ -198,7 +142,6 @@ NOTE: 通过搜索 `^ *".*" *+`, 找到大量连着的这个pattern, 就是这�
                 ...
             ])
           })
-
 ```
 8.3. answer from askfiy: 
 ```markdown
@@ -213,22 +156,17 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.3.20: line 26940
 2023.3.40: line 23878
 2023.4.10: line 23850
-
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
-
 # check if a program is able to find in nvim
 `echo exepath('python')`
 `echo executable('clippy')`
-
-
 # TODO: 
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 - consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
 - add print() custom_capture for python
 - TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not
-
 # vim.schedule 陷阱/值得注意的点
 ```lua
 local map = {}
@@ -249,7 +187,6 @@ end
 但是这样不work, 因为vim.schedule 会把process(t)的过程delay到for循环后面. 这样没有一个t会在这个for循环中被处理.
 别这样写, 因为vim.schedule仍然是在vim main loop中执行的, 只是delay的串行, 并不会并行, 所以老老实实的挨个process(t) 
 TJ有一个视频: https://www.youtube.com/watch?v=GMS0JvS7W1Y&t=358s&ab_channel=TJDeVries 解释为什么要schedule(write的时候不安全)
-
 # closure usage
 why using closure? -- enclose some state
 closure can be seen as some kind of `function instantiate`, 因为利用closure return的function,
@@ -261,17 +198,14 @@ closure有一个妙用, 比方说一个callback function 调用方固定了其�
 ```lua
 local function get_workspace_symbols_requester(bufnr, opts)
   local cancel = function() end
-
   --  bufnr, opts, cancel are the enclosed states of the returned function
   return function(prompt)
     local tx, rx = channel.oneshot()
     cancel()
     _, cancel = vim.lsp.buf_request(bufnr, "workspace/symbol", { query = prompt }, tx)
-
     -- Handle 0.5 / 0.5.1 handler situation
     local err, res = rx()
     assert(not err, err)
-
     local locations = vim.lsp.util.symbols_to_items(res or {}, bufnr) or {}
     if not vim.tbl_isempty(locations) then
       locations = utils.filter_symbols(locations, opts) or {}
@@ -281,25 +215,21 @@ local function get_workspace_symbols_requester(bufnr, opts)
 end
 -- get_workspace_symbols_requester(0,opts) to get a new cb
 ```
-
 # callback
 main thread(或者process) new了一个新的thread(或者spawn出去一个新的process),并指定其在结束时call function cb,那么这个cb就是所谓的callback.
 callback执行环境是: main thread(or process)
 怎么去建模这件事情呢: `||`脑子里开始只有一条主线, 然后fork出去一条并行的线(child thread/process), 某时再交汇回来, 主线交叉的那个点就是callback function执行的点
 (当然, 对于vim这类有loop的程序而言, 这个点可能暂时不安全, 那么会schedule cb's execution later) 
-
 # coroutine and stack
 coroutine的特点: 不管一个context(我们叫coroutine.create()出来的东西context)中调用多深,
 co.yield(val)的val值始终是yield给resume这个context的context.
 yield之后, 这个context会保存state: 当前的位置(即便是多层的函数调用),别的context再resume它的时候,
 它将直接从这个调用位置开始
-
 'yield'对应的是coroutine, 值直接给co.resume的主, `return`对应的是栈, 值给调用它的函数
 想象这么一幅图: 两条生产线——两个coroutine, 每一个生产线从前到后有若干箱子从大到小——它们就是栈
 co.yield/resume 是直接从一条生产线跳到另外一条去换context干活, 而栈是在这条支线上做完直接扔掉一个箱子,
 把结果return给它的上层(仍在这条产线上). 协程是同一个线程内部的切换context, 不是多线程, 不可能两个产线同时在做
 (可以想象成, 不管咋切换, 干活的人还是一个人)
-
 # no-wait map
 When defining a buffer-local mapping for "," there may be a global mapping
 that starts with ",".  Then you need to type another character for Vim to know
@@ -307,7 +237,6 @@ whether to use the "," mapping or the longer one.  To avoid this add the
 <nowait> argument.  Then the mapping will be used when it matches, Vim does
 not wait for more characters to be typed.  However, if the characters were
 already typed they are used.
-
 # termopen and chansend
 首先理解一下为什么termopen返回值会是一个channel-ID
 因为terminal在nvim中本质上就是一个buffer, 并不是真正的terminal,
@@ -319,7 +248,6 @@ example:
 1. `:terminal`
 2. focus into that buffer and `:lua =vim.b.terminal_job_id` -> channel-ID
 3. send something: `lua vim.fn.chansend(channel-ID,{'python\r\n'})`
-
 # vim.wait is not the same with vim.loop.sleep !!!
 vim.wait 有一个作用是: sync scheduled tasks, vim.loop.sleep则没有这个作用
 原理是: vim.wait只会block当前的context, 从当前context抽离,
@@ -351,7 +279,6 @@ print('3',vim.loop.now())
 使用`vim.wait`会block当前`execute current file`这个context, 从而
 main loop能够处理其他的context, 这些其他的context中就包括了: 
 execute any scheduled(and due) tasks, 所以defer_fn的task被执行了.
-
 ## example 2
 use vim.wait to sync uv.fs_read
 ```lua
@@ -377,7 +304,6 @@ vim.wait(5,function ()
 end)
 print('after wait: ',vim.loop.now())
 ```
-
 ## example 3: fix project.nvim load problem in lazy
 在lazy.nvim中, 如果指定一个plugin是通过`keys = {{',x',function() end}}`方式加载,
 那么首次加载时真实发生的事情是: 首先加载该插件, 然后run它的`config = function() xxx end`
@@ -390,13 +316,11 @@ task, 它会在keys部分运行完之后, 即整个context结束之后才能开�
 把刚才`require('xxx').setup`这个scheduled task做完.再回到config -> keys.
 我写了一个testplugin('~/contrib/testplugin') 来方便展示. 困扰很久的`project.nvim` lazy load
 的问题也是这么解决的(commit SHA: 5ab3d7edf2052324071609724309403e61e91882)
-
 # get the last changed/yanked position
 ```lua
 local pos1 = vim.fn.getpos "'["
 local pos2 = vim.fn.getpos "']"
 ```
-
 # to understand plenary async
 demo code: `~/.config/nvim/lua/scratch/test_plenary_async.lua`
 ## async.wrap
@@ -404,7 +328,6 @@ demo code: `~/.config/nvim/lua/scratch/test_plenary_async.lua`
 M.wrap = function(func, argc)
   local function leaf(...)
     local nargs = select("#", ...)
-
     if nargs == argc then
       return func(...)
     else
@@ -421,7 +344,6 @@ A function is just a chunk of codes/logic/statements about how to do something,
 call leaf() will actually do nothing in this coroutine, 
 只是将 func(how to do it), argc(func所需参数个数), ...(调用的具体参数) yield出去,
 让主coroutine拿到, 至于拿到之后怎么处理那是外部协程的事情.
-
 ## async.void and async.run (execute function)
 ```lua
 local execute = function(async_function, callback, ...)
@@ -491,10 +413,8 @@ args(具体参数)给yield出去, 让主协程去做, 让主协程做的好处�
 在副协程yield的时候执行.
 副协程还是要继续要, 怎么做呢? 将step作为callback传给被wrap的函数的最后一个参数, 而被wrap的函数也
 非常默契的在最后`callback()`了. 等同于调用step()
-
 **函数就是一种特殊的data, 甚至可以看成是一个引用, 什么引用? 指向一块代码(开头)的引用/地址而已
 call a func就是回到某一段代码的开端, 继续执行**
-
 # how to temporally disable a autocmd
 ```lua
 vim.opt.eventignore:append({ 'FileType' })
@@ -502,7 +422,6 @@ fn.bufload(bufnr)
 --restore eventignore
 vim.opt.eventignore:remove({ 'FileType' })
 ```
-
 # how to debounce to avoid a function called very frequently?
 可以用下面的, 也可以用telescope/debounce.lua中的
 ```lua
@@ -517,16 +436,13 @@ function to_debounce()
   end
 end
 ```
-
 # defer_fn/schedule_wrap 的一个特点/使用误区
 被defer_fnwrap的function执行的理论时间是: 起始时间(vim.defer_fn call的时间)+defer的量.
 但是实际main loop 开始check的时候, 如果有积压的过时的deferred tasks, 它们不会再按照之前schedule的
 时间执行, 而是被一股脑扔出去, 只保留先后顺序, 不再保留彼此之间的interval
 这个really confusing, 但是也能理解: main loop不想欠东西, 有积压的就一并送出去
 详细的例子和注释见: ~/.config/nvim/lua/scratch/defer_fn_complex.lua
-
 # vim.fn.search('nvim')
-
 # use vim in pipeline
 - `ls -1 | nvim -`
 - `nvim - <<(ls -1)`
@@ -535,7 +451,6 @@ end
 `<<(command)` 同样的作用
 而 `|` 则是重定向stdout of last command to the latter command's stdin 
 `<<<"here string"`则是将一个string作为stdin
-
 # filter -- use external program to insert text
 `:help filter`
 filter的standard input从motion/range/visual来, 然后将其standard output
@@ -549,7 +464,6 @@ for i in range(0,10):
 这个trick用来输入一些很有规律的文本时很有用
 - example 2:
 select the `import xxx`statements, and then `:'<,'>!sort`就能sort import语句了
-
 # 制作comment文本框
 ```text
 # this is a comment line
@@ -561,21 +475,17 @@ select the `import xxx`statements, and then `:'<,'>!sort`就能sort import语句
 ************************
 ```
 可以这么干: 复制两遍, 然后select a line, `r*` 关键就是利用visual mode下的`r`replace
-
 # submatch and `&`
 在替换的时候, 可以:
 - `s/xyz/&_list/g` 用&来替代匹配中的部分
 - `s/xyz/\=submatch(0) . "_list"/g` 这里用\=submatch来进行同样的操作 
-
 # add match pattern highlight
 `:help match-highlight`
 `:match Visual /pattern/`
 how to clear the last highlight: 
 `:match none`
-
 # git
 ## git mergetool
 https://gist.github.com/karenyyng/f19ff75c60f18b4b8149/e6ae1d38fb83e05c4378d8e19b014fd8975abb39#table-of-content
-
 # show diff before save buffer
 `:w !diff % -`

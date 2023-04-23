@@ -4,7 +4,8 @@ local modules = {
   'core.lazy',
   'core.keymap',
   'core.gui',
-  'scratch.repl'
+  'scratch.repl',
+  'contrib.statusline'
 }
 
 for _, module in ipairs(modules) do

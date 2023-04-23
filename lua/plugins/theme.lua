@@ -5,6 +5,9 @@ local override_hl = function ()
   hi default LspReferenceText ctermbg=237 guibg=#343d46
   hi default LspReferenceWrite ctermbg=237 guibg=#343d46 gui=Bold,Italic
   hi! link IndentLine Comment
+  hi! link StatusLeft StatusLine
+  hi! link StatusRight StatusLine
+  hi! link StatusMid StatusLine
   ]])
 end
 

@@ -229,6 +229,7 @@ local plugins = {
         },
       }
       require('symbols-outline').setup(opts)
+      require('core.utils').map("n","<leader>ls",":SymbolsOutline<CR>")
     end,
   },
   {

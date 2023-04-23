@@ -106,6 +106,18 @@ function M.setup(client,bufnr)
     opt = vim.tbl_deep_extend("force", {}, map_opts, opt or {})
     require('core.utils').map(mode,lhs,rhs,opt)
   end
+
+  vim.api.nvim_create_user_command('FixImport',function ()
+    local buf = vim.api.nvim_get_current_buf()
+    local clients = vim.lsp.buf_get_clients(buf)
+    for id,_client in pairs(clients) do
+      if _client.name~='null-ls' then
+        _client.notify("workspace/didChangeConfiguration", { settings = _client.config.settings })
+      end
+    end
+  end,{})
+
+  buf_set_keymap('n', "<leader>dt","<Cmd>lua require('contrib.my_diagnostic').toggle_line_diagnostic()<CR>",map_opts)
   buf_set_keymap("n", "<leader>gd","<cmd>lua require('telescope.builtin').lsp_definitions()<CR>",map_opts)
   buf_set_keymap("n", "<leader>gr","<cmd>lua require('telescope.builtin').lsp_references()<CR>",map_opts)
   buf_set_keymap("n", "gd", "", {callback = M.Smart_goto_definition})

@@ -53,6 +53,22 @@ local M = {
 }
 
 function M.config()
+  vim.api.nvim_create_autocmd("BufEnter",{
+    callback=function ()
+      local bufnr = vim.api.nvim_get_current_buf()
+      if vim.api.nvim_buf_line_count(bufnr) > 3000 then
+        vim.o.foldenable = false
+        vim.b.indent_blankline_enabled = false -- NOTE: important for performance
+      else
+        vim.o.foldenable = true
+        vim.o.foldmethod = "expr"
+        vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+      end
+    end})
+
+  vim.keymap.set('i','<C-x><C-l>','<Cmd>lua require("contrib.treesitter.python").fast_signature()<CR>')
+  vim.keymap.set('i','<C-x><C-g>','<Cmd>lua require("contrib.treesitter.python").fast_init_class()<CR>')
+
   local options = {
     ensure_installed = {"python","c","query","vim","markdown","markdown_inline"}, -- NOTE: playground need query parser
     playground = { 

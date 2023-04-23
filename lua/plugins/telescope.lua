@@ -24,7 +24,8 @@ local M = {
       require('telescope.builtin').live_grep({
         cwd = '/usr/local/share/nvim/runtime/doc/'
       })
-    end }
+    end },
+    { ",l", require('scratch.telescope_list_sections').list_section }
   },
   dependencies = {
     {

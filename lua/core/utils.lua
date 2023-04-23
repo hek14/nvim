@@ -111,6 +111,25 @@ end
 
 _G.deep_equal = M.deep_equal
 
+_G.any_client_attached = function (bufnr)
+  bufnr = bufnr or vim.fn.bufnr()
+  -- local clients = vim.lsp.get_active_clients()
+  -- local attached = {}
+  -- for i,client in ipairs(clients) do
+  --   if vim.lsp.buf_is_attached(bufnr,client.id) then
+  --     table.insert(attached,{id=client.id,name=client.name})
+  --   end
+  -- end
+  local attached = {}
+  local clients = vim.lsp.buf_get_clients(bufnr) or {}
+  for id,client in pairs(clients) do
+    if client.name~='null-ls' then
+      table.insert(attached,{id=id,name=client.name})
+    end
+  end
+  return attached
+end
+
 M.map = function(mode, keys, rhs, opt)
   local options = { noremap = true, silent = true }
   if opt then

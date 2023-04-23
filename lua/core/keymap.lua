@@ -36,15 +36,6 @@ local function others()
   map("n", "<Down>", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
   map("n", "<Up>", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
 
-  map("i", "<C-q>",function ()
-    if vim.g.cmp_enabled then
-      require("cmp").close()
-      vim.g.cmp_enabled = false
-    else
-      require('cmp').complete()
-      vim.g.cmp_enabled = true
-    end
-  end)
   -- don't yank text on cut ( x )
   -- map({ "n", "v" }, "x", '"_x')
 
@@ -61,7 +52,6 @@ local function others()
 
   map("n", ',s',require('core.utils').ScopeSearch)
   map("x", ',s',require('core.utils').ScopeSearch)
-  -- map('n', ',l',require('scratch.telescope_list_sections').list_section)
 
   map("n", "<leadr>ts", [[ :keeppatterns<Bar>:%s/\s\+$//e<CR> ]] )
   cmd [[ command! DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]
@@ -148,18 +138,7 @@ local function others()
   end)
 
   ft_map({'lua','vim'}, "n", "<leader>so", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
-  map("n","<leader>ls",":SymbolsOutline<CR>")
   map("n",",q",":<C-u>cq 55<CR>")
-
-  vim.api.nvim_create_user_command('FixImport',function ()
-    local buf = vim.api.nvim_get_current_buf()
-    local clients = vim.lsp.buf_get_clients(buf)
-    for id,client in pairs(clients) do
-      if client.name~='null-ls' then
-        client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
-      end
-    end
-  end,{})
 
   -- map("i", "<C-n>", "<C-O>o",{noremap = true})
   -- map("i", "<C-e>", "<C-O>O",{noremap = true})
@@ -220,10 +199,6 @@ local function others()
   map("o", "u%", ":normal vu%<CR>")
 
   map("n",'gp',[['`[' . strpart(getregtype(), 0, 1) . '`]']], {expr=true})
-
-  map('i','<C-x><C-l>','<Cmd>lua require("contrib.treesitter.python").fast_signature()<CR>')
-  map('i','<C-x><C-g>','<Cmd>lua require("contrib.treesitter.python").fast_init_class()<CR>')
-  map('n','<leader>dt','<Cmd>lua require("contrib.my_diagnostic").toggle_line_diagnostic()<CR>')
 
   map("n", {"<TAB>","]b"}, ":bn<CR>")
   map("n", {"<S-Tab>","[b"}, ":bp<CR>")

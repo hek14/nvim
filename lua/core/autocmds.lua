@@ -78,23 +78,23 @@ local function setup_terminal()
 end
 setup_terminal()
 
+M.au('TermOpen',{
+  pattern = 'term://*toggleterm#*',
+  callback = function ()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local bufname = vim.api.nvim_buf_get_name(bufnr)
+    local id = string.match(bufname,'#%d+$')
+    id = string.sub(id,2)
+    local value = '%#Visual' .. string.format([[#  id: %s]],id) .. '%X'
+    local status_ok, _ = pcall(vim.api.nvim_set_option_value, "winbar", value, { scope = "local" })
+  end
+})
+
 M.au("BufReadPost",{callback=function ()
   if vim.fn.line("'\"")>0 and vim.fn.line("'\"")<=vim.fn.line("$") then
     vim.cmd [[ exe "normal! g`\"" ]]
   end
 end,desc="Return to last edit position when opening files (You want this!)"})
-
-M.au("BufEnter",{callback=function ()
-  local bufnr = vim.api.nvim_get_current_buf()
-  if vim.api.nvim_buf_line_count(bufnr) > 3000 then
-    vim.o.foldenable = false
-    vim.b.indent_blankline_enabled = false -- NOTE: important for performance
-  else
-    vim.o.foldenable = true
-    vim.o.foldmethod = "expr"
-    vim.o.foldexpr = "nvim_treesitter#foldexpr()"
-  end
-end})
 
 M.au('BufEnter',{callback=function ()
   local bufnr = vim.api.nvim_get_current_buf()
@@ -104,11 +104,6 @@ M.au('BufEnter',{callback=function ()
   end
 end})
 
-M.au("CmdwinLeave",{callback=function ()
-  if package.loaded['cmp'] then
-    require('cmp').close()
-  end
-end})
 
 vim.g.old_current_word = ""
 vim.g.last_focused_win = nil
@@ -141,42 +136,6 @@ M.au("BufEnter",{callback=function ()
   end
 end})
 
-_G.any_client_attached = function (bufnr)
-  bufnr = bufnr or vim.fn.bufnr()
-  -- local clients = vim.lsp.get_active_clients()
-  -- local attached = {}
-  -- for i,client in ipairs(clients) do
-  --   if vim.lsp.buf_is_attached(bufnr,client.id) then
-  --     table.insert(attached,{id=client.id,name=client.name})
-  --   end
-  -- end
-  local attached = {}
-  local clients = vim.lsp.buf_get_clients(bufnr) or {}
-  for id,client in pairs(clients) do
-    if client.name~='null-ls' then
-      table.insert(attached,{id=id,name=client.name})
-    end
-  end
-  return attached
-end
-
--- M.au("FileType",{pattern='lua',callback=function()
---   if vim.bo.buflisted then
---     vim.defer_fn(function()
---       local attached_clients = any_client_attached()
---       if #attached_clients == 0 or (#attached_clients==1 and attached_clients[1].name=='null-ls') then
---         vim.cmd [[echohl WarningMsg]]
---         vim.cmd [[echo 'Manually start lsp']]
---         vim.cmd [[echohl None]]
---         vim.defer_fn(function()
---           vim.cmd [[LspStart]]
---         end,0)
---       end
---     end,50)
---   end
--- end})
-
-
 -- disable syntax in large file: maybe consume too much time
 -- M.au("FileType",{callback=function ()
 --   if vim.fn.wordcount()['bytes'] > 2048000 or vim.fn.line('$') > 5000 then
@@ -186,23 +145,13 @@ end
 -- end})
 
 M.ft_map = function(ft,mode,lhs,rhs,opts)
-  M.au('FileType',{callback=function ()
-    local merged_opts = vim.tbl_extend('force',{buffer=true},opts or {})
-    map(mode,lhs,rhs,merged_opts)
-  end,
-    pattern=ft})
+  M.au('FileType',{
+    callback=function ()
+      local merged_opts = vim.tbl_extend('force',{buffer=true},opts or {})
+      map(mode,lhs,rhs,merged_opts)
+    end,
+    pattern=ft
+  })
 end
-
-M.au('TermOpen',{
-  pattern = 'term://*toggleterm#*',
-  callback = function ()
-    local bufnr = vim.api.nvim_get_current_buf()
-    local bufname = vim.api.nvim_buf_get_name(bufnr)
-    local id = string.match(bufname,'#%d+$')
-    id = string.sub(id,2)
-    local value = '%#Visual' .. string.format([[#  id: %s]],id) .. '%X'
-    local status_ok, _ = pcall(vim.api.nvim_set_option_value, "winbar", value, { scope = "local" })
-  end
-})
 
 return M

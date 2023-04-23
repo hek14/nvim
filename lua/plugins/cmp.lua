@@ -180,6 +180,16 @@ function M.config()
     },
   }
 
+  require('core.utils').map("i", "<C-q>",function ()
+    if vim.g.cmp_enabled then
+      require("cmp").close()
+      vim.g.cmp_enabled = false
+    else
+      require('cmp').complete()
+      vim.g.cmp_enabled = true
+    end
+  end)
+
   -- Set configuration for specific filetype.
   cmp.setup.filetype('tex', {
     sources = {

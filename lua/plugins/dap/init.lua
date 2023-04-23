@@ -1,3 +1,4 @@
+local group = vim.api.nvim_create_augroup('kk_dap',{clear=true})
 local M = {
   'mfussenegger/nvim-dap',
   keys = {
@@ -62,33 +63,83 @@ M.config = function()
       edit = '<C-e>',
       repl = 'r',
     },
-    icons = { expanded = '▾', collapsed = '▸' },
-    layouts = {
-      {
-        elements = {
-          'scopes',
-          'breakpoints',
-          'stacks',
-          'watches',
-        },
-        size = 80,
-        position = 'right',
-      },
-      {
-        elements = {
-          'repl',
-          'console',
-        },
-        size = 10,
-        position = 'bottom',
-      },
-    },
+    -- icons = { expanded = '▾', collapsed = '▸' },
+    -- layouts = {
+    --   {
+    --     elements = {
+    --       'scopes',
+    --       'breakpoints',
+    --       'stacks',
+    --       'watches',
+    --     },
+    --     size = 80,
+    --     position = 'right',
+    --   },
+    --   {
+    --     elements = {
+    --       'repl',
+    --       'console',
+    --     },
+    --     size = 10,
+    --     position = 'bottom',
+    --   },
+    -- },
   })
 
   -- Events Listeners
   local dap = require('dap')
+  local keymaps = {
+    ['i'] = {
+      {"<C-w>h","<Esc><C-w>h"},
+      {"<C-w>n","<Esc><C-w>j"},
+      {"<C-w>e","<Esc><C-w>k"},
+      {"<C-w>i","<Esc><C-w>l"},
+      {"<C-LEFT>","<Esc><C-w>h"},
+      {"<C-DOWN>","<Esc><C-w>j"},
+      {"<C-UP>","<Esc><C-w>k"},
+      {"<C-RIGHT>","<Esc><C-w>l"},
+      {"<C-w>l",function ()
+        if vim.api.nvim_win_is_valid(vim.g.last_focused_win)then
+          vim.api.nvim_set_current_win(vim.g.last_focused_win) 
+          local ft = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(vim.g.last_focused_win), 'filetype')
+          if ft == 'dap-repl' or ft == 'dapui_watches' then
+            print('is dap')
+            vim.cmd [[startinsert]]
+          end
+        end
+      end}
+    }
+  }
   dap.listeners.after.event_initialized['dapui_config'] = function()
+    print('dap event_initialized')
     require('dapui').open()
+    local wins = vim.api.nvim_list_wins()
+    local target = nil
+    local curr_win = vim.api.nvim_get_current_win()
+    for _,win in ipairs(wins) do
+      vim.api.nvim_win_call(win,function ()
+        local buffer = vim.api.nvim_win_get_buf(win)
+        local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
+        if filetype:match('dap') then
+          if "dap-repl"==filetype then
+            target = win
+            vim.g.dap_repl_buffer = vim.api.nvim_win_get_buf(win)
+          end
+          if filetype=="dap-repl" or filetype=='dapui_watches' then
+            vim.api.nvim_create_autocmd({'BufWinEnter','WinEnter'}, {command='startinsert',group=group,buffer=buffer})
+            vim.api.nvim_create_autocmd({'WinLeave'}, {command='stopinsert',group=group,buffer=buffer})
+          end
+          for mode, maps in pairs(keymaps) do
+            for i, mapargs in ipairs(maps) do
+              vim.keymap.set(mode, mapargs[1], mapargs[2], {noremap=true,silent=true,buffer=buffer})
+            end
+          end
+        end
+      end)
+    end
+    if target then
+      vim.api.nvim_set_current_win(target)
+    end
   end
   dap.listeners.before.event_terminated['dapui_config'] = function()
     require('dapui').close()
@@ -141,47 +192,5 @@ M.config = function()
       return [[:<C-u>lua require('dapui').eval()<CR>]]
     end
   end, { expr = true })
-
-  -- autocmd
-  local group = vim.api.nvim_create_augroup('kk_dap',{clear=true})
-  local au = function(event, opts)
-    vim.api.nvim_create_autocmd(event, vim.tbl_extend('force',opts,{group=group}))
-  end
-  -- au('FileType',{
-  --   pattern = 'dap-repl',
-  --   callback = require('dap.ext.autocompl').attach
-  -- })
-  au({'BufWinEnter','WinEnter'},{
-    callback = function ()
-      local buffer = vim.api.nvim_get_current_buf()
-      local ft = vim.api.nvim_buf_get_option(buffer,'filetype')
-      if ft=='dap-repl' then
-        vim.cmd [[ startinsert ]]
-        vim.keymap.map("i","<C-w>l",function ()
-          if vim.api.nvim_win_is_valid(vim.g.last_focused_win)then
-            vim.api.nvim_set_current_win(vim.g.last_focused_win) 
-          end
-        end,{buffer=buffer})
-        vim.keymap.set("i","<C-w>h","<Esc><C-w>h<CR>",{noremap=true,silent=true,buffer=buffer})
-        vim.keymap.set("i","<C-w>n","<Esc><C-w>j<CR>",{noremap=true,silent=true,buffer=buffer})
-        vim.keymap.set("i","<C-w>e","<Esc><C-w>k<CR>",{noremap=true,silent=true,buffer=buffer})
-        vim.keymap.set("i","<C-w>i","<Esc><C-w>l<CR>",{noremap=true,silent=true,buffer=buffer})
-        vim.keymap.set("i","<C-LEFT>","<Esc><C-w>h<CR>",{noremap=true,silent=true,buffer=buffer})
-        vim.keymap.set("i","<C-DOWN>","<Esc><C-w>j<CR>",{noremap=true,silent=true,buffer=buffer})
-        vim.keymap.set("i","<C-UP>","<Esc><C-w>k<CR>",{noremap=true,silent=true,buffer=buffer})
-        vim.keymap.set("i","<C-RIGHT>","<Esc><C-w>l<CR>",{noremap=true,silent=true,buffer=buffer})
-      end
-    end
-  })
-  au("WinLeave",{
-    callback = function ()
-      local buffer = vim.api.nvim_get_current_buf()
-      local ft = vim.api.nvim_buf_get_option(buffer,'filetype')
-      if ft=='dap-repl' then
-        vim.cmd [[ stopinsert ]]
-      end
-    end
-  })
-
 end
 return M

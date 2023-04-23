@@ -61,7 +61,7 @@ function M.config()
     -- NOTE: guide to toggle cmp completion, now you can add a imap to toggle this option, refer to core/mappings.lua
     enabled = function()
       -- NOTE: this is from https://github.com/hrsh7th/nvim-cmp/blob/93cf84f7deb2bdb640ffbb1d2f8d6d412a7aa558/lua/cmp/config/default.lua
-      local disable_cmp_file_types = {"prompt"}
+      local disable_cmp_file_types = {"prompt","TelescopePrompt"}
       if vim.tbl_contains(disable_cmp_file_types,vim.bo.filetype) then
         return false
       end

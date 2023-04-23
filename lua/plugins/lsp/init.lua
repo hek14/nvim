@@ -133,22 +133,6 @@ function M.config()
   }
 
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
-  capabilities.textDocument.completion.completionItem.documentationFormat = { "markdown", "plaintext" }
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  capabilities.textDocument.completion.completionItem.preselectSupport = true
-  capabilities.textDocument.completion.completionItem.insertReplaceSupport = true
-  capabilities.textDocument.completion.completionItem.labelDetailsSupport = true
-  capabilities.textDocument.completion.completionItem.deprecatedSupport = true
-  capabilities.textDocument.completion.completionItem.commitCharactersSupport = true
-  capabilities.semanticTokensProvider = nil
-  capabilities.textDocument.completion.completionItem.tagSupport = { valueSet = { 1 } }
-  capabilities.textDocument.completion.completionItem.resolveSupport = {
-    properties = {
-      "documentation",
-      "detail",
-      "additionalTextEdits",
-    },
-  }
   -- avoid annoying multiple clients offset_encodings detected warning
   -- refer to: https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428#issuecomment-997226723
   capabilities.offsetEncoding = { "utf-16" }
@@ -163,16 +147,16 @@ function M.config()
       end
     end
 
-    if vim.tbl_contains({"pylance"}, client.name) then
+    if vim.tbl_contains({"pylance","lua_ls"}, client.name) then
       client.server_capabilities.semanticTokensProvider = nil
---      client.server_capabilities.semanticTokensProvider = {
---        legend = {
---          tokenTypes = {},
---          tokenModifiers = {},
---        },
---        full = true,
---        range = true,
---      }
+      -- client.server_capabilities.semanticTokensProvider = {
+      --   legend = {
+      --     tokenTypes = {},
+      --     tokenModifiers = {},
+      --   },
+      --   full = true,
+      --   range = true,
+      -- }
     end
     -- client.server_capabilities.document_formatting = true
     -- client.server_capabilities.document_range_formatting = true

@@ -1,3 +1,11 @@
+# record of debug buggy bufferline.nvim
+遇到一个bug: 使用dap, 结束debug之后, insert mode下type anything, 都有概率回到normal mode
+debug最终发现是bufferline.nvim挂的autocmd的问题. 解决过程:
+1. `nvim -V9nvim.log` 这样会set verbose=9, 并保存到nvim.log
+2. 在出现bug之前(dap结束之前), 一直`echo > nvim.log`去清空这个文件
+3. 出现bug之后打开这个文件搜索“insert”找到可能引发bug的若干插件, 一个一个去掉看bug消失了没
+4. Extra tip: 出现bug时, `:Lazy`看看现在没加载哪些插件, 它们一定没问题 
+
 # important tips for raise keyboard response speed/make keypress snappier
 ## on mac os
 ```shell

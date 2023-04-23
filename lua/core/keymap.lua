@@ -211,7 +211,6 @@ local function others()
   map('i','<C-w>',quick_insert_profile)
   map('n','<C-p>',function()
     vim.cmd([[ :set buflisted | set nohidden ]])
-    require('bufferline.ui').refresh()
   end,{desc='pin this buffer'})
 
   vim.cmd([[

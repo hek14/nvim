@@ -183,6 +183,12 @@ M.map = function(mode, keys, rhs, opt)
   map_wrapper(mode, keys)
 end
 
+M.del_map = function(mode, lhs, bufnr)
+  -- The dummy set before del is done for safety, in case a default mapping does not exist.
+  vim.keymap.set(mode, lhs, '', { buffer = bufnr })
+  vim.keymap.del(mode, lhs, { buffer = bufnr })
+end
+
 -- clear command line from lua
 M.clear_cmdline = function()
   vim.defer_fn(function()

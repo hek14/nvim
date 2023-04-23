@@ -6,6 +6,12 @@ local map = utils.map
 
 local cmd = vim.cmd
 
+local del_keymap_safe = function(mode, lhs, bufnr)
+  -- The dummy set before del is done for safety, in case a default mapping does not exist.
+  vim.keymap.set('n', lhs, '', { buffer = bufnr })
+  vim.keymap.del('n', lhs, { buffer = bufnr })
+end
+
 -- these mappings will only be called during initialization
 local colemak = function ()
   local lhs = "neilukj"

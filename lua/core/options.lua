@@ -9,6 +9,7 @@ _G.diagnostic_choice = "telescope" -- telescope or Trouble
 
 local clippy_found = vim.fn.executable("clippy")==1
 
+opt.laststatus = 3
 opt.title = true
 opt.clipboard = clippy_found and "unnamedplus" or ""
 g.clipboard = {

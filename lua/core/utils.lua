@@ -83,7 +83,7 @@ M.hide_statusline = function()
 
   -- shown table from config has the highest priority
   if vim.tbl_contains(shown, buftype) then
-    api.nvim_set_option("laststatus", 2)
+    api.nvim_set_option("laststatus", 3)
     return
   end
 
@@ -92,7 +92,7 @@ M.hide_statusline = function()
     return
   end
 
-  api.nvim_set_option("laststatus", 2)
+  api.nvim_set_option("laststatus", 3)
 end
 
 M.deep_equal = function(t1,t2)

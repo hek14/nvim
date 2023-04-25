@@ -331,16 +331,50 @@ local plugins = {
   {
     'kevinhwang91/nvim-bqf',
     ft = 'qf',
-    -- config = function()
-    --   vim.cmd([[
-    --   augroup nvim-bqf-kk
-    --   autocmd FileType qf lua vim.defer_fn(function() require('bqf').enable() end,50)
-    --   augroup END
-    --   ]])
-    -- end,
+    config = function()
+      local group = vim.api.nvim_create_augroup('hack_bqf',{clear=true})
+      vim.api.nvim_create_autocmd('ExitPre',{
+        group = group,
+        callback = function()
+          print('kill all qf')
+          for b in ipairs(vim.api.nvim_list_bufs()) do
+            if vim.api.nvim_buf_get_option(b, 'filetype') == 'qf' then
+              vim.api.nvim_buf_delete(b, {force = true})
+            end
+          end
+        end
+      })
+      vim.api.nvim_create_autocmd('FileType',{
+        pattern = 'qf',
+        group = group,
+        callback = function()
+          local timer = vim.loop.new_timer()
+          local bufnr = vim.api.nvim_get_current_buf()
+          local start = vim.loop.now()
+          timer:start(10,10,vim.schedule_wrap(function()
+            vim.api.nvim_buf_call(bufnr, function()
+              print('current buf: ',vim.api.nvim_get_current_buf())
+              if vim.w.bqf_enabled then
+                print('bqf loaded ',vim.loop.now()-start)
+                vim.cmd [[ set modifiable ]]
+                vim.keymap.set('n','<C-s>','<cmd>call qf_refactor#replace()<CR>',{ buffer = bufnr })
+                vim.keymap.set('n','q',':bd!<CR>',{ buffer = bufnr })
+                if timer then
+                  timer:stop()
+                  timer:close()
+                  timer = nil
+                end
+              end
+            end)
+          end))
+        end
+      })
+    end
   },
   {
     'stefandtw/quickfix-reflector.vim',
+    enabled = false, -- NOTE: use my own ~/.config/nvim/plugin/qf_refactor.vim
+
     -- this plugin conflicts with the above nvim-bqf, it will ca nvim-bqf not working, there is two solutions:
     -- soluction 1: defer the nvim-bqf loading just like above
     -- solution 2: modify the quickfix-reflector.vim init_buffer like below:

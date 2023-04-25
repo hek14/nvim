@@ -80,6 +80,10 @@ local M = {
         require'telescope'.load_extension('symbol_overlay')
       end
     },
+    {
+      'ii14/emmylua-nvim',
+      ft = 'lua',
+    }
   }
 }
 
@@ -243,6 +247,11 @@ function M.config()
               globals = { "vim" }
             },
             workspace = {
+              library = {
+                vim.env.VIMRUNTIME,
+                vim.env.HOME .. '/.local/share/nvim/lazy/emmylua-nvim',
+                -- vim.api.nvim_get_runtime_file('', true),
+              },
               checkThirdParty = false
             }
           }

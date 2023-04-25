@@ -497,3 +497,5 @@ how to clear the last highlight:
 https://gist.github.com/karenyyng/f19ff75c60f18b4b8149/e6ae1d38fb83e05c4378d8e19b014fd8975abb39#table-of-content
 # show diff before save buffer
 `:w !diff % -`
+# getcompletion function
+`vim.fn.getcompletion('lua', "command")` to get completion list, maybe useful in utils

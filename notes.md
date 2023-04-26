@@ -1,3 +1,19 @@
+# coroutine 陷阱
+coroutine中出了错不会报错, "it just failed silently"
+```lua
+local co = coroutine
+
+local thread = co.create(function()
+  local color = vim.api.nvim_get_hl_by_name('diffAdded',true) -- NOTE: diffadded is not defined, however run this in coroutine just failed silently
+  vim.print(color)
+  co.yield(color)
+end)
+
+-- local color = vim.api.nvim_get_hl_by_name('diffAdded',true) -- NOTE: diffadded is not defined, so run this in main will spawn an error
+-- vim.print(color)
+local val = co.resume(thread)
+print(co.status(thread))
+```
 # record of debug buggy bufferline.nvim
 遇到一个bug: 使用dap, 结束debug之后, insert mode下type anything, 都有概率回到normal mode
 debug最终发现是bufferline.nvim挂的autocmd的问题. 解决过程:

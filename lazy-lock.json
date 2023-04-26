@@ -95,5 +95,6 @@
   "vim-tranquille": { "branch": "master", "commit": "ee986881f347010f15e85bc7df48e65119fde046" },
   "vimtex": { "branch": "master", "commit": "a7b1654ef59bfd8c15ab3e0eb27451319174a131" },
   "vimux": { "branch": "master", "commit": "616fcb4799674a7a809b14ca2dc155bb6ba25788" },
-  "visual_studio_code": { "branch": "master", "commit": "c49ef8dbbbc3d2dc8016a23d8b6a7a0ad9cd03d1" }
+  "visual_studio_code": { "branch": "master", "commit": "c49ef8dbbbc3d2dc8016a23d8b6a7a0ad9cd03d1" },
+  "whiskyline.nvim": { "branch": "main", "commit": "382b867eaf1e0019cab918f9be9479d889c1dfdb" }
 }

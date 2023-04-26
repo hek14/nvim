@@ -190,6 +190,14 @@ local plugins = {
     end,
   },
   {
+    'nvimdev/whiskyline.nvim',
+    dependencies = 'gitsigns.nvim',
+    event = 'VimEnter',
+    config = function()
+      require('whiskyline').setup()
+    end
+  },
+  {
     'nvimdev/indentmini.nvim',
     enabled = false,
     event = 'BufEnter',
@@ -358,9 +366,8 @@ local plugins = {
       vim.api.nvim_create_autocmd('ExitPre',{
         group = group,
         callback = function()
-          print('kill all qf')
           for b in ipairs(vim.api.nvim_list_bufs()) do
-            if vim.api.nvim_buf_get_option(b, 'filetype') == 'qf' then
+            if vim.api.nvim_buf_is_valid(b) and vim.api.nvim_buf_get_option(b, 'filetype') == 'qf' then
               vim.api.nvim_buf_delete(b, {force = true})
             end
           end
@@ -375,9 +382,7 @@ local plugins = {
           local start = vim.loop.now()
           timer:start(10,10,vim.schedule_wrap(function()
             vim.api.nvim_buf_call(bufnr, function()
-              print('current buf: ',vim.api.nvim_get_current_buf())
               if vim.w.bqf_enabled then
-                print('bqf loaded ',vim.loop.now()-start)
                 vim.cmd [[ set modifiable ]]
                 vim.keymap.set('n','<C-s>','<cmd>call qf_refactor#replace()<CR>',{ buffer = bufnr })
                 vim.keymap.set('n','q',':bd!<CR>',{ buffer = bufnr })

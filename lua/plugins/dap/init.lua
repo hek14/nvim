@@ -2,7 +2,7 @@ local group = vim.api.nvim_create_augroup('kk_dap',{clear=true})
 local M = {
   'mfussenegger/nvim-dap',
   keys = {
-    { '<leader>b', ':lua require"dap".toggle_breakpoint()<CR>' },
+    -- { '<leader>b', ':lua require"dap".toggle_breakpoint()<CR>' },
     { '<leader>B', 
       ":lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>" 
     },

@@ -319,7 +319,7 @@ local filter_locations_by_uri = function(locations,pattern)
 end
 
 M.next_ref_handler = function(label, result, ctx, config)
-  if not ctx.index or ctx.index==0 then 
+  if not ctx.index then 
     if type(ctx.fallback) == 'function' then
       ctx.fallback()  
     end
@@ -350,6 +350,10 @@ M.next_ref_handler = function(label, result, ctx, config)
     end
     return false
   end
+  if index == 0 then
+    print(fmt("%s/%s",current_loc,#sorted_locations))
+    return true
+  end
   local target = current_loc + index
   if target > #sorted_locations then
     target = 1
@@ -357,10 +361,10 @@ M.next_ref_handler = function(label, result, ctx, config)
   if target < 1 then
     target = #sorted_locations
   end
+  print(fmt("%s/%s",target,#sorted_locations))
   vim.cmd('normal! m`')
   vim.api.nvim_win_set_cursor(0, {sorted_locations[target].range.start.line + 1, sorted_locations[target].range.start.character})
   profile_time = (vim.loop.hrtime() - profile_start) / 1000000
-  print(fmt("[PIG] next_ref spent %s",profile_time))
   return true
 end
 

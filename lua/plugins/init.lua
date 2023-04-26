@@ -135,7 +135,29 @@ local plugins = {
         'akinsho/toggleterm.nvim',
         cmd = 'ToggleTerm',
         config = function ()
-          require("toggleterm").setup()
+          vim.api.nvim_create_autocmd('TermOpen',{
+            pattern = 'term://*toggleterm#*',
+            callback = function ()
+              local bufnr = vim.api.nvim_get_current_buf()
+              local bufname = vim.api.nvim_buf_get_name(bufnr)
+              local id = string.match(bufname,'#%d+$')
+              id = string.sub(id,2)
+              local value = '%#Visual' .. string.format([[#  id: %s]],id) .. '%X'
+              local status_ok, _ = pcall(vim.api.nvim_set_option_value, "winbar", value, { scope = "local" })
+            end
+          })
+
+          require("toggleterm").setup({
+            highlights = {
+              Normal = {
+                link = 'Visual'
+              },
+              NormalFloat = {
+                link = 'Visual'
+              },
+            },
+
+          })
         end
       }
     },

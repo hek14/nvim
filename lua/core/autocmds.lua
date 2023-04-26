@@ -78,18 +78,6 @@ local function setup_terminal()
 end
 setup_terminal()
 
-M.au('TermOpen',{
-  pattern = 'term://*toggleterm#*',
-  callback = function ()
-    local bufnr = vim.api.nvim_get_current_buf()
-    local bufname = vim.api.nvim_buf_get_name(bufnr)
-    local id = string.match(bufname,'#%d+$')
-    id = string.sub(id,2)
-    local value = '%#Visual' .. string.format([[#  id: %s]],id) .. '%X'
-    local status_ok, _ = pcall(vim.api.nvim_set_option_value, "winbar", value, { scope = "local" })
-  end
-})
-
 M.au("BufReadPost",{callback=function ()
   if vim.fn.line("'\"")>0 and vim.fn.line("'\"")<=vim.fn.line("$") then
     vim.cmd [[ exe "normal! g`\"" ]]

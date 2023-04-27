@@ -289,7 +289,7 @@ M.get_class_name = function()
       break
     end
   end
-  local query = vim.treesitter.get_query("python", "class_name")
+  local query = vim.treesitter.query.get("python", "class_name")
   if class_node==nil then
     return nil
   else

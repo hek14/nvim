@@ -110,8 +110,8 @@ local function gen_lsp_and_ts_symbols(opts)
     if not hidden and filename then
       ordinal = filename .. " "
     end
-    ordinal = ordinal .. symbol_name .. entry.ts_info .. entry.type
-    -- ordinal = ordinal .. symbol_name
+    -- ordinal = ordinal .. symbol_name .. entry.ts_info .. entry.type
+    ordinal = ordinal .. symbol_name
     return make_entry.set_default_entry_mt({
       value = entry,
       ordinal = ordinal,

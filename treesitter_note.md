@@ -54,7 +54,7 @@ local parse_str = [[
     name: (identifier) @definition.function)
    (#set! definition.function.scope "parent"))
 ]]
-local query = vim.treesitter.parse_query('python',parse_str)`
+local query = vim.treesitter.query.parse('python',parse_str)`
 ```
 - what is `Query object`
 a TS Query is just like a regex search: `(.*)python(.*)`

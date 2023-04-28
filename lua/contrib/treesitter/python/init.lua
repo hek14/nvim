@@ -270,7 +270,7 @@ test_{}()
   ls.snip_expand(combine_shots)
 end
 
-vim.treesitter.query.set_query(
+vim.treesitter.query.set(
   "python",
   "class_name",
   [[ 
@@ -289,7 +289,7 @@ M.get_class_name = function()
       break
     end
   end
-  local query = vim.treesitter.get_query("python", "class_name")
+  local query = vim.treesitter.query.get("python", "class_name")
   if class_node==nil then
     return nil
   else

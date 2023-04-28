@@ -16,7 +16,7 @@ function M.get_query_matches(buffer, lang, query_str, root)
 
     local root = root or ts.get_parser(buffer, lang):parse()[1]:root()
 
-    local query = ts.parse_query(lang, query_str)
+    local query = ts.query.parse(lang, query_str)
 
     return query:iter_matches(root, buffer)
 end
@@ -33,7 +33,7 @@ local extract_all_comments = function(bufnr,line,pattern)
     line = line - 1
   end
   local lang = vim.api.nvim_buf_get_option(bufnr,'filetype')
-  local query = vim.treesitter.parse_query(
+  local query = vim.treesitter.query.parse(
   lang,string.format(
   [[
   [

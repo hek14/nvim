@@ -421,7 +421,15 @@ local plugins = {
     'mbbill/undotree',
     cmd = 'UndotreeToggle',
     init = function()
-      require('core.utils').map('n', '<C-x>u', ':UndotreeToggle | UndotreeFocus<CR>')
+      require('core.utils').map('n', '<C-x>u', function() 
+        vim.cmd [[ UndotreeToggle ]]
+        for _,win in ipairs(require('core.utils').get_all_window_buffer_filetype()) do
+          if win.filetype == 'undotree' then
+            vim.api.nvim_set_current_win(win.winnr)
+            break
+          end
+        end
+      end)
     end,
   },
   {

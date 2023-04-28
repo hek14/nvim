@@ -12,7 +12,7 @@ local query = [[
   name: (aliased_import
           name: (dotted_name) @kk_modules))
 ]]
-local parsed_query = ts.parse_query("python", query)
+local parsed_query = ts.query.parse("python", query)
 -- local print = _G.p
 
 local kk_modules = {}

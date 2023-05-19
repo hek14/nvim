@@ -1,3 +1,14 @@
+# rust installation
+一些rust写的package或者library需要安装rust:
+- install rustup:
+有了rustup, 其他rust相关工具都能用它下载;
+`nix-env -iA nixpkgs.rustup`
+- 配置rustup
+用nightly, stable会有很多问题
+`rustup install nightly`
+`rustup default nightly`
+这样之后rustc, cargo就都有了
+
 # coroutine 陷阱
 coroutine中出了错不会报错, "it just failed silently"
 ```lua

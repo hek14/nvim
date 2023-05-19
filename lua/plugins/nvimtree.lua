@@ -3,12 +3,15 @@ local function on_attach(bufnr)
   local function opts(desc)
     return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
   end
-  vim.keymap.set('n', '<C-e>', api.node.open.replace_tree_buffer, opts('Open: In Place'))
+  api.config.mappings.default_on_attach(bufnr)
+  require('core.utils').del_map('n','J',bufnr)
+  require('core.utils').del_map('n','K',bufnr)
+
+  require('core.utils').del_map('n','n',bufnr)
+  require('core.utils').del_map('n','e',bufnr)
+  require('core.utils').del_map('n','i',bufnr)
   vim.keymap.set('n', 'N', api.node.navigate.sibling.last, opts('Last Sibling'))
   vim.keymap.set('n', 'E', api.node.navigate.sibling.first, opts('First Sibling'))
-  vim.keymap.set('n', 'R', api.tree.reload, opts('Refresh'))
-  vim.keymap.set('n', 'r', api.fs.rename, opts('Rename'))
-  vim.keymap.set('n', '<C-r>', api.fs.rename_sub, opts('Rename: Omit Filename'))
 end
 local M = {
   "nvim-tree/nvim-tree.lua",

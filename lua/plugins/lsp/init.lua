@@ -196,8 +196,8 @@ function M.config()
     handlers = my_lsp_handlers
   }
 
-  local python_lsp = 'pylance'
-  local pyright_opts = {
+  local python_lsp = 'jedi'
+  local pyright_opts =  vim.tbl_deep_extend('force',options, {
     settings = {
       python = {
         analysis = {
@@ -225,8 +225,7 @@ function M.config()
       util.root_pattern(unpack(root_files))(fname) or
       util.path.dirname(fname)
     end
-  }
-  pyright_opts = vim.tbl_deep_extend('force',options,pyright_opts)
+  })
 
   require("mason-lspconfig").setup({
     automatic_installation = false,
@@ -308,6 +307,35 @@ function M.config()
   if python_lsp == 'pylance' then
     require('plugins.lsp.pylance_config')
     require('lspconfig').pylance.setup(pyright_opts)
+  end
+  if python_lsp == 'jedi' then
+    local jedi_opts = vim.tbl_deep_extend('force',options,{
+      cmd = {vim.fn.expand('~/miniconda3/envs/py12306/bin/jedi-language-server')},
+    })
+    require'lspconfig'.jedi_language_server.setup(jedi_opts)
+  end
+  if python_lsp == 'pylyzer' then
+    local pylyzer_opts = vim.tbl_deep_extend('force',options,{
+      cmd = { "pylyzer", "--server" },
+      filetypes = { "python" },
+      settings = {
+        {
+          python = {
+            checkOnType = false,
+            diagnostics = true,
+            inlayHints = true,
+            smartCompletion = true
+          }
+        }
+      },
+      root_dir = function(fname)
+        local root_files = {'pyproject.toml', 'pyrightconfig.json'}
+        return util.find_git_ancestor(fname) or
+        util.root_pattern(unpack(root_files))(fname) or
+        util.path.dirname(fname)
+      end
+    })
+    require'lspconfig'.pylyzer.setup(pylyzer_opts)
   end
   -- require("plugins.null-ls").setup()
   require("plugins.lsp.diagnostics").setup()

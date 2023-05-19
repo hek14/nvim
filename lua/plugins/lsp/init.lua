@@ -229,7 +229,7 @@ function M.config()
   pyright_opts = vim.tbl_deep_extend('force',options,pyright_opts)
 
   require("mason-lspconfig").setup({
-    automatic_installation = true,
+    automatic_installation = false,
     ensure_installed = {'pyright', 'jsonls'}, -- ruff_lsp not needed, use ruff with null-ls instead
   })
 

@@ -129,10 +129,11 @@ function M.config()
       -- ["<C-f>"] = cmp.mapping.scroll_docs(4),
       ["<C-Space>"] = cmp.mapping.complete(),
       ["<C-v>"] = cmp.mapping.close(),
-      ["<CR>"] = cmp.mapping.confirm {
-        behavior = cmp.ConfirmBehavior.Replace,
-        select = true,
-      },
+      ['<CR>'] = cmp.mapping.confirm({ select = true }),
+      -- ["<CR>"] = cmp.mapping.confirm {
+      --   behavior = cmp.ConfirmBehavior.Replace,
+      --   select = true,
+      -- },
       ["<tab>"] = function(fallback)
         if cmp.visible() then
           cmp.select_next_item()

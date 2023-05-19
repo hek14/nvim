@@ -147,17 +147,7 @@ local plugins = {
             end
           })
 
-          require("toggleterm").setup({
-            highlights = {
-              Normal = {
-                link = 'Visual'
-              },
-              NormalFloat = {
-                link = 'Visual'
-              },
-            },
-
-          })
+          require("toggleterm").setup()
         end
       }
     },
@@ -557,7 +547,8 @@ local plugins = {
         return false
       end)
       -- NOTE: why do this here? 
-      -- the projects are read in the source code: project.lua -> M.init() -> history.read_projects_from_history() -> uv.fs_read(history_file), this is a async callback!
+      -- the projects are read in the source code: project.lua -> M.init() -> history.read_projects_from_history() -> uv.fs_read(history_file,callback), 
+      -- the project list is built in a async callback!
       -- which means it will not be executed immediately, so when we first call [[Telescope projects]]
       -- it will call this config part first, `config` will load project and *schedule* the read_projects_from_history, but the project lists are empty right now. 
       -- we can use vim.wait to sync the callback, see notes.md

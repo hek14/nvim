@@ -167,7 +167,7 @@ relations with bufnr:
 8. 以'2023.2.30'版本为例: 
 8.1. 定位报错的message, 这个要首先通过`node server.bundle.js --stdio`看原本的message, 然后搜索里面的部分关键词 
 2023.2.30版本 [25872-26003]行其实就是`node server.bundle.js --stdio`报的那些错, 
-NOTE: 通过搜索 `^ *".*" *+`, 找到大量连着的这个pattern, 就是这个报错message所在的位置.
+通过搜索 `^ *".*" *+`, 找到大量连着的这个pattern, 就是这个报错message所在的位置.
 8.2. '/for (const' 找到一个这样的结构:
 ```node.js
           (function () {
@@ -178,7 +178,13 @@ NOTE: 通过搜索 `^ *".*" *+`, 找到大量连着的这个pattern, 就是这�
             ])
           })
 ```
-8.3. answer from askfiy: 
+8.3 另外的定位方法: 
+搜索`^ *0x.*function.*_0x.*_0x.*_0x`, 会有很多个, 然后如下的那个:
+前面有很多行连续以'+'结尾, 也就是8.2中所提到的报错message
+小技巧, 这相当于是要搜索两个pattern, 那么可以用match-highlight来高亮一个,搜索下一个时就能看到
+前一个pattern的结果 `match Visual /^ *".*" +$/`
+找到这一个之后再找 `(function () {` 或者`/for (const`都行
+8.4. answer from askfiy: 
 ```markdown
 If you know node.js, you can try to find the answer from Pylance's encryption source code, it is actually very simple.
 The verification code is similar to "if !has(vscode) { return false};".
@@ -191,6 +197,7 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.3.20: line 26940
 2023.3.40: line 23878
 2023.4.10: line 23850
+2023.5.30: line 33086
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
 # check if a program is able to find in nvim

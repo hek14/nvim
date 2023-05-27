@@ -1,5 +1,8 @@
 return {
-  'hek14/lspsaga.nvim',
+  -- dir = '~/contrib/lspsaga.nvim',
+  -- 'hek14/lspsaga.nvim',
+  -- branch = 'main',
+  'glepnir/lspsaga.nvim',
   branch = 'main',
   enabled = true,
   event = "BufRead",

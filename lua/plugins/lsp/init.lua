@@ -196,7 +196,7 @@ function M.config()
     handlers = my_lsp_handlers
   }
 
-  local python_lsp = 'jedi'
+  local python_lsp = 'pylance'
   local pyright_opts =  vim.tbl_deep_extend('force',options, {
     settings = {
       python = {
@@ -310,7 +310,7 @@ function M.config()
   end
   if python_lsp == 'jedi' then
     local jedi_opts = vim.tbl_deep_extend('force',options,{
-      cmd = {vim.fn.expand('~/miniconda3/envs/py12306/bin/jedi-language-server')},
+      -- cmd = {vim.fn.expand('~/miniconda3/envs/py12306/bin/jedi-language-server')},
     })
     require'lspconfig'.jedi_language_server.setup(jedi_opts)
   end

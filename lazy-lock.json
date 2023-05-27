@@ -43,7 +43,7 @@
   "neotest-vim-test": { "branch": "master", "commit": "75c4228882ae4883b11bfce9b8383e637eb44192" },
   "nerdicons.nvim": { "branch": "main", "commit": "6dfb8abaf278f6075605902f5e79b8fef9403b3b" },
   "nredir.nvim": { "branch": "main", "commit": "22cdf3aaf43d563b27c5bbbd31da5ab23efec972" },
-  "nui.nvim": { "branch": "main", "commit": "db2e3d694d42f32074cb19daa4ded4bfc7955ec9" },
+  "nui.nvim": { "branch": "main", "commit": "2b2732528e4a79eb8542568bd51d25f710395bd6" },
   "nvim-autopairs": { "branch": "master", "commit": "59df87a84c80a357ca8d8fe86e451b93ac476ccc" },
   "nvim-bqf": { "branch": "main", "commit": "1276701ed0216b94d7919d5c07845dcdf05fbde5" },
   "nvim-cmp": { "branch": "main", "commit": "a0225043ab823fcad8d0d802e276d9838fb48c30" },
@@ -97,3 +97,4 @@
   "vimux": { "branch": "master", "commit": "616fcb4799674a7a809b14ca2dc155bb6ba25788" },
   "visual_studio_code": { "branch": "master", "commit": "8270e820e47d0398b7d795a82f8e6ae3ddaef87a" },
   "whiskyline.nvim": { "branch": "main", "commit": "2cc41a941290bbb254e84eb95efcfa8691a63cdf" }
+}

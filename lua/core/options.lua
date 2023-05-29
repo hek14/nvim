@@ -74,6 +74,8 @@ opt.whichwrap:append "<>[]hl"
 opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
 opt.foldlevelstart = -1
 opt.foldenable = true
+opt.foldmethod = 'indent'
+opt.foldexpr = nil
 
 g.mapleader = " "
 vim.env['PATH'] = vim.fn.stdpath('config') .. '/bin:' .. vim.env['PATH']

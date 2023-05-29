@@ -34,20 +34,56 @@ local M = {
     "williamboman/mason-lspconfig.nvim",
     {
       'j-hui/fidget.nvim', -- show lsp progress
-      config = function() require('fidget').setup {
-        text = {
-          spinner = 'dots', -- or 'line'
-          done = "Done",
-          commenced = "Started",
-          completed = "Completed",
-        },
-        window = {
-          blend = 0,  -- &winblend for the window
-        },
-        fmt = {
-          stack_upwards = true,  -- list of tasks grows upwards
+      lazy = false,
+      config = function() 
+        require('fidget').setup {
+          text = {
+            spinner = 'dots', -- or 'line'
+            done = "Done",
+            commenced = "Started",
+            completed = "Completed",
+          },
+          window = {
+            blend = 0,  -- &winblend for the window
+          },
+          fmt = {
+            stack_upwards = true,  -- list of tasks grows upwards
+          }
+        } 
+      end
+    },
+    {
+      'SmiteshP/nvim-gps',
+      keys = {
+        {
+          ',w',function()
+            vim.print(require('nvim-gps').get_location())
+          end
         }
-      } end
+      },
+      config = function()
+        require('nvim-gps').setup()
+      end,
+    },
+    {
+      'simrat39/symbols-outline.nvim',
+      cmd = { 'SymbolsOutline' },
+      config = function()
+        local opts = {
+          keymaps = {
+            fold = 'f',
+            unfold = 'F',
+          },
+        }
+        require('symbols-outline').setup(opts)
+        require('core.utils').map("n","<leader>ls",":SymbolsOutline<CR>")
+      end,
+    },
+    {
+      'folke/trouble.nvim',
+      config = function()
+        require('trouble').setup({})
+      end,
     },
     {
       "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",

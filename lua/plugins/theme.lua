@@ -1,9 +1,12 @@
 local override_hl = function ()
   vim.cmd([[
   hi clear CursorLine
-  hi default LspReferenceRead ctermbg=237 guibg=#343d46
-  hi default LspReferenceText ctermbg=237 guibg=#343d46
-  hi default LspReferenceWrite ctermbg=237 guibg=#343d46 gui=Bold,Italic
+  " hi default LspReferenceRead guibg=#949996
+  " hi default LspReferenceText guibg=#949996
+  " hi default LspReferenceWrite guibg=#264F78 gui=Bold,Italic
+  hi! link LspReferenceWrite Visual
+  hi! link LspReferenceRead Search
+  hi! link LspReferenceText Search
   hi! link IndentLine Comment
   hi! link StatusLeft StatusLine
   hi! link StatusRight StatusLine

@@ -4,7 +4,7 @@ local plugins = {
     cmd = {'Git', 'Gedit','Gdiffsplit','Gread','Gwrite','Ggrep','GMove','GDelete','GBrowse'}
   },
   {
-    'hek14/easyformat.nvim',
+    'nvimdev/easyformat.nvim',
     ft = { 'python', 'lua' },
     config = function()
       vim.env['PATH'] = vim.fn.expand('~/.local/share/nvim/mason/bin:') .. vim.env['PATH']
@@ -13,14 +13,6 @@ local plugins = {
       configs.use_default({
         'lua',
       })
-      -- configs.python = {
-      --   cmd = 'black',
-      --   args = {},
-      --   find = false,
-      --   fname = true,
-      --   stdin = false,
-      --   do_not_need_stdout = true,
-      -- }
       configs.python = {
         cmd = 'black',
         args = {'-'},
@@ -40,19 +32,6 @@ local plugins = {
     end,
   },
   {
-    'SmiteshP/nvim-gps',
-    keys = {
-      {
-        ',w',function()
-          vim.print(require('nvim-gps').get_location())
-        end
-      }
-    },
-    config = function()
-      require('nvim-gps').setup()
-    end,
-  },
-  {
     'sbulav/nredir.nvim',
     cmd = 'Nredir',
   },
@@ -69,32 +48,7 @@ local plugins = {
     },
   },
   { 'nvim-lua/plenary.nvim' },
-  {
-    'bfredl/nvim-luadev',
-    cmd = 'Luadev',
-    keys = {
-      '<Plug>(Luadev-RunLine)',
-      '<Plug>(Luadev-Run)',
-      '<Plug>(Luadev-RunWord)',
-      '<Plug>(Luadev-Complete)',
-    },
-    init = function()
-      local map = require('core.utils').map
-      map('n', '<C-x>l', '<Plug>(Luadev-RunLine)', { remap = true })
-      map('n', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
-      map('x', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
-      map('n', '<C-x>w', '<Plug>(Luadev-RunWord)', { remap = true })
-      map('i', '<C-x>c', '<Plug>(Luadev-Complete)', { remap = true })
-    end,
-  },
   { 'nvim-tree/nvim-web-devicons' },
-  {
-    'glepnir/nerdicons.nvim',
-    cmd = 'NerdIcons',
-    config = function()
-      require('nerdicons').setup({})
-    end,
-  },
   {
     'glepnir/template.nvim', 
     cmd = {'Template','TemProject'}, 
@@ -106,70 +60,6 @@ local plugins = {
       })
       require('telescope').load_extension('find_template')
     end
-  },
-  {
-    'norcalli/nvim-colorizer.lua',
-    cmd = 'ColorizerToggle',
-    config = function()
-      require('colorizer').setup()
-    end,
-  },
-  {
-    'RRethy/vim-tranquille',
-    event = 'BufEnter',
-    config = function()
-      require('core.utils').map(
-        'n',
-        'g/',
-        '<Plug>(tranquille_search)',
-        { noremap = true, silent = true }
-      )
-    end,
-  },
-  {
-    'lmburns/lf.nvim',
-    cmd = 'Lf',
-    dependencies = { 
-      'nvim-lua/plenary.nvim', 
-      {
-        'akinsho/toggleterm.nvim',
-        cmd = 'ToggleTerm',
-        config = function ()
-          vim.api.nvim_create_autocmd('TermOpen',{
-            pattern = 'term://*toggleterm#*',
-            callback = function ()
-              local bufnr = vim.api.nvim_get_current_buf()
-              local bufname = vim.api.nvim_buf_get_name(bufnr)
-              local id = string.match(bufname,'#%d+$')
-              id = string.sub(id,2)
-              local value = '%#Visual' .. string.format([[#  id: %s]],id) .. '%X'
-              local status_ok, _ = pcall(vim.api.nvim_set_option_value, "winbar", value, { scope = "local" })
-            end
-          })
-
-          require("toggleterm").setup()
-        end
-      }
-    },
-    opts = {
-      winblend = 0,
-      highlights = { NormalFloat = { guibg = 'NONE' } },
-      border = 'double', -- border kind: single double shadow curved
-      height = 0.70,
-      width = 0.85,
-      escape_quit = true,
-    },
-    keys = {
-      { '<cmd>Lf<cr>', desc = 'lfcd' },
-    },
-  },
-  {
-    'echasnovski/mini.sessions',
-    version = false,
-    lazy = false,
-    config = function()
-      require('mini.sessions').setup()
-    end,
   },
   {
     'echasnovski/mini.surround',
@@ -189,14 +79,13 @@ local plugins = {
   },
   {
     'nvimdev/indentmini.nvim',
-    enabled = false,
+    enabled = true,
     event = 'BufEnter',
     config = function()
       require('indentmini').setup({
         exclude = {'dashboard', 'lazy', 'help', 'markdown', 'terminal', 'floaterm', 'vim'}
       })
     end,
-    -- this is no required but if you want indent blanklink line this is needed
     dependencies = { 'nvim-treesitter/nvim-treesitter'}
   },
   {
@@ -224,38 +113,10 @@ local plugins = {
   },
   {
     'luukvbaal/statuscol.nvim',
-    enabled = false,
-    -- enabled = function()
-    --   local v = vim.fn.has('nvim-0.9')
-    --   if v == 1 then
-    --     return true
-    --   else
-    --     return false
-    --   end
-    -- end,
+    enabled = true,
     event = 'BufRead',
     config = function()
       require('statuscol').setup({ setopt = true })
-    end,
-  },
-  {
-    'simrat39/symbols-outline.nvim',
-    cmd = { 'SymbolsOutline' },
-    config = function()
-      local opts = {
-        keymaps = {
-          fold = 'f',
-          unfold = 'F',
-        },
-      }
-      require('symbols-outline').setup(opts)
-      require('core.utils').map("n","<leader>ls",":SymbolsOutline<CR>")
-    end,
-  },
-  {
-    'folke/trouble.nvim',
-    config = function()
-      require('trouble').setup({})
     end,
   },
   {
@@ -263,13 +124,12 @@ local plugins = {
     event = 'InsertCharPre',
     config = function()
       local default = {
-        mapping = { 'jk' },
+        mapping = { 'jj' },
         timeout = 300,
       }
       require('better_escape').setup(default)
     end,
   },
-  -- misc plugins
   {
     'windwp/nvim-autopairs',
     config = true,
@@ -285,7 +145,6 @@ local plugins = {
       map('v', '<leader>/', ":lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>")
     end,
   },
-  -- file managing , picker etc
   {
     'ThePrimeagen/harpoon',
     keys = {
@@ -298,26 +157,10 @@ local plugins = {
     },
   },
   {
-    'sakhnik/nvim-gdb',
-    init = function()
-      vim.g.nvimgdb_disable_start_keymaps = true
-    end,
-    config = function()
-      vim.cmd([[
-      nnoremap <expr> <Leader>dd ":GdbStartPDB python -m pdb " . expand('%')
-      ]])
-      vim.cmd([[
-      command! GdbExit lua NvimGdb.i():send('exit')
-      nnoremap <Leader>ds :GdbExit<CR>
-      ]])
-    end,
-  },
-  {
     'Pocco81/TrueZen.nvim',
     cmd = { 'TZAtaraxis', 'TZMinimalist', 'TZFocus' },
     init = function()
       require('core.utils').map('n', 'gq', '<cmd>TZFocus<CR>')
-      -- require("core.utils").map("i", "<C-q>", "<cmd>TZFocus<CR>")
     end,
   },
   {
@@ -331,7 +174,6 @@ local plugins = {
       map({ 'n', 'x' }, 'gs', '<Plug>(leap-from-window)')
     end,
   },
-  -- 1. populate the quickfix
   {
     'mhinz/vim-grepper',
     lazy = false,
@@ -391,7 +233,6 @@ local plugins = {
   {
     'stefandtw/quickfix-reflector.vim',
     enabled = false, -- NOTE: use my own ~/.config/nvim/plugin/qf_refactor.vim
-
     -- this plugin conflicts with the above nvim-bqf, it will ca nvim-bqf not working, there is two solutions:
     -- soluction 1: defer the nvim-bqf loading just like above
     -- solution 2: modify the quickfix-reflector.vim init_buffer like below:
@@ -422,12 +263,6 @@ local plugins = {
       end)
     end,
   },
-  {
-    'tpope/vim-scriptease',
-    enabled = false,
-    cmd = 'Messages',
-  },
-  { 'MunifTanjim/nui.nvim' },
   {
     'rcarriga/nvim-notify',
     enabled = false,
@@ -460,6 +295,21 @@ local plugins = {
   {
     'metakirby5/codi.vim',
     cmd = { 'Codi', 'CodiNew', 'CodiSelect', 'CodiExpand' },
+  },
+  {
+    'sakhnik/nvim-gdb',
+    init = function()
+      vim.g.nvimgdb_disable_start_keymaps = true
+    end,
+    config = function()
+      vim.cmd([[
+      nnoremap <expr> <Leader>dd ":GdbStartPDB python -m pdb " . expand('%')
+      ]])
+      vim.cmd([[
+      command! GdbExit lua NvimGdb.i():send('exit')
+      nnoremap <Leader>ds :GdbExit<CR>
+      ]])
+    end,
   },
   {
     'nvim-neotest/neotest',
@@ -514,7 +364,6 @@ local plugins = {
       { "<leader>fp", function ()
         require('telescope').load_extension('projects')
         require'telescope'.extensions.projects.projects{}
-        -- vim.cmd [[ Telescope projects ]] 
       end
     }},
     name = 'project.nvim',
@@ -605,10 +454,9 @@ local plugins = {
   },
   {
     'folke/persistence.nvim',
-    enabled = false, -- use very few times, but consume too much time at startup
-    event = 'BufReadPre', -- this will only start session saving when an actual file was opened
+    enabled = false,
+    event = 'BufReadPre',
     init = function()
-      -- this mapping should be in the init module, to that before the loading of whick-key, otherwise it will not work
       local map = require('core.utils').map
       map('n', '<space>qs', [[<cmd>lua require("persistence").load()<cr>]])
       map('n', '<space>ql', [[<cmd>lua require("persistence").load({ last = true })<cr>]])
@@ -623,12 +471,9 @@ local plugins = {
   },
   {
     'folke/todo-comments.nvim',
-    -- how to use it?
-    -- using TODO: (the last colon is necessary)
     event = 'BufRead',
     dependencies = 'nvim-lua/plenary.nvim',
     config = function()
-      -- HACK: #104 Invalid in command-line window
       local hl = require('todo-comments.highlight')
       local highlight_win = hl.highlight_win
       hl.highlight_win = function(win, force)
@@ -637,10 +482,10 @@ local plugins = {
       require('todo-comments').setup({
         keywords = {
           FIX = {
-            icon = ' ', -- icon used for the sign, and in search results
-            color = 'error', -- can be a hex color, or a named color (see below)
-            alt = { 'FIXME', 'BUG', 'FIXIT', 'ISSUE', 'MAYBE' }, -- a set of other keywords that all map to this FIX keywords
-            signs = true, -- configure signs for some keywords individually
+            icon = ' ',
+            color = 'error',
+            alt = { 'FIXME', 'BUG', 'FIXIT', 'ISSUE', 'MAYBE' },
+            signs = true,
           },
         },
       })
@@ -665,15 +510,6 @@ local plugins = {
     end,
   },
   {
-    't9md/vim-choosewin',
-    enabled = false,
-    event = 'VimEnter',
-    config = function()
-      vim.g.choosewin_overlay_enable = 1
-      require('core.utils').map('n', '-', '<Plug>(choosewin)', { noremap = false })
-    end,
-  },
-  {
     'alexghergh/nvim-tmux-navigation',
     event = 'VeryLazy',
     config = function()
@@ -690,7 +526,6 @@ local plugins = {
       })
     end,
   },
-  { 'kdheepak/cmp-latex-symbols' },
   {
     'lervag/vimtex',
     ft = 'tex',
@@ -707,10 +542,64 @@ local plugins = {
   },
   {
     'rhysd/vim-grammarous',
-    enabled = false, -- very hard to : cannot ignore the latex keywords
+    enabled = false,
     init = function()
       vim.g['grammarous#languagetool_cmd'] = 'languagetool -l en-US'
     end,
   },
+  -- {
+  --   'bfredl/nvim-luadev',
+  --   cmd = 'Luadev',
+  --   keys = {
+  --     '<Plug>(Luadev-RunLine)',
+  --     '<Plug>(Luadev-Run)',
+  --     '<Plug>(Luadev-RunWord)',
+  --     '<Plug>(Luadev-Complete)',
+  --   },
+  --   init = function()
+  --     local map = require('core.utils').map
+  --     map('n', '<C-x>l', '<Plug>(Luadev-RunLine)', { remap = true })
+  --     map('n', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
+  --     map('x', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
+  --     map('n', '<C-x>w', '<Plug>(Luadev-RunWord)', { remap = true })
+  --     map('i', '<C-x>c', '<Plug>(Luadev-Complete)', { remap = true })
+  --   end,
+  -- },
+  -- {
+  --   'glepnir/nerdicons.nvim',
+  --   cmd = 'NerdIcons',
+  --   config = function()
+  --     require('nerdicons').setup({})
+  --   end,
+  -- },
+  -- {
+  --   'norcalli/nvim-colorizer.lua',
+  --   cmd = 'ColorizerToggle',
+  --   config = function()
+  --     require('colorizer').setup()
+  --   end,
+  -- },
+  -- {
+  --   'echasnovski/mini.sessions',
+  --   version = false,
+  --   lazy = false,
+  --   config = function()
+  --     require('mini.sessions').setup()
+  --   end,
+  -- },
+  -- {
+  --   'tpope/vim-scriptease',
+  --   enabled = false,
+  --   cmd = 'Messages',
+  -- },
+  -- {
+  --   't9md/vim-choosewin',
+  --   enabled = false,
+  --   event = 'VimEnter',
+  --   config = function()
+  --     vim.g.choosewin_overlay_enable = 1
+  --     require('core.utils').map('n', '-', '<Plug>(choosewin)', { noremap = false })
+  --   end,
+  -- },
 }
 return plugins

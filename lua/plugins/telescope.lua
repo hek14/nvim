@@ -1,6 +1,7 @@
 local map = require("core.utils").map
 local M = {
   "nvim-telescope/telescope.nvim",
+  enabled = true,
   cmd = "Telescope",
   keys = {
     { "<leader>b", "<cmd>Telescope buffers<CR>" },
@@ -146,7 +147,7 @@ function M.config()
     },
     defaults = {
       -- layout_strategy = vim.loop.os_uname().sysname=='Linux' and 'vertical' or 'horizontal',
-      layout_strategy = 'vertical',
+      layout_strategy = 'horizontal',
       layout_config = { height = 0.8 },
       mappings = {
         i = {

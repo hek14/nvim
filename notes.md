@@ -59,6 +59,12 @@ https://www.nerdfonts.com/font-downloads
       cp bin/nvim /usr/bin/ (for linux)
   1.5 cp -r share/nvim /usr/local/share/ (for mac-os)
       cp -r share/nvim /usr/share/ (for linux)
+  1.6 cp -r lib/nvim /usr/local/lib/ (for mac-os)
+      cp -r lib/nvim /usr/lib/ (for linux)
+要注意的是: mac-os不能使用从chrome浏览器点击下载nvim-macos.tar.gz的方式
+使用这种方式安装的nvim会经常报开发者不受信任的错误.
+mac上下载的正确方式是从safari或者直接复制链接之后terminal wget.
+
 2. remove the ~/.cache/nvim and ~/.local/share/nvim
 3. remove ~/.config/nvim/plugin/packer_compiled.lua
 4. install dependencies

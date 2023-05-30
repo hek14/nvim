@@ -9,7 +9,6 @@ local plugins = {
     config = function()
       vim.env['PATH'] = vim.fn.expand('~/.local/share/nvim/mason/bin:') .. vim.env['PATH']
       local configs = require('easyformat.config')
-      configs.timeout = 300
       configs.use_default({
         'lua',
       })

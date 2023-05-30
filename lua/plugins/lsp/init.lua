@@ -104,11 +104,12 @@ local M = {
     },
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
-      enabled = true,
+      enabled = false,
       dependencies = { 'navic', 'nvim-tree/nvim-web-devicons' },
       name = "barbecue",
       opts = {},
     },
+    { 'Bekaboo/dropbar.nvim' },
     {
       'hek14/symbol-overlay.nvim',
       config = function ()

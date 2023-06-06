@@ -67,6 +67,7 @@ local M = {
     },
     {
       'simrat39/symbols-outline.nvim',
+      enabled = false,
       cmd = { 'SymbolsOutline' },
       config = function()
         local opts = {
@@ -93,6 +94,7 @@ local M = {
     },
     {
       'hek14/nvim-navic',
+      enabled = true,
       name = 'navic',
       branch = 'refactor',
       config = function ()
@@ -101,6 +103,7 @@ local M = {
     },
     {
       'hek14/vim-illuminate',
+      enabled = true,
     },
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
@@ -160,7 +163,6 @@ end
 
 function M.config()
   local util = require'lspconfig'.util
-  local illuminate_present,illuminate = pcall(require,'illuminate')
 
   local my_lsp_handlers = {
     ["textDocument/hover"] = vim.lsp.with(M.lsp_hover, {
@@ -205,8 +207,13 @@ function M.config()
     --   client.server_capabilities.document_formatting = false
     -- end
     -- vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
-    require 'illuminate'.on_attach(client)
-    if client.server_capabilities.documentSymbolProvider then
+    local illuminate_present,illuminate = pcall(require,'illuminate')
+    if illuminate_present then
+      require 'illuminate'.on_attach(client)
+    end
+
+    local navic_present,navic = pcall(require,'nvim-navic')
+    if client.server_capabilities.documentSymbolProvider and navic_present then
       require("nvim-navic").attach(client, bufnr)
     end
     require("contrib.pig").on_attach(bufnr)

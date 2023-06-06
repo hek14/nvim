@@ -28,6 +28,7 @@ local M = {
     {"theHamsta/nvim-treesitter-pairs"},
     {
       "nvim-treesitter/playground",
+      enabled = false,
       config = function()
         require('core.utils').map('n', ',x', ':TSPlaygroundToggle<cr>')
         require('core.utils').map('n', ',h',':TSHighlightCapturesUnderCursor<cr>')
@@ -35,6 +36,7 @@ local M = {
     }, 
     {
       "David-Kunz/treesitter-unit",
+      enabled = false,
       config = function()
         require"treesitter-unit".enable_highlighting()
         local map = require("core.utils").map
@@ -72,9 +74,9 @@ function M.config()
 
   local options = {
     ensure_installed = {"python","c","query","vim","markdown","markdown_inline"}, -- NOTE: playground need query parser
-    playground = { 
-      enable = true 
-    },
+    -- playground = { 
+    --   enable = true 
+    -- },
     query_linter = {
       enable = true,
       use_virtual_text = true,

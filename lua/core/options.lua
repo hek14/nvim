@@ -63,7 +63,7 @@ opt.listchars:append("eol:↴")
 opt.listchars:append("tab:↹ ")
 
 -- interval for writing swap file to disk, also used by gitsigns
-opt.updatetime = 200
+opt.updatetime = 750
 
 -- go to previous/next line with h,l,left arrow and right arrow
 -- when cursor reaches end/beginning of line

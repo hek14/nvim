@@ -6,7 +6,7 @@ local M = {
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
     "hrsh7th/cmp-nvim-lsp-signature-help",
-    "lukas-reineke/cmp-rg",
+    -- "lukas-reineke/cmp-rg",
     "L3MON4D3/LuaSnip",
     "saadparwaiz1/cmp_luasnip",
     "hrsh7th/cmp-nvim-lua",
@@ -214,16 +214,16 @@ function M.config()
     },
   })
 
-  local cmp_rg_complete = function()
-    cmp.complete({
-      config = {
-        sources = {
-          { name = "rg" }, -- should install the cmp-rg
-        }
-      }
-    })
-  end
-  require('core.utils').map('i','<C-g>',cmp_rg_complete,{noremap=true,silent=true})
+  -- local cmp_rg_complete = function()
+  --   cmp.complete({
+  --     config = {
+  --       sources = {
+  --         { name = "rg" }, -- should install the cmp-rg
+  --       }
+  --     }
+  --   })
+  -- end
+  -- require('core.utils').map('i','<C-g>',cmp_rg_complete,{noremap=true,silent=true})
 
 
   local cmp_config = function()

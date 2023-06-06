@@ -111,6 +111,7 @@ docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest b
 - https://github.com/folke/edgy.nvim
 - https://github.com/nvim-neo-tree/neo-tree.nvim
 - https://github.com/stevearc/oil.nvim
+- https://github.com/google/executor.nvim
 # Youtuber to follow
 1. jesse19skelton
 - https://www.youtube.com/@jesse19skelton -- nice videos about karabiner and  yabai [his github]()

@@ -158,11 +158,10 @@ function M.config()
       end
     },
     sources = {
-      { name = "luasnip", priority = 200 },
-      { name = "path" , priority = 200 },
+      { name = "luasnip" },
+      { name = "path"  },
       { 
         name = "nvim_lsp", 
-        priority = 100, 
         entry_filter = function(entry, ctx)
           -- NOTE: example of filtering source
           local cond = require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
@@ -170,10 +169,17 @@ function M.config()
           return cond
         end
       },
-      { name = 'nvim_lsp_signature_help', priority = 100 },
-      { name = "nvim_lua", priority = 50 },
-      { name = "latex_symbols", priority = 1 },
-      { name = "buffer", priority = 1 }
+      { name = 'nvim_lsp_signature_help' },
+      { name = "nvim_lua" },
+      { name = "latex_symbols" },
+      { 
+        name = "buffer", 
+        option = {
+          get_bufnrs = function()
+            return vim.api.nvim_list_bufs()
+          end,
+        }
+      }
       -- { name = "mine_config_yaml", trigger_characters = { '.' } }, -- manually trigger
     },
     window = {
@@ -197,7 +203,14 @@ function M.config()
     sources = {
       { name = 'omni' },
       { name = 'luasnip' },
-      { name = 'buffer' },
+      { 
+        name = "buffer", 
+        option = {
+          get_bufnrs = function()
+            return vim.api.nvim_list_bufs()
+          end,
+        }
+      }
     },
   })
 

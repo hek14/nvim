@@ -1,5 +1,9 @@
 local plugins = {
   {
+    'tpope/vim-scriptease',
+    cmd = 'Messages',
+  },
+  {
     'tpope/vim-fugitive',
     cmd = {'Git', 'Gedit','Gdiffsplit','Gread','Gwrite','Ggrep','GMove','GDelete','GBrowse'}
   },
@@ -585,11 +589,6 @@ local plugins = {
   --   config = function()
   --     require('mini.sessions').setup()
   --   end,
-  -- },
-  -- {
-  --   'tpope/vim-scriptease',
-  --   enabled = false,
-  --   cmd = 'Messages',
   -- },
   -- {
   --   't9md/vim-choosewin',

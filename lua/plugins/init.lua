@@ -82,14 +82,12 @@ local plugins = {
   },
   {
     'nvimdev/indentmini.nvim',
-    enabled = true,
     event = 'BufEnter',
     config = function()
       require('indentmini').setup({
         exclude = {'dashboard', 'lazy', 'help', 'markdown', 'terminal', 'floaterm', 'vim'}
       })
     end,
-    dependencies = { 'nvim-treesitter/nvim-treesitter'}
   },
   {
     'lukas-reineke/indent-blankline.nvim',

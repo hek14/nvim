@@ -92,18 +92,57 @@ local M = {
         vim.cmd([[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]])
       end,
     },
+    -- {
+    --   'hek14/nvim-navic',
+    --   enabled = true,
+    --   name = 'navic',
+    --   branch = 'refactor',
+    --   config = function ()
+    --     require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
+    --   end
+    -- },
     {
-      'hek14/nvim-navic',
-      enabled = true,
-      name = 'navic',
-      branch = 'refactor',
-      config = function ()
-        require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
+      "SmiteshP/nvim-navbuddy",
+      dependencies = {
+        "SmiteshP/nvim-navic",
+        "MunifTanjim/nui.nvim"
+      },
+      event = 'BufRead',
+      config = function()
+        local navbuddy = require("nvim-navbuddy")
+        local actions = require("nvim-navbuddy.actions")
+        navbuddy.setup {
+          mappings = {
+            ["n"] = actions.next_sibling(),     -- down
+            ["e"] = actions.previous_sibling(), -- up
+            ["h"] = actions.parent(),           -- Move to left panel
+            ["i"] = actions.children(),         -- Move to right panel
+            ["N"] = actions.move_down(),        -- Move focused node down
+            ["E"] = actions.move_up(),          -- Move focused node up
+            ["u"] = actions.insert_name(),      -- Insert at start of name
+            ["U"] = actions.insert_scope(),     -- Insert at start of scope
+          },
+          lsp = {
+            auto_attach = true
+          },
+        }
       end
     },
     {
-      'hek14/vim-illuminate',
+      'RRethy/vim-illuminate',
+      event = 'BufRead',
       enabled = true,
+      config = function()
+        require('illuminate').configure({
+          -- providers: provider used to get references in the buffer, ordered by priority
+          providers = {
+            'lsp',
+            'treesitter',
+            -- 'regex',
+          },
+          delay = 200
+        })
+      end
     },
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal

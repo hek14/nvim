@@ -279,7 +279,7 @@ end
 
 
 local refresh
-refresh = function(locations,prompt_bufnr,opts)
+refresh = vim.schedule_wrap(function(locations,prompt_bufnr,opts)
   local current_picker = action_state.get_current_picker(prompt_bufnr)
   local current_input = action_state.get_current_line()
   actions._close(prompt_bufnr, current_picker.initial_mode == 'insert')
@@ -323,7 +323,7 @@ refresh = function(locations,prompt_bufnr,opts)
     push_tagstack_on_edit = true,
   })
   :find()
-end
+end)
 
 M.references = function(opts)
   opts = opts or {bufnr = vim.api.nvim_get_current_buf(), winnr = vim.api.nvim_get_current_win()}

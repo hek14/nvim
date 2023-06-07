@@ -109,7 +109,7 @@ function M.setup(client,bufnr)
 
   vim.api.nvim_create_user_command('FixImport',function ()
     local buf = vim.api.nvim_get_current_buf()
-    local clients = vim.lsp.buf_get_clients(buf)
+    local clients = vim.lsp.get_active_clients({bufnr = buf})
     for id,_client in pairs(clients) do
       if _client.name~='null-ls' then
         _client.notify("workspace/didChangeConfiguration", { settings = _client.config.settings })

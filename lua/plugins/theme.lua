@@ -7,7 +7,8 @@ local override_hl = function ()
   hi! link LspReferenceWrite Visual
   hi! link LspReferenceRead Search
   hi! link LspReferenceText Search
-  hi! link IndentLine Comment
+  " hi! link IndentLine Comment
+  hi! IndentLine guifg='#524f4f'
   hi! link StatusLeft StatusLine
   hi! link StatusRight StatusLine
   hi! link StatusMid StatusLine
@@ -105,11 +106,6 @@ local vscode_theme = {
     vim.schedule(function ()
       require("visual_studio_code").setup({
         mode = "dark",
-        hooks = {
-          after = function()
-            vim.cmd [[highlight! link IndentLine Comment]]
-          end
-        }
       })
       override_hl()
     end)

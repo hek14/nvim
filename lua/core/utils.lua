@@ -7,6 +7,7 @@ _G.profile = function(cmd, times, flush)
   local start = vim.loop.hrtime()
   for _ = 1, times, 1 do
     if flush then
+      ---@diagnostic disable-next-line: undefined-global
       jit.flush(cmd, true)
     end
     cmd()
@@ -121,7 +122,7 @@ _G.any_client_attached = function (bufnr)
   --   end
   -- end
   local attached = {}
-  local clients = vim.lsp.buf_get_clients(bufnr) or {}
+  local clients = vim.lsp.get_active_clients({bufnr = bufnr}) or {}
   for id,client in pairs(clients) do
     if client.name~='null-ls' then
       table.insert(attached,{id=id,name=client.name})
@@ -363,6 +364,9 @@ function M.get_relative_path(base_path, my_path)
   local my_data = M.getDirectores(my_path)
   local base_len = #base_data
   local my_len = #my_data
+  if (not base_data) or (not my_data) then
+    return
+  end
 
   if base_len > my_len then
     return my_path
@@ -426,6 +430,7 @@ end
 
 function _G.TimeTravel(args)
   local default = os.date("*t")
+  ---@diagnostic disable-next-line: unused-local, param-type-mismatch
   args = vim.tbl_extend('force',default,args)
   local old_time = os.time(args)
   local now = os.time()
@@ -559,6 +564,7 @@ M.log = function (...)
     if #str > 2 then
       if log_path ~= nil and #log_path > 3 then
         local f = io.open(log_path, "a+")
+        ---@diagnostic disable-next-line: unused-local, param-type-mismatch
         io.output(f)
         io.write(str .. "=======\n")
         io.close(f)
@@ -880,7 +886,7 @@ M.reload_config = function()
         return s
       end
     end
-    return nil
+    return false
   end, vim.fn.split(vim.fn.execute("scriptnames"), "\n"))
   -- remove last search highlight
   vim.cmd("nohl")

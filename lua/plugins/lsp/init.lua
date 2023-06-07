@@ -67,6 +67,7 @@ local M = {
     },
     {
       'simrat39/symbols-outline.nvim',
+      enabled = false,
       cmd = { 'SymbolsOutline' },
       config = function()
         local opts = {
@@ -91,16 +92,57 @@ local M = {
         vim.cmd([[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]])
       end,
     },
+    -- {
+    --   'hek14/nvim-navic',
+    --   enabled = true,
+    --   name = 'navic',
+    --   branch = 'refactor',
+    --   config = function ()
+    --     require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
+    --   end
+    -- },
     {
-      'hek14/nvim-navic',
-      name = 'navic',
-      branch = 'refactor',
-      config = function ()
-        require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
+      "SmiteshP/nvim-navbuddy",
+      dependencies = {
+        "SmiteshP/nvim-navic",
+        "MunifTanjim/nui.nvim"
+      },
+      event = 'BufRead',
+      config = function()
+        local navbuddy = require("nvim-navbuddy")
+        local actions = require("nvim-navbuddy.actions")
+        navbuddy.setup {
+          mappings = {
+            ["n"] = actions.next_sibling(),     -- down
+            ["e"] = actions.previous_sibling(), -- up
+            ["h"] = actions.parent(),           -- Move to left panel
+            ["i"] = actions.children(),         -- Move to right panel
+            ["N"] = actions.move_down(),        -- Move focused node down
+            ["E"] = actions.move_up(),          -- Move focused node up
+            ["u"] = actions.insert_name(),      -- Insert at start of name
+            ["U"] = actions.insert_scope(),     -- Insert at start of scope
+          },
+          lsp = {
+            auto_attach = true
+          },
+        }
       end
     },
     {
-      'hek14/vim-illuminate',
+      'RRethy/vim-illuminate',
+      event = 'BufRead',
+      enabled = true,
+      config = function()
+        require('illuminate').configure({
+          -- providers: provider used to get references in the buffer, ordered by priority
+          providers = {
+            'lsp',
+            'treesitter',
+            -- 'regex',
+          },
+          delay = 200
+        })
+      end
     },
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
@@ -160,7 +202,6 @@ end
 
 function M.config()
   local util = require'lspconfig'.util
-  local illuminate_present,illuminate = pcall(require,'illuminate')
 
   local my_lsp_handlers = {
     ["textDocument/hover"] = vim.lsp.with(M.lsp_hover, {
@@ -205,8 +246,13 @@ function M.config()
     --   client.server_capabilities.document_formatting = false
     -- end
     -- vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
-    require 'illuminate'.on_attach(client)
-    if client.server_capabilities.documentSymbolProvider then
+    local illuminate_present,illuminate = pcall(require,'illuminate')
+    if illuminate_present then
+      require 'illuminate'.on_attach(client)
+    end
+
+    local navic_present,navic = pcall(require,'nvim-navic')
+    if client.server_capabilities.documentSymbolProvider and navic_present then
       require("nvim-navic").attach(client, bufnr)
     end
     require("contrib.pig").on_attach(bufnr)

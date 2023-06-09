@@ -143,15 +143,21 @@ M.config = function()
   end
   dap.listeners.before.event_terminated['dapui_config'] = function()
     require('dapui').close()
-    vim.cmd [[stopinsert]]
+    vim.schedule(function()
+      vim.cmd [[stopinsert]]
+    end)
   end
   dap.listeners.before.event_exited['dapui_config'] = function()
     require('dapui').close()
-    vim.cmd [[stopinsert]]
+    vim.schedule(function()
+      vim.cmd [[stopinsert]]
+    end)
   end
   dap.listeners.before.disconnect['dapui_config'] = function()
     require('dapui').close()
-    vim.cmd [[stopinsert]]
+    vim.schedule(function()
+      vim.cmd [[stopinsert]]
+    end)
   end
 
   require('telescope').load_extension('dap')

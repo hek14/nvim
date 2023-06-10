@@ -1,3 +1,4 @@
+local map = require('core.utils').map
 local plugins = {
   {
     'tpope/vim-scriptease',
@@ -122,7 +123,6 @@ local plugins = {
     keys = { 'gcc' },
     config = true,
     init = function()
-      local map = require('core.utils').map
       map('n', '<leader>/', ":lua require('Comment.api').toggle.linewise.current()<CR>")
       map('v', '<leader>/', ":lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>")
     end,
@@ -132,7 +132,6 @@ local plugins = {
     event = 'BufRead',
     config = function()
       require('leap').setup({})
-      local map = require('core.utils').map
       map({ 'n', 'x', 'o' }, '<C-f>', '<Plug>(leap-forward-to)')
       map({ 'n', 'x', 'o' }, '<C-b>', '<Plug>(leap-backward-to)')
       map({ 'n', 'x' }, 'gs', '<Plug>(leap-from-window)')
@@ -216,7 +215,7 @@ local plugins = {
     'mbbill/undotree',
     cmd = 'UndotreeToggle',
     init = function()
-      require('core.utils').map('n', '<C-x>u', function() 
+      map('n', '<C-x>u', function() 
         vim.cmd [[ UndotreeToggle ]]
         for _,win in ipairs(require('core.utils').get_all_window_buffer_filetype()) do
           if win.filetype == 'undotree' then
@@ -321,6 +320,19 @@ local plugins = {
     'skywind3000/asyncrun.vim',
     dependencies = {
       'preservim/vimux',
+      keys = {
+        -- tw, th, tv is used for built-in terminal
+        {'<leader>tt', function()
+          if vim.fn.exists('g:VimuxRunnerIndex') > 0 then
+            vim.cmd [[VimuxTogglePane]]
+          else
+            vim.cmd [[VimuxOpenRunner]]
+          end
+        end},
+        {'<leader>tr', [[:<C-u>call VimuxRunCommand("")<Left><Left>]]},
+        {'<leader>tc', [[<Cmd>VimuxInterruptRunner<CR>]]},
+        {'<leader>tl', [[<Cmd>VimuxClearTerminalScreen<CR>]]},
+      },
       init = function()
         vim.g.VimuxHeight = '30'
       end,
@@ -332,7 +344,7 @@ local plugins = {
       'python',
       'n',
       ',t',
-      '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>'
+      '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) -mode=term -pos=tmux python "$(VIM_FILEPATH)"<CR>'
       )
     end,
   },
@@ -341,7 +353,6 @@ local plugins = {
     enabled = false,
     event = 'BufReadPre',
     init = function()
-      local map = require('core.utils').map
       map('n', '<space>qs', [[<cmd>lua require("persistence").load()<cr>]])
       map('n', '<space>ql', [[<cmd>lua require("persistence").load({ last = true })<cr>]])
       map('n', '<space>qd', [[<cmd>lua require("persistence").stop()<cr>]])
@@ -441,7 +452,6 @@ local plugins = {
   --     '<Plug>(Luadev-Complete)',
   --   },
   --   init = function()
-  --     local map = require('core.utils').map
   --     map('n', '<C-x>l', '<Plug>(Luadev-RunLine)', { remap = true })
   --     map('n', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
   --     map('x', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
@@ -477,7 +487,7 @@ local plugins = {
   --   event = 'VimEnter',
   --   config = function()
   --     vim.g.choosewin_overlay_enable = 1
-  --     require('core.utils').map('n', '-', '<Plug>(choosewin)', { noremap = false })
+  --     map('core.utils').map('n', '-', '<Plug>(choosewin)', { noremap = false })
   --   end,
   -- },
 }

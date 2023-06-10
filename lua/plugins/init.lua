@@ -37,6 +37,9 @@ local plugins = {
   {
     'sbulav/nredir.nvim',
     cmd = 'Nredir',
+    init = function()
+      vim.cmd[[cnoremap <C-g> <Home>Nredir <End><CR>]]
+    end,
   },
   {
     'jackMort/ChatGPT.nvim',

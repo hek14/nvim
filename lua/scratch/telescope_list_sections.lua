@@ -1,20 +1,19 @@
-local action_state = require "telescope.actions.state"
-local action_set = require "telescope.actions.set"
-local actions = require "telescope.actions"
-local finders = require "telescope.finders"
-local make_entry = require "telescope.make_entry"
-local pickers = require "telescope.pickers"
-local previewers = require "telescope.previewers"
-local sorters = require "telescope.sorters"
-local utils = require "telescope.utils"
-local conf = require("telescope.config").values
-
 local patterns = {
   ['python'] = '^ *#####',
   ['lua'] = '^ *-----'
 }
 local M = {}
 function M.list_section()
+  local action_state = require "telescope.actions.state"
+  local action_set = require "telescope.actions.set"
+  local actions = require "telescope.actions"
+  local finders = require "telescope.finders"
+  local make_entry = require "telescope.make_entry"
+  local pickers = require "telescope.pickers"
+  local previewers = require "telescope.previewers"
+  local sorters = require "telescope.sorters"
+  local utils = require "telescope.utils"
+  local conf = require("telescope.config").values
   local bufnr = vim.api.nvim_get_current_buf()
   local opts = {bufnr=bufnr}
   -- All actions are on the current buffer

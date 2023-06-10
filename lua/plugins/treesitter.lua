@@ -23,7 +23,6 @@ local M = {
   end,
   dependencies = {
     {"nvim-treesitter/nvim-treesitter-textobjects"},
-    {"nvim-treesitter/nvim-treesitter-refactor"}, 
     {"HiPhish/nvim-ts-rainbow2"},
     {"theHamsta/nvim-treesitter-pairs"},
     {

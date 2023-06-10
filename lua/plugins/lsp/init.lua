@@ -29,42 +29,8 @@ local M = {
   end,
   dependencies = {
     "jose-elias-alvarez/null-ls.nvim",
-    "j-hui/fidget.nvim",
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
-    {
-      'j-hui/fidget.nvim', -- show lsp progress
-      lazy = false,
-      config = function() 
-        require('fidget').setup {
-          text = {
-            spinner = 'dots', -- or 'line'
-            done = "Done",
-            commenced = "Started",
-            completed = "Completed",
-          },
-          window = {
-            blend = 0,  -- &winblend for the window
-          },
-          fmt = {
-            stack_upwards = true,  -- list of tasks grows upwards
-          }
-        } 
-      end
-    },
-    {
-      'SmiteshP/nvim-gps',
-      keys = {
-        {
-          ',w',function()
-            vim.print(require('nvim-gps').get_location())
-          end
-        }
-      },
-      config = function()
-        require('nvim-gps').setup()
-      end,
-    },
     {
       'simrat39/symbols-outline.nvim',
       enabled = false,
@@ -87,20 +53,12 @@ local M = {
       end,
     },
     {
-      "WhoIsSethDaniel/toggle-lsp-diagnostics.nvim",
-      init = function()
-        vim.cmd([[command! -nargs=0 ToggleDiagVirtual lua require'toggle_lsp_diagnostics'.toggle_virtual_text()]])
-      end,
+      "SmiteshP/nvim-navic",
+      -- 'hek14/nvim-navic',
+      -- config = function ()
+      --   require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
+      -- end
     },
-    -- {
-    --   'hek14/nvim-navic',
-    --   enabled = true,
-    --   name = 'navic',
-    --   branch = 'refactor',
-    --   config = function ()
-    --     require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
-    --   end
-    -- },
     {
       "SmiteshP/nvim-navbuddy",
       dependencies = {
@@ -146,12 +104,15 @@ local M = {
     },
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
-      enabled = false,
-      dependencies = { 'navic', 'nvim-tree/nvim-web-devicons' },
+      enabled = true,
+      dependencies = { 'nvim-tree/nvim-web-devicons' },
       name = "barbecue",
       opts = {},
     },
-    { 'Bekaboo/dropbar.nvim' },
+    { 
+      'Bekaboo/dropbar.nvim',
+      enabled = false,
+    },
     {
       'hek14/symbol-overlay.nvim',
       config = function ()

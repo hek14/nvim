@@ -41,18 +41,6 @@ local plugins = {
       vim.cmd[[cnoremap <C-g> <Home>Nredir <End><CR>]]
     end,
   },
-  {
-    'jackMort/ChatGPT.nvim',
-    cmd = { 'ChatGPT', 'ChatGPTActAs' },
-    config = function()
-      require('chatgpt').setup({})
-    end,
-    dependencies = {
-      'MunifTanjim/nui.nvim',
-      'nvim-lua/plenary.nvim',
-      'nvim-telescope/telescope.nvim',
-    },
-  },
   { 'nvim-lua/plenary.nvim' },
   { 'nvim-tree/nvim-web-devicons' },
   {
@@ -77,6 +65,7 @@ local plugins = {
   },
   {
     'nvimdev/whiskyline.nvim',
+    enabled = false,
     dependencies = 'gitsigns.nvim',
     event = 'VimEnter',
     config = function()
@@ -124,17 +113,6 @@ local plugins = {
     end,
   },
   {
-    'max397574/better-escape.nvim',
-    event = 'InsertCharPre',
-    config = function()
-      local default = {
-        mapping = { 'jj' },
-        timeout = 300,
-      }
-      require('better_escape').setup(default)
-    end,
-  },
-  {
     'windwp/nvim-autopairs',
     config = true,
     event = 'InsertEnter',
@@ -147,24 +125,6 @@ local plugins = {
       local map = require('core.utils').map
       map('n', '<leader>/', ":lua require('Comment.api').toggle.linewise.current()<CR>")
       map('v', '<leader>/', ":lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>")
-    end,
-  },
-  {
-    'ThePrimeagen/harpoon',
-    keys = {
-      { '<leader>ma', "<cmd>lua require('harpoon.mark').add_file()<cr>", desc = 'harpoon add' },
-      {
-        '<leader>mt',
-        "<cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>",
-        desc = 'harpoon toggle',
-      },
-    },
-  },
-  {
-    'Pocco81/TrueZen.nvim',
-    cmd = { 'TZAtaraxis', 'TZMinimalist', 'TZFocus' },
-    init = function()
-      require('core.utils').map('n', 'gq', '<cmd>TZFocus<CR>')
     end,
   },
   {
@@ -297,10 +257,6 @@ local plugins = {
     ft = { 'markdown' },
   },
   {
-    'metakirby5/codi.vim',
-    cmd = { 'Codi', 'CodiNew', 'CodiSelect', 'CodiExpand' },
-  },
-  {
     'sakhnik/nvim-gdb',
     init = function()
       vim.g.nvimgdb_disable_start_keymaps = true
@@ -313,52 +269,6 @@ local plugins = {
       command! GdbExit lua NvimGdb.i():send('exit')
       nnoremap <Leader>ds :GdbExit<CR>
       ]])
-    end,
-  },
-  {
-    'nvim-neotest/neotest',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-treesitter/nvim-treesitter',
-      'antoinemadec/FixCursorHold.nvim',
-      'nvim-neotest/neotest-python',
-      'nvim-neotest/neotest-plenary',
-      'nvim-neotest/neotest-vim-test',
-    },
-    init = function()
-      vim.api.nvim_create_user_command(
-        'TestNearest',
-        ":lua require('neotest').run.run()",
-        { force = true }
-      )
-      vim.api.nvim_create_user_command(
-        'TestFile',
-        ":lua require('neotest').run.run(vim.fn.expand('%'))",
-        { force = true }
-      )
-      vim.api.nvim_create_user_command(
-        'TestDebug',
-        ":lua require('neotest').run.run({strategy = 'dap'})",
-        { force = true }
-      )
-      vim.api.nvim_create_user_command(
-        'TestStop',
-        ":lua require('neotest').run.stop()",
-        { force = true }
-      )
-    end,
-    config = function()
-      require('neotest').setup({
-        adapters = {
-          require('neotest-python')({
-            dap = { justMyCode = false },
-          }),
-          require('neotest-plenary'),
-          require('neotest-vim-test')({
-            ignore_file_types = { 'python', 'vim', 'lua' },
-          }),
-        },
-      })
     end,
   },
   {
@@ -408,53 +318,23 @@ local plugins = {
     end,
   },
   {
-    'skywind3000/asynctasks.vim',
-    cmd = 'AsyncTask',
-    init = function()
-      vim.g.asyncrun_open = 6
-    end,
+    'skywind3000/asyncrun.vim',
     dependencies = {
-      {
-        'skywind3000/asyncrun.vim',
-        -- << NOTE: macros
-        -- $(VIM_FILEPATH)  - File name of current buffer with full path
-        -- $(VIM_FILENAME)  - File name of current buffer without path
-        -- $(VIM_FILEDIR)   - Full path of current buffer without the file name
-        -- $(VIM_FILEEXT)   - File extension of current buffer
-        -- $(VIM_FILENOEXT) - File name of current buffer without path and extension
-        -- $(VIM_PATHNOEXT) - Current file name with full path but without extension
-        -- $(VIM_CWD)       - Current directory
-        -- $(VIM_RELDIR)    - File path relativize to current directory
-        -- $(VIM_RELNAME)   - File name relativize to current directory
-        -- $(VIM_ROOT)      - Project root directory
-        -- $(VIM_CWORD)     - Current word under cursor
-        -- $(VIM_CFILE)     - Current filename under cursor
-        -- $(VIM_GUI)       - Is running under gui ?
-        -- $(VIM_VERSION)   - Value of v:version
-        -- $(VIM_COLUMNS)   - How many columns in vim's screen
-        -- $(VIM_LINES)     - How many lines in vim's screen
-        -- $(VIM_SVRNAME)   - Value of v:servername for +clientserver usage
-        -- $(VIM_PRONAME)   - Name of current project root directory
-        -- $(VIM_DIRNAME)   - Name of current directory
-        -- >> END
-        dependencies = {
-          'preservim/vimux',
-          init = function()
-            vim.g.VimuxHeight = '30'
-          end,
-        },
-        cmd = 'AsyncRun',
-        init = function()
-          local ft_map = require('core.autocmds').ft_map
-          ft_map(
-            'python',
-            'n',
-            ',t',
-            '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>'
-          )
-        end,
-      },
+      'preservim/vimux',
+      init = function()
+        vim.g.VimuxHeight = '30'
+      end,
     },
+    cmd = 'AsyncRun',
+    init = function()
+      local ft_map = require('core.autocmds').ft_map
+      ft_map(
+      'python',
+      'n',
+      ',t',
+      '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)"<CR>'
+      )
+    end,
   },
   {
     'folke/persistence.nvim',

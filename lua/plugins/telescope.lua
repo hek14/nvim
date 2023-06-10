@@ -154,8 +154,10 @@ function M.config()
           ["<cr>"] = function(prompt_bufnr)
             require('telescope.actions').select_default(prompt_bufnr)
             local val = action_state.get_current_line()
-            vim.fn.setreg('p',val)
-            -- vim.cmd[[normal! zv]]
+            vim.schedule(function()
+              vim.fn.setreg('p',val)
+              -- vim.cmd[[normal! zv]]
+            end)
           end,
           ["<c-s>"] = open_in_nvim_tree,
         },
@@ -166,7 +168,9 @@ function M.config()
           ["<esc>"] = function(prompt_bufnr)
             require('telescope.actions').close(prompt_bufnr)
             local val = action_state.get_current_line()
-            vim.fn.setreg('p',val)
+            vim.schedule(function()
+              vim.fn.setreg('p',val)
+            end)
           end,
         }
       },

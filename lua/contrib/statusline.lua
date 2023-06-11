@@ -114,17 +114,23 @@ local lineinfo = function()
   return " %P %l:%c "
 end
 
+local root = function()
+  local _root = vim.loop.cwd()
+  local home = vim.env['HOME']
+  return _root:gsub(home,'~')
+end
+
 Statusline = {}
 Statusline.active = function()
   local statusline = ""
   statusline = statusline .. [[%#StatusLeft#]]
-  statusline = statusline .. vim.loop.cwd() .. " | " .. vim.fn.expand('%')
-  statusline = statusline .. [[ %m %r]]
-  statusline = statusline .. [[%=]]
-  statusline = statusline .. [[%#StatusMid#]]
-  statusline = statusline .. lsp_client() .. "   " .. dap()
-  statusline = statusline .. [[%=]]
-  statusline = statusline .. [[%#StatusRight#]]
+  statusline = statusline .. root() .. " | " .. vim.fn.expand('%')
+  statusline = statusline .. [[ %m %r ]]
+  -- statusline = statusline .. [[%=]]  -- NOTE: `%=` is separator
+  -- statusline = statusline .. [[%#StatusMid#]] -- NOTE:`%#` is highlight-group
+  -- statusline = statusline .. lsp_client() .. "   " .. dap()
+  -- statusline = statusline .. [[%=]]
+  -- statusline = statusline .. [[%#StatusRight#]]
   statusline = statusline .. [[%l,]] .. get_column_number() .. [[   ]]
   statusline = statusline .. [[%p%%]]
   return statusline

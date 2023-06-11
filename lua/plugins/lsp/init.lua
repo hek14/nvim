@@ -4,6 +4,7 @@
 -- To top-out one capability: client.server_capabilities.semanticTokensProvider = nil
 
 local au = require('core.autocmds').au
+local map = require('core.utils').map
 local M = {
   "neovim/nvim-lspconfig",
   cmd = 'LspStart',
@@ -43,7 +44,7 @@ local M = {
           },
         }
         require('symbols-outline').setup(opts)
-        require('core.utils').map("n","<leader>ls",":SymbolsOutline<CR>")
+        map("n","<leader>ls",":SymbolsOutline<CR>")
       end,
     },
     {
@@ -54,10 +55,25 @@ local M = {
     },
     {
       "SmiteshP/nvim-navic",
-      -- 'hek14/nvim-navic',
-      -- config = function ()
-      --   require('core.utils').map("n", '[g', "<Cmd>lua require('nvim-navic').goto_last_context()<CR>", {silent=false})
-      -- end
+      config = function()
+        map('n','[g',function()
+          local buf = vim.api.nvim_get_current_buf()
+          local data = require('nvim-navic').get_data(buf)
+          if #data == 0 then return end
+          vim.cmd [[normal! m`]]
+          local last = data[#data]
+          local curr = vim.api.nvim_win_get_cursor(0)
+          if curr[1]==last.scope.start.line then
+            if #data -1 > 0 then
+              vim.api.nvim_win_set_cursor(0,{data[#data-1].scope.start.line, data[#data-1].scope.start.character})
+            end
+          else
+            if #data > 0 then
+              vim.api.nvim_win_set_cursor(0,{data[#data].scope.start.line, data[#data].scope.start.character})
+            end
+          end
+        end)
+      end
     },
     {
       "SmiteshP/nvim-navbuddy",
@@ -105,9 +121,10 @@ local M = {
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
       enabled = true,
-      dependencies = { 'nvim-tree/nvim-web-devicons' },
-      name = "barbecue",
-      opts = {},
+      dependencies = { 'SmiteshP/nvim-navic','nvim-tree/nvim-web-devicons' },
+      config = function()
+        require("barbecue").setup()
+      end
     },
     { 
       'Bekaboo/dropbar.nvim',

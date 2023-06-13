@@ -9,33 +9,6 @@ local plugins = {
     cmd = {'Git', 'Gedit','Gdiffsplit','Gread','Gwrite','Ggrep','GMove','GDelete','GBrowse'}
   },
   {
-    'nvimdev/easyformat.nvim',
-    ft = { 'python', 'lua' },
-    config = function()
-      vim.env['PATH'] = vim.fn.expand('~/.local/share/nvim/mason/bin:') .. vim.env['PATH']
-      local configs = require('easyformat.config')
-      configs.use_default({
-        'lua',
-      })
-      configs.python = {
-        cmd = 'black',
-        args = {'-'},
-        stdin = true,
-      }
-      configs.lua = {
-        cmd = 'stylua',
-        args = {},
-        find = '.stylua.toml',
-        fname = true,
-        stdin = false,
-        do_not_need_stdout = true,
-      }
-      require('easyformat').setup({
-        fmt_on_save = false,
-      })
-    end,
-  },
-  {
     'sbulav/nredir.nvim',
     cmd = 'Nredir',
     init = function()

@@ -133,6 +133,7 @@ Statusline.active = function()
   -- statusline = statusline .. [[%#StatusRight#]]
   statusline = statusline .. [[%l,]] .. get_column_number() .. [[   ]]
   statusline = statusline .. [[%p%%]]
+  statusline = statusline .. '    #'  .. vim.fn.bufnr()
   return statusline
 end
 

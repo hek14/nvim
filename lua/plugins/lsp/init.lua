@@ -72,6 +72,9 @@ local M = {
               vim.api.nvim_win_set_cursor(0,{data[#data].scope.start.line, data[#data].scope.start.character})
             end
           end
+          if #vim.fn.matchstr(vim.fn.expand('<cword>'), [[\(def\|class\|function\|struct\)]])>0 then
+            vim.cmd('normal! w')
+          end
         end)
       end
     },

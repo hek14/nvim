@@ -1,5 +1,12 @@
 local map = require('core.utils').map
 local plugins = {
+  { 
+    "akinsho/toggleterm.nvim",
+    cmd = 'ToggleTerm',
+    config = function()
+      require("toggleterm").setup{}
+    end
+  },
   {
     'tpope/vim-scriptease',
     cmd = 'Messages',

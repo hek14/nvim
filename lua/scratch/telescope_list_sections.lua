@@ -52,7 +52,10 @@ function M.list_section()
       action_set.select:enhance {
         post = function()
           local selection = action_state.get_selected_entry()
-          vim.api.nvim_win_set_cursor(0, { selection.lnum, 0 })
+          vim.schedule(function()
+            vim.api.nvim_win_set_cursor(0, { selection.lnum, 0 })
+            vim.cmd [[normal! ^]]
+          end)
         end,
       }
 

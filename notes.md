@@ -1,3 +1,18 @@
+# create autocmd example
+```lua
+vim.api.nvim_create_user_command('Lspsaga', function(args)
+  require('lspsaga.command').load_command(args.fargs[1], args.fargs[2])
+end, {
+  range = true,
+  nargs = '+',
+  complete = function(arg)
+    local list = require('lspsaga.command').command_list()
+    return vim.tbl_filter(function(s)
+      return string.match(s, '^' .. arg)
+    end, list)
+  end,
+})
+```
 # rust installation
 一些rust写的package或者library需要安装rust:
 - install rustup:

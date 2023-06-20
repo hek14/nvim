@@ -12,21 +12,21 @@ function M.config()
       topdelete = { hl = "DiffDelete", text = "‾", numhl = "GitSignsDeleteNr" },
       changedelete = { hl = "DiffChangeDelete", text = "~", numhl = "GitSignsChangeNr" },
     },
-    keymaps = {
-      noremap = true,
-      ['n <leader>hs'] = '<cmd>Gitsigns stage_hunk<CR>',
-      ['v <leader>hs'] = ':Gitsigns stage_hunk<CR>',
-      ['n <leader>hu'] = '<cmd>Gitsigns undo_stage_hunk<CR>',
-      ['n <leader>hr'] = '<cmd>Gitsigns reset_hunk<CR>',
-      ['v <leader>hr'] = ':Gitsigns reset_hunk<CR>',
-      ['n <leader>hb'] = '<cmd>lua require"gitsigns".blame_line{full=true}<CR>',
-      ['n <leader>hd'] = '<cmd>Gitsigns preview_hunk<CR>',
-
-      ['n ]c'] = { expr = true, "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'"},
-      ['n [c'] = { expr = true, "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'"},
-      ['o uh'] = ':<C-U>Gitsigns select_hunk<CR>',
-      ['x uh'] = ':<C-U>Gitsigns select_hunk<CR>',
-    }
+    on_attach = function(bufnr)
+      -- if vim.api.nvim_buf_get_name(bufnr):match(<PATTERN>) then
+      --   -- Don't attach to specific buffers whose name matches a pattern
+      --   return false
+      -- end
+      require('core.utils').map('n', '<leader>hs', '<cmd>Gitsigns stage_hunk<CR>', {buffer=bufnr})
+      require('core.utils').map('n', '<leader>hu', '<cmd>Gitsigns undo_stage_hunk<CR>',{buffer=bufnr})
+      require('core.utils').map('n', '<leader>hr', '<cmd>Gitsigns reset_hunk<CR>',{buffer=bufnr})
+      require('core.utils').map('n', '<leader>hb', '<cmd>lua require"gitsigns".blame_line{full=true}<CR>',{buffer=bufnr})
+      require('core.utils').map('n', '<leader>hp', '<cmd>Gitsigns preview_hunk<CR>',{buffer=bufnr})
+      require('core.utils').map('n', ']c', [[&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>']], {expr=true,buffer=bufnr})
+      require('core.utils').map('n', '[c', [[&diff ? ']c' : '<cmd>Gitsigns prev_hunk<CR>']], {expr=true,buffer=bufnr})
+      require('core.utils').map('x', 'uh','<Cmd>Gitsigns select_hunk<CR>',{buffer=bufnr})
+      require('core.utils').map('o', 'uh','<Cmd>Gitsigns select_hunk<CR>',{buffer=bufnr})
+    end
   }
 end
 return M

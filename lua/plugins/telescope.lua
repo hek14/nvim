@@ -186,7 +186,6 @@ function M.config()
         -- --no_ignore will search too much files, you can toggle this option in live_grep_args
       },
       file_ignore_patterns = {
-        ".git",
         "__pycache__",
         "%.log",
         "%.npz",

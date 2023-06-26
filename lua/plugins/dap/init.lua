@@ -145,18 +145,27 @@ M.config = function()
     require('dapui').close()
     vim.schedule(function()
       vim.cmd [[stopinsert]]
+      pcall(function ()
+        vim.cmd (string.format('bwipe! %s',vim.g.dap_repl_buffer))
+      end)
     end)
   end
   dap.listeners.before.event_exited['dapui_config'] = function()
     require('dapui').close()
     vim.schedule(function()
       vim.cmd [[stopinsert]]
+      pcall(function ()
+        vim.cmd (string.format('bwipe! %s',vim.g.dap_repl_buffer))
+      end)
     end)
   end
   dap.listeners.before.disconnect['dapui_config'] = function()
     require('dapui').close()
     vim.schedule(function()
       vim.cmd [[stopinsert]]
+      pcall(function ()
+        vim.cmd (string.format('bwipe! %s',vim.g.dap_repl_buffer))
+      end)
     end)
   end
 

@@ -82,7 +82,7 @@ local function others()
     end
     vim.api.nvim_feedkeys(keycode('import numpy as np\n'),'n',false)
     vim.api.nvim_feedkeys(keycode('import torch\n'),'n',false)
-    vim.api.nvim_feedkeys(keycode('import matplotlib.pyplot as plt\n'),'n',false)
+    -- vim.api.nvim_feedkeys(keycode('import matplotlib.pyplot as plt\n'),'n',false)
   end,{desc = "insert frequent python package"})
 
   map("n", "<Up>", "5<C-w>+")

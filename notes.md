@@ -179,15 +179,16 @@ relations with bufnr:
 ```node.js
           (function () {
             const _0x3bbf32 = _0x561cbb;
-            // return !0x0; 这就是我们要添加的
+            return !0x0; 这就是我们要添加的
             for (const _0x3c4358 of [
                 ...
             ])
           })
 ```
-8.3 另外的定位方法: 
-搜索`^ *0x.*function.*_0x.*_0x.*_0x`, 会有很多个, 然后如下的那个:
-前面有很多行连续以'+'结尾, 也就是8.2中所提到的报错message
+8.3 另外的定位方法: BINGO! this method is nice
+搜索`^ *0x.*function.*_0x.*_0x.*_0x`, 会有很多个, 然后找到符合如下特征的那个:
+前面有很多行连续以'+'结尾, 也就是8.2中所提到的报错message.
+一般而言, 就是最后的那个, 所以"G" goto the end, 然后 "?" 反向搜索这个pattern就行
 小技巧, 这相当于是要搜索两个pattern, 那么可以用match-highlight来高亮一个,搜索下一个时就能看到
 前一个pattern的结果 `match Visual /^ *".*" +$/`
 找到这一个之后再找 `(function () {` 或者`/for (const`都行
@@ -205,6 +206,7 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.3.40: line 23878
 2023.4.10: line 23850
 2023.5.30: line 33086
+2023.6.30: line 38544
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
 # check if a program is able to find in nvim

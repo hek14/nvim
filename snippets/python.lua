@@ -187,7 +187,7 @@ return {
   })),
   s("nor",fmt(
   [[
-  {} = ({} - {}.min()) / ({}.max() - {}.min())
+  {} = ({} - {}.min()) / ({}.max() - {}.min() + 1e-6)
   ]],
   {
     d(2,function(args,_,_)

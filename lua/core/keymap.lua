@@ -152,7 +152,7 @@ local function others()
   -- swap line up and down
   map("n", "<leader>j", "<Esc>:m .+1<CR>==")
   map("n", "<leader>k", "<Esc>:m .-2<CR>==")
-  map("n",'<leader>tv', ":lua require('core.utils')<CR> | :lua back_to_future()<CR>")
+  map("n",'<leader>tv', ":lua require('core.utils')<CR> | :lua back_to_the_future()<CR>")
   map("n",",r", function ()
     local sub_word = require('contrib.my_sub_word').get_sub_word()
     return ":<C-u>s/"  .. sub_word .. "//g<Left><Left>"

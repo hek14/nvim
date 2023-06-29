@@ -207,6 +207,8 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.4.10: line 23850
 2023.5.30: line 33086
 2023.6.30: line 38544
+2023.6.40: line 38509
+2023.6.41: line 38764
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
 # check if a program is able to find in nvim

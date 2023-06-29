@@ -299,6 +299,14 @@ M.sleep = function(n)
   os.execute("sleep " .. tonumber(n))
 end
 
+M.reload_env = function()
+  local output = vim.fn.system('source ~/.zshenv ; env')
+  output = require('core.utils').stringSplit(vim.trim(output),'\n')
+  for _, item in ipairs(output) do
+    local res = require('core.utils').stringSplit(item,'=')
+    vim.env[res[1]] = res[2]
+  end
+end
 
 M.reload_plugin = function(plugins)
   vim.loader.reset()
@@ -444,7 +452,7 @@ function _G.TimeTravel(args)
 end
 
 
-function _G.back_to_future()
+function _G.back_to_the_future()
   local time_travel = {menu=nil,tmp_buffer=nil}
   local Menu = require("nui.menu")
   local event = require("nui.utils.autocmd").event
@@ -467,7 +475,7 @@ function _G.back_to_future()
     border = {
       style = "rounded",
       text = {
-        top = "TimeTravel",
+        top = "Back to the Future",
         top_align = "center",
       },
     },

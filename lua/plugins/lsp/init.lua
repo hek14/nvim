@@ -199,6 +199,7 @@ function M.config()
   -- avoid annoying multiple clients offset_encodings detected warning
   -- refer to: https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428#issuecomment-997226723
   capabilities.offsetEncoding = { "utf-16" }
+  require('core.utils').reload_env()
 
   local on_attach = function(client, bufnr)
     local launch_in_home = client.config.root_dir == vim.env["HOME"]
@@ -261,12 +262,18 @@ function M.config()
   }
 
   local python_lsp = 'pylance'
+  local env_pythonpath = vim.env['PYTHONPATH']
+  if env_pythonpath then
+    env_pythonpath = require('core.utils').stringSplit(env_pythonpath,':')
+  else
+    env_pythonpath = {}
+  end
   local pyright_opts =  vim.tbl_deep_extend('force',options, {
     settings = {
       python = {
         analysis = {
           typeCheckingMode = "off",
-          extraPaths = { '.', './*', './**/*', './**/**/*' },
+          extraPaths = vim.tbl_extend('force', { '.', './*', './**/*', './**/**/*' }, env_pythonpath ),
           autoImportCompletions = false,
           autoSearchPaths = true,
           diagnosticMode = "openFilesOnly", -- "workspace"

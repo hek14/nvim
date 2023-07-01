@@ -162,15 +162,15 @@ local resolve_document_symbols = function(bufnr,client_id)
   return results
 end
 
-local handle_diagnostics = function(a,params,client_id,c,config,bufnr)
+local handle_diagnostics = function(a,params,c,config,bufnr)
   local results = nil
-  -- results = resolve_document_symbols(bufnr,client_id.client_id) -- NOTE: currently too slow using lsp
+  -- results = resolve_document_symbols(bufnr,c.client_id.c.client_id) -- NOTE: currently too slow using lsp
   filter(params.diagnostics, filter_rule_fn, results)
-  vim.lsp.diagnostic.on_publish_diagnostics(a, params, client_id, c, config)
+  vim.lsp.diagnostic.on_publish_diagnostics(a, params, c, config)
 end
 
 
-local function custom_on_publish_diagnostics(a, params, client_id, c, config)
+local function custom_on_publish_diagnostics(_, params, c, config)
   local bufnr = vim.fn.bufnr()
   if timer[bufnr]~=nil then
     timer[bufnr]:stop() -- NOTE: timer:stop will need some time, so there maybe two timer call at the same time
@@ -178,7 +178,7 @@ local function custom_on_publish_diagnostics(a, params, client_id, c, config)
     timer[bufnr] = vim.loop.new_timer()
   end
   timer[bufnr]:start(100,0, vim.schedule_wrap(function ()
-    handle_diagnostics(a,params,client_id,c,config,bufnr)
+    handle_diagnostics(_,params,c,config,bufnr)
   end))
 end
 

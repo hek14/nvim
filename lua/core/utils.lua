@@ -308,6 +308,14 @@ M.reload_env = function()
   end
 end
 
+M.append_env_path = function(path)
+  local last_char = string.sub(path,#path) 
+  if last_char~=':' then
+    path = path .. ':'
+  end
+  vim.env['PATH'] = path .. vim.env['PATH']
+end
+
 M.reload_plugin = function(plugins)
   vim.loader.reset()
   local function _reload_plugin(plugin)

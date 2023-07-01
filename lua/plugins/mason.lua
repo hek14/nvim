@@ -1,6 +1,7 @@
 -- NOTE: manage all of the external tools that need to be installed by lsp/dap
 local M = {
   "williamboman/mason.nvim",
+  enabled = false,
 }
 
 M.tools = {
@@ -11,12 +12,12 @@ M.tools = {
   "shfmt",
   "ruff",
   "jsonlint",
-  -- "isort",
-  -- "flake8",
-  -- "black",
-  -- "selene",
-  -- "eslint_d",
-  -- "deno",
+  "isort",
+  "flake8",
+  "black",
+  "selene",
+  "eslint_d",
+  "deno",
 }
 
 function M.check()

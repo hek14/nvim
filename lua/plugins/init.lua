@@ -109,7 +109,6 @@ local plugins = {
   },
   {
     'ggandor/leap.nvim',
-    enabled = false,
     event = 'BufRead',
     config = function()
       require('leap').setup({})
@@ -120,6 +119,7 @@ local plugins = {
   },
   {
     "folke/flash.nvim",
+    enabled = false,
     event = "VeryLazy",
     opts = {},
     keys = {

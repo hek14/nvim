@@ -29,9 +29,6 @@ local M = {
   })
   end,
   dependencies = {
-    "jose-elias-alvarez/null-ls.nvim",
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
     {
       'simrat39/symbols-outline.nvim',
       enabled = false,
@@ -182,8 +179,6 @@ function M.lsp_signature_help(_, result, ctx, config)
 end
 
 function M.config()
-  local util = require'lspconfig'.util
-
   local my_lsp_handlers = {
     ["textDocument/hover"] = vim.lsp.with(M.lsp_hover, {
       border = "rounded",
@@ -201,32 +196,7 @@ function M.config()
   capabilities.offsetEncoding = { "utf-16" }
 
   local on_attach = function(client, bufnr)
-    local launch_in_home = client.config.root_dir == vim.env["HOME"]
-    if launch_in_home then
-      local answer = vim.fn.input("really want to launch_in_home? y/n: ")
-      if answer == 'n' then
-        vim.lsp.buf_detach_client(bufnr,client.id)
-        return
-      end
-    end
-
-    if vim.tbl_contains({"pylance","lua_ls"}, client.name) then
-      client.server_capabilities.semanticTokensProvider = nil
-      -- client.server_capabilities.semanticTokensProvider = {
-      --   legend = {
-      --     tokenTypes = {},
-      --     tokenModifiers = {},
-      --   },
-      --   full = true,
-      --   range = true,
-      -- }
-    end
-    -- client.server_capabilities.document_formatting = true
-    -- client.server_capabilities.document_range_formatting = true
-    -- if client.name == "pyright" then
-    --   client.server_capabilities.document_formatting = false
-    -- end
-    -- vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
+    vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
     local illuminate_present,illuminate = pcall(require,'illuminate')
     if illuminate_present then
       require 'illuminate'.on_attach(client)
@@ -236,7 +206,7 @@ function M.config()
     if client.server_capabilities.documentSymbolProvider and navic_present then
       require("nvim-navic").attach(client, bufnr)
     end
-    require("contrib.pig").on_attach(bufnr)
+    -- require("contrib.pig").on_attach(bufnr)
     require('plugins.lsp.keymap').setup(client,bufnr)
     -- NOTE: just use the vv wrapper in .zshrc to do this
     -- if vim.tbl_contains({'pylance','Pylance','pyright','Pyright'},client.name) then
@@ -259,149 +229,9 @@ function M.config()
     on_attach = on_attach,
     handlers = my_lsp_handlers
   }
-
-  local python_lsp = 'pylance'
-  local pyright_opts =  vim.tbl_deep_extend('force',options, {
-    settings = {
-      python = {
-        analysis = {
-          typeCheckingMode = "off",
-          extraPaths = { '.', './*', './**/*', './**/**/*' },
-          autoImportCompletions = false,
-          autoSearchPaths = true,
-          diagnosticMode = "openFilesOnly", -- "workspace"
-          useLibraryCodeForTypes = true,
-          logLevel = "Error",
-          diagnosticSeverityOverrides = {
-            -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-            reportGeneralTypeIssues = "none",
-            reportOptionalMemberAccess = "none",
-            reportOptionalSubscript = "none",
-            reportPrivateImportUsage = "none",
-            reportUnusedImport = "none"
-          },
-        },
-      },
-    },
-    root_dir = function(fname)
-      local root_files = {'pyproject.toml', 'pyrightconfig.json'}
-      return util.find_git_ancestor(fname) or
-      util.root_pattern(unpack(root_files))(fname) or
-      util.path.dirname(fname)
-    end
-  })
-
-  require("mason-lspconfig").setup({
-    automatic_installation = false,
-    ensure_installed = {'pyright', 'jsonls'}, -- ruff_lsp not needed, use ruff with null-ls instead
-  })
-
-  require("mason-lspconfig").setup_handlers({
-    function (server_name) -- the default one
-       require("lspconfig")[server_name].setup(options)
-    end,
-    ["lua_ls"] = function ()
-      local opt = {
-        settings = {
-          single_file_support = true,
-          Lua = {
-            diagnostics = {
-              enable = true,
-              globals = { "vim" }
-            },
-            workspace = {
-              library = {
-                vim.env.VIMRUNTIME,
-                vim.env.HOME .. '/.local/share/nvim/lazy/emmylua-nvim',
-                -- vim.api.nvim_get_runtime_file('', true),
-              },
-              checkThirdParty = false
-            }
-          }
-        }
-      }
-      opt = vim.tbl_deep_extend('force',options,opt)
-      require("lspconfig").lua_ls.setup(opt)
-    end,
-    ["pyright"] = function ()
-      if python_lsp == 'pyright' then
-        require("lspconfig").pyright.setup(pyright_opts)
-      end
-    end,
-    -- ["ruff_lsp"] = function ()
-    --   local opt = {
-    --     settings = {
-    --       ruff_lsp = {
-    --         args = ["--config=/path/to/pyproject.toml"],
-    --       }
-    --     },
-    --     root_dir = function(fname)
-    --       local root_files = {'pyproject.toml', 'pyrightconfig.json'}
-    --       return util.find_git_ancestor(fname) or
-    --       util.root_pattern(unpack(root_files))(fname) or
-    --       util.path.dirname(fname)
-    --     end
-    --   }
-    --   require("lspconfig").ruff_lsp.setup(opt)
-    -- end,
-    ["texlab"] = function ()
-      local opt = {
-        settings = {
-          texlab = {
-            build = {
-              args = {
-                "-xelatex", "-verbose", "-file-line-error",
-                "-synctex=1", "-interaction=nonstopmode", "%f"
-              },
-              executable = "latexmk",
-              forwardSearchAfter = true
-            },
-            chktex = {onOpenAndSave = true},
-            forwardSearch = {
-              args = {"--synctex-forward", "%l:1:%f", "%p"},
-              executable = "zathura"
-            }
-          }
-        }
-      }
-      opt = vim.tbl_deep_extend('force',options,opt)
-      require("lspconfig").texlab.setup(opt)
-    end
-  })
-  if python_lsp == 'pylance' then
-    require('plugins.lsp.pylance_config')
-    require('lspconfig').pylance.setup(pyright_opts)
-  end
-  if python_lsp == 'jedi' then
-    local jedi_opts = vim.tbl_deep_extend('force',options,{
-      -- cmd = {vim.fn.expand('~/miniconda3/envs/py12306/bin/jedi-language-server')},
-    })
-    require'lspconfig'.jedi_language_server.setup(jedi_opts)
-  end
-  if python_lsp == 'pylyzer' then
-    local pylyzer_opts = vim.tbl_deep_extend('force',options,{
-      cmd = { "pylyzer", "--server" },
-      filetypes = { "python" },
-      settings = {
-        {
-          python = {
-            checkOnType = false,
-            diagnostics = true,
-            inlayHints = true,
-            smartCompletion = true
-          }
-        }
-      },
-      root_dir = function(fname)
-        local root_files = {'pyproject.toml', 'pyrightconfig.json'}
-        return util.find_git_ancestor(fname) or
-        util.root_pattern(unpack(root_files))(fname) or
-        util.path.dirname(fname)
-      end
-    })
-    require'lspconfig'.pylyzer.setup(pylyzer_opts)
-  end
-  -- require("plugins.null-ls").setup()
+  require('plugins.lsp.lua').setup(options)
+  require('plugins.lsp.python').setup(options,'pyright')
+  require('plugins.lsp.latex').setup(options)
   require("plugins.lsp.diagnostics").setup()
 end
 return M

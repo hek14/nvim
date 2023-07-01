@@ -11,6 +11,12 @@ M.au = function(event,opt)
   vim.api.nvim_create_autocmd(event,merged_opts)
 end
 
+M.au("BufNewFile", function(args)
+  if string.match(args.file,'%.py$') or string.match(args.file,'%.lua$')then
+    vim.cmd [[LspStart]]
+  end
+end)
+
 M.au("FileType",{
   pattern='txt',
   command='if expand("%:t")=="pose.txt" | set ro | endif'

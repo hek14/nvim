@@ -1,3 +1,12 @@
+# lsp server installation guide
+## pyright
+`pip install pyright`
+## jedi-language-server
+`pip install jedi-language-server`
+## ruff-lsp
+`pip install ruff-lsp`
+## lua-language-server
+download from "https://github.com/LuaLS/lua-language-server/releases", extract them, and add the bin/ to vim.env["PATH"]
 # create autocmd example
 ```lua
 vim.api.nvim_create_user_command('Lspsaga', function(args)

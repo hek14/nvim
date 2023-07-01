@@ -230,8 +230,14 @@ function M.config()
     handlers = my_lsp_handlers
   }
   require('plugins.lsp.lua').setup(options)
-  require('plugins.lsp.python').setup(options,'pyright')
   require('plugins.lsp.latex').setup(options)
-  require("plugins.lsp.diagnostics").setup()
+  -- NOTE: python: currently use jedi for navigation and ruff for diagnostics
+  require('plugins.lsp.python').setup(options,'jedi_language_server')
+  require('plugins.lsp.python').setup(options,'ruff_lsp')
+  -- require('plugins.lsp.python').setup(options,'diagnosticls')
+  -- require('plugins.lsp.python').setup(options,'anakin_language_server')
+  -- require('plugins.lsp.python').setup(options,'pyright')
+  -- require('plugins.lsp.python').setup(options,'pylyzer')
+  -- require("plugins.lsp.diagnostics").setup() -- TODO: buggy
 end
 return M

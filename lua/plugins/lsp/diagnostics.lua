@@ -29,10 +29,7 @@ local function filter(arr, func, args)
 end
 
 
-local filter_rule_fn_lua = function (diagnostic,old_index,symbols)
-  -- if string.match(diagnostic.message, 'Undefined global.*') then
-  --   return false
-  -- end
+local filter_rule_fn_lua = function (diagnostic,old_index,args)
   if string.match(diagnostic.message, 'Undefined field.*') then
     return false
   end
@@ -77,9 +74,9 @@ local handle_import = function(diagnostic)
       if other_err then
         print(string.format("err: %s",other_err))
       else
-        vim.notify("no err:!!! ",no_module_found,other_err)
+        vim.print("no err:!!! ",no_module_found,other_err)
         print("no err:!!! ",no_module_found,other_err)
-        local clients = vim.lsp.buf_get_clients(buf)
+        local clients = vim.lsp.get_active_clients({bufnr=buf})
         for id,client in pairs(clients) do
           if client.name=='pylance' then
             print('try to fix!!! pylance')
@@ -98,30 +95,21 @@ local handle_import = function(diagnostic)
   end)
 end
 
-local filter_rule_fn_python = function(diagnostic,old_index,symbols)
+local filter_rule_fn_python = function(diagnostic,old_index,args)
+  -- NOTE:import
   -- if (diagnostic.code and string.match(diagnostic.code,'reportMissingImports')) or
   --   (diagnostic.message and string.match(diagnostic.message, 'Import.*could not be resolved'))
   --   then
   --     handle_import(diagnostic)
   --   end
-  if (diagnostic.message and string.match(diagnostic.message,'not accessed')) then
+
+  -- NOTE: ruff, disable `too long line`
+  if (diagnostic.source == 'Ruff' and diagnostic.code == 'E501') then
     return false
   end
+
   return true
 end
-
-local function filter_rule_fn(diagnostic,old_index,symbols)
-  -- Only filter out Pyright stuff for now
-  -- To get line diagnostics :lua =vim.lsp.diagnostic.get_line_diagnostics()
-  if diagnostic.source == "Lua Diagnostics." then
-    return filter_rule_fn_lua(diagnostic,old_index,symbols)
-  end
-  if diagnostic.source == "Pyright"  or diagnostic.source == 'Pylance' then
-    return filter_rule_fn_python(diagnostic,old_index,symbols)
-  end
-  return true
-end
-
 
 local resolve_document_symbols = function(bufnr,client_id)
   local start = vim.loop.hrtime()
@@ -165,21 +153,27 @@ end
 local handle_diagnostics = function(a,params,c,config,bufnr)
   local results = nil
   -- results = resolve_document_symbols(bufnr,c.client_id.c.client_id) -- NOTE: currently too slow using lsp
-  filter(params.diagnostics, filter_rule_fn, results)
+  local ft = vim.api.nvim_buf_get_option(bufnr, 'filetype')
+  if ft == 'lua' then
+    filter(params.diagnostics, filter_rule_fn_lua, results)
+  elseif ft == 'python' then
+    filter(params.diagnostics, filter_rule_fn_python, results)
+  end
   vim.lsp.diagnostic.on_publish_diagnostics(a, params, c, config)
 end
 
-
 local function custom_on_publish_diagnostics(_, params, c, config)
-  local bufnr = vim.fn.bufnr()
-  if timer[bufnr]~=nil then
-    timer[bufnr]:stop() -- NOTE: timer:stop will need some time, so there maybe two timer call at the same time
-  else
-    timer[bufnr] = vim.loop.new_timer()
-  end
-  timer[bufnr]:start(100,0, vim.schedule_wrap(function ()
-    handle_diagnostics(_,params,c,config,bufnr)
-  end))
+  handle_diagnostics(_,params,c,config,vim.fn.bufnr())
+  -- NOTE: keep it minumum, do not use timer
+  -- local bufnr = vim.fn.bufnr()
+  -- if timer[bufnr]~=nil then
+  --   timer[bufnr]:stop() -- NOTE: timer:stop will need some time, so there maybe two timer call at the same time
+  -- else
+  --   timer[bufnr] = vim.loop.new_timer()
+  -- end
+  -- timer[bufnr]:start(100,0, vim.schedule_wrap(function ()
+  --   handle_diagnostics(_,params,c,config,bufnr)
+  -- end))
 end
 
 

@@ -15,6 +15,9 @@ M.setup = function(options,server)
     end
     opts =  {
       on_attach = function(client, bufnr)
+        if client.name == 'pylance' then
+          client.server_capabilities.semanticTokensProvider = nil
+        end
         options.on_attach(client,bufnr)
         local launch_in_home = client.config.root_dir == vim.env["HOME"]
         if launch_in_home then

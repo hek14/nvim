@@ -31,7 +31,6 @@ local M = {
   dependencies = {
     {
       'simrat39/symbols-outline.nvim',
-      enabled = false,
       cmd = { 'SymbolsOutline' },
       config = function()
         local opts = {
@@ -196,7 +195,9 @@ function M.config()
   capabilities.offsetEncoding = { "utf-16" }
 
   local on_attach = function(client, bufnr)
-    vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
+    vim.schedule(function()
+      vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
+    end)
     local illuminate_present,illuminate = pcall(require,'illuminate')
     if illuminate_present then
       require 'illuminate'.on_attach(client)
@@ -232,12 +233,13 @@ function M.config()
   require('plugins.lsp.lua').setup(options)
   require('plugins.lsp.latex').setup(options)
   -- NOTE: python: currently use jedi for navigation and ruff for diagnostics
-  require('plugins.lsp.python').setup(options,'jedi_language_server')
+  -- require('plugins.lsp.python').setup(options,'jedi_language_server')
   require('plugins.lsp.python').setup(options,'ruff_lsp')
   -- require('plugins.lsp.python').setup(options,'diagnosticls')
   -- require('plugins.lsp.python').setup(options,'anakin_language_server')
+  require('plugins.lsp.python').setup(options,'pylance')
   -- require('plugins.lsp.python').setup(options,'pyright')
   -- require('plugins.lsp.python').setup(options,'pylyzer')
-  -- require("plugins.lsp.diagnostics").setup() -- TODO: buggy
+  require("plugins.lsp.diagnostics").setup()
 end
 return M

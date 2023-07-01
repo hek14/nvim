@@ -3,10 +3,10 @@ require('core.utils').append_env_path(vim.fn.stdpath('config') .. '/bin/lua/bin'
 M.setup = function(options)
   local opts = {
     on_attach = function(client, bufnr)
-      options.on_attach(client, bufnr)
       client.server_capabilities.semanticTokensProvider = nil
       client.server_capabilities.document_formatting = false
       client.server_capabilities.document_range_formatting = false
+      options.on_attach(client, bufnr)
     end,
     settings = {
       single_file_support = true,

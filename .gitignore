@@ -1,8 +1,10 @@
 bin/lua
-bin/python
+bin/python/ruff-lsp
+bin/python/pyright-langserver
+bin/python/anakinls
+bin/python/jedi-language-server
 ms-python*
 *.zip
-
 
 .DS_Store
 *.log

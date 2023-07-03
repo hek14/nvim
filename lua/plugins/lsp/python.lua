@@ -28,27 +28,31 @@ M.setup = function(options,server)
           end
         end
       end,
-      -- settings = {
-      --   python = {
-      --     analysis = {
+      settings = {
+        python = {
+          analysis = {
+            extraPaths = { '.', './*', './**/*', './**/**/*' },
       --       typeCheckingMode = "off",
-      --       extraPaths = { '.', './*', './**/*', './**/**/*' },
       --       autoImportCompletions = false,
       --       autoSearchPaths = true,
-      --       diagnosticMode = "openFilesOnly", -- "workspace"
+      --       diagnosticMode = "openFilesOnly", -- or "workspace"
       --       useLibraryCodeForTypes = true,
       --       logLevel = "Error",
-      --       diagnosticSeverityOverrides = {
-      --         -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-      --         reportGeneralTypeIssues = "none",
-      --         reportOptionalMemberAccess = "none",
-      --         reportOptionalSubscript = "none",
-      --         reportPrivateImportUsage = "none",
-      --         reportUnusedImport = "none"
-      --       },
-      --     },
-      --   },
-      -- },
+            diagnosticSeverityOverrides = {
+              -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+              -- reportGeneralTypeIssues = "none",
+              -- reportOptionalMemberAccess = "none",
+              -- reportOptionalSubscript = "none",
+              -- reportPrivateImportUsage = "none",
+              -- reportUnboundVariable = "none",
+              -- reportUnusedImport = "none",
+              -- reportUnusedClass = "none",
+              -- reportUnusedFunction = "none",
+              -- reportUnusedVariable = "none",
+            },
+          },
+        },
+      },
       root_dir = root_dir
     }
   elseif server == 'pylsp' then

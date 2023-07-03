@@ -1,5 +1,8 @@
 bin/lua
 bin/python
+ms-python*
+*.zip
+
 
 .DS_Store
 *.log

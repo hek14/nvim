@@ -17,6 +17,13 @@ M.au("BufNewFile", function(args)
   end
 end)
 
+-- M.au('ExitPre',{
+--   callback = function()
+--     vim.fn.system(string.format([[ps aux | grep -i '\(pylance\|jedi\|pyright\|ruff\)' | grep -v 'grep' | awk '{print $2}' | xargs -I {} kill -9 {}]]))
+--   end,
+--   once = true
+-- })
+
 M.au("FileType",{
   pattern='txt',
   command='if expand("%:t")=="pose.txt" | set ro | endif'

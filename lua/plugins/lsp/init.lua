@@ -196,7 +196,7 @@ function M.config()
 
   local on_attach = function(client, bufnr)
     vim.schedule(function()
-      vim.notify("🐷 catches this buffer!",vim.log.levels.INFO)
+      vim.notify(string.format("🐷 %s catches buffer %s!",client.name,bufnr),vim.log.levels.INFO)
     end)
     local illuminate_present,illuminate = pcall(require,'illuminate')
     if illuminate_present then
@@ -207,17 +207,8 @@ function M.config()
     if client.server_capabilities.documentSymbolProvider and navic_present then
       require("nvim-navic").attach(client, bufnr)
     end
-    -- require("contrib.pig").on_attach(bufnr)
     require('plugins.lsp.keymap').setup(client,bufnr)
-    -- NOTE: just use the vv wrapper in .zshrc to do this
-    -- if vim.tbl_contains({'pylance','Pylance','pyright','Pyright'},client.name) then
-    --   au('ExitPre',{
-    --     callback = function()
-    --       vim.fn.system(string.format("ps aux | grep -i '%s' | grep -v 'grep' | awk '{print $2}' | xargs -I {} kill -9 {}",client.name))
-    --     end,
-    --     once = true
-    --   })
-    -- end
+    -- require("contrib.pig").on_attach(bufnr)
     -- require('contrib.show_diagnostic_in_message').on_attach(bufnr)
   end
 
@@ -237,8 +228,8 @@ function M.config()
   require('plugins.lsp.python').setup(options,'ruff_lsp')
   -- require('plugins.lsp.python').setup(options,'diagnosticls')
   -- require('plugins.lsp.python').setup(options,'anakin_language_server')
-  require('plugins.lsp.python').setup(options,'pylance')
-  -- require('plugins.lsp.python').setup(options,'pyright')
+  -- require('plugins.lsp.python').setup(options,'pylance')
+  require('plugins.lsp.python').setup(options,'pyright')
   -- require('plugins.lsp.python').setup(options,'pylyzer')
   require("plugins.lsp.diagnostics").setup()
 end

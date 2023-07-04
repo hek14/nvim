@@ -409,6 +409,13 @@ end
 -- ==========
 
 M.stringSplit = function(inputstr, sep)
+  if sep == '' then
+    local t = {}
+    for i = 1,#inputstr do
+      table.insert(t,inputstr:sub(i,i))
+    end
+    return t
+  end
   sep=sep or '%s'
   local t={}
   for field,s in string.gmatch(inputstr, "([^"..sep.."]*)("..sep.."?)") do

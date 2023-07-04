@@ -29,6 +29,9 @@ local au_group = vim.api.nvim_create_augroup("PIG",{clear=true})
 local profile_start = nil
 local profile_time = nil
 
+cmd('hi def StrikeoutColor ctermbg=red     ctermfg=white  guibg=red     guifg=white')
+-- cmd('hi def KeepColor      ctermbg=#706d64 ctermfg=white  guibg=#706d64 guifg=white')
+
 local function echo(hlgroup, msg)
   cmd(fmt('echohl %s', hlgroup))
   cmd(fmt('echo "[PIG] %s"', msg))
@@ -121,7 +124,7 @@ local function prepare_new_line(line,loc,new_name)
   local mid = new_name .. old_name
   local right = string.sub(line,end_char+1,#line)
   -- return require('nui.text')(left .. mid .. right, "htmlStrike")
-  return left .. mid .. right, {start_col=start_char-1+#new_name,end_col=end_char+#new_name}
+  return left .. mid .. right, {old_start_col=start_char-1+#new_name,old_end_col=end_char+#new_name,new_start_col=start_char-1,new_end_col=start_char-1+#new_name}
 end
 
 local Inc_loc = function(loc,index)
@@ -562,7 +565,9 @@ M.location_handler = function(label, result, ctx, config)
       end})
 
       for _, loc in ipairs(rename_lines) do
-        vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"Error",loc.line,loc.start_col,loc.end_col)
+        -- vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"Error",loc.line,loc.start_col,loc.end_col)
+        vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"StrikeoutColor",loc.line,loc.old_start_col,loc.old_end_col)
+        -- vim.api.nvim_buf_add_highlight(last_pig_menu.bufnr,PIG_ns,"KeepColor",loc.line,loc.new_start_col,loc.new_end_col)
       end
 
       for _, loc in ipairs(file_lines) do

@@ -54,6 +54,7 @@ M.config = function()
   for _, ft_path in ipairs(vim.api.nvim_get_runtime_file('lua/plugins/dap/configs/*.lua', true)) do
     loadfile(ft_path)()
   end
+  require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'} })
   require('nvim-dap-virtual-text').setup({})
   require('dapui').setup({
     mappings = {

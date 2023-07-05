@@ -26,7 +26,6 @@ end
 local function others()
   -- Don't copy the replaced text after pasting in visual mode
   map("v", "p", "p:let @+=@0<CR>")
-  map("n", ",g", "<Cmd>pwd<CR>")
   map("n", "g/", [[<Cmd>execute "match Visual /" . @/ . "/"<CR>]])
   map("n", "g?", [[<Cmd>match none<CR>]])
 

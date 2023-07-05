@@ -12,8 +12,11 @@ M.au = function(event,opt)
 end
 
 M.au("BufNewFile", function(args)
-  if string.match(args.file,'%.py$') or string.match(args.file,'%.lua$')then
-    vim.cmd [[LspStart]]
+  local patterns = {'%.py$', '%.lua$', '%.c$', '%.cpp$', '%.h$'}
+  for _, e in ipairs(patterns) do
+    if string.match(args.file,e) then
+      vim.cmd [[LspStart]]
+    end
   end
 end)
 

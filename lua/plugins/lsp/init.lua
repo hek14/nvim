@@ -222,6 +222,7 @@ function M.config()
     handlers = my_lsp_handlers
   }
   require('plugins.lsp.lua').setup(options)
+  require('plugins.lsp.c').setup(options)
   require('plugins.lsp.latex').setup(options)
   -- NOTE: python: currently use jedi for navigation and ruff for diagnostics
   -- require('plugins.lsp.python').setup(options,'jedi_language_server')

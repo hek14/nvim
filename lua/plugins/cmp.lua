@@ -184,9 +184,9 @@ function M.config()
               if not vim.api.nvim_buf_is_loaded(b) then
                 return false
               end
-              if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
-                return false
-              end
+              -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
+              --   return false
+              -- end
               return true
             end, vim.api.nvim_list_bufs())
           return bufnrs
@@ -228,9 +228,9 @@ function M.config()
               if not vim.api.nvim_buf_is_loaded(b) then
                 return false
               end
-              if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
-                return false
-              end
+              -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
+              --   return false
+              -- end
               return true
             end, vim.api.nvim_list_bufs())
             return bufnrs

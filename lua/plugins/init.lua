@@ -1,5 +1,12 @@
 local map = require('core.utils').map
 local plugins = {
+  {
+    "Pocco81/true-zen.nvim",
+    cmd = {'TZNarrow', 'TZFocus', 'TZMinimalist', 'TZAtaraxis'},
+    config = function()
+      require("true-zen").setup({})
+    end,
+  },
   { 
     "akinsho/toggleterm.nvim",
     cmd = 'ToggleTerm',
@@ -284,13 +291,13 @@ local plugins = {
     init = function()
       vim.g.nvimgdb_disable_start_keymaps = true
     end,
+    keys = {
+      {"<leader>dd", [[":GdbStartPDB python -m pdb " . expand('%')]], expr=true },
+    },
     config = function()
       vim.cmd([[
-      nnoremap <expr> <Leader>dd ":GdbStartPDB python -m pdb " . expand('%')
-      ]])
-      vim.cmd([[
       command! GdbExit lua NvimGdb.i():send('exit')
-      nnoremap <Leader>ds :GdbExit<CR>
+      nnoremap <Leader>dz :GdbExit<CR>
       ]])
     end,
   },

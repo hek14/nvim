@@ -174,24 +174,25 @@ function M.config()
       { name = "latex_symbols" },
       { 
         name = "buffer", 
-        option = {
-          get_bufnrs = function()
-            local bufnrs = vim.tbl_filter(function(b)
-              if 1 ~= vim.fn.buflisted(b) then
-                return false
-              end
-              -- only hide unloaded buffers if opts.show_all_buffers is false, keep them listed if true or nil
-              if not vim.api.nvim_buf_is_loaded(b) then
-                return false
-              end
-              -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
-              --   return false
-              -- end
-              return true
-            end, vim.api.nvim_list_bufs())
-          return bufnrs
-          end,
-        }
+        -- this may slow down the nvim a lot
+        -- option = {
+        --   get_bufnrs = function()
+        --     local bufnrs = vim.tbl_filter(function(b)
+        --       if 1 ~= vim.fn.buflisted(b) then
+        --         return false
+        --       end
+        --       -- only hide unloaded buffers if opts.show_all_buffers is false, keep them listed if true or nil
+        --       if not vim.api.nvim_buf_is_loaded(b) then
+        --         return false
+        --       end
+        --       -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
+        --       --   return false
+        --       -- end
+        --       return true
+        --     end, vim.api.nvim_list_bufs())
+        --   return bufnrs
+        --   end,
+        -- }
       }
       -- { name = "mine_config_yaml", trigger_characters = { '.' } }, -- manually trigger
     },
@@ -218,24 +219,25 @@ function M.config()
       { name = 'luasnip' },
       { 
         name = "buffer", 
-        option = {
-          get_bufnrs = function()
-            local bufnrs = vim.tbl_filter(function(b)
-              if 1 ~= vim.fn.buflisted(b) then
-                return false
-              end
-              -- only hide unloaded buffers if opts.show_all_buffers is false, keep them listed if true or nil
-              if not vim.api.nvim_buf_is_loaded(b) then
-                return false
-              end
-              -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
-              --   return false
-              -- end
-              return true
-            end, vim.api.nvim_list_bufs())
-            return bufnrs
-          end,
-        }
+        -- this may slow down the nvim a lot
+        -- option = {
+        --   get_bufnrs = function()
+        --     local bufnrs = vim.tbl_filter(function(b)
+        --       if 1 ~= vim.fn.buflisted(b) then
+        --         return false
+        --       end
+        --       -- only hide unloaded buffers if opts.show_all_buffers is false, keep them listed if true or nil
+        --       if not vim.api.nvim_buf_is_loaded(b) then
+        --         return false
+        --       end
+        --       -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
+        --       --   return false
+        --       -- end
+        --       return true
+        --     end, vim.api.nvim_list_bufs())
+        --     return bufnrs
+        --   end,
+        -- }
       }
     },
   })

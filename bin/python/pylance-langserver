@@ -3,6 +3,6 @@
 // @ts-nocheck
 
 // Stash the base directory into a global variable.
-global.__rootDirectory = __dirname + '/ms-python.vscode-pylance-2023.6.41/dist';
+global.__rootDirectory = __dirname + '/ms-python.vscode-pylance-2023.6.43/dist';
 
-require('./ms-python.vscode-pylance-2023.6.41/dist/server.bundle.js');
+require('./ms-python.vscode-pylance-2023.6.43/dist/server.bundle.js');

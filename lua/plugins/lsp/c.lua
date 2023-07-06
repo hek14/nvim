@@ -13,6 +13,7 @@ M.setup = function(options)
       client.server_capabilities.document_formatting = false
       client.server_capabilities.document_range_formatting = false
       options.on_attach(client, bufnr)
+      vim.lsp.inlay_hint(bufnr, true)
     end,
     cmd = {
       'clangd',

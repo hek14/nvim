@@ -19,6 +19,7 @@ M.setup = function(options,server)
           client.server_capabilities.semanticTokensProvider = nil
         end
         options.on_attach(client,bufnr)
+        -- vim.lsp.inlay_hint(bufnr,true)
         local launch_in_home = client.config.root_dir == vim.env["HOME"]
         if launch_in_home then
           local answer = vim.fn.input("really want to launch_in_home? y/n: ")
@@ -31,13 +32,18 @@ M.setup = function(options,server)
       settings = {
         python = {
           analysis = {
+            -- inlayHints= {
+            --   enable = true,
+            --   functionReturnTypes = true,
+            --   variableTypes = true,
+            -- },
             extraPaths = { '.', './*', './**/*', './**/**/*' },
-      --       typeCheckingMode = "off",
-      --       autoImportCompletions = false,
-      --       autoSearchPaths = true,
-      --       diagnosticMode = "openFilesOnly", -- or "workspace"
-      --       useLibraryCodeForTypes = true,
-      --       logLevel = "Error",
+            -- typeCheckingMode = "off",
+            -- autoImportCompletions = false,
+            -- autoSearchPaths = true,
+            -- diagnosticMode = "openFilesOnly", -- or "workspace"
+            -- useLibraryCodeForTypes = true,
+            -- logLevel = "Error",
             diagnosticSeverityOverrides = {
               -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
               -- reportGeneralTypeIssues = "none",

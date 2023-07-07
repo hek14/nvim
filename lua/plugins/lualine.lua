@@ -2,7 +2,7 @@ local theme = require('plugins.theme')
 local theme_plugin = theme.name and theme.name or theme[1]
 local M = {
   "nvim-lualine/lualine.nvim",
-  enabled = false,
+  enabled = true,
   dependencies = { 
     "nvim-tree/nvim-web-devicons",
     theme_plugin
@@ -102,41 +102,46 @@ M.highlight = function ()
   vim.api.nvim_set_hl(0,"lualine_c_diagnostics_error_normal", { fg = '#f14c4c', bg = '#007acc' })
 end
 M.config = function ()
-  require('lualine').setup {
+  require('lualine').setup({
     options = {
-      globalstatus = true,
-      theme = 'auto'    
-    },
-    winbar = {},
-    inactive_winbar = {},
-    sections = {
-      lualine_a = {'mode'},
-      lualine_b = { 
-        { 
-          pwd, 
-          icon = ':Dir:',
-          color = { fg='#8caaee', bg='#51576d' }
-        }
-      },
-      lualine_c = {'branch', 'diagnostics'},
-      lualine_x = {
-        {
-          reference_hint,
-          icon = ' Reference:',
-          color = { fg='#8caaee', bg='#51576d' }
-        },
-        {
-          lsp_name,
-          icon = ' LSP:',
-          color = { fg='#8caaee', bg='#51576d' }
-        },
-      },
-      lualine_y = {'filetype'},
-      lualine_z = {'location'}
-    },
-    inactive_sections = {},
-  }  
-  M.highlight()
+      theme = "modus-vivendi"
+    }
+  })
+  -- require('lualine').setup {
+  --   options = {
+  --     globalstatus = true,
+  --     theme = 'auto'    
+  --   },
+  --   winbar = {},
+  --   inactive_winbar = {},
+  --   sections = {
+  --     lualine_a = {'mode'},
+  --     lualine_b = { 
+  --       { 
+  --         pwd, 
+  --         icon = ':Dir:',
+  --         color = { fg='#8caaee', bg='#51576d' }
+  --       }
+  --     },
+  --     lualine_c = {'branch', 'diagnostics'},
+  --     lualine_x = {
+  --       {
+  --         reference_hint,
+  --         icon = ' Reference:',
+  --         color = { fg='#8caaee', bg='#51576d' }
+  --       },
+  --       {
+  --         lsp_name,
+  --         icon = ' LSP:',
+  --         color = { fg='#8caaee', bg='#51576d' }
+  --       },
+  --     },
+  --     lualine_y = {'filetype'},
+  --     lualine_z = {'location'}
+  --   },
+  --   inactive_sections = {},
+  -- }  
+  -- M.highlight()
 end
 
 return M

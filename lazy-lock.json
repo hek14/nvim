@@ -21,6 +21,7 @@
   "indentmini.nvim": { "branch": "main", "commit": "6615c19d5221576e39c030cfe60cb4ce3ca4be65" },
   "lazy.nvim": { "branch": "main", "commit": "5af331ea65418dc9361769891921fdee4bcc837a" },
   "lspsaga.nvim": { "branch": "main", "commit": "4f075452c466df263e69ae142f6659dcf9324bf6" },
+  "lualine.nvim": { "branch": "master", "commit": "05d78e9fd0cdfb4545974a5aa14b1be95a86e9c9" },
   "markdown-preview.nvim": { "branch": "master", "commit": "02cc3874738bc0f86e4b91f09b8a0ac88aef8e96" },
   "mini.surround": { "branch": "main", "commit": "9d1956b576d7051da3a483b251dfc778121c60db" },
   "nredir.nvim": { "branch": "main", "commit": "22cdf3aaf43d563b27c5bbbd31da5ab23efec972" },

@@ -8,7 +8,7 @@ local modules = {
   'core.keymap',
   'core.gui',
   'scratch.repl',
-  'contrib.statusline'
+  -- 'contrib.statusline'
 }
 
 for _, module in ipairs(modules) do

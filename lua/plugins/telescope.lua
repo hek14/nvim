@@ -5,7 +5,8 @@ local M = {
   cmd = "Telescope",
   keys = {
     { "<leader>b", "<cmd>Telescope buffers<CR>" },
-    { "<leader>ff", "<cmd>Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>" },
+    -- { "<leader>ff", "<cmd>Telescope find_files find_command=rg,--ignore-file=" .. vim.env['HOME'] .. "/.rg_ignore," .. "--no-ignore,--files<CR>" },
+    { "<leader>ff", "<cmd>Telescope find_files<CR>" },
     { "<leader>fa", "<cmd>Telescope find_files follow=true no_ignore=true hidden=true<CR>" },
     { "<leader>fg", "<cmd>Telescope git_commits<CR>" },
     { "<leader>gs", "<cmd>Telescope git_status<CR>" },
@@ -182,7 +183,7 @@ function M.config()
         "--line-number",
         "--column",
         "--smart-case",
-        "--ignore-file=" .. vim.env["HOME"] .. "/.rg_ignore"
+        -- "--ignore-file=" .. vim.env["HOME"] .. "/.rg_ignore"
         -- --no_ignore will search too much files, you can toggle this option in live_grep_args
       },
       file_ignore_patterns = {

@@ -4,7 +4,7 @@ local ts_utils = require("nvim-treesitter.ts_utils")
 local ts_parsers = require("nvim-treesitter.parsers")
 local ts_queries = require("nvim-treesitter.query")
 local ts_locals = require('nvim-treesitter.locals')
-local get_node_text = vim.treesitter.query.get_node_text
+local get_node_text = vim.treesitter.get_node_text
 local log = require'core.utils'.log
 local fmt = string.format
 
@@ -116,7 +116,7 @@ function M.get_scope(bufnr,position)
   local nodes = {}
   local function add_node_data(pos, capture_name, capture_node)
     local text = ""
-    text = vim.treesitter.query.get_node_text(capture_node, bufnr)
+    text = get_node_text(capture_node, bufnr)
     if text == nil then
       return nil
     end
@@ -207,14 +207,18 @@ function M.get_type(bufnr,position)
   local parent = get_main_node(node)
   local parent_range = {parent:range()}
   local q = vim.treesitter.query.get(ft,'locals')
-  for id, _node, _meta in q:iter_captures(parent, bufnr, parent_range[1],parent_range[3]+1) do
-    if q.captures[id]:match("definition") then
-      if vim.deep_equal( { _node:range() }, node_range ) then
-        return 'write'
+  if q then
+    for id, _node, _meta in q:iter_captures(parent, bufnr, parent_range[1],parent_range[3]+1) do
+      if q.captures[id]:match("definition") then
+        if vim.deep_equal( { _node:range() }, node_range ) then
+          return 'write'
+        end
       end
     end
+    return 'read'
+  else
+    return 'unknown'
   end
-  return 'read'
 end
 
 

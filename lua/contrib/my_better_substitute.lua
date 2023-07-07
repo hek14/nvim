@@ -46,7 +46,7 @@ M.my_better_substitute = function()
   local result = ''
   local last_end_col,last_end_row = 0,parent_start_row
   local on_confirm = function(new_name)
-    for pattern, match, metadata in query:iter_matches(parent_node, buffer) do
+    for pattern, match, metadata in query:iter_matches(parent_node, buffer,0,-1) do
       for id,node in pairs(match) do
         local start_row,start_col,end_row,end_col = node:range()
         if last_end_row == start_row then

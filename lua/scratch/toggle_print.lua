@@ -2,7 +2,7 @@ local ts_utils = require("nvim-treesitter.ts_utils")
 local ts_parsers = require("nvim-treesitter.parsers")
 local ts_queries = require("nvim-treesitter.query")
 local ts_locals = require('nvim-treesitter.locals')
-local get_node_text = vim.treesitter.query.get_node_text
+local get_node_text = vim.treesitter.get_node_text
 local log = require'core.utils'.log
 local fmt = string.format
 

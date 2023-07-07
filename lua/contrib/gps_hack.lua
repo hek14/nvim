@@ -30,7 +30,7 @@ M.gps_context_parent = function(level_up)
   local data = {}
   local function add_one_node(pos,capture_name,capture_node)
     local text = ""
-    text = vim.treesitter.query.get_node_text(capture_node, 0)
+    text = vim.treesitter.get_node_text(capture_node, 0)
     text = string.gsub(text, "%s+", ' ')
 
     local start_row, start_col, end_row, end_col = ts_utils.get_node_range(capture_node)

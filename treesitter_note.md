@@ -26,7 +26,7 @@ This will return a table of immutable |treesitter-tree| that represent the
   pos: [line,character], line and character should start at zero!
   `vim.treesitter.get_node_at_pos(bufnr,pos[1],pos[2])`
 - get node text,range,type,etc.
-  - `vim.treesitter.query.get_node_text(node,bufnr)` NOTE: very important to set the bufnr params, or you'll get `nil`
+  - `vim.treesitter.get_node_text(node,bufnr)` NOTE: very important to set the bufnr params, or you'll get `nil`
   - `node:range()`
   - `node:type()`
   - `node:child()`

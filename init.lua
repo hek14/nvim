@@ -1,4 +1,6 @@
-vim.loop = vim.uv
+if vim.uv then
+  vim.loop = vim.uv
+end
 local modules = {
   'core.options',
   'core.autocmds',

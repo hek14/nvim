@@ -195,12 +195,16 @@ relations with bufnr:
           })
 ```
 8.3 另外的定位方法: BINGO! this method is nice
-搜索`^ *0x.*function.*_0x.*_0x.*_0x`, 会有很多个, 然后找到符合如下特征的那个:
-前面有很多行连续以'+'结尾, 也就是8.2中所提到的报错message.
-一般而言, 就是最后的那个, 所以"G" goto the end, 然后 "?" 反向搜索这个pattern就行
-小技巧, 这相当于是要搜索两个pattern, 那么可以用match-highlight来高亮一个,搜索下一个时就能看到
-前一个pattern的结果 `match Visual /^ *".*" +$/`
+
+**搜索`^ *0x.*function.*_0x.*_0x.*_0x`**
+
+
+会有很多个, 然后找到符合如下特征的那个:
+1. 前面有很多行连续以'+'结尾的字符串, 也就是8.2中所提到的报错message.
+2. 一般而言, 就是最后的那个, 所以"G" goto the end, 然后 "?" 反向搜索这个pattern就行
+
 找到这一个之后再找 `(function () {` 或者`/for (const`都行
+
 8.4. answer from askfiy: 
 ```markdown
 If you know node.js, you can try to find the answer from Pylance's encryption source code, it is actually very simple.
@@ -218,6 +222,7 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.6.30: line 38544
 2023.6.40: line 38509
 2023.6.41: line 38764
+2023.7.11: line 51267
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
 # check if a program is able to find in nvim

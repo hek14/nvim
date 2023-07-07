@@ -1,3 +1,4 @@
+vim.loop = vim.uv
 local modules = {
   'core.options',
   'core.autocmds',

@@ -28,3 +28,6 @@ lua/scratch/two_input_t.lua
 __pycache__
 reference
 spell
+
+bin/c
+bin/cpptools-osx-arm64.vsix

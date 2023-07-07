@@ -1,6 +1,26 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    'cdelledonne/vim-cmake',
+    ft = {'c', 'cpp'},
+    init = function()
+      vim.g.cmake_link_compile_commands = 1
+    end,
+    keys = {
+      {'<leader>cg', '<cmd>CMakeGenerate<cr>'},
+      {'<leader>cb', '<cmd>CMakeBuild<cr>'},
+      {'<leader>ci', '<cmd>CMakeInstall<cr>'},
+      {'<leader>ct', '<cmd>CMakeTest<cr>'},
+    }
+  },
+  {
+    'alepez/vim-gtest',
+    ft = {'c', 'cpp'},
+    keys = {
+      {',g', ':GTestCmd '}
+    },
+  },
+  {
     "Pocco81/true-zen.nvim",
     cmd = {'TZNarrow', 'TZFocus', 'TZMinimalist', 'TZAtaraxis'},
     config = function()
@@ -116,6 +136,7 @@ local plugins = {
   },
   {
     'ggandor/leap.nvim',
+    enabled = false,
     event = 'BufRead',
     config = function()
       require('leap').setup({})
@@ -126,7 +147,6 @@ local plugins = {
   },
   {
     "folke/flash.nvim",
-    enabled = false,
     event = "VeryLazy",
     opts = {},
     keys = {
@@ -328,6 +348,7 @@ local plugins = {
           'package.json',
           'main.py',
           'trainer*.py',
+          'CMakeLists.txt'
         },
         exclude_dirs = {},
         show_hidden = false,

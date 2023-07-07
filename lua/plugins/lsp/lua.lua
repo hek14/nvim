@@ -7,10 +7,16 @@ M.setup = function(options)
       client.server_capabilities.document_formatting = false
       client.server_capabilities.document_range_formatting = false
       options.on_attach(client, bufnr)
+      -- vim.lsp.inlay_hint(bufnr,true)
     end,
     settings = {
       single_file_support = true,
       Lua = {
+        -- hint = {
+        --   enable = true,
+        --   arrayIndex = 'enable',
+        --   setType = true
+        -- },
         diagnostics = {
           enable = true,
           globals = { "vim" }

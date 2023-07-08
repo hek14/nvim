@@ -1,6 +1,7 @@
 local patterns = {
   ['python'] = '^ *#####',
-  ['lua'] = '^ *-----'
+  ['lua'] = '^ *-----',
+  ['zsh'] = '^ *####'
 }
 local M = {}
 function M.list_section()

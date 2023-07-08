@@ -48,7 +48,7 @@ M.au("BufRead",{command="set foldlevel=99"})
 
 M.au("BufRead",{
   command = 'set ro',
-  pattern = '*dyj*code'
+  pattern = {'*dyj*code', '*site.*packages*'}
 })
 
 -- -- how to find which pattern triggeres the autocmd? example here:

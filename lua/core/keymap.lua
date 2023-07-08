@@ -24,6 +24,7 @@ local colemak = function ()
 end
 
 local function others()
+  map('n','<leader>ss',require('core.utils').range_search)
   -- Don't copy the replaced text after pasting in visual mode
   map("v", "p", "p:let @+=@0<CR>")
   map("n", "g/", [[<Cmd>execute "match Visual /" . @/ . "/"<CR>]])

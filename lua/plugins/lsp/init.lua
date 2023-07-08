@@ -119,7 +119,7 @@ local M = {
     },
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
-      enabled = true,
+      enabled = false,
       dependencies = { 'SmiteshP/nvim-navic','nvim-tree/nvim-web-devicons' },
       config = function()
         require("barbecue").setup()
@@ -195,9 +195,9 @@ function M.config()
   capabilities.offsetEncoding = { "utf-16" }
 
   local on_attach = function(client, bufnr)
-    vim.schedule(function()
-      vim.notify(string.format("🐷 %s catches buffer %s!",client.name,bufnr),vim.log.levels.INFO)
-    end)
+    -- vim.schedule(function()
+      -- vim.notify(string.format("🐷 %s catches buffer %s!",client.name,bufnr),vim.log.levels.INFO)
+    -- end)
     local illuminate_present,illuminate = pcall(require,'illuminate')
     if illuminate_present then
       require 'illuminate'.on_attach(client)

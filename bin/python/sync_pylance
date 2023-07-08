@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+file="$HOME/.config/nvim/bin/python/ms-python.vscode-pylance-$1.zip"
+if [[ -f $file ]]; then
+  echo "syncing " $file
+  scp $file qingdao:~/.config/nvim/bin/python/
+  scp $file qingdao2:~/.config/nvim/bin/python/
+else
+  echo 'the file is existed: ' $file   
+fi

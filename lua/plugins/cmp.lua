@@ -160,6 +160,7 @@ function M.config()
       -- end
     },
     sources = {
+      { name = 'nvim_lua' },
       { name = "luasnip" },
       { name = "path"  },
       { 
@@ -219,19 +220,29 @@ function M.config()
     end
   end)
 
-  -- Set configuration for specific filetype.
-  cmp.setup.filetype('tex', {
-    sources = {
-      { name = 'omni' },
-      { name = 'luasnip' },
-      { name = "latex_symbols" },
-    },
-  })
-  cmp.setup.filetype('lua', {
-    sources = {
-      { name = "nvim_lua" },
-    },
-  })
+  -- Set configuration for specific filetype. but the general sources are not added
+  -- local au = require('core.autocmds').au
+  -- au('Filetype', {
+  --   pattern = 'tex',
+  --   callback = function()
+  --     cmp.setup.buffer {
+  --       sources = {
+  --         { name = 'omni' },
+  --         { name = 'luasnip' },
+  --         { name = "latex_symbols" },
+  --       },
+  --     }
+  --   end})
+
+  -- au('Filetype', {
+  --   pattern = 'lua',
+  --   callback = function()
+  --     cmp.setup.buffer {
+  --       sources = {
+  --         { name = 'nvim_lua' }
+  --       },
+  --     }
+  --   end})
 
   -- local cmp_rg_complete = function()
   --   cmp.complete({

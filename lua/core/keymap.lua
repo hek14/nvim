@@ -126,6 +126,7 @@ local function others()
     else
       vim.cmd [[ Messages clear ]]
     end
+    require('core.utils').clear_cmdline()
   end)
   map("n","<leader>mm",function ()
     local win_infos = require('core.utils').get_all_window_buffer_filetype()

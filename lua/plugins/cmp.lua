@@ -2,14 +2,14 @@ local M = {
   "hrsh7th/nvim-cmp",
   event = {"InsertEnter","CmdlineEnter"},
   dependencies = {
-    "hrsh7th/cmp-nvim-lsp",
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
-    "hrsh7th/cmp-nvim-lsp-signature-help",
     -- "lukas-reineke/cmp-rg",
     "L3MON4D3/LuaSnip",
     "saadparwaiz1/cmp_luasnip",
     "hrsh7th/cmp-nvim-lua",
+    "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-nvim-lsp-signature-help",
     'kdheepak/cmp-latex-symbols',
     "rafamadriz/friendly-snippets",
     {
@@ -26,9 +26,9 @@ local M = {
         -- `:` cmdline setup.
         cmp.setup.cmdline(':', {
           mapping = cmp.mapping.preset.cmdline(),
-          sources = cmp.config.sources({
-            { name = 'path' }
-          }, {
+          sources = cmp.config.sources(
+          { name = 'path' },
+          {
             {
               name = 'cmdline',
               option = {
@@ -44,7 +44,7 @@ local M = {
 
 function M.config()
   local cmp = require"cmp"
-  vim.opt.completeopt = "menuone,noselect"
+  vim.opt.completeopt = { "menu", "menuone", "noselect" }
 
   local t = function(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -122,77 +122,88 @@ function M.config()
       end,
     },
     mapping = {
-      ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
-      ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
+      ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
+      ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       ["<Up>"] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i' }),
       ['<Down>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i' }),
-      -- ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-      -- ["<C-f>"] = cmp.mapping.scroll_docs(4),
+      ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+      ["<C-a>"] = cmp.mapping.abort(),
+      ["<C-f>"] = cmp.mapping.scroll_docs(4),
       ["<C-Space>"] = cmp.mapping.complete(),
       ["<C-v>"] = cmp.mapping.close(),
-      ['<CR>'] = cmp.mapping.confirm({ select = true }),
-      -- ["<CR>"] = cmp.mapping.confirm {
-      --   behavior = cmp.ConfirmBehavior.Replace,
-      --   select = true,
-      -- },
-      ["<tab>"] = function(fallback)
-        if cmp.visible() then
-          cmp.select_next_item()
-          -- remove this: separate mappings for luasnip and nvim-cmp
-          -- elseif require'luasnip'.expand_or_jumpable() then
-          --   vim.fn.feedkeys(t("<Plug>luasnip-expand-or-jump"), "")
-        elseif check_back_space() then
-          vim.fn.feedkeys(t("<tab>"), "n")
+      ["<CR>"] = cmp.mapping(function(fallback)
+        if cmp.get_selected_entry() then
+          cmp.confirm {select = true, behavior = cmp.ConfirmBehavior.Insert}
         else
+          cmp.close()
           fallback()
         end
-      end,
-      ["<S-tab>"] = function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-          -- elseif require'luasnip'.jumpable(-1) then
-          --   vim.fn.feedkeys(t("<Plug>luasnip-jump-prev"), "")
-        else
-          fallback()
-        end
-      end
+      end,{ "i", "c" }),
+      ["<tab>"] = cmp.config.disable,
+      ["<S-tab>"] = cmp.config.disable,
+      -- ["<tab>"] = function(fallback)
+      --   if cmp.visible() then
+      --     cmp.select_next_item()
+      --     -- remove this: separate mappings for luasnip and nvim-cmp
+      --     -- elseif require'luasnip'.expand_or_jumpable() then
+      --     --   vim.fn.feedkeys(t("<Plug>luasnip-expand-or-jump"), "")
+      --   elseif check_back_space() then
+      --     vim.fn.feedkeys(t("<tab>"), "n")
+      --   else
+      --     fallback()
+      --   end
+      -- end,
+      -- ["<S-tab>"] = function(fallback)
+      --   if cmp.visible() then
+      --     cmp.select_prev_item()
+      --     -- elseif require'luasnip'.jumpable(-1) then
+      --     --   vim.fn.feedkeys(t("<Plug>luasnip-jump-prev"), "")
+      --   else
+      --     fallback()
+      --   end
+      -- end
     },
     sources = {
       { name = "luasnip" },
       { name = "path"  },
       { 
         name = "nvim_lsp", 
-        entry_filter = function(entry, ctx)
-          -- NOTE: example of filtering source
-          local cond = require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
-          cond = cond and require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Snippet'
-          return cond
-        end
+        -- NOTE: example of filtering source
+        -- entry_filter = function(entry, ctx)
+        --   local cond = require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
+        --   cond = cond and require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Snippet'
+        --   return cond
+        -- end
       },
       { name = 'nvim_lsp_signature_help' },
-      { name = "nvim_lua" },
-      { name = "latex_symbols" },
       { 
         name = "buffer", 
-        -- this may slow down the nvim a lot
-        -- option = {
-        --   get_bufnrs = function()
-        --     local bufnrs = vim.tbl_filter(function(b)
-        --       if 1 ~= vim.fn.buflisted(b) then
-        --         return false
-        --       end
-        --       -- only hide unloaded buffers if opts.show_all_buffers is false, keep them listed if true or nil
-        --       if not vim.api.nvim_buf_is_loaded(b) then
-        --         return false
-        --       end
-        --       -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
-        --       --   return false
-        --       -- end
-        --       return true
-        --     end, vim.api.nvim_list_bufs())
-        --   return bufnrs
-        --   end,
-        -- }
+        keyword_length = 5,
+        -- NOTE: this may slow down nvim
+        option = {
+          get_bufnrs = function()
+            local win_bufs = require('core.utils').get_all_window_buffer_filetype()
+            local bufs = {}
+            for i, win_buf in ipairs(win_bufs) do
+              table.insert(bufs, win_buf.bufnr)
+            end
+            return bufs
+          --   local bufnrs = vim.tbl_filter(function(b)
+          --     if 1 ~= vim.fn.buflisted(b) then
+          --       return false
+          --     end
+          --     -- only hide unloaded buffers if opts.show_all_buffers is false, keep them listed if true or nil
+          --     if not vim.api.nvim_buf_is_loaded(b) then
+          --       return false
+          --     end
+          --     -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
+          --     --   return false
+          --     -- end
+          --     return true
+          --   end, vim.api.nvim_list_bufs())
+          -- return bufnrs
+          end,
+        }
       }
       -- { name = "mine_config_yaml", trigger_characters = { '.' } }, -- manually trigger
     },
@@ -217,28 +228,12 @@ function M.config()
     sources = {
       { name = 'omni' },
       { name = 'luasnip' },
-      { 
-        name = "buffer", 
-        -- this may slow down the nvim a lot
-        -- option = {
-        --   get_bufnrs = function()
-        --     local bufnrs = vim.tbl_filter(function(b)
-        --       if 1 ~= vim.fn.buflisted(b) then
-        --         return false
-        --       end
-        --       -- only hide unloaded buffers if opts.show_all_buffers is false, keep them listed if true or nil
-        --       if not vim.api.nvim_buf_is_loaded(b) then
-        --         return false
-        --       end
-        --       -- if not string.find(vim.api.nvim_buf_get_name(b), vim.loop.cwd(), 1, true) then
-        --       --   return false
-        --       -- end
-        --       return true
-        --     end, vim.api.nvim_list_bufs())
-        --     return bufnrs
-        --   end,
-        -- }
-      }
+      { name = "latex_symbols" },
+    },
+  })
+  cmp.setup.filetype('lua', {
+    sources = {
+      { name = "nvim_lua" },
     },
   })
 

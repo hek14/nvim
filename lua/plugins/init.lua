@@ -123,6 +123,25 @@ local plugins = {
   {
     'windwp/nvim-autopairs',
     event = 'InsertEnter',
+    opts = {
+      check_ts = true,
+      ts_config = { -- will not add a pair on that treesitter node
+        lua = { "string", "source" },
+      },
+      disable_filetype = { "TelescopePrompt", "spectre_panel" },
+      ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
+      fast_wrap = { -- fast insert a pair by pressing <C-e> at a bracket, useful for function call
+        map = "<c-e>",
+        chars = { "{", "[", "(", '"', "'" },
+        pattern = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], "%s+", ""),
+        offset = 0, -- Offset from pattern match
+        end_key = "$",
+        keys = "arstdhneio",
+        check_comma = true,
+        highlight = "Search",
+        highlight_grey = "Comment",
+      },
+    }
   },
   {
     'numToStr/Comment.nvim',

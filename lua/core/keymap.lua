@@ -24,6 +24,16 @@ local colemak = function ()
 end
 
 local function others()
+  vim.api.nvim_create_user_command('ProfileStart',function()
+    local file = vim.fn.input("Log file: ","nvim_log.txt")
+    vim.cmd(string.format('profile start %s',file))
+    vim.cmd [[profile file *]]
+    vim.cmd [[profile func *]]
+  end,{})
+  vim.api.nvim_create_user_command('ProfileEnd',function()
+    vim.cmd [[profile pause]]
+    vim.cmd [[wa | qa]]
+  end,{})
   map('n','<leader>ss',require('core.utils').range_search)
   -- Don't copy the replaced text after pasting in visual mode
   map("v", "p", "p:let @+=@0<CR>")

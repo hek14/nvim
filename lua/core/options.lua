@@ -70,6 +70,9 @@ opt.updatetime = 750
 -- when cursor reaches end/beginning of line
 opt.whichwrap:append "<>[]hl"
 
+-- :help wrap
+opt.wrap = false
+
 -- indent: needed by ufo
 -- opt.foldcolumn = '1'
 opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value

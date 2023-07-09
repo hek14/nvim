@@ -2,7 +2,7 @@ local M = {}
 require('core.utils').append_env_path(vim.fn.stdpath('config') .. '/bin/python') -- pyright, pylance
 local util = require'lspconfig'.util
 local root_dir = function(fname)
-  local root_files = {'pyproject.toml', 'pyrightconfig.json', '.root', '.python-version', '.envrc'}
+  local root_files = {'pyproject.toml', 'pyrightconfig.json', '.root', '.python-version', '.envrc', '.vscode'}
   return util.find_git_ancestor(fname) or
   util.root_pattern(unpack(root_files))(fname) or
   util.path.dirname(fname)

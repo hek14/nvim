@@ -219,11 +219,30 @@ local plugins = {
   },
   {
     "folke/flash.nvim",
-    event = "VeryLazy",
-    opts = {},
+    event = "BufRead",
+    config = function()
+      require('flash').setup{
+        labels = "hneiodtsra",
+        label = {
+          rainbow = {
+            enabled = false,
+            -- number between 1 and 9
+            shade = 5,
+          },
+        },
+        modes = {
+          search = { -- search mode: / and ?
+          enabled = false
+          }
+        }
+      }
+      vim.cmd [[hi! FlashCurrent guibg=blue]]
+      vim.cmd [[hi! FlashLabel guibg=red]]
+      vim.cmd [[hi! FlashMatch guibg=gray]]
+    end,
     keys = {
       {
-        "s",
+        "<C-f>",
         mode = { "n", "x", "o" },
         function()
           -- default options: exact mode, multi window, all directions, with a backdrop
@@ -232,7 +251,7 @@ local plugins = {
         desc = "Flash",
       },
       {
-        "S",
+        "<F2>",
         mode = { "n", "o", "x" },
         function()
           -- show labeled treesitter nodes around the cursor
@@ -240,24 +259,6 @@ local plugins = {
         end,
         desc = "Flash Treesitter",
       },
-      {
-        "r",
-        mode = "o",
-        function()
-          -- jump to a remote location to execute the operator
-          require("flash").remote()
-        end,
-        desc = "Remote Flash",
-      },
-      {
-        "R",
-        mode = { "n", "o", "x" },
-        function()
-          -- show labeled treesitter nodes around the search matches
-          require("flash").treesitter_search()
-        end,
-        desc = "Treesitter Search",
-      }
     },
   },
   {

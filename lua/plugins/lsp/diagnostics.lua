@@ -185,9 +185,10 @@ function M.setup()
 
   -- Automatically update diagnostics
   vim.diagnostic.config({
-    underline = false,
+    underline = true,
     update_in_insert = false,
-    virtual_text = {spacing = 4, prefix = "●"},
+    -- virtual_text = {spacing = 4, prefix = "●"},
+    virtual_text = false,
     severity_sort = true
   })
   vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(custom_on_publish_diagnostics,{})

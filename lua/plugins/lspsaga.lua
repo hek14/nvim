@@ -4,7 +4,7 @@ return {
   -- branch = 'main',
   'nvimdev/lspsaga.nvim',
   branch = 'version_3',
-  enabled = true,
+  enabled = false,
   event = "BufRead",
   config = function()
     require('lspsaga').setup{}

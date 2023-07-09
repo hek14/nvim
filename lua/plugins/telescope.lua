@@ -20,7 +20,8 @@ local M = {
     -- { "<leader>fw", "<Cmd>lua require('contrib.telescope_custom_pickers').live_grep()<CR>"},
     { "<leader>fw", "<Cmd>Telescope live_grep_args<CR>"},
     { "<leader>f/", "<cmd>lua require('core.utils').grep_last_search()<CR>" },
-    { "<leader><leader>w", "<Cmd>lua require('telescope.builtin').grep_string()<CR>"},
+    { "<leader><space>", "<cmd>Telescope commands<CR>" },
+    -- { "<leader><leader>w", "<Cmd>lua require('telescope.builtin').grep_string()<CR>"},
     { "<leader>z", ":Telescope zoxide list<CR>" },
     { "<leader>sd", function ()
       require('telescope.builtin').live_grep({

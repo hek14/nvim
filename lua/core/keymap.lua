@@ -24,6 +24,7 @@ local colemak = function ()
 end
 
 local function others()
+  map('n','<C-j>','J',{noremap=true})
   vim.api.nvim_create_user_command('ProfileStart',function()
     local file = vim.fn.input("Log file: ","nvim_log.txt")
     vim.cmd(string.format('profile start %s',file))

@@ -1,5 +1,8 @@
 {
     "workspace.checkThirdParty": false,
+    "workspace.ignoreDir": [
+      "./bin"
+    ],
     "diagnostics.disable": [
         "deprecated"
     ]

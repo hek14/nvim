@@ -142,7 +142,7 @@ M.config = function()
       vim.api.nvim_set_current_win(target)
     end
   end
-  dap.listeners.before.event_terminated['dapui_config'] = function()
+  dap.listeners.after.event_terminated['dapui_config'] = function()
     require('dapui').close()
     vim.schedule(function()
       vim.cmd [[stopinsert]]
@@ -151,7 +151,7 @@ M.config = function()
       end)
     end)
   end
-  dap.listeners.before.event_exited['dapui_config'] = function()
+  dap.listeners.after.event_exited['dapui_config'] = function()
     require('dapui').close()
     vim.schedule(function()
       vim.cmd [[stopinsert]]
@@ -160,7 +160,7 @@ M.config = function()
       end)
     end)
   end
-  dap.listeners.before.disconnect['dapui_config'] = function()
+  dap.listeners.after.disconnect['dapui_config'] = function()
     require('dapui').close()
     vim.schedule(function()
       vim.cmd [[stopinsert]]
@@ -199,7 +199,7 @@ M.config = function()
     if found_hover ~= nil then
       return string.format([[:<C-u>%s wincmd w<CR>]], found_hover)
     else
-      return [[:<C-u>lua require('dapui').eval()<Left>]]
+      return [[:<C-u>lua require('dapui').eval('')<Left><Left>]]
     end
   end, { expr = true })
 
@@ -208,7 +208,7 @@ M.config = function()
     if found_hover ~= nil then
       return string.format([[:<C-u>%s wincmd w<CR>]], found_hover)
     else
-      return [[:<C-u>lua require('dapui').eval()<CR>]]
+      return [[<Cmd>lua require("dapui").eval()<CR>]]
     end
   end, { expr = true })
 end

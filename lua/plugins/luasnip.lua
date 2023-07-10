@@ -38,11 +38,7 @@ function M.config()
 
   -- exit snippet, should be used with the delete_check_events,region_check_events,update_events
   map({'i','s'},'<C-u>',function ()
-    if ls.in_snippet() then
-      ls.unlink_current()
-    else
-      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-e>',true,false,true),'n',false)
-    end
+    ls.unlink_current()
   end,{silent=false})
   local line_breaker = function()
     return ls.t({"",""})

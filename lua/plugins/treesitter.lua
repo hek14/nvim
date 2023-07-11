@@ -72,7 +72,7 @@ function M.config()
   vim.keymap.set('i','<C-x><C-g>','<Cmd>lua require("contrib.treesitter.python").fast_init_class()<CR>')
 
   local options = {
-    ensure_installed = {"python","c","query","vim","markdown","markdown_inline"}, -- NOTE: playground need query parser
+    ensure_installed = {"python","c","cpp","query","vim","markdown","markdown_inline"}, -- NOTE: playground need query parser
     -- playground = { 
     --   enable = true 
     -- },

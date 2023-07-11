@@ -42,6 +42,17 @@ local M = {
   },
 }
 
+local function before_words()
+  local line = vim.api.nvim_get_current_line()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  return line:sub(0, col)
+end
+
+local function feedkeys(key, mode)
+  local keycode = vim.api.nvim_replace_termcodes(key, true, false, true)
+  vim.api.nvim_feedkeys(keycode, mode, false)
+end
+
 function M.config()
   local cmp = require"cmp"
   vim.opt.completeopt = { "menu", "menuone", "noselect" }
@@ -59,6 +70,9 @@ function M.config()
 
   vim.g.cmp_enabled = true
   cmp.setup {
+    completion = {
+      autocomplete = false
+    },
     -- NOTE: guide to toggle cmp completion, now you can add a imap to toggle this option, refer to core/mappings.lua
     enabled = function()
       -- NOTE: this is from https://github.com/hrsh7th/nvim-cmp/blob/93cf84f7deb2bdb640ffbb1d2f8d6d412a7aa558/lua/cmp/config/default.lua
@@ -126,16 +140,24 @@ function M.config()
       ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       ["<Up>"] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i' }),
       ['<Down>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i' }),
-      ["<C-d>"] = cmp.mapping.scroll_docs(-4),
       ["<C-a>"] = cmp.mapping.abort(),
-      ["<C-f>"] = cmp.mapping.scroll_docs(4),
+      -- ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+      -- ["<C-f>"] = cmp.mapping.scroll_docs(4),
       ["<C-Space>"] = cmp.mapping.complete(),
       ["<C-v>"] = cmp.mapping.close(),
       ["<F1>"] = cmp.mapping(function(fallback)
         cmp.confirm {select = true, behavior = cmp.ConfirmBehavior.Insert}
       end,{ "i", "c" }),
       ["<CR>"] = cmp.config.disable,
-      ["<tab>"] = cmp.config.disable,
+      ["<tab>"] = cmp.mapping(function(fallback)
+        local words = before_words()
+        if not words:match('%S') then
+          -- return feedkeys('<TAB>')
+          fallback()
+        else
+          cmp.complete()
+        end
+      end),
       ["<S-tab>"] = cmp.config.disable,
       -- ["<tab>"] = function(fallback)
       --   if cmp.visible() then

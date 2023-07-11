@@ -82,6 +82,7 @@ local plugins = {
   },
   {
     'nvimdev/indentmini.nvim',
+    enabled = false,
     event = 'BufEnter',
     config = function()
       require('indentmini').setup({
@@ -142,9 +143,11 @@ local plugins = {
         highlight = "Search",
         highlight_grey = "Comment",
       }}
-      local cmp = require('cmp')
-      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-      cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())
+      pcall(function()
+        local cmp = require('cmp')
+        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+        cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())
+      end)
     end
   },
   {

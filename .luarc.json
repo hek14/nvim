@@ -5,5 +5,9 @@
     ],
     "diagnostics.disable": [
         "deprecated"
+    ],
+    "workspace.library": [
+        "/Users/hk/.local/share/bob/v0.9.1/nvim-macos/share/nvim/runtime/lua",
+        "/Users/hk/.config/coc/extensions/coc-sumneko-lua-data/neodev/types/nightly"
     ]
 }

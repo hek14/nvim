@@ -234,4 +234,4 @@ function M.config()
   -- require('plugins.lsp.python').setup(options,'pylyzer')
   require("plugins.lsp.diagnostics").setup()
 end
-return M
+return {}

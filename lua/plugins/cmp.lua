@@ -291,4 +291,4 @@ function M.config()
 
   vim.cmd('hi! CmpFloatBorder guifg=red')
 end
-return M
+return {}

@@ -131,7 +131,17 @@ local plugins = {
         },
         disable_filetype = { "TelescopePrompt", "spectre_panel" },
         ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
-        }
+        fast_wrap = { -- fast insert a pair by pressing <C-e> at a bracket, useful for function call
+        map = "<c-e>",
+        chars = { "{", "[", "(", '"', "'" },
+        pattern = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], "%s+", ""),
+        offset = 0, -- Offset from pattern match
+        end_key = "$",
+        keys = "arstdhneio",
+        check_comma = true,
+        highlight = "Search",
+        highlight_grey = "Comment",
+      }}
       local cmp = require('cmp')
       local cmp_autopairs = require('nvim-autopairs.completion.cmp')
       cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())

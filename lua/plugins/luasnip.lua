@@ -37,9 +37,7 @@ function M.config()
   require('luasnip.loaders.from_lua').lazy_load({ paths = vim.fn.stdpath('config') .. '/snippets' })
 
   -- exit snippet, should be used with the delete_check_events,region_check_events,update_events
-  map({'i','s'},'<C-u>',function ()
-    ls.unlink_current()
-  end,{silent=false})
+  map({'i','s','n'},'<C-l>','<Cmd>LuaSnipUnlinkCurrent<CR>',{silent=false})
   local line_breaker = function()
     return ls.t({"",""})
   end

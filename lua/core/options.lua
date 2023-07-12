@@ -81,5 +81,8 @@ opt.foldenable = true
 opt.foldmethod = 'indent'
 opt.foldexpr = nil
 
+-- for nvim-cmp
+opt.completeopt = { "menu", "menuone", "noselect" }
+
 g.mapleader = " "
 vim.env['PATH'] = vim.fn.stdpath('config') .. '/bin:' .. vim.env['PATH']

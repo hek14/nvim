@@ -64,14 +64,6 @@ M.setup = function(options,server)
       },
       root_dir = root_dir
     }
-    if server == 'pyright' then
-      opts.cmd = {
-        '/usr/bin/node', 
-        '--max-old-space-size=3072',
-        vim.fn.expand'~/.config/coc/extensions/node_modules/coc-pyright/node_modules/pyright/langserver.index.js',
-        '--stdio'
-      }
-    end
   elseif server == 'pylsp' then
     opts = {
       settings = {
@@ -94,6 +86,18 @@ M.setup = function(options,server)
           -- },
           root_dir = root_dir
         }
+  elseif server == 'coc-pyright' then
+    print('setting up coc-pyrht')
+    opts = {
+      cmd = {
+        'node',
+        '--max-old-space-size=3072',
+        vim.fn.expand('~/.config/coc/extensions/node_modules/coc-pyright/node_modules/pyright/langserver.index.js'),
+        '--stdio'
+      },
+      root_dir = root_dir,
+    }
+    server = 'pyright' -- pyright is a valid item in lspconfig
   else
     opts = {
       root_dir = root_dir

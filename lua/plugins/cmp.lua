@@ -84,7 +84,20 @@ function M.config()
       { name = "path" },
       { name = "nvim_lsp" },
       { name = 'nvim_lsp_signature_help' },
-      { name = 'buffer', keyword_length = 5 }
+      {
+        name = 'buffer',
+        keyword_length = 5,
+        option = {
+          get_bufnrs = function()
+            local win_bufs = require('core.utils').get_all_window_buffer_filetype()
+            local bufs = {}
+            for i, win_buf in ipairs(win_bufs) do
+              table.insert(bufs, win_buf.bufnr)
+            end
+            return bufs
+          end
+        }
+      }
     },
     enabled = function()
       local ft = vim.api.nvim_buf_get_option(0,'ft')

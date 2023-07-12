@@ -2,13 +2,12 @@
 
 vim.env['PATH'] = vim.fn.stdpath('config') .. '/bin:' .. vim.env['PATH']
 local util = require("lspconfig.util")
-local bin_name = "pylance-langserver"
 local found_exe = vim.fn.executable('pylance-langserver')
 if found_exe == 0 then
   error("install pylance first: check ~/.config/nvim/lua/plugins/lsp/check_pylance.lua")
   return false
 end
-local cmd = { bin_name, "--stdio" }
+local cmd = { 'pylance-langserver', "--stdio" }
 local root_files = {
   "pyproject.toml",
   "setup.py",

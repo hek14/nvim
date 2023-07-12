@@ -11,7 +11,7 @@ M.setup = function(options,server)
   local opts = {}
   if vim.tbl_contains({'pylance','pyright'}, server)then
     if server == 'pylance' then
-      require('plugins.lsp.pylance_config')
+      require('plugins.lsp.init_pylance')
     end
     opts =  {
       on_attach = function(client, bufnr)
@@ -29,39 +29,7 @@ M.setup = function(options,server)
           end
         end
       end,
-      settings = {
-        python = {
-          analysis = {
-            -- NOTE: refer to https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-            -- NOTE: and https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance
-            -- inlayHints= {
-            --   enable = true,
-            --   functionReturnTypes = true,
-            --   variableTypes = true,
-            -- },
-            -- extraPaths = { '.', './*', './**/*', './**/**/*' },
-            -- include = {},
-            -- exclude = {},
-            typeCheckingMode = "off",
-            autoImportCompletions = false,
-            autoSearchPaths = false,
-            diagnosticMode = "openFilesOnly", -- or "workspace"
-            useLibraryCodeForTypes = true,
-            -- logLevel = "Error",
-            diagnosticSeverityOverrides = {
-              -- reportGeneralTypeIssues = "none",
-              -- reportOptionalMemberAccess = "none",
-              -- reportOptionalSubscript = "none",
-              -- reportPrivateImportUsage = "none",
-              -- reportUnboundVariable = "none",
-              -- reportUnusedImport = "none",
-              -- reportUnusedClass = "none",
-              -- reportUnusedFunction = "none",
-              -- reportUnusedVariable = "none",
-            },
-          },
-        },
-      },
+      settings = require('plugins.lsp.pyright_config'),
       root_dir = root_dir
     }
   elseif server == 'pylsp' then

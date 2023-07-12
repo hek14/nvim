@@ -9,7 +9,7 @@ local root_dir = function(fname)
 end
 M.setup = function(options,server)
   local opts = {}
-  if vim.tbl_contains({'pylance','pyright'}, server)then
+  if vim.tbl_contains({'pylance','pyright','coc-pyright'}, server)then
     if server == 'pylance' then
       require('plugins.lsp.init_pylance')
     end
@@ -32,6 +32,16 @@ M.setup = function(options,server)
       settings = require('plugins.lsp.pyright_config'),
       root_dir = root_dir
     }
+    if server == 'coc-pyright' then
+      print('setting up coc-pyrht')
+      opts.cmd = {
+        'node',
+        '--max-old-space-size=3072',
+        vim.fn.expand('~/.config/coc/extensions/node_modules/coc-pyright/node_modules/pyright/langserver.index.js'),
+        '--stdio'
+      }
+      server = 'pyright' -- pyright is a valid item in lspconfig
+    end
   elseif server == 'pylsp' then
     opts = {
       settings = {
@@ -48,24 +58,12 @@ M.setup = function(options,server)
   elseif server == 'ruff_lsp' then
     opts = {
       -- settings = {
-        --   ruff_lsp = {
-          --     args = {"--config=/path/to/pyproject.toml"},
-          --   }
-          -- },
-          root_dir = root_dir
-        }
-  elseif server == 'coc-pyright' then
-    print('setting up coc-pyrht')
-    opts = {
-      cmd = {
-        'node',
-        '--max-old-space-size=3072',
-        vim.fn.expand('~/.config/coc/extensions/node_modules/coc-pyright/node_modules/pyright/langserver.index.js'),
-        '--stdio'
-      },
-      root_dir = root_dir,
+      --   ruff_lsp = {
+      --     args = {"--config=/path/to/pyproject.toml"},
+      --   }
+      -- },
+      root_dir = root_dir
     }
-    server = 'pyright' -- pyright is a valid item in lspconfig
   else
     opts = {
       root_dir = root_dir

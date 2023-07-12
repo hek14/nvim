@@ -87,6 +87,10 @@ function M.config()
       { name = 'buffer', keyword_length = 5 }
     },
     enabled = function()
+      local ft = vim.api.nvim_buf_get_option(0,'ft')
+      if string.match(ft, 'Prompt') then
+        return false
+      end
       return vim.g.cmp_enabled
     end,
     snippet = {

@@ -189,7 +189,13 @@ function M.config()
     }),
   }
 
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  local cmp_present, cmp = pcall(require, 'cmp')
+  local capabilities
+  if cmp_present then
+    capabilities = require('cmp_nvim_lsp').default_capabilities()
+  else
+    capabilities = vim.lsp.protocol.make_client_capabilities()
+  end
   -- avoid annoying multiple clients offset_encodings detected warning
   -- refer to: https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428#issuecomment-997226723
   capabilities.offsetEncoding = { "utf-16" }
@@ -229,9 +235,9 @@ function M.config()
   -- require('plugins.lsp.python').setup(options,'ruff_lsp')
   -- require('plugins.lsp.python').setup(options,'diagnosticls')
   -- require('plugins.lsp.python').setup(options,'anakin_language_server')
-  require('plugins.lsp.python').setup(options,'pylance')
+  -- require('plugins.lsp.python').setup(options,'pylance')
   -- require('plugins.lsp.python').setup(options,'pyright')
   -- require('plugins.lsp.python').setup(options,'pylyzer')
   require("plugins.lsp.diagnostics").setup()
 end
-return {}
+return M

@@ -125,12 +125,13 @@ local M = {
         require("barbecue").setup()
       end
     },
-    { 
+    {
       'Bekaboo/dropbar.nvim',
       enabled = false,
     },
     {
       'hek14/symbol-overlay.nvim',
+      enabled = false,
       config = function ()
         require('symbol-overlay').setup()
         require'telescope'.load_extension('symbol_overlay')
@@ -235,7 +236,7 @@ function M.config()
   -- require('plugins.lsp.python').setup(options,'ruff_lsp')
   -- require('plugins.lsp.python').setup(options,'diagnosticls')
   -- require('plugins.lsp.python').setup(options,'anakin_language_server')
-  -- require('plugins.lsp.python').setup(options,'pylance')
+  require('plugins.lsp.python').setup(options,'pylance')
   -- require('plugins.lsp.python').setup(options,'pyright')
   -- require('plugins.lsp.python').setup(options,'pylyzer')
   require("plugins.lsp.diagnostics").setup()

@@ -64,6 +64,14 @@ M.setup = function(options,server)
       },
       root_dir = root_dir
     }
+    if server == 'pyright' then
+      opts.cmd = {
+        '/usr/bin/node', 
+        '--max-old-space-size=3072',
+        vim.fn.expand'~/.config/coc/extensions/node_modules/coc-pyright/node_modules/pyright/langserver.index.js',
+        '--stdio'
+      }
+    end
   elseif server == 'pylsp' then
     opts = {
       settings = {

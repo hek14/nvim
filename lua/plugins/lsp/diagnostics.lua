@@ -103,6 +103,10 @@ local filter_rule_fn_python = function(diagnostic,old_index,args)
   --     handle_import(diagnostic)
   --   end
 
+  -- NOTE: disable all pyright diag
+  if (diagnostic.source == 'Pyright' or diagnostic.sources == 'Pylance') then
+    return false
+  end
   -- NOTE: ruff, disable `too long line`
   if (diagnostic.source == 'Ruff' and diagnostic.code == 'E501') then
     return false

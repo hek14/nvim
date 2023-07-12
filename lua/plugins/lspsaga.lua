@@ -3,30 +3,25 @@ return {
   -- 'hek14/lspsaga.nvim',
   -- branch = 'main',
   'nvimdev/lspsaga.nvim',
-  branch = 'version_3',
   enabled = false,
   event = "BufRead",
   config = function()
-    require('lspsaga').setup{}
-    -- require("lspsaga").setup({
-    --   symbol_in_winbar = { enable = false },
-    --   lightbulb = {
-    --     enable = false,
-    --     enable_in_insert = false,
-    --   },
-    --   finder = {
-    --     keys = {
-    --       jump_to = 'p',
-    --       edit = { 'o', '<CR>' },
-    --       vsplit = 's',
-    --       split = 'i',
-    --       tabe = 't',
-    --       tabnew = 'r',
-    --       quit = { 'q', '<ESC>' },
-    --       close_in_preview = '<C-q>'
-    --     },
-    --   },
-    -- })
+    require("lspsaga").setup({
+      symbol_in_winbar = { enable = false },
+      lightbulb = { enable = false },
+      finder = {
+        keys = {
+          jump_to = 'p',
+          edit = { 'o', '<CR>' },
+          vsplit = 's',
+          split = 'i',
+          tabe = 't',
+          tabnew = 'r',
+          quit = { 'q', '<ESC>' },
+          close_in_preview = '<C-q>'
+        },
+      },
+    })
     local au = require('core.autocmds').au
     au('FileType', {
       callback = function ()
@@ -36,7 +31,6 @@ return {
       end,
       pattern = 'lspsagafinder'
     })
-      
   end,
   dependencies = {
     {"nvim-tree/nvim-web-devicons"},

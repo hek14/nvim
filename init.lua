@@ -8,6 +8,7 @@ local modules = {
   'core.keymap',
   'core.gui',
   'scratch.repl',
+  'scratch.coc_menu_non_ts'
   -- 'contrib.statusline'
 }
 

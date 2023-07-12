@@ -130,6 +130,7 @@ function M.setup(client,bufnr)
   --     label = 'reference'
   --   })
   -- end})
+  buf_set_keymap("n", "gy", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
   buf_set_keymap("n", "gr",function ()
     vim.cmd [[Telescope lsp_references]]
     -- require('scratch.my_lsp_symbols').references()

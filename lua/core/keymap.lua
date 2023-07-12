@@ -170,8 +170,16 @@ local function others()
     return ":<C-u>s/"  .. sub_word .. "//g<Left><Left>"
   end,{expr=true,silent=false}) -- NOTE: should specify silent=false, because we need the cmdline to be appeared for <Left>
   map("n",",z", function ()
-    local eval_name = require('core.utils').quick_eval()
-    return eval_name .. '<Left>'
+    local buf = vim.api.nvim_get_current_buf()
+    local ft = vim.api.nvim_buf_get_option(buf,'ft')
+    if ft=='lua' then
+      local eval_name = require('core.utils').quick_eval()
+      return eval_name .. '<Left>'
+    else
+      pcall(function()
+        vim.cmd [[TZFocus]]
+      end)
+    end
   end,{expr=true,silent=false})-- NOTE: should specify silent=false, because we need the cmdline to be appeared for <Left>
   map("n",'<leader>rr',require('contrib.my_better_substitute').my_better_substitute)
   -- line line_start line_end

@@ -106,15 +106,15 @@ local function gen_lsp_and_ts_symbols(opts)
     local filename = entry.filename
     local symbol_msg = entry.text
     local symbol_type, symbol_name = symbol_msg:match "%[(.+)%]%s+(.*)"
-    local ordinal = ""
-    if not hidden and filename then
-      ordinal = filename .. " "
-    end
+    -- local ordinal = ""
+    -- if not hidden and filename then
+    --   ordinal = filename .. " "
+    -- end
     -- ordinal = ordinal .. symbol_name .. entry.ts_info .. entry.type
-    ordinal = ordinal .. symbol_name
+    -- ordinal = ordinal .. symbol_name
     return make_entry.set_default_entry_mt({
       value = entry,
-      ordinal = ordinal,
+      ordinal = symbol_name,
       display = make_display,
       ts_info = entry.ts_info,
       type = entry.type,

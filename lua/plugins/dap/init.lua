@@ -45,7 +45,10 @@ local M = {
     'rcarriga/nvim-dap-ui',
     'mfussenegger/nvim-dap-python',
     'nvim-telescope/telescope-dap.nvim',
-    'rcarriga/cmp-dap',
+    {'rcarriga/cmp-dap',enabled = function()
+      local ok, cmp = pcall(require,'cmp')
+      return ok
+    end},
     'jbyuki/one-small-step-for-vimkind',
   },
 }
@@ -171,13 +174,16 @@ M.config = function()
   end
 
   require('telescope').load_extension('dap')
-  require('cmp').setup.filetype({ 'dap-repl', 'dapui_watches' }, {
-    sources = require('cmp').config.sources({
-      { name = 'dap' },
-    }, {
-      { name = 'buffer' },
-    }),
-  })
+  local ok, cmp = require('cmp')
+  if ok then
+    cmp.setup.filetype({ 'dap-repl', 'dapui_watches' }, {
+      sources = require('cmp').config.sources({
+        { name = 'dap' },
+      }, {
+        { name = 'buffer' },
+      }),
+    })
+  end
 
   local function focus_hover()
     local found = nil

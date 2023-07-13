@@ -174,7 +174,7 @@ M.config = function()
   end
 
   require('telescope').load_extension('dap')
-  local ok, cmp = require('cmp')
+  local ok, cmp = pcall(require,'cmp')
   if ok then
     cmp.setup.filetype({ 'dap-repl', 'dapui_watches' }, {
       sources = require('cmp').config.sources({

@@ -64,7 +64,7 @@ end
 function M.init()
   -- toggle cmp
   vim.g.cmp_enabled = true
-  require('core.utils').map("i", "<C-q>",function ()
+  vim.api.nvim_create_user_command('ToggleCmp',function()
     if vim.g.cmp_enabled then
       require("cmp").close()
       vim.g.cmp_enabled = false
@@ -72,7 +72,9 @@ function M.init()
       require('cmp').complete()
       vim.g.cmp_enabled = true
     end
-  end)
+  end,{})
+
+  require('core.utils').map("i", "<C-q>","<Cmd>ToggleCmp<CR>")
 end
 
 function M.config()

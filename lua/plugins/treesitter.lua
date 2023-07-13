@@ -82,8 +82,7 @@ function M.config()
       lint_events = { "BufWrite", "CursorHold" },
     },
     highlight = {
-      enable = false, 
-      use_languagetree = false,
+      enable = true, 
     },
     indent = {
       enable = false

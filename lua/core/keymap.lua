@@ -24,6 +24,7 @@ local colemak = function ()
 end
 
 local function others()
+  map("i","<C-d>","<Del>")
   map('n','<C-j>','J',{noremap=true})
   vim.api.nvim_create_user_command('ProfileStart',function()
     local file = vim.fn.input("Log file: ","nvim_log.txt")
@@ -261,13 +262,13 @@ local function others()
   execute ":'<,'>normal @".nr2char(getchar())
   endfunction
   ]])
+  map("n", "H","^")
+  map("n", "I","g_")
+  map("x", "H","^")
+  map("x", "I","g_")
+  -- map("n", "n","gj")
+  -- map("n", "e","gk")
 end
 
 others()
 colemak()
-map("n", "H","^")
-map("n", "I","g_")
-map("x", "H","^")
-map("x", "I","g_")
--- map("n", "n","gj")
--- map("n", "e","gk")

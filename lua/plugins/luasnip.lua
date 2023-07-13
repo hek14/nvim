@@ -43,7 +43,7 @@ function M.config()
   local line_breaker = function()
     return ls.t({"",""})
   end
-  map({ "i", "s" }, "<c-d>", function()
+  map({ "i", "s" }, "<c-y>", function()
     if ls.expandable() then 
       ls.expand()
     end

@@ -127,6 +127,8 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest bash -c "apt-get update -y && apt-get install git fzf ripgrep neovim -y && nvim"
 ```
 # refer to useful plugins
+- https://github.com/nosduco/remote-sshfs.nvim
+- https://github.com/OscarCreator/rsync.nvim
 - https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
 - https://github.com/ziontee113/syntax-tree-surfer: navigater/swap based on syntax tree(powered by treesitter)
 - https://github.com/stevearc/overseer.nvim: yet another task manager

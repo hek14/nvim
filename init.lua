@@ -8,6 +8,7 @@ local modules = {
   'core.keymap',
   'core.gui',
   'scratch.repl',
+  'contrib.indent'
   -- 'contrib.statusline'
 }
 

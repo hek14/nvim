@@ -8,6 +8,7 @@ local override_hl = function ()
   hi! link StatusLeft StatusLine
   hi! link StatusRight StatusLine
   hi! link StatusMid StatusLine
+  hi! Gray guifg=#52504c
   ]])
 end
 

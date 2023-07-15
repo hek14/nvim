@@ -9,9 +9,8 @@ M.setup = function(options)
   end
   local opts = {
     on_attach = function(client, bufnr)
-      client.server_capabilities.semanticTokensProvider = nil
-      client.server_capabilities.document_formatting = false
-      client.server_capabilities.document_range_formatting = false
+      -- client.server_capabilities.document_formatting = false
+      -- client.server_capabilities.document_range_formatting = false
       options.on_attach(client, bufnr)
       -- vim.lsp.inlay_hint(bufnr, true)
     end,

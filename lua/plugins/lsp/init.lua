@@ -202,6 +202,9 @@ function M.config()
   capabilities.offsetEncoding = { "utf-16" }
 
   local on_attach = function(client, bufnr)
+    if vim.fn.has('nvim-0.10') then
+      client.server_capabilities.semanticTokensProvider = nil
+    end
     -- vim.schedule(function()
       -- vim.notify(string.format("🐷 %s catches buffer %s!",client.name,bufnr),vim.log.levels.INFO)
     -- end)

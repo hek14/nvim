@@ -203,7 +203,8 @@ function M.config()
 
   local on_attach = function(client, bufnr)
     if vim.fn.has('nvim-0.10') then
-      client.server_capabilities.semanticTokensProvider = nil
+      client.server_capabilities.semanticTokensProvider = nil -- disable
+      -- vim.lsp.semantic_tokens.start(bufnr, client) -- enable
     end
     -- vim.schedule(function()
       -- vim.notify(string.format("🐷 %s catches buffer %s!",client.name,bufnr),vim.log.levels.INFO)

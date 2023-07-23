@@ -32,3 +32,8 @@ spell
 bin/c
 bin/cpptools-osx-arm64.vsix
 bin/python/coc-pyright
+extension
+*.xml
+cookies.txt
+extension.vsixmanifest
+*.vsix

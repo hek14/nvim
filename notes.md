@@ -101,6 +101,9 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 ## make
 `CMAKE_BUILD_TYPE=RelWithDebInfo`
 # refer to following dotfiles:
+- https://github.com/vsedov/nvim: really hacky about pylance config
+- https://github.com/max397574/omega-nvim: only hack pylance!!!
+- https://github.com/abzcoding/lvim: a lot of things to refer
 - https://github.com/tjdevries/config_manager/tree/master/xdg_config/nvim
 - https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
 - https://github.com/lucasvianav/nvim: nice hacking about lspconfig handlers

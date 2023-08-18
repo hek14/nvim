@@ -54,10 +54,10 @@ print(co.status(thread))
 3. 出现bug之后打开这个文件搜索“insert”找到可能引发bug的若干插件, 一个一个去掉看bug消失了没
 4. Extra tip: 出现bug时, `:Lazy`看看现在没加载哪些插件, 它们一定没问题 
 # important tips for raise keyboard response speed/make keypress snappier
+https://apple.stackexchange.com/questions/10467/how-to-increase-keyboard-key-repeat-rate-on-os-x
 ## on mac os
 ```shell
-defaults write NSGlobalDomain KeyRepeat -int 1
-defaults write NSGlobalDomain InitialKeyRepeat -int 10
+defaults write -g ApplePressAndHoldEnabled -bool false; defaults write NSGlobalDomain KeyRepeat -int 1; defaults write NSGlobalDomain InitialKeyRepeat -int 10
 ```
 you should *restart* to make this work.
 ## on linux
@@ -101,6 +101,7 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 ## make
 `CMAKE_BUILD_TYPE=RelWithDebInfo`
 # refer to following dotfiles:
+- https://github.com/HCY-ASLEEP/NVIM-Config: 没有插件的nvim config
 - https://github.com/vsedov/nvim: really hacky about pylance config
 - https://github.com/max397574/omega-nvim: only hack pylance!!!
 - https://github.com/abzcoding/lvim: a lot of things to refer

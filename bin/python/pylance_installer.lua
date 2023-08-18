@@ -1,192 +1,42 @@
--- local Pkg = require("mason-core.package")
--- local configs = require("lspconfig.configs")
--- local lsp_util = require("vim.lsp.util")
--- local path = require("mason-core.path")
--- local util = require("lspconfig.util")
--- local index = require("mason-registry.index")
---
--- index["pylance"] = "modules.lsp.lsp.mason.python"
---
--- local root_files = {
---     "pyproject.toml",
---     "setup.py",
---     "setup.cfg",
---     "requirements.txt",
---     "Pipfile",
---     "pyrightconfig.json",
--- }
+local uv = vim.loop
+local Job = require'plenary.job'
+local script0 = [[mkdir tmp]]
+local script1 = [[curl -s -c cookies.txt https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance]]
+local script2 = [[curl -s https://marketplace.visualstudio.com/_apis/public/gallery/publishers/ms-python/vsextensions/vscode-pylance/latest/vspackage -j -b cookies.txt --compressed --output pylance.vsix]]
+local script3 = [[unzip pylance.vsix]]
+local script4 = {'/Users/hk/.local/bin/gsed', '-i', [[0,/\(if(\!process\[[^] ]*\]\[[^] ]*\])return\!0x\)1/ s//\10/]], 'extension/dist/server.bundle.js'}
+local script5 = {'mv', vim.fn.expand("~/.config/nvim/tmp"), vim.fn.expand("~/.config/nvim/bin/python/pylance_latest")}
 
-local function extract_method()
-    local range_params = lsp_util.make_given_range_params(nil, nil, 0, "utf-16")
-    local arguments = { vim.uri_from_bufnr(0):gsub("file://", ""), range_params.range }
-    local params = {
-        command = "pylance.extractMethod",
-        arguments = arguments,
-    }
-    vim.lsp.buf.execute_command(params)
+local todo = {script0, script1, script2, script3, script4, script5}
+local function go(index)
+  if(index>#todo) then
+    vim.notify("all job done", vim.log.levels.INFO)
+    return
+  end
+
+  local comps = todo[index]
+  if type(todo[index])=="string" then
+    comps = require('core.utils').stringSplit(todo[index], ' ')
+  end
+  vim.print(comps)
+  Job:new({
+    command = comps[1],
+    args = vim.list_slice(comps,2),
+    cwd = (index==1) and vim.fn.expand("~/.config/nvim") or vim.fn.expand("~/.config/nvim/tmp"),
+    env = {
+      ['http_proxy'] = "http://localhost:6666",
+      ['https_proxy'] = "http://localhost:6666",
+      ['all_proxy'] = "http://localhost:6666",
+    },
+    on_exit = vim.schedule_wrap(function(j, code)
+      vim.print(j:stderr_result())
+      if(code~=0) then
+        vim.notify(string.format("ERROR script %d",index),vim.log.levels.ERROR) 
+        return
+      end
+      vim.notify(string.format("job %d done",index), vim.log.levels.INFO)
+      go(index+1)
+    end),
+  }):start()
 end
-
-local function extract_variable()
-    local range_params = lsp_util.make_given_range_params(nil, nil, 0, "utf-16")
-    local arguments = { vim.uri_from_bufnr(0):gsub("file://", ""), range_params.range }
-    local params = {
-        command = "pylance.extractVarible",
-        arguments = arguments,
-    }
-    vim.lsp.buf.execute_command(params)
-end
-
-local function organize_imports()
-    local params = {
-        command = "pyright.organizeimports",
-        arguments = { vim.uri_from_bufnr(0) },
-    }
-    vim.lsp.buf.execute_command(params)
-end
-
-local function on_workspace_executecommand(err, result, ctx)
-    if ctx.params.command:match("WithRename") then
-        ctx.params.command = ctx.params.command:gsub("WithRename", "")
-        vim.lsp.buf.execute_command(ctx.params)
-    end
-    if result then
-        if result.label == "Extract Method" then
-            local old_value = result.data.newSymbolName
-            local file = vim.tbl_keys(result.edits.changes)[1]
-            local range = result.edits.changes[file][1].range.start
-            local params = { textDocument = { uri = file }, position = range }
-            local client = vim.lsp.get_client_by_id(ctx.client_id)
-            local bufnr = ctx.bufnr
-            local prompt_opts = {
-                prompt = "New Method Name: ",
-                default = old_value,
-            }
-            if not old_value:find("new_var") then
-                range.character = range.character + 5
-            end
-            vim.ui.input(prompt_opts, function(input)
-                if not input or #input == 0 then
-                    return
-                end
-                params.newName = input
-                local handler = client.handlers["textDocument/rename"] or vim.lsp.handlers["textDocument/rename"]
-                client.request("textDocument/rename", params, handler, bufnr)
-            end)
-        end
-    end
-end
-
--- if not configs["pylance"] then
---     configs["pylance"] = {
---         default_config = {
---             filetypes = { "python" },
---             root_dir = util.root_pattern(unpack(root_files)),
---             cmd = { "pylance", "--stdio" },
---             single_file_support = true,
---             capabilities = vim.lsp.protocol.make_client_capabilities(),
---             settings = {
---                 editor = { formatOnType = true },
---                 python = {
---                     analysis = {
---                         autoSearchPaths = true,
---                         useLibraryCodeForTypes = true,
---                         diagnosticMode = "workspace",
---                         typeCheckingMode = "basic",
---                         completeFunctionParens = true,
---                         indexing = false,
---                         inlayHints = {
---                             variableTypes = true,
---                             functionReturnTypes = true,
---                             callArgumentNames = true,
---                             pytestParameters = true,
---                         },
---                     },
---                 },
---             },
---             handlers = {
---                 ["workspace/executeCommand"] = on_workspace_executecommand,
---             },
---         },
---         commands = {
---             PylanceExtractMethod = {
---                 extract_method,
---                 description = "Extract Method",
---             },
---             PylanceExtractVarible = {
---                 extract_variable,
---                 description = "Extract Variable",
---             },
---             PylanceOrganizeImports = {
---                 organize_imports,
---                 description = "Organize Imports",
---             },
---         },
---         docs = {
---             package_json = vim.fn.expand(
---                 "$HOME/.local/share/nvim/mason/packages/pylance/extension/package.json",
---                 false,
---                 true
---             )[1],
---             description = [[
---       https://github.com/microsoft/pyright
---       `pyright`, a static type checker and language server for python
---       ]],
---         },
---     }
--- end
-
-local function installer(ctx)
-    local script = [[
-    curl -s -c cookies.txt 'https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance' > /dev/null &&
-    curl -s "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/ms-python/vsextensions/vscode-pylance/latest/vspackage"
-         -j -b cookies.txt --compressed --output "pylance.vsix"
-    ]]
-    ctx.receipt:with_primary_source(ctx.receipt.unmanaged)
-    ctx.spawn.bash({ "-c", script:gsub("\n", " ") })
-    ctx.spawn.unzip({ "pylance.vsix" })
-    ctx.spawn.bash({
-        "-c",
-        [[sed -i "0,/\(if(\!process\[[^] ]*\]\[[^] ]*\])return\!0x\)1/ s//\10/" extension/dist/server.bundle.js]],
-    })
-    ctx:link_bin(
-        "pylance",
-        ctx:write_node_exec_wrapper("pylance", path.concat({ "extension", "dist", "server.bundle.js" }))
-    )
-end
-
-local function myinstaller()
-  local script = [[
-  curl -s -c cookies.txt 'https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance' > /dev/null &&
-  curl -s "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/ms-python/vsextensions/vscode-pylance/latest/vspackage" -j -b cookies.txt --compressed --output pylance.vsix
-  ]]
-  vim.fn.system({'bash','-c',script:gsub("\n"," ")})
-  vim.fn.system({'unzip',"pylance.vsix"})
-  vim.fn.system({'bash','-c',[[
-    sed -i "0,/\(if(\!process\[[^] ]*\]\[[^] ]*\])return\!0x\)1/ s//\10/" extension/dist/server.bundle.js
-  ]]})
-end
-
--- TODO: use plenary job to rewrite this
--- local Job = require'plenary.job'
--- Job:new({
---   command = 'rg',
---   args = { '--files' },
---   cwd = '/usr/bin',
---   env = { ['a'] = 'b' },
---   on_exit = function(j, return_val)
---     print(return_val)
---     print(j:result())
---   end,
--- }):sync() -- or start()
-
-
--- return Pkg.new({
---     name = "pylance",
---     desc = [[Fast, feature-rich language support for Python]],
---     homepage = "https://github.com/microsoft/pylance",
---     languages = { Pkg.Lang.Python },
---     categories = { Pkg.Cat.LSP },
---     install = installer,
---     myinstaller = myinstaller()
--- })
-return myinstaller
+go(1)

@@ -23,8 +23,8 @@ local M = {
   end,
   dependencies = {
     {"nvim-treesitter/nvim-treesitter-textobjects"},
-    {"HiPhish/nvim-ts-rainbow2"},
-    {"theHamsta/nvim-treesitter-pairs"},
+    {"HiPhish/nvim-ts-rainbow2",enabled = false}, -- replace with sentiment
+    {"theHamsta/nvim-treesitter-pairs",enabled = false},
     {
       "nvim-treesitter/playground",
       enabled = false,
@@ -97,7 +97,7 @@ function M.config()
       }
     },
     rainbow = {
-      enable = true,
+      enable = false,
       -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
     },
     pairs = {

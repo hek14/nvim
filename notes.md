@@ -101,6 +101,8 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 ## make
 `CMAKE_BUILD_TYPE=RelWithDebInfo`
 # refer to following dotfiles:
+<!-- TODO: look at dlvhdr tmux/nvim/kitty dotfiles -->
+- https://github.com/dlvhdr/dotfiles: 很好看的tmux+kitty配置, 值得一看 (介绍视频: https://www.youtube.com/watch?v=CHV0TWO-b4A&ab_channel=JoshMedeski)
 - https://github.com/HCY-ASLEEP/NVIM-Config: 没有插件的nvim config
 - https://github.com/vsedov/nvim: really hacky about pylance config
 - https://github.com/max397574/omega-nvim: only hack pylance!!!
@@ -131,6 +133,7 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest bash -c "apt-get update -y && apt-get install git fzf ripgrep neovim -y && nvim"
 ```
 # refer to useful plugins
+- https://github.com/nvimdev/rapid.nvim: async compile just like Emacs
 - https://github.com/nosduco/remote-sshfs.nvim
 - https://github.com/OscarCreator/rsync.nvim
 - https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here

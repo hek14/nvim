@@ -1,4 +1,5 @@
 local override_hl = function ()
+  vim.api.nvim_set_hl(0,'MatchParen',{bg = '#264f78', bold = true})
   vim.cmd([[
   hi clear CursorLine
   hi! LspReferenceWrite guibg=#264f78 gui=bold

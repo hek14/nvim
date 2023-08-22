@@ -1,6 +1,15 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "utilyre/sentiment.nvim",
+    version = "*",
+    event = "VeryLazy", -- keep for lazy loading
+    opts = {},
+    init = function()
+      vim.g.loaded_matchparen = 1
+    end,
+  },
+  {
     'cdelledonne/vim-cmake',
     ft = {'c', 'cpp'},
     init = function()

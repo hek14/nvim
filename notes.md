@@ -1,3 +1,5 @@
+# minimal config to reproduce an issue
+https://github.com/folke/noice.nvim/wiki/Minimal-%60init.lua%60-to-Reproduce-an-Issue
 # lsp server installation guide
 ## pyright
 `pip install pyright`

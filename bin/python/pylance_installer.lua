@@ -1,11 +1,11 @@
-local proxy_port = is_mac and "6666" or "9978"
+local proxy_port = is_mac and "8877" or "9978"
 local sed_path = is_mac and '/Users/hk/.local/bin/gsed' or 'sed'
 
 local uv = vim.loop
 local Job = require'plenary.job'
 local script0 = [[mkdir tmp]]
 local script1 = [[rm -rf ~/.config/nvim/bin/python/pylance_latest]]
-local script2 = [[curl -s -c cookies.txt https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance]]
+local script2 = [[curl -s -c cookies.txt https://marketplace.visualstudio.com/items\?itemName=ms-python.vscode-pylance]]
 local script3 = [[curl -s https://marketplace.visualstudio.com/_apis/public/gallery/publishers/ms-python/vsextensions/vscode-pylance/latest/vspackage -j -b cookies.txt --compressed --output pylance.vsix]]
 local script4 = [[unzip pylance.vsix]]
 local script5 = {sed_path, '-i', [[0,/\(if(\!process\[[^] ]*\]\[[^] ]*\])return\!0x\)1/ s//\10/]], 'extension/dist/server.bundle.js'}

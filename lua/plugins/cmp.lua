@@ -1,45 +1,51 @@
 local M = {
-  "hrsh7th/nvim-cmp",
-  event = {"InsertEnter","CmdlineEnter"},
-  dependencies = {
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-path",
-    -- "lukas-reineke/cmp-rg",
-    "L3MON4D3/LuaSnip",
-    "saadparwaiz1/cmp_luasnip",
-    "hrsh7th/cmp-nvim-lua",
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-nvim-lsp-signature-help",
-    'kdheepak/cmp-latex-symbols',
-    "rafamadriz/friendly-snippets",
-    {
-      "hrsh7th/cmp-cmdline",
-      config = function()
-        local cmp = require("cmp")
-        -- `/` cmdline setup.
-        cmp.setup.cmdline('/', {
-          mapping = cmp.mapping.preset.cmdline(),
-          sources = {
-            { name = 'buffer' }
-          }
-        })
-        -- `:` cmdline setup.
-        cmp.setup.cmdline(':', {
-          mapping = cmp.mapping.preset.cmdline(),
-          sources = cmp.config.sources(
-          { name = 'path' },
-          {
-            {
-              name = 'cmdline',
-              option = {
-                ignore_cmds = { 'Man', '!' }
-              }
+  {
+    "hrsh7th/nvim-cmp",
+    event = {"InsertEnter","CmdlineEnter"},
+    dependencies = {
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      -- "lukas-reineke/cmp-rg",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+      "hrsh7th/cmp-nvim-lua",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-nvim-lsp-signature-help",
+      "rafamadriz/friendly-snippets",
+      {
+        "hrsh7th/cmp-cmdline",
+        config = function()
+          local cmp = require("cmp")
+          -- `/` cmdline setup.
+          cmp.setup.cmdline('/', {
+            mapping = cmp.mapping.preset.cmdline(),
+            sources = {
+              { name = 'buffer' }
             }
           })
-        })
-      end,
-    }, -- enhance grep and quickfix list
+          -- `:` cmdline setup.
+          cmp.setup.cmdline(':', {
+            mapping = cmp.mapping.preset.cmdline(),
+            sources = cmp.config.sources(
+            { name = 'path' },
+            {
+              {
+                name = 'cmdline',
+                option = {
+                  ignore_cmds = { 'Man', '!' }
+                }
+              }
+            })
+          })
+        end,
+      }, -- enhance grep and quickfix list
+    },
   },
+  {
+    'kdheepak/cmp-latex-symbols',
+    dependencies = 'hrsh7th/nvim-cmp',
+    ft = 'tex'
+  }
 }
 
 local function before_words()

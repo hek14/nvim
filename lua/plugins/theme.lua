@@ -95,6 +95,7 @@ local everforest = {
   event = "VimEnter",
   config = function ()
     vim.cmd[[colorscheme everforest]]   
+    override_hl()
   end
 }
 
@@ -121,6 +122,12 @@ local material = {
   end,
 }
 
-return vscode_theme
--- vim.cmd.colorscheme('solarized')
--- return {}
+local paradox = {
+  'nvimdev/paradox.vim',
+  config = function()
+    vim.cmd.colorscheme('paradox')
+    override_hl()
+  end
+}
+
+return everforest

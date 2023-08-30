@@ -149,15 +149,17 @@ docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest b
 - https://github.com/stevearc/oil.nvim
 - https://github.com/google/executor.nvim
 # Youtuber to follow
-1. jesse19skelton
-- https://www.youtube.com/@jesse19skelton -- nice videos about karabiner and  yabai [his github]()
-- https://www.notion.so/Yabai-8da3b829872d432fac43181b7ff628fc
-2. s1n7ax
+- jesse19skelton
+https://www.youtube.com/@jesse19skelton -- nice videos about karabiner and  yabai [his github]()
+https://www.notion.so/Yabai-8da3b829872d432fac43181b7ff628fc
+- s1n7ax
 https://www.youtube.com/@s1n7ax/videos
-3. yukiUthman
+- yukiUthman
 https://www.youtube.com/@yukiuthman8358
 https://www.youtube.com/watch?v=W8Mq--dqNow&ab_channel=YukiUthman : nice video about new_work threading!!!
 https://www.youtube.com/playlist?list=PLOe6AggsTaVvsguiM_LAbdkm7dFCxYxe3
+- Andrew Courter
+https://www.youtube.com/@ascourter
 # for pyright completion stubs
 https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs
 example: how to use it for cv2 module completion:

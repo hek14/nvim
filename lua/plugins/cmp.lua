@@ -67,7 +67,7 @@ local check_back_space = function()
   return col == 0 or vim.fn.getline('.'):sub(col, col):match '%s' ~= nil
 end
 
-function M.init()
+M[1].init = function()
   -- toggle cmp
   vim.g.cmp_enabled = true
   vim.api.nvim_create_user_command('ToggleCmp',function()
@@ -83,7 +83,7 @@ function M.init()
   require('core.utils').map("i", "<C-q>","<Cmd>ToggleCmp<CR>")
 end
 
-function M.config()
+M[1].config = function()
   local cmp = require('cmp')
   cmp.setup{
     window = {

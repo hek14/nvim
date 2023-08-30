@@ -7,7 +7,7 @@ local M = {
     "nvim-tree/nvim-web-devicons",
     theme_plugin
   },
-  event = "VeryLazy",
+  event = "BufRead",
 }
 
 local winbar = function ()

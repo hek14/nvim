@@ -556,6 +556,18 @@ local plugins = {
       vim.g.vimtex_text_obj_enabled = 0
     end,
     config = function()
+      vim.g.vimtex_compiler_latexmk_engines = {
+        ['_']                = '-xelatex',
+        ['pdfdvi']           = '-pdfdvi',
+        ['pdfps']            = '-pdfps',
+        ['pdflatex']         = '-pdf',
+        ['luatex']           = '-lualatex',
+        ['lualatex']         = '-lualatex',
+        ['xelatex']          = '-xelatex',
+        ['context (pdftex)'] = '-pdf -pdflatex=texexec',
+        ['context (luatex)'] = '-pdf -pdflatex=context',
+        ['context (xetex)']  = [[-pdf -pdflatex=''texexec --xtx'']],
+      }
       vim.g.vimtex_view_method = 'skim'
       vim.cmd([[
       let maplocalleader = ","

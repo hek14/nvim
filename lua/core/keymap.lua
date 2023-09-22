@@ -270,5 +270,5 @@ local function others()
   -- map("n", "e","gk")
 end
 
-others()
 colemak()
+others()

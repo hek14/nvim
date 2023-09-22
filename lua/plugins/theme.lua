@@ -109,6 +109,10 @@ local vscode_theme = {
       override_hl()
     end)
   end,
+  -- priority = 100,
+  config = function()
+    vim.cmd([[colorscheme visual_studio_code]])
+  end,
 }
 
 local material = {
@@ -130,4 +134,4 @@ local paradox = {
   end
 }
 
-return everforest
+return vscode_theme

@@ -24,7 +24,7 @@ local colemak = function ()
 end
 
 local function others()
-  map("i","<C-d>","<Del>")
+  -- map("i","<C-d>","<Del>")
   map('n','<C-j>','J',{noremap=true})
   vim.api.nvim_create_user_command('ProfileStart',function()
     local file = vim.fn.input("Log file: ","nvim_log.txt")

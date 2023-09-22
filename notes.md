@@ -1,3 +1,11 @@
+# TODO: 
+- rapid.nvim
+- AsyncRun: https://github.com/skywind3000/asyncrun.vim/wiki/Better-way-for-C-and-Cpp-development-in-Vim-8
+- learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
+- refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
+- consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
+- add print() custom_capture for python
+- TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not
 # minimal config to reproduce an issue
 https://github.com/folke/noice.nvim/wiki/Minimal-%60init.lua%60-to-Reproduce-an-Issue
 # lsp server installation guide
@@ -243,12 +251,6 @@ The verification code is similar to "if !has(vscode) { return false};".
 # check if a program is able to find in nvim
 `echo exepath('python')`
 `echo executable('clippy')`
-# TODO: 
-- learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
-- refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
-- consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
-- add print() custom_capture for python
-- TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not
 # vim.schedule 陷阱/值得注意的点
 ```lua
 local map = {}

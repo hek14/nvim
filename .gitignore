@@ -37,3 +37,5 @@ extension
 cookies.txt
 extension.vsixmanifest
 *.vsix
+
+Debug/.cmake/api/v1/query/client-vim-cmake

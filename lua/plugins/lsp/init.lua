@@ -119,7 +119,7 @@ local M = {
     },
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
-      enabled = true,
+      enabled = false,
       dependencies = { 'SmiteshP/nvim-navic','nvim-tree/nvim-web-devicons' },
       config = function()
         require("barbecue").setup()

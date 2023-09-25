@@ -1,5 +1,9 @@
 # TODO: 
 - rapid.nvim
+- look at dlvhdr tmux/nvim/kitty dotfiles: https://github.com/dlvhdr/dotfiles -->
+- a vscode command-p: https://github.com/mrjones2014/legendary.nvim
+- another vscode command-p: https://github.com/FeiyouG/commander.nvim
+- https://github.com/prochri/telescope-all-recent.nvim
 - AsyncRun: https://github.com/skywind3000/asyncrun.vim/wiki/Better-way-for-C-and-Cpp-development-in-Vim-8
 - learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
@@ -111,7 +115,6 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 ## make
 `CMAKE_BUILD_TYPE=RelWithDebInfo`
 # refer to following dotfiles:
-<!-- TODO: look at dlvhdr tmux/nvim/kitty dotfiles -->
 - https://github.com/dlvhdr/dotfiles: 很好看的tmux+kitty配置, 值得一看 (介绍视频: https://www.youtube.com/watch?v=CHV0TWO-b4A&ab_channel=JoshMedeski)
 - https://github.com/HCY-ASLEEP/NVIM-Config: 没有插件的nvim config
 - https://github.com/vsedov/nvim: really hacky about pylance config

@@ -2,6 +2,13 @@
 - refer: https://www.youtube.com/watch?v=86sgKa0jeO4&ab_channel=s1n7ax
 - refer: https://github.com/s1n7ax/youtube-neovim-treesitter-query
 
+# 以comment为例写highlight match
+这里匹配了所有含有`@...`的comment
+```lisp
+((comment) @gu 
+  (#lua-match? @gu "@.*") (#offset! @gu 0 1 0 -1) (#set! "priority" 500))
+```
+
 # tsnode/tstree api
 some default module used in the later article:
 ```lua

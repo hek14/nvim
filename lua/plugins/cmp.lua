@@ -98,7 +98,7 @@ M[1].config = function()
       { name = 'nvim_lsp_signature_help' },
       {
         name = 'buffer',
-        keyword_length = 5,
+        -- keyword_length = 5,
         option = {
           get_bufnrs = function()
             local win_bufs = require('core.utils').get_all_window_buffer_filetype()

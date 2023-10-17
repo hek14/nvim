@@ -149,8 +149,19 @@ M[1].config = function()
     end
   end)
 
-  -- local mine_config_yaml = require("contrib.cmp_config_yaml")
-  -- cmp.register_source("mine_config_yaml", mine_config_yaml.new())
+  local mine_config_yaml = require("contrib.cmp_config_yaml")
+  cmp.register_source("mine_config_yaml", mine_config_yaml.new())
+
+  local cmp_config = function()
+    cmp.complete({
+      config = {
+        sources = {
+          { name = "mine_config_yaml" }, -- should install the cmp-rg
+        }
+      }
+    })
+  end
+  vim.keymap.set('i','<C-c>',cmp_config,{noremap=true,silent=true})
 end
 
 return M

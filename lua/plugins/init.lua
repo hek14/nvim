@@ -1,6 +1,13 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "echasnovski/mini.pick",
+    enabled = false,
+    version = false,
+    event = {"InsertEnter", "CmdlineEnter"},
+    opts = {},
+  },
+  {
     "utilyre/sentiment.nvim",
     version = "*",
     event = "VeryLazy", -- keep for lazy loading

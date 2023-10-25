@@ -46,6 +46,7 @@
   "one-small-step-for-vimkind": { "branch": "main", "commit": "edbb34ee779049f2071dc7becff0bbf51c865906" },
   "plenary.nvim": { "branch": "master", "commit": "50012918b2fc8357b87cff2a7f7f0446e47da174" },
   "project.nvim": { "branch": "main", "commit": "8c6bad7d22eef1b71144b401c9f74ed01526a4fb" },
+  "rose-pine": { "branch": "main", "commit": "e29002cbee4854a9c8c4b148d8a52fae3176070f" },
   "sentiment.nvim": { "branch": "main", "commit": "54a6db15b630eccfa98c32a76baf90f21c6f1e40" },
   "sqlite.lua": { "branch": "master", "commit": "b7e28c8463254c46a8e61c52d27d6a2040492fc3" },
   "statuscol.nvim": { "branch": "main", "commit": "98d02fc90ebd7c4674ec935074d1d09443d49318" },
@@ -72,6 +73,5 @@
   "vim-illuminate": { "branch": "master", "commit": "3bd2ab64b5d63b29e05691e624927e5ebbf0fb86" },
   "vim-scriptease": { "branch": "master", "commit": "18511d389675d773994215ddb572ccdc2b72f52b" },
   "vimtex": { "branch": "master", "commit": "e6264120d31d0b5e69d06041b52d40f9ec5ffec5" },
-  "vimux": { "branch": "master", "commit": "616fcb4799674a7a809b14ca2dc155bb6ba25788" },
-  "visual_studio_code": { "branch": "master", "commit": "75995b9cfaad3413cf1ca9a2e9f20b41ce53ae8a" }
+  "vimux": { "branch": "master", "commit": "616fcb4799674a7a809b14ca2dc155bb6ba25788" }
 }

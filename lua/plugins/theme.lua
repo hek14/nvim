@@ -1,4 +1,5 @@
 local override_hl = function ()
+  vim.api.nvim_set_hl(0,'Visual',{bg = '#36497d', bold = true})
   vim.api.nvim_set_hl(0,'MatchParen',{bg = '#264f78', bold = true})
   vim.cmd([[
   " hi clear CursorLine
@@ -134,4 +135,23 @@ local paradox = {
   end
 }
 
-return vscode_theme
+local srcery = {
+  "srcery-colors/srcery-vim",
+  event = "VeryLazy",
+  config = function()
+    vim.g.srcery_italic = 1
+    vim.cmd.colorscheme('srcery')
+    override_hl()
+  end
+}
+
+local rose_pine = {
+  'rose-pine/neovim', 
+  name = 'rose-pine',
+  event = "VeryLazy",
+  config = function()
+    vim.cmd.colorscheme('rose-pine')
+  end
+}
+
+return srcery

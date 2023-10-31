@@ -1,11 +1,8 @@
 # TODO: 
-- rapid.nvim
 - look at dlvhdr tmux/nvim/kitty dotfiles: https://github.com/dlvhdr/dotfiles -->
-- a vscode command-p: https://github.com/mrjones2014/legendary.nvim
-- another vscode command-p: https://github.com/FeiyouG/commander.nvim
-- https://github.com/prochri/telescope-all-recent.nvim
+- hack telescope: https://github.com/prochri/telescope-all-recent.nvim
 - AsyncRun: https://github.com/skywind3000/asyncrun.vim/wiki/Better-way-for-C-and-Cpp-development-in-Vim-8
-- learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
+- learn `async await`: https://github.com/ms-jpq/lua-async-await
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 - consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
 - add print() custom_capture for python
@@ -70,6 +67,9 @@ print(co.status(thread))
 # important tips for raise keyboard response speed/make keypress snappier
 https://apple.stackexchange.com/questions/10467/how-to-increase-keyboard-key-repeat-rate-on-os-x
 ## on mac os
+The step values that correspond to the sliders on the GUI are as follow (lower equals faster):
+KeyRepeat: 120, 90, 60, 30, 12, 6, 2
+InitialKeyRepeat: 120, 94, 68, 35, 25, 15
 ```shell
 defaults write -g ApplePressAndHoldEnabled -bool false; defaults write NSGlobalDomain KeyRepeat -int 1; defaults write NSGlobalDomain InitialKeyRepeat -int 10
 ```
@@ -146,7 +146,6 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest bash -c "apt-get update -y && apt-get install git fzf ripgrep neovim -y && nvim"
 ```
 # refer to useful plugins
-- https://github.com/nvimdev/rapid.nvim: async compile just like Emacs
 - https://github.com/nosduco/remote-sshfs.nvim
 - https://github.com/OscarCreator/rsync.nvim
 - https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here
@@ -204,7 +203,7 @@ relations with bufnr:
 4. vim打开这个`server.bundle.js`, 此时它已经变成很多行了(format之前就只有一行)
 5. 到26099行或者搜索0x1ad9, 加上`return !0x0;` 这一行
 6. 测试: `node server.bundle.js --stdio` 通过!!!
-7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的licence不通过的那句话
+7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的license不通过的那句话
 8. 以'2023.2.30'版本为例: 
 8.1. 定位报错的message, 这个要首先通过`node server.bundle.js --stdio`看原本的message, 然后搜索里面的部分关键词 
 2023.2.30版本 [25872-26003]行其实就是`node server.bundle.js --stdio`报的那些错, 
@@ -249,6 +248,12 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.6.41: line 38764
 2023.7.10: line 45089
 2023.7.11: line 51267
+
+8.5 update: 2023.10.50版本之后
+除了上述修改之外, 还需要修改一处initialize才会通过
+搜索`licenseErr`: 全局只会出现两处
+2023.10.50: line 58415, 将`!0x0` 改成 `!0x1` (false)
+
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
 # check if a program is able to find in nvim

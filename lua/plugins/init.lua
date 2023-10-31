@@ -1,6 +1,40 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "tamton-aquib/keys.nvim",
+    cmd = "KeysToggle",
+    config = function()
+      require("keys").setup {
+        enable_on_startup = false,
+        win_opts = {
+          width = 25
+        },
+      }
+    end
+  },
+  {
+    "nvimdev/rapid.nvim",
+    lazy = false,
+    config = function()
+      require('rapid').setup()
+    end
+  },
+  {
+    "nvimdev/epo.nvim",
+    enabled = false,
+    event = {"InsertEnter"},
+    config = function()
+      require('epo').setup({
+        -- default value of options.
+        fuzzy = true,
+        -- increase this value can aviod trigger complete when delete character.
+        debounce = 200,
+        -- when completion confrim auto show a signature help floating window.
+        signature = true,
+      })
+    end
+  },
+  {
     "echasnovski/mini.pick",
     enabled = false,
     version = false,
@@ -405,6 +439,7 @@ local plugins = {
   },
   {
     'ahmedkhalf/project.nvim',
+    event = {"BufRead"};
     keys = {
       { "<leader>fp", function ()
         require('telescope').load_extension('projects')
@@ -442,8 +477,8 @@ local plugins = {
         return false
       end)
       -- NOTE: why do this here? 
-      -- the projects are read in the source code: project.lua -> M.init() -> history.read_projects_from_history() -> uv.fs_read(history_file,callback), 
-      -- the project list is built in a async callback!
+      -- the projects are read in the source code: setup() -> project.lua init() -> history.lua read_projects_from_history() -> uv.fs_read(history_file,callback), 
+      -- the project list is built in an async callback!
       -- which means it will not be executed immediately, so when we first call [[Telescope projects]]
       -- it will call this config part first, `config` will load project and *schedule* the read_projects_from_history, but the project lists are empty right now. 
       -- we can use vim.wait to sync the callback, see notes.md
@@ -474,12 +509,21 @@ local plugins = {
     cmd = 'AsyncRun',
     init = function()
       local ft_map = require('core.autocmds').ft_map
-      ft_map(
-      'python',
-      'n',
-      ',t',
-      '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) -mode=term -pos=tmux python "$(VIM_FILEPATH)"<CR>'
-      )
+      ft_map( 'python', 'n', ',t', '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) -mode=term -pos=tmux python "$(VIM_FILEPATH)"<CR>')
+      ft_map( {'cpp', 'c'}, 'n', ',t', '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) -mode=term -pos=tmux python "$(VIM_FILEPATH)"<CR>')
+      vim.cmd [[
+      " automatically open quickfix window when AsyncRun command is executed
+      " set the quickfix window 6 lines height.
+      let g:asyncrun_open = 6
+
+      " ring the bell to notify you job finished
+      let g:asyncrun_bell = 1
+
+      " F10 to toggle quickfix window
+      nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>
+      nnoremap <silent> <F5> :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+      nnoremap <silent> <F9> :AsyncRun clang++ -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+      ]]
     end,
   },
   {

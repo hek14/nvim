@@ -1,11 +1,8 @@
 # TODO: 
-- rapid.nvim
 - look at dlvhdr tmux/nvim/kitty dotfiles: https://github.com/dlvhdr/dotfiles -->
-- a vscode command-p: https://github.com/mrjones2014/legendary.nvim
-- another vscode command-p: https://github.com/FeiyouG/commander.nvim
-- https://github.com/prochri/telescope-all-recent.nvim
+- hack telescope: https://github.com/prochri/telescope-all-recent.nvim
 - AsyncRun: https://github.com/skywind3000/asyncrun.vim/wiki/Better-way-for-C-and-Cpp-development-in-Vim-8
-- learn `async await`: https://github.com/ms-jpq/lua-async-await and [lspsaga](https://github.com/glepnir/lspsaga.nvim)
+- learn `async await`: https://github.com/ms-jpq/lua-async-await
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 - consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
 - add print() custom_capture for python
@@ -70,6 +67,9 @@ print(co.status(thread))
 # important tips for raise keyboard response speed/make keypress snappier
 https://apple.stackexchange.com/questions/10467/how-to-increase-keyboard-key-repeat-rate-on-os-x
 ## on mac os
+The step values that correspond to the sliders on the GUI are as follow (lower equals faster):
+KeyRepeat: 120, 90, 60, 30, 12, 6, 2
+InitialKeyRepeat: 120, 94, 68, 35, 25, 15
 ```shell
 defaults write -g ApplePressAndHoldEnabled -bool false; defaults write NSGlobalDomain KeyRepeat -int 1; defaults write NSGlobalDomain InitialKeyRepeat -int 10
 ```
@@ -146,7 +146,6 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest bash -c "apt-get update -y && apt-get install git fzf ripgrep neovim -y && nvim"
 ```
 # refer to useful plugins
-- https://github.com/nvimdev/rapid.nvim: async compile just like Emacs
 - https://github.com/nosduco/remote-sshfs.nvim
 - https://github.com/OscarCreator/rsync.nvim
 - https://github.com/anuvyklack/hydra.nvim: emacs hydra alternative for nvim! finally here

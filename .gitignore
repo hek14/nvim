@@ -3,6 +3,7 @@ bin/python/ruff-lsp
 bin/python/pyright-langserver
 bin/python/anakinls
 bin/python/jedi-language-server
+bin/python/pylance_latest
 ms-python*
 *.zip
 

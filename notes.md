@@ -203,7 +203,7 @@ relations with bufnr:
 4. vim打开这个`server.bundle.js`, 此时它已经变成很多行了(format之前就只有一行)
 5. 到26099行或者搜索0x1ad9, 加上`return !0x0;` 这一行
 6. 测试: `node server.bundle.js --stdio` 通过!!!
-7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的licence不通过的那句话
+7. 如何找到的: 通过看没修改之前`node server.bundle.js --stdio` 本来输出的license不通过的那句话
 8. 以'2023.2.30'版本为例: 
 8.1. 定位报错的message, 这个要首先通过`node server.bundle.js --stdio`看原本的message, 然后搜索里面的部分关键词 
 2023.2.30版本 [25872-26003]行其实就是`node server.bundle.js --stdio`报的那些错, 
@@ -248,6 +248,12 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.6.41: line 38764
 2023.7.10: line 45089
 2023.7.11: line 51267
+
+8.5 update: 2023.10.50版本之后
+除了上述修改之外, 还需要修改一处initialize才会通过
+搜索`licenseErr`: 全局只会出现两处
+2023.10.50: line 58415, 将`!0x0` 改成 `!0x1` (false)
+
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`
 # check if a program is able to find in nvim

@@ -42,3 +42,4 @@ extension.vsixmanifest
 Debug/.cmake/api/v1/query/client-vim-cmake
 
 bin/python/pylance_2023_10_20
+bin/python/pylance_2023_10_50

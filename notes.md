@@ -218,10 +218,9 @@ relations with bufnr:
             ])
           })
 ```
-8.3 另外的定位方法: BINGO! this method is nice
+8.3 最新定位方法: BINGO! this method is nice
 
 **搜索`^ *0x.*function.*_0x.*_0x.*_0x`**
-
 
 会有很多个, 然后找到符合如下特征的那个:
 1. 前面有很多行连续以'+'结尾的字符串, 也就是8.2中所提到的报错message.
@@ -250,9 +249,31 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.7.11: line 51267
 
 8.5 update: 2023.10.50版本之后
-除了上述修改之外, 还需要修改一处initialize才会通过
-搜索`licenseErr`: 全局只会出现两处
+参考: https://github.com/VSCodium/vscodium/discussions/1641
+除了上述修改之外, 还需要修改一处initialize才会通过:
 2023.10.50: line 58415, 将`!0x0` 改成 `!0x1` (false)
+如何找到它?
+方法一:  搜索`licenseErr`: 全局只会出现两处(10.53就不奏效了, 这个字符串不见了)
+方法二:  上面有搜索过`(function () {` ,找到和`(` match的 `)`
+```javascript
+          (function () { 
+            const _0x5b9e79 = _0x509125;
+			return !0x0; 这是第一处修改
+            blabla
+            .........
+          })() || 找到match的`)`
+            (process[_0x509125(0x1184)][_0x509125(0x1af7)](
+              _0x15d791[_0x509125(0x422) + _0x509125(0x1d1b)] + "\x0a"
+            ),
+            process[_0x509125(0x1daa)](0x1)),
+            (Error[_0x509125(0x82a) + _0x509125(0x7c1)] = 0x20),
+            (0x0, _0xaf82a4(0x9378)[_0x509125(0x159c)])(!0x1); 这是第二处修改, 将!0x0改成!0x1
+        },
+```
+8.6 重新变成单行
+```bash
+tr -d '\n' < server.bundle.js > packed_server.bundle.js
+```
 
 # find what highlight is used undercursor
 `:Redir lua =vim.inspect_pos()`

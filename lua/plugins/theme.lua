@@ -127,14 +127,6 @@ local material = {
   end,
 }
 
-local paradox = {
-  'nvimdev/paradox.vim',
-  config = function()
-    vim.cmd.colorscheme('paradox')
-    override_hl()
-  end
-}
-
 local srcery = {
   "srcery-colors/srcery-vim",
   event = "VeryLazy",

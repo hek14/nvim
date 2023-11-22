@@ -13,28 +13,6 @@ local plugins = {
     end
   },
   {
-    "nvimdev/rapid.nvim",
-    lazy = false,
-    config = function()
-      require('rapid').setup()
-    end
-  },
-  {
-    "nvimdev/epo.nvim",
-    enabled = false,
-    event = {"InsertEnter"},
-    config = function()
-      require('epo').setup({
-        -- default value of options.
-        fuzzy = true,
-        -- increase this value can aviod trigger complete when delete character.
-        debounce = 200,
-        -- when completion confrim auto show a signature help floating window.
-        signature = true,
-      })
-    end
-  },
-  {
     "echasnovski/mini.pick",
     enabled = false,
     version = false,
@@ -122,25 +100,6 @@ local plugins = {
     end,
   },
   {
-    'nvimdev/whiskyline.nvim',
-    enabled = false,
-    dependencies = 'gitsigns.nvim',
-    event = 'VimEnter',
-    config = function()
-      require('whiskyline').setup()
-    end
-  },
-  {
-    'nvimdev/indentmini.nvim',
-    enabled = false,
-    event = 'BufEnter',
-    config = function()
-      require('indentmini').setup({
-        exclude = {'dashboard', 'lazy', 'help', 'markdown', 'terminal', 'floaterm', 'vim'}
-      })
-    end,
-  },
-  {
     'lukas-reineke/indent-blankline.nvim',
     enabled = false,
     event = 'VimEnter',
@@ -165,7 +124,7 @@ local plugins = {
   },
   {
     'luukvbaal/statuscol.nvim',
-    enabled = true,
+    enabled = false,
     event = 'BufRead',
     config = function()
       require('statuscol').setup({ setopt = true })

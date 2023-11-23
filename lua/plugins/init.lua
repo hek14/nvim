@@ -1,6 +1,9 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "MunifTanjim/nui.nvim"
+  },
+  {
     "tamton-aquib/keys.nvim",
     cmd = "KeysToggle",
     config = function()

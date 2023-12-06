@@ -100,7 +100,7 @@ local everforest = {
   end
 }
 
-local vscode_theme = {
+local vscode = {
   "askfiy/visual_studio_code",
   init = function()
     vim.schedule(function ()
@@ -146,4 +146,4 @@ local rose_pine = {
   end
 }
 
-return srcery
+return vscode

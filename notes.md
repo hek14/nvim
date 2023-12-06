@@ -1,4 +1,6 @@
 # TODO: 
+- check: https://github.com/quarto-dev/quarto-nvim
+- check: https://github.com/3rd/image.nvim/
 - look at dlvhdr tmux/nvim/kitty dotfiles: https://github.com/dlvhdr/dotfiles -->
 - hack telescope: https://github.com/prochri/telescope-all-recent.nvim
 - AsyncRun: https://github.com/skywind3000/asyncrun.vim/wiki/Better-way-for-C-and-Cpp-development-in-Vim-8

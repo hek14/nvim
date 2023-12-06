@@ -70,7 +70,7 @@ opt.updatetime = 750
 -- when cursor reaches end/beginning of line
 opt.whichwrap:append "<>[]hl"
 
--- :help wrap
+-- wrap to `textwidth`
 opt.wrap = false
 
 -- indent: needed by ufo

@@ -1,6 +1,43 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "kawre/leetcode.nvim",
+    lazy = vim.fn.argv()[1] ~= "leetcode.nvim",
+    build = ":TSUpdate html",
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+      "nvim-lua/plenary.nvim", -- required by telescope
+      "MunifTanjim/nui.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "rcarriga/nvim-notify",
+      "nvim-tree/nvim-web-devicons",
+    },
+    opts = {
+      clang = "cpp",
+      cn = { -- leetcode.cn
+        enabled = true, ---@type boolean
+        translator = true, ---@type boolean
+        translate_problems = true, ---@type boolean
+      },
+      hooks = {
+        LeetQuestionNew = {
+          function()
+            local buf = vim.api.nvim_get_current_buf()
+            local file_name = vim.fn.expand("%:t")
+            local first_line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)
+            if(#first_line == 0 or not string.match(first_line[1], "^#include<bits/stdc++.h>")) then
+              local lines = {"#include<bits/stdc++.h>", "using namespace std;"}
+              vim.api.nvim_buf_set_lines(buf, 0, 0, false, lines)
+              vim.cmd[[write]]
+            end
+            local command = string.format( [[!sed -i 's/[^ ]*\.cpp/%s/g' CMakeLists.txt]], file_name )
+            vim.cmd(command)
+          end
+        },
+      },
+    },
+  },
+  {
     "MunifTanjim/nui.nvim"
   },
   {
@@ -357,7 +394,7 @@ local plugins = {
   },
   {
     'rcarriga/nvim-notify',
-    enabled = false,
+    enabled = true,
     config = function()
       require('notify').setup({
         background_colour = '#000000',

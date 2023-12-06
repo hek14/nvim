@@ -16,7 +16,7 @@ M.setup = function(options,server)
     opts =  {
       on_attach = function(client, bufnr)
         options.on_attach(client,bufnr)
-        -- vim.lsp.inlay_hint(bufnr,true)
+        -- vim.lsp.inlay_hint.enable(bufnr, true)
         local launch_in_home = client.config.root_dir == vim.env["HOME"]
         if launch_in_home then
           local answer = vim.fn.input("really want to launch_in_home? y/n: ")

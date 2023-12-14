@@ -1,6 +1,13 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "giusgad/pets.nvim",
+    enabled = false,
+    dependencies = { "MunifTanjim/nui.nvim", "giusgad/hologram.nvim" },
+    lazy = false,
+    opts = {}
+  },
+  {
     "kawre/leetcode.nvim",
     lazy = vim.fn.argv()[1] ~= "leetcode.nvim",
     build = ":TSUpdate html",

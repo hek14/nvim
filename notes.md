@@ -7,7 +7,6 @@
 - learn `async await`: https://github.com/ms-jpq/lua-async-await
 - refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
 - consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
-- add print() custom_capture for python
 - TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not
 # minimal config to reproduce an issue
 https://github.com/folke/noice.nvim/wiki/Minimal-%60init.lua%60-to-Reproduce-an-Issue
@@ -228,7 +227,7 @@ relations with bufnr:
 1. 前面有很多行连续以'+'结尾的字符串, 也就是8.2中所提到的报错message.
 2. 一般而言, 就是最后的那个, 所以"G" goto the end, 然后 "?" 反向搜索这个pattern就行
 
-找到这一个之后再找 `(function () {` 或者`/for (const`都行
+找到这一个之后再找 `(function () {`(这个pattern更好) 或者`/for (const`(别用这个)都行
 
 8.4. answer from askfiy: 
 ```markdown
@@ -249,14 +248,14 @@ The verification code is similar to "if !has(vscode) { return false};".
 2023.6.41: line 38764
 2023.7.10: line 45089
 2023.7.11: line 51267
+2023.11.102: line 59012 + 59094
 
 8.5 update: 2023.10.50版本之后
 参考: https://github.com/VSCodium/vscodium/discussions/1641
 除了上述修改之外, 还需要修改一处initialize才会通过:
 2023.10.50: line 58415, 将`!0x0` 改成 `!0x1` (false)
 如何找到它?
-方法一:  搜索`licenseErr`: 全局只会出现两处(10.53就不奏效了, 这个字符串不见了)
-方法二:  上面有搜索过`(function () {` ,找到和`(` match的 `)`
+上面有搜索过`(function () {`, 找到和`(` match的 `)`
 ```javascript
           (function () { 
             const _0x5b9e79 = _0x509125;

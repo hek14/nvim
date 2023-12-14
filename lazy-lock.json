@@ -75,3 +75,4 @@
   "vimtex": { "branch": "master", "commit": "29b6c052707b2d713fe2097cd5df54ce12ba2f90" },
   "vimux": { "branch": "master", "commit": "616fcb4799674a7a809b14ca2dc155bb6ba25788" },
   "visual_studio_code": { "branch": "master", "commit": "06d7ae7e69a7d5d00519ed8007e76aa1506d7834" }
+}

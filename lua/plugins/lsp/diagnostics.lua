@@ -191,7 +191,8 @@ function M.setup()
     virtual_text = false,
     severity_sort = true
   })
-  vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(custom_on_publish_diagnostics,{})
+
+  -- vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(custom_on_publish_diagnostics,{})
 end
 
 return M

@@ -2,7 +2,7 @@ local map = require('core.utils').map
 local plugins = {
   {
     "giusgad/pets.nvim",
-    enabled = false,
+    enabled = true,
     dependencies = { "MunifTanjim/nui.nvim", "giusgad/hologram.nvim" },
     lazy = false,
     opts = {}

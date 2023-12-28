@@ -76,7 +76,7 @@ local plugins = {
     end,
   },
   {
-    'cdelledonne/vim-cmake',
+    'hek14/vim-cmake',
     ft = {'c', 'cpp'},
     init = function()
       vim.g.cmake_link_compile_commands = 1

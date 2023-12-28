@@ -1,4 +1,5 @@
 # TODO: 
+- check modern-unix shell tools: https://github.com/ibraheemdev/modern-unix
 - check: https://github.com/quarto-dev/quarto-nvim
 - check: https://github.com/3rd/image.nvim/
 - look at dlvhdr tmux/nvim/kitty dotfiles: https://github.com/dlvhdr/dotfiles -->

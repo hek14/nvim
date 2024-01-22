@@ -1,6 +1,15 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = { },
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    }
+  },
+  {
     "giusgad/pets.nvim",
     enabled = true,
     dependencies = { "MunifTanjim/nui.nvim", "giusgad/hologram.nvim" },

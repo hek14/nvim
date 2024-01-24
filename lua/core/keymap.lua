@@ -160,8 +160,8 @@ local function others()
   -- map("i", "<C-e>", "<C-O>O",{noremap = true})
 
   map("n", "N","mzJ`z")
-  map("n", "k","nzzzv")
-  map("n", "K","Nzzzv")
+  -- map("n", "k","nzzzv")
+  -- map("n", "K","Nzzzv")
   -- swap line up and down
   map("n", "<leader>j", "<Esc>:m .+1<CR>==")
   map("n", "<leader>k", "<Esc>:m .-2<CR>==")

@@ -84,5 +84,18 @@ opt.foldexpr = nil
 -- for nvim-cmp
 opt.completeopt = { "menu", "menuone", "noselect" }
 
+opt.listchars = {
+    -- tab = "⇥ ",
+    tab = "  ",
+    -- leadmultispace = "┊ ",
+    leadmultispace = "  ",
+    trail = "␣",
+    nbsp = "⍽",
+    -- eol = "↴",
+    eol = " ",
+    -- space = "⋅",
+    space = " ",
+}
+
 g.mapleader = " "
 vim.env['PATH'] = vim.fn.stdpath('config') .. '/bin:' .. vim.env['PATH']

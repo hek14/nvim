@@ -117,7 +117,8 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 ## make
 `CMAKE_BUILD_TYPE=RelWithDebInfo`
 # refer to following dotfiles:
-- https://github.com/dlvhdr/dotfiles: 很好看的tmux+kitty配置, 值得一看 (介绍视频: https://www.youtube.com/watch?v=CHV0TWO-b4A&ab_channel=JoshMedeski)
+- https://github.com/omerxx/dotfiles: https://www.youtube.com/@devopstoolbox
+- https://github.com/dlvhdr/dotfiles: 很好看的tmux+kitty配置 https://www.youtube.com/@JoshMedeski
 - https://github.com/HCY-ASLEEP/NVIM-Config: 没有插件的nvim config
 - https://github.com/vsedov/nvim: really hacky about pylance config
 - https://github.com/max397574/omega-nvim: only hack pylance!!!

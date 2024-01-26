@@ -158,4 +158,11 @@ M.ft_map = function(ft,mode,lhs,rhs,opts)
   })
 end
 
+M.au({"BufNewFile","BufRead"}, {
+  callback = function()
+    vim.cmd [[setfiletype tmux]]
+  end,
+  pattern = "*.conf"
+})
+
 return M

@@ -1,14 +1,3 @@
-# TODO: 
-- check modern-unix shell tools: https://github.com/ibraheemdev/modern-unix
-- check: https://github.com/quarto-dev/quarto-nvim
-- check: https://github.com/3rd/image.nvim/
-- look at dlvhdr tmux/nvim/kitty dotfiles: https://github.com/dlvhdr/dotfiles -->
-- hack telescope: https://github.com/prochri/telescope-all-recent.nvim
-- AsyncRun: https://github.com/skywind3000/asyncrun.vim/wiki/Better-way-for-C-and-Cpp-development-in-Vim-8
-- learn `async await`: https://github.com/ms-jpq/lua-async-await
-- refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
-- consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
-- TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not
 # minimal config to reproduce an issue
 https://github.com/folke/noice.nvim/wiki/Minimal-%60init.lua%60-to-Reproduce-an-Issue
 # lsp server installation guide
@@ -144,7 +133,7 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 - https://github.com/ibhagwan/nvim-lua: the author of fzf-lua
 - https://github.com/ibhagwan/dots: documented about configs, picky about plugins
 - https://github.com/XXiaoA/nvimrc
-# to try others' dotfiles
+# use docker to try a refreshed nvim
 ```shell
 docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest bash -c "apt-get update -y && apt-get install git fzf ripgrep neovim -y && nvim"
 ```
@@ -229,7 +218,7 @@ relations with bufnr:
 1. 前面有很多行连续以'+'结尾的字符串, 也就是8.2中所提到的报错message.
 2. 一般而言, 就是最后的那个, 所以"G" goto the end, 然后 "?" 反向搜索这个pattern就行
 
-找到这一个之后再找 `(function () {`(这个pattern更好) 或者`/for (const`(别用这个)都行
+找到这一个之后再找 `(function () {`
 
 8.4. answer from askfiy: 
 ```markdown

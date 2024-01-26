@@ -33,8 +33,8 @@ M.setup = function(options,server)
       opts.cmd = {
         "pyright-langserver",
         "--stdio",
-        "--cancellationReceive=file:c4464628709ac495bcf211d6279e14b21243079c86",
-        '--node-ipc'
+        -- "--cancellationReceive=file:c4464628709ac495bcf211d6279e14b21243079c86",
+        -- '--node-ipc'
       }
     elseif
       server == 'coc-pyright' then
@@ -43,16 +43,16 @@ M.setup = function(options,server)
         '--max-old-space-size=3072',
         vim.fn.expand('~/.config/nvim/bin/python/coc-pyright/langserver.index.js'),
         '--stdio',
-        "--cancellationReceive=file:c4464628709ac495bcf211d6279e14b21243079c86",
-        '--node-ipc'
+        -- "--cancellationReceive=file:c4464628709ac495bcf211d6279e14b21243079c86",
+        -- '--node-ipc'
       }
       server = 'pyright' -- pyright is a valid item in lspconfig
     else
       opts.cmd = {
         vim.fn.expand('~/.config/nvim/bin/python/pylance-langserver'),
         '--stdio',
-        "--cancellationReceive=file:c4464628709ac495bcf211d6279e14b21243079c86",
-        '--node-ipc'
+        -- "--cancellationReceive=file:c4464628709ac495bcf211d6279e14b21243079c86",
+        -- '--node-ipc'
       }
     end
   elseif server == 'pylsp' then

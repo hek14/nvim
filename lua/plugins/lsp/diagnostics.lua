@@ -186,7 +186,7 @@ function M.setup()
   -- Automatically update diagnostics
   vim.diagnostic.config({
     underline = true,
-    update_in_insert = false,
+    update_in_insert = true,
     -- virtual_text = {spacing = 4, prefix = "●"},
     virtual_text = false,
     severity_sort = true

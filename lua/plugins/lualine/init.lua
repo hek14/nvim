@@ -81,6 +81,7 @@ M.config = function ()
           end,
         },
         components.branch,
+        components.diagnostics
       },
       lualine_b = {
         components.diff,

@@ -156,7 +156,7 @@ M[1].config = function()
 
   local mine_config_yaml = require("contrib.cmp_config_yaml")
   cmp.register_source("mine_config_yaml", mine_config_yaml.new())
-  cmp.register_source('remote_path', require('scratch.parse_remote_path').new())
+  cmp.register_source('remote_path', require('contrib.parse_remote_path').new())
 
   local cmp_config = function()
     cmp.complete({

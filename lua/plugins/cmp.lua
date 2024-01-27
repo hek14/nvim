@@ -94,6 +94,7 @@ M[1].config = function()
       { name = 'nvim_lua' },
       { name = "luasnip" },
       { name = "path" },
+      { name = "remote_path" },
       { name = "nvim_lsp" },
       { name = 'nvim_lsp_signature_help' },
       {
@@ -125,6 +126,10 @@ M[1].config = function()
     },
     mapping = {
       ["<C-a>"] = cmp.mapping.close(), -- or abort
+      ['<CR>'] = cmp.mapping.confirm({
+        behavior = cmp.ConfirmBehavior.Replace,
+        select = true,
+      }),
       -- ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       -- ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       -- ["<C-d>"] = cmp.mapping.scroll_docs(-4),
@@ -151,6 +156,7 @@ M[1].config = function()
 
   local mine_config_yaml = require("contrib.cmp_config_yaml")
   cmp.register_source("mine_config_yaml", mine_config_yaml.new())
+  cmp.register_source('remote_path', require('scratch.parse_remote_path').new())
 
   local cmp_config = function()
     cmp.complete({

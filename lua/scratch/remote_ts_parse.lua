@@ -16,7 +16,7 @@ local profiler = function (what)
   local start = vim.loop.hrtime()
   return { 
     finish = function ()
-      log(string.format('%s spent time: %s ms',what or "",(vim.loop.hrtime()-start)/1000000)) 
+      -- log(string.format('%s spent time: %s ms',what or "",(vim.loop.hrtime()-start)/1000000)) 
     end}
 end
 
@@ -41,7 +41,7 @@ local reload_and_reparse_file = function(item)
   -- NOTE: should set the filetype manually for treesitter parse, because we use noautocmd
   local ok, _ = pcall(vim.api.nvim_buf_set_option,bufnr,'filetype',item.filetype)
   if not ok then
-    log("cannot set filetyte")
+    -- log("cannot set filetyte")
   end
   local filelang = ts_parsers.ft_to_lang(item.filetype)
   local parser = ts_parsers.get_parser(bufnr, filelang)
@@ -52,11 +52,13 @@ end
 
 
 local on_file_modified = function(path,filetick_now)
-  log('update path and parse the buffer: ',path, filetick_now)
+  -- log('update path and parse the buffer: ',path, filetick_now)
   if parse_results[path].filetick ~= filetick_now then -- maybe the send function already update it
     local item = {file = path, filetick = filetick_now, filetype = parse_results[path].filetype}
     local ok, err = pcall(reload_and_reparse_file,item)
-    if not ok then log(fmt('cannot automatically reload_and_reparse_file for ',path),err) end
+    if not ok then 
+      -- log(fmt('cannot automatically reload_and_reparse_file for ',path),err)
+    end
     -- log(fmt('watcher update: [%s]: ',path))
   else
     -- log(fmt("the handle function already update file: %s",path))
@@ -163,7 +165,7 @@ local parse = function(input)
     if not vim.tbl_contains(fail_parse_keys, file_pos_key) then
       local ok,value = pcall(update_parse_results,item)
       if not ok then
-        log("cannot parse item",value)
+        -- log("cannot parse item",value)
         set_file_pos_result(item.file,item.position,'parse_error')
       else
         set_file_pos_result(item.file,item.position,value)
@@ -203,7 +205,7 @@ M.test = function ()
   local input = R('scratch.two_input_t')
   input[#input+1] = curr
   local t = fake_stdin_from_t(input)
-  log('test input: ',type(t), #t, t[1])
+  -- log('test input: ',type(t), #t, t[1])
   M.handle(nil,t,nil)
 end
 

@@ -3,6 +3,7 @@ local plugins = {
   {
     "folke/noice.nvim",
     event = "VeryLazy",
+    enabled = false,
     opts = { },
     dependencies = {
       "MunifTanjim/nui.nvim",

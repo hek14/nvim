@@ -5,7 +5,7 @@ local M = {
   enabled = true,
   dependencies = {
     "nvim-tree/nvim-web-devicons",
-    "folke/noice.nvim",
+    -- "folke/noice.nvim",
     theme_plugin
   },
   event = "VeryLazy"
@@ -86,14 +86,14 @@ M.config = function ()
       lualine_b = {
         components.diff,
       },
-      lualine_c = {
-        {
-          require("noice").api.status.search.get,
-          cond = require("noice").api.status.search.has,
-          color = { fg = "#f0a275", bg = "NONE" },
-        },
-        -- components.breadcrumbs,
-      },
+      -- lualine_c = {
+      --   {
+      --     require("noice").api.status.search.get,
+      --     cond = require("noice").api.status.search.has,
+      --     color = { fg = "#f0a275", bg = "NONE" },
+      --   },
+      --   -- components.breadcrumbs,
+      -- },
       lualine_x = {
         components.treesitter,
         components.lsp,

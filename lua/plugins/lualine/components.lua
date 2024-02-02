@@ -1,5 +1,4 @@
 local conditions = require("plugins.lualine.conditions")
-local colors = require("tokyonight.colors").setup({})
 
 local function color(highlight_group, content)
   return "%#" .. highlight_group .. "#" .. content .. "%*"
@@ -108,14 +107,12 @@ return {
   branch = {
     "b:gitsigns_head",
     icon = "",
-    color = { fg = colors.fg_dark, bg = "NONE" },
     cond = conditions.hide_in_width,
   },
   diff = {
     "diff",
     source = diff_source,
     symbols = { added = "+", modified = "~", removed = "-" },
-    color = { fg = colors.fg_dark, bg = "NONE" },
     colored = false,
     cond = nil,
   },
@@ -123,7 +120,6 @@ return {
     "diagnostics",
     sources = { "nvim_diagnostic" },
     symbols = { error = " ", warn = " ", info = " ", hint = "󰌶 " },
-    color = { fg = colors.fg_dark, bg = "NONE" },
     cond = nil,
   },
   treesitter = {
@@ -134,7 +130,6 @@ return {
       end
       return ""
     end,
-    color = { fg = colors.fg_dark, bg = "NONE" },
     cond = conditions.hide_in_width,
   },
   lsp = {
@@ -175,17 +170,14 @@ return {
       unique_client_names = vim.fn.uniq(unique_client_names)
       return table.concat(unique_client_names, "  ")
     end,
-    color = { fg = colors.fg_dark, bg = "NONE" },
   },
   location = {
     "location",
     cond = conditions.hide_in_width,
-    color = { fg = colors.fg_dark, bg = "NONE" },
   },
   progress = {
     "progress",
     cond = conditions.hide_in_width,
-    color = { fg = colors.fg_dark, bg = "NONE" },
   },
   spaces = {
     function()
@@ -196,18 +188,15 @@ return {
       return label .. vim.api.nvim_buf_get_option(0, "shiftwidth") .. " "
     end,
     cond = conditions.hide_in_width,
-    color = { fg = colors.fg_dark, bg = "NONE" },
   },
   encoding = {
     "o:encoding",
     fmt = string.upper,
-    color = { fg = colors.fg_dark, bg = "NONE" },
     cond = conditions.hide_in_width,
   },
   filetype = {
     "filetype",
     cond = conditions.hide_in_width,
-    color = { fg = colors.fg_dark, bg = "NONE" },
   },
   filename = {
     function()
@@ -223,7 +212,6 @@ return {
       if not icon and #file_name == 0 then
         -- Is in a folder
         icon = ""
-        devicon_color = colors.fg_dark
       end
 
       -- File modified
@@ -239,7 +227,6 @@ return {
 
       -- Icon
 
-      vim.api.nvim_set_hl(0, "LuaLineFileIcon", { fg = devicon_color or colors.fg_dark, bg = "NONE" })
       local icon_statusline = color("LuaLineFileIcon", icon or "")
       table.insert(segments, icon_statusline)
 
@@ -260,7 +247,6 @@ return {
       return chars[index]
     end,
     padding = { left = 0, right = 0 },
-    color = { fg = colors.fg_dark, bg = "NONE" },
     cond = nil,
   },
 }

@@ -23,11 +23,11 @@ local M = {
     { "<leader><space>", "<cmd>Telescope commands<CR>" },
     -- { "<leader><leader>w", "<Cmd>lua require('telescope.builtin').grep_string()<CR>"},
     { "<leader>z", ":Telescope zoxide list<CR>" },
-    { "<leader>sd", function ()
-      require('telescope.builtin').live_grep({
-        cwd = '/usr/local/share/nvim/runtime/doc/'
-      })
-    end },
+    -- { "<leader>sd", function ()
+    --   require('telescope.builtin').live_grep({
+    --     cwd = '/usr/local/share/nvim/runtime/doc/'
+    --   })
+    -- end },
     { ",l", require('scratch.telescope_list_sections').list_section }
   },
   dependencies = {
@@ -153,6 +153,8 @@ function M.config()
       layout_config = { height = 0.8 },
       mappings = {
         i = {
+          ["<C-n>"] = actions.cycle_history_next,
+          ["<C-p>"] = actions.cycle_history_prev,
           ["<cr>"] = function(prompt_bufnr)
             require('telescope.actions').select_default(prompt_bufnr)
             local val = action_state.get_current_line()

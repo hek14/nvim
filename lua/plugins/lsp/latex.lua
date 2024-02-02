@@ -1,4 +1,5 @@
 local M = {}
+local util = require'lspconfig'.util
 require('core.utils').append_env_path(vim.env['HOME'] .. '/.cargo/bin')
 M.setup = function(options)
   local opts = {
@@ -18,7 +19,13 @@ M.setup = function(options)
           executable = "zathura"
         }
       }
-    }
+    },
+    root_dir = function(fname)
+      local root_files = {'latexmkrc'}
+      return util.find_git_ancestor(fname) or
+      util.root_pattern(unpack(root_files))(fname) or
+      util.path.dirname(fname)
+    end,
   }
   opts = vim.tbl_deep_extend('force',options,opts)
   require("lspconfig").texlab.setup(opts)

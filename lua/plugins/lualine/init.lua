@@ -26,11 +26,6 @@ end
 
 M.config = function ()
   local components = require("plugins.lualine.components")
-  local colors = theme.colors()
-  if not colors then
-    return
-  end
-
   local tree_view_ok, tree_view = pcall(require, "nvim-tree.view")
   if not tree_view_ok then
     return
@@ -44,12 +39,11 @@ M.config = function ()
       return empty_space .. name .. empty_space
     end,
     cond = tree_view.is_visible,
-    color = { fg = colors.fg_dark, bg = "NONE", gui = "italic" },
   }
 
   require("lualine").setup({
     options = {
-      theme = "16color",
+      theme = "auto",
       globalstatus = true,
       component_separators = "",
       section_separators = "",
@@ -67,10 +61,6 @@ M.config = function ()
           cond = function()
             return #vim.api.nvim_list_tabpages() > 1
           end,
-          tabs_color = {
-            active = { fg = colors.fg_dark, bg = "NONE" },
-            inactive = { fg = colors.fg_dark, bg = "NONE" },
-          },
           fmt = function(_, context)
             local curr = vim.fn.tabpagenr()
             if curr == context.tabnr then

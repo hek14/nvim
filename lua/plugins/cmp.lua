@@ -5,12 +5,13 @@ local M = {
     dependencies = {
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
+      "hrsh7th/cmp-omni",
       -- "lukas-reineke/cmp-rg",
       "L3MON4D3/LuaSnip",
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lua",
       "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-nvim-lsp-signature-help",
+      -- "hrsh7th/cmp-nvim-lsp-signature-help",
       "rafamadriz/friendly-snippets",
       {
         "hrsh7th/cmp-cmdline",
@@ -96,7 +97,7 @@ M[1].config = function()
       { name = "path" },
       { name = "remote_path" },
       { name = "nvim_lsp" },
-      { name = 'nvim_lsp_signature_help' },
+      -- { name = 'nvim_lsp_signature_help' },
       {
         name = 'buffer',
         -- keyword_length = 5,
@@ -134,7 +135,51 @@ M[1].config = function()
       -- ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       -- ["<C-d>"] = cmp.mapping.scroll_docs(-4),
       -- ["<C-f>"] = cmp.mapping.scroll_docs(4),
-    }
+    },
+    formatting = {
+      format = function(entry, vim_item)
+        local icons = {
+          Text = "",
+          Method = "",
+          Function = "",
+          Constructor = "",
+          Field = "ﰠ",
+          Variable = "",
+          Class = "ﴯ",
+          Interface = "",
+          Module = "",
+          Property = "ﰠ",
+          Unit = "塞",
+          Value = "",
+          Enum = "",
+          Keyword = "",
+          Snippet = "",
+          Color = "",
+          File = "",
+          Reference = "",
+          Folder = "",
+          EnumMember = "",
+          Constant = "",
+          Struct = "פּ",
+          Event = "",
+          Operator = "",
+          TypeParameter = "",
+          Omni = "⚾️"
+        }
+        if(entry.source.name == "omni") then
+          vim_item.kind = "Omni"
+        end
+        vim_item.kind = string.format("%s %s", icons[vim_item.kind], vim_item.kind)
+        vim_item.menu = ({
+          omni = "[Omni]",
+          nvim_lsp = "[Lsp]",
+          nvim_lua = "[Lua]",
+          buffer = "[Buf]",
+          mine_config_yaml = "[Config]"
+        })[entry.source.name]
+        return vim_item
+      end,
+    },
   }
   vim.cmd('hi! CmpFloatBorder guifg=red')
 
@@ -168,6 +213,28 @@ M[1].config = function()
     })
   end
   vim.keymap.set('i','<C-c>',cmp_config,{noremap=true,silent=true})
+  cmp.setup.filetype({ 'tex' }, {
+    sources = {
+      { name = 'omni', option = { disable_omnifuncs = { 'v:lua.vim.lsp.omnifunc' } } },
+      { name = "luasnip" },
+      { name = "path" },
+      { name = "nvim_lsp" },
+      {
+        name = 'buffer',
+        option = {
+          get_bufnrs = function()
+            local win_bufs = require('core.utils').get_all_window_buffer_filetype()
+            local bufs = {}
+            for i, win_buf in ipairs(win_bufs) do
+              table.insert(bufs, win_buf.bufnr)
+            end
+            return bufs
+          end
+        }
+      }
+    },
+  })
+
 end
 
 return M

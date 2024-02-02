@@ -1,14 +1,70 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "coffebar/transfer.nvim",
+    dependencies = "nvim-neo-tree/neo-tree.nvim",
+    cmd = { "TransferInit", "DiffRemote", "TransferUpload", "TransferDownload", "TransferDirDiff", "TransferRepeat" },
+    keys = {
+      {"<leader>ss", "<Cmd>TransferUpload .<CR>"},
+      {"<leader>sd", "<Cmd>TransferDownload .<CR>"},
+    },
+    opts = {
+      config_template = [[
+return {
+  ["server1"] = {
+    host = "qingdao",
+    mappings = {
+      {
+        ["local"] = ".",
+        ["remote"] = "/home/heke/",
+      },
+    },
+  },
+}
+]],
+      upload_rsync_params = {
+        "-arlzi",
+        -- "--delete",
+        "--checksum",
+        "--exclude-from=" .. vim.env["HOME"] .. "/.rg_ignore"
+      },
+      download_rsync_params = {
+        "-arlzi",
+        -- "--delete",
+        "--checksum",
+        "--exclude-from=" .. vim.env["HOME"] .. "/.rg_ignore"
+      },
+    },
+  },
+  {
     "folke/noice.nvim",
     event = "VeryLazy",
-    enabled = false,
-    opts = { },
+    enabled = true,
     dependencies = {
       "MunifTanjim/nui.nvim",
       "rcarriga/nvim-notify",
-    }
+    },
+    config = function()
+      require('noice').setup({
+        routes = {
+          {
+            filter = {
+              event = "msg_show",
+              find = "written",
+            },
+            opts = {
+              skip = true,
+              -- action = function()
+              --   vim.cmd("messages")
+              -- end
+            },
+          },
+        }
+      })
+      map("n", "<leader>nd", "<Cmd>NoiceDismiss<CR>")
+      map("n", "<Esc>", [[:noh | NoiceDismiss<CR>]])
+      require('telescope').load_extension('noice')
+    end
   },
   {
     "giusgad/pets.nvim",
@@ -137,8 +193,8 @@ local plugins = {
   { 'nvim-lua/plenary.nvim' },
   { 'nvim-tree/nvim-web-devicons' },
   {
-    'glepnir/template.nvim', 
-    cmd = {'Template','TemProject'}, 
+    'glepnir/template.nvim',
+    cmd = {'Template','TemProject'},
     config = function()
       require('template').setup({
         temp_dir = '~/.config/nvim/template',

@@ -24,6 +24,13 @@ local colemak = function ()
 end
 
 local function others()
+  map("n", ",t", ":5TermExec cmd=''<Left>", {silent = false})
+  vim.api.nvim_create_user_command('QingdaoTerm',function()
+    local Terminal  = require('toggleterm.terminal').Terminal
+    local lazygit = Terminal:new({ hidden = true, count = 5 })
+    lazygit:toggle()
+    lazygit:send("unset_proxy && clippy ssh qingdao")
+  end,{})
   -- map("i","<C-d>","<Del>")
   map('n','<C-j>','J',{noremap=true})
   vim.api.nvim_create_user_command('ProfileStart',function()

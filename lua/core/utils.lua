@@ -915,9 +915,4 @@ M.reload_config = function()
   vim.cmd("nohl")
 end
 
-_G.qingdao_term = function()
-  vim.api.nvim_command("ToggleTerm")
-  vim.api.nvim_command("TermExec cmd='unset_proxy && clippy ssh qingdao'")
-end
-
 return M

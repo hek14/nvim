@@ -1,6 +1,7 @@
 local M =  {
   "voldikss/vim-floaterm",
   lazy = false,
+  enabled = false
 }
 
 function M.init()

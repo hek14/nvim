@@ -87,19 +87,28 @@ end
 M[1].config = function()
   local cmp = require('cmp')
   cmp.setup{
+    performance = {
+      debounce = 30,
+      throttle = 15,
+      fetching_timeout = 250,
+      confirm_resolve_timeout = 40,
+      async_budget = 0.5,
+      max_view_entries = 100,
+    },
     window = {
       completion = cmp.config.window.bordered(),
       documentation = cmp.config.window.bordered(),
     },
     sources = {
-      { name = 'nvim_lua' },
-      { name = "luasnip" },
-      { name = "path" },
-      { name = "remote_path" },
-      { name = "nvim_lsp" },
+      { name = 'nvim_lua', priority = 1000 },
+      { name = "luasnip", priority = 750 },
+      { name = "path", priority = 250 },
+      { name = "remote_path", priority = 100 },
+      { name = "nvim_lsp", priority = 1000 },
       -- { name = 'nvim_lsp_signature_help' },
       {
         name = 'buffer',
+        priority = 500,
         -- keyword_length = 5,
         option = {
           get_bufnrs = function()

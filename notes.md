@@ -1,3 +1,41 @@
+# the recipe for running shell command async in neovim
+1. use my ~/.config/nvim/lua/scratch/job_util.lua
+```lua
+local M = require("scratch.job_util")
+local t = M.new([[rsync -avrzh qingdao:~/codes_med33/IMWUT2022/tmp/ /Users/hk/mnt/qingdao/codes_med33/IMWUT2022/tmp/]], function(out, err)
+  if out then
+    vim.notify(vim.inspect(out), vim.log.levels.WARN)
+    M.dump_to_file("~/log", out)
+  else
+    vim.notify("No stdout", vim.log.levels.ERROR)
+  end
+  if err then
+    vim.notify(string.format("Error: %s", vim.inspect(err)), vim.log.levels.ERROR)
+    M.dump_to_file("~/log2", err)
+  end
+end)
+t:run()
+```
+2. use `:AsyncRun CMD`
+
+# meta table pass through `self`
+```lua
+local M = {}
+M.new = function(cmd, exit_hook)
+  return setmetatable({
+    cmd = cmd,
+    sorted = false,
+    std_out = {},
+    std_err = {},
+    exit_hook = exit_hook,
+  }, {__index = M})
+end
+
+function M:on_exit(arg1, arg2)
+    这样写会自动pass self进来
+end
+详见: ~/.config/nvim/lua/scratch/job_util.lua
+```
 # minimal config to reproduce an issue
 https://github.com/folke/noice.nvim/wiki/Minimal-%60init.lua%60-to-Reproduce-an-Issue
 # lsp server installation guide
@@ -106,6 +144,7 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 ## make
 `CMAKE_BUILD_TYPE=RelWithDebInfo`
 # refer to following dotfiles:
+- https://github.com/coffebar/dotfiles: nice rsync plugin, transfer.nvim
 - https://github.com/omerxx/dotfiles: https://www.youtube.com/@devopstoolbox
 - https://github.com/dlvhdr/dotfiles: 很好看的tmux+kitty配置 https://www.youtube.com/@JoshMedeski
 - https://github.com/HCY-ASLEEP/NVIM-Config: 没有插件的nvim config

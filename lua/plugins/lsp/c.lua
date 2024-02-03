@@ -15,7 +15,7 @@ M.setup = function(options)
       -- vim.lsp.inlay_hint(bufnr, true)
     end,
     cmd = {
-      'clangd',
+      '/opt/homebrew/opt/llvm/bin/clangd',
       '--background-index',
       '--clang-tidy',
       '--header-insertion=iwyu',

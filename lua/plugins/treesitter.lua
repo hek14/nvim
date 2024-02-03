@@ -73,6 +73,7 @@ function M.config()
 
   local options = {
     ensure_installed = {"python","c","cpp","query","vim","vimdoc","markdown","markdown_inline"}, -- NOTE: playground need query parser
+    -- parser path: ~/.local/share/nvim/lazy/nvim-treesitter/parser/
     -- playground = { 
     --   enable = true 
     -- },

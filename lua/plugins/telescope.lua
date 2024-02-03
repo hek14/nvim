@@ -32,6 +32,12 @@ local M = {
   },
   dependencies = {
     {
+      "nvim-telescope/telescope-smart-history.nvim",
+      dependencies = {
+        "kkharji/sqlite.lua"
+      }
+    },
+    {
       "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
     },
     {
@@ -151,6 +157,10 @@ function M.config()
       -- layout_strategy = vim.loop.os_uname().sysname=='Linux' and 'vertical' or 'horizontal',
       layout_strategy = 'horizontal',
       layout_config = { height = 0.8 },
+      history = {
+        path = '~/.local/share/nvim/databases/telescope_history.sqlite3',
+        limit = 100,
+      },
       mappings = {
         i = {
           ["<C-n>"] = actions.cycle_history_next,
@@ -237,7 +247,7 @@ function M.config()
   -- options.defaults = require('telescope.themes').get_ivy(options.defaults)
   telescope.setup(options)
   local extensions = {
-    "bookmarks", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf","conda"
+    "bookmarks", "zoxide", "file_browser", "dotfiles", "live_grep_args", "fzf","conda", "smart_history"
   }
   for _, ext in ipairs(extensions) do telescope.load_extension(ext) end
 end

@@ -1,3 +1,7 @@
+# solve error: `treesitter_query parse error at xxx structure`
+删除`/usr/local/lib/nvim/parser/*.so`
+用`nvim-treesitter`去`TSIntall` all of the parsers
+
 # the recipe for running shell command async in neovim
 1. use my ~/.config/nvim/lua/scratch/job_util.lua
 ```lua
@@ -115,15 +119,19 @@ https://www.codingfont.com/
 https://www.nerdfonts.com/font-downloads
 # for newly installed:
 1. install nvim nightly
-  1.1 wget -c xxx.tar.gz (from the github release page)
-  1.2 extract xxx.tar.gz
-  1.3 cd nvim-xxx
-  1.4 cp bin/nvim /usr/local/bin/ (for mac-os)
-      cp bin/nvim /usr/bin/ (for linux)
-  1.5 cp -r share/nvim /usr/local/share/ (for mac-os)
-      cp -r share/nvim /usr/share/ (for linux)
-  1.6 cp -r lib/nvim /usr/local/lib/ (for mac-os)
-      cp -r lib/nvim /usr/lib/ (for linux)
+  1.1 wget -c nvim-macos.tar.gz (from the github release page)
+  1.2 xattr -c nvim-macos.tar.gz
+  1.3 extract xxx.tar.gz
+  1.4 cd nvim-xxx
+  1.5 rm -rf /usr/local/bin/nvim /usr/local/lib/nvim /usr/local/share/nvim
+  1.6 for mac-os:
+      cp bin/nvim /usr/local/bin/
+      cp -r share/nvim /usr/local/share/
+      cp -r lib/nvim /usr/local/lib/
+  1.7 for linux:
+      cp bin/nvim /usr/bin/
+      cp -r share/nvim /usr/share/
+      cp -r lib/nvim /usr/lib/
 要注意的是: mac-os不能使用从chrome浏览器点击下载nvim-macos.tar.gz的方式
 使用这种方式安装的nvim会经常报开发者不受信任的错误.
 mac上下载的正确方式是从safari或者直接复制链接之后wget.

@@ -126,13 +126,6 @@ return {
     end
   },
   {
-    "echasnovski/mini.pick",
-    enabled = false,
-    version = false,
-    event = {"InsertEnter", "CmdlineEnter"},
-    opts = {},
-  },
-  {
     "utilyre/sentiment.nvim",
     version = "*",
     event = "VeryLazy", -- keep for lazy loading
@@ -168,13 +161,6 @@ return {
       require("true-zen").setup({})
     end,
   },
-  { 
-    "akinsho/toggleterm.nvim",
-    cmd = 'ToggleTerm',
-    config = function()
-      require("toggleterm").setup{}
-    end
-  },
   {
     'tpope/vim-scriptease',
     cmd = 'Messages',
@@ -182,6 +168,10 @@ return {
   {
     'tpope/vim-fugitive',
     cmd = {'Git', 'Gedit','Gdiffsplit','Gread','Gwrite','Ggrep','GMove','GDelete','GBrowse'}
+  },
+  {
+    "tpope/vim-surround",
+    event = "BufEnter"
   },
   {
     'sbulav/nredir.nvim',
@@ -206,6 +196,7 @@ return {
   },
   {
     'echasnovski/mini.surround',
+    enabled = false,
     keys = { 'sa', 'sd', 'sr', 'sf', 'sF', 'sh', 'sn' },
     version = false,
     config = function()
@@ -244,7 +235,13 @@ return {
     end,
   },
   {
+    "cohama/lexima.vim",
+    lazy = false,
+  },
+  {
     'windwp/nvim-autopairs',
+    version = "*",
+    enabled = false,
     event = 'InsertEnter',
     config = function()
       require('nvim-autopairs').setup{
@@ -255,11 +252,9 @@ return {
         disable_filetype = { "TelescopePrompt", "spectre_panel" },
         ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
       }
-      pcall(function()
-        local cmp = require('cmp')
-        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-        cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())
-      end)
+      local cmp = require('cmp')
+      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+      cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())
     end
   },
   {
@@ -267,60 +262,21 @@ return {
     event = 'BufEnter',
     config = function()
       require("Comment").setup {
-
-        -- LHS of operator-pending mapping in NORMAL + VISUAL mode
         opleader = {
-          -- line-comment keymap
           line = "gc",
-          -- block-comment keymap
           block = "gb",
         },
-
-        -- Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
         mappings = {
-
-          -- operator-pending mapping
-          -- Includes:
-          --  `gcc`               -> line-comment  the current line
-          --  `gcb`               -> block-comment the current line
-          --  `gc[count]{motion}` -> line-comment  the region contained in {motion}
-          --  `gb[count]{motion}` -> block-comment the region contained in {motion}
           basic = true,
-
-          -- extra mapping
-          -- Includes `gco`, `gcO`, `gcA`
           extra = true,
         },
-
-        -- LHS of toggle mapping in NORMAL + VISUAL mode
         toggler = {
-          -- line-comment keymap
-          --  Makes sense to be related to your opleader.line
           line = "gcc",
-
-          -- block-comment keymap
-          --  Make sense to be related to your opleader.block
           block = "gbc",
         },
-
-        -- Pre-hook, called before commenting the line
-        --    Can be used to determine the commentstring value
-        -- pre_hook = nil,
-
-        -- Post-hook, called after commenting is done
-        --    Can be used to alter any formatting / newlines / etc. after commenting
-        -- post_hook = nil,
-
-        -- Can be used to ignore certain lines when doing linewise motions.
-        --    Can be string (lua regex)
-        --    Or function (that returns lua regex)
-          -- ignore = nil,
-        }
-
-        -- local comment_ft = require "Comment.ft"
-        -- comment_ft.set("lua", { "--%s", "--[[%s]]" })
-      end,
-    },
+      }
+    end,
+  },
   {
     'ggandor/leap.nvim',
     enabled = false,
@@ -581,8 +537,8 @@ return {
     cmd = 'AsyncRun',
     init = function()
       local ft_map = require('core.autocmds').ft_map
-      ft_map( 'python', 'n', ',t', '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) -mode=term -pos=tmux python "$(VIM_FILEPATH)"<CR>')
-      ft_map( {'cpp', 'c'}, 'n', ',t', '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) -mode=term -pos=tmux python "$(VIM_FILEPATH)"<CR>')
+      ft_map( 'python', 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)" ')
+      ft_map( {'cpp', 'c'}, 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) ./Debug/hello ')
       vim.cmd [[
       " automatically open quickfix window when AsyncRun command is executed
       " set the quickfix window 6 lines height.
@@ -733,14 +689,6 @@ return {
   --   cmd = 'ColorizerToggle',
   --   config = function()
   --     require('colorizer').setup()
-  --   end,
-  -- },
-  -- {
-  --   'echasnovski/mini.sessions',
-  --   version = false,
-  --   lazy = false,
-  --   config = function()
-  --     require('mini.sessions').setup()
   --   end,
   -- },
   -- {

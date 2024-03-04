@@ -4,8 +4,10 @@ local M = {
   event = 'VimEnter',
   init = function()
     local map = require("core.utils").map
-    map("n", {"<TAB>","]b"}, ":BufferLineCycleNext <CR>")
-    map("n", {"<S-Tab>","[b"}, ":BufferLineCyclePrev <CR>")
+    map("n", {"<Tab>","]b"}, ":BufferLineCycleNext<CR>")
+    map("n", {"<S-Tab>","[b"}, ":BufferLineCyclePrev<CR>")
+    map("n", "<leader>wa", ":BufferLineMoveNext<CR>")
+    map("n", "<leader>wA", ":BufferLineMovePrev<CR>")
   end,
 }
 

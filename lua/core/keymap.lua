@@ -224,8 +224,8 @@ local function others()
 
   map("n",'gp',[['`[' . strpart(getregtype(), 0, 1) . '`]']], {expr=true})
 
-  map("n", {"<TAB>","]b"}, ":bn<CR>")
-  map("n", {"<S-Tab>","[b"}, ":bp<CR>")
+  -- map("n", {"<TAB>","]b"}, ":bn<CR>")
+  -- map("n", {"<S-Tab>","[b"}, ":bp<CR>")
 
   local escape = require('core.utils').termcode
   local function quick_insert_profile()

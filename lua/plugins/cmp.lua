@@ -5,6 +5,7 @@ local M = {
     dependencies = {
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
+      "hrsh7th/cmp-omni",
       -- "lukas-reineke/cmp-rg",
       "L3MON4D3/LuaSnip",
       "saadparwaiz1/cmp_luasnip",
@@ -86,18 +87,28 @@ end
 M[1].config = function()
   local cmp = require('cmp')
   cmp.setup{
+    performance = {
+      debounce = 30,
+      throttle = 15,
+      fetching_timeout = 250,
+      confirm_resolve_timeout = 40,
+      async_budget = 0.5,
+      max_view_entries = 100,
+    },
     window = {
       completion = cmp.config.window.bordered(),
       documentation = cmp.config.window.bordered(),
     },
     sources = {
-      { name = 'nvim_lua' },
-      { name = "luasnip" },
-      { name = "path" },
-      { name = "nvim_lsp" },
+      { name = 'nvim_lua', priority = 1000 },
+      { name = "luasnip", priority = 750 },
+      { name = "path", priority = 250 },
+      -- { name = "remote_path", priority = 100 },
+      { name = "nvim_lsp", priority = 1000 },
       { name = 'nvim_lsp_signature_help' },
       {
         name = 'buffer',
+        priority = 500,
         -- keyword_length = 5,
         option = {
           get_bufnrs = function()
@@ -125,11 +136,59 @@ M[1].config = function()
     },
     mapping = {
       ["<C-a>"] = cmp.mapping.close(), -- or abort
+      ['<CR>'] = cmp.mapping.confirm({
+        behavior = cmp.ConfirmBehavior.Replace,
+        select = true,
+      }),
       -- ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       -- ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       -- ["<C-d>"] = cmp.mapping.scroll_docs(-4),
       -- ["<C-f>"] = cmp.mapping.scroll_docs(4),
-    }
+    },
+    formatting = {
+      format = function(entry, vim_item)
+        local icons = {
+          Text = "",
+          Method = "",
+          Function = "",
+          Constructor = "",
+          Field = "ﰠ",
+          Variable = "",
+          Class = "ﴯ",
+          Interface = "",
+          Module = "",
+          Property = "ﰠ",
+          Unit = "塞",
+          Value = "",
+          Enum = "",
+          Keyword = "",
+          Snippet = "",
+          Color = "",
+          File = "",
+          Reference = "",
+          Folder = "",
+          EnumMember = "",
+          Constant = "",
+          Struct = "פּ",
+          Event = "",
+          Operator = "",
+          TypeParameter = "",
+          Omni = "⚾️"
+        }
+        if(entry.source.name == "omni") then
+          vim_item.kind = "Omni"
+        end
+        vim_item.kind = string.format("%s %s", icons[vim_item.kind], vim_item.kind)
+        vim_item.menu = ({
+          omni = "[Omni]",
+          nvim_lsp = "[Lsp]",
+          nvim_lua = "[Lua]",
+          buffer = "[Buf]",
+          mine_config_yaml = "[Config]"
+        })[entry.source.name]
+        return vim_item
+      end,
+    },
   }
   vim.cmd('hi! CmpFloatBorder guifg=red')
 
@@ -151,6 +210,7 @@ M[1].config = function()
 
   local mine_config_yaml = require("contrib.cmp_config_yaml")
   cmp.register_source("mine_config_yaml", mine_config_yaml.new())
+  cmp.register_source('remote_path', require('contrib.parse_remote_path').new())
 
   local cmp_config = function()
     cmp.complete({
@@ -162,6 +222,28 @@ M[1].config = function()
     })
   end
   vim.keymap.set('i','<C-c>',cmp_config,{noremap=true,silent=true})
+  cmp.setup.filetype({ 'tex' }, {
+    sources = {
+      { name = 'omni', option = { disable_omnifuncs = { 'v:lua.vim.lsp.omnifunc' } } },
+      { name = "luasnip" },
+      { name = "path" },
+      { name = "nvim_lsp" },
+      {
+        name = 'buffer',
+        option = {
+          get_bufnrs = function()
+            local win_bufs = require('core.utils').get_all_window_buffer_filetype()
+            local bufs = {}
+            for i, win_buf in ipairs(win_bufs) do
+              table.insert(bufs, win_buf.bufnr)
+            end
+            return bufs
+          end
+        }
+      }
+    },
+  })
+
 end
 
 return M

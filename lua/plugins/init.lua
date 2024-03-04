@@ -1,6 +1,83 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "willothy/flatten.nvim",
+    config = true,
+    lazy = false,
+    -- event = {'TermEnter', 'TermOpen'}
+  },
+  {
+    "coffebar/transfer.nvim",
+    dependencies = "nvim-neo-tree/neo-tree.nvim",
+    cmd = { "TransferInit", "DiffRemote", "TransferUpload", "TransferDownload", "TransferDirDiff", "TransferRepeat" },
+    keys = {
+      {"<leader>ss", "<Cmd>TransferUpload .<CR>"},
+      {"<leader>sd", "<Cmd>TransferDownload .<CR>"},
+    },
+    opts = {
+      config_template = [[
+return {
+  ["server1"] = {
+    host = "qingdao",
+    mappings = {
+      {
+        ["local"] = ".",
+        ["remote"] = "/home/heke/",
+      },
+    },
+  },
+}
+]],
+      upload_rsync_params = {
+        "-arlzi",
+        -- "--delete",
+        "--checksum",
+        "--exclude-from=" .. vim.env["HOME"] .. "/.rg_ignore"
+      },
+      download_rsync_params = {
+        "-arlzi",
+        -- "--delete",
+        "--checksum",
+        "--exclude-from=" .. vim.env["HOME"] .. "/.rg_ignore"
+      },
+    },
+  },
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    enabled = true,
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    config = function()
+      require('noice').setup({
+        lsp = {
+          signature = {
+            enabled = false,
+          }
+        },
+        routes = {
+          {
+            filter = {
+              event = "msg_show",
+              find = "written",
+            },
+            opts = {
+              skip = true,
+              -- action = function()
+              --   vim.cmd("messages")
+              -- end
+            },
+          },
+        }
+      })
+      map("n", "<leader>nd", "<Cmd>NoiceDismiss<CR>")
+      map("n", "<Esc>", [[:noh | NoiceDismiss<CR>]])
+      require('telescope').load_extension('noice')
+    end
+  },
+  {
     "giusgad/pets.nvim",
     enabled = true,
     dependencies = { "MunifTanjim/nui.nvim", "giusgad/hologram.nvim" },
@@ -60,13 +137,6 @@ local plugins = {
     end
   },
   {
-    "echasnovski/mini.pick",
-    enabled = false,
-    version = false,
-    event = {"InsertEnter", "CmdlineEnter"},
-    opts = {},
-  },
-  {
     "utilyre/sentiment.nvim",
     version = "*",
     event = "VeryLazy", -- keep for lazy loading
@@ -102,13 +172,6 @@ local plugins = {
       require("true-zen").setup({})
     end,
   },
-  { 
-    "akinsho/toggleterm.nvim",
-    cmd = 'ToggleTerm',
-    config = function()
-      require("toggleterm").setup{}
-    end
-  },
   {
     'tpope/vim-scriptease',
     cmd = 'Messages',
@@ -116,6 +179,10 @@ local plugins = {
   {
     'tpope/vim-fugitive',
     cmd = {'Git', 'Gedit','Gdiffsplit','Gread','Gwrite','Ggrep','GMove','GDelete','GBrowse'}
+  },
+  {
+    "tpope/vim-surround",
+    event = "BufEnter"
   },
   {
     'sbulav/nredir.nvim',
@@ -127,8 +194,8 @@ local plugins = {
   { 'nvim-lua/plenary.nvim' },
   { 'nvim-tree/nvim-web-devicons' },
   {
-    'glepnir/template.nvim', 
-    cmd = {'Template','TemProject'}, 
+    'glepnir/template.nvim',
+    cmd = {'Template','TemProject'},
     config = function()
       require('template').setup({
         temp_dir = '~/.config/nvim/template',
@@ -140,6 +207,7 @@ local plugins = {
   },
   {
     'echasnovski/mini.surround',
+    enabled = false,
     keys = { 'sa', 'sd', 'sr', 'sf', 'sF', 'sh', 'sn' },
     version = false,
     config = function()
@@ -178,7 +246,13 @@ local plugins = {
     end,
   },
   {
+    "cohama/lexima.vim",
+    lazy = false,
+  },
+  {
     'windwp/nvim-autopairs',
+    version = "*",
+    enabled = false,
     event = 'InsertEnter',
     config = function()
       require('nvim-autopairs').setup{
@@ -189,11 +263,9 @@ local plugins = {
         disable_filetype = { "TelescopePrompt", "spectre_panel" },
         ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
       }
-      pcall(function()
-        local cmp = require('cmp')
-        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-        cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())
-      end)
+      local cmp = require('cmp')
+      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+      cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())
     end
   },
   {
@@ -201,60 +273,21 @@ local plugins = {
     event = 'BufEnter',
     config = function()
       require("Comment").setup {
-
-        -- LHS of operator-pending mapping in NORMAL + VISUAL mode
         opleader = {
-          -- line-comment keymap
           line = "gc",
-          -- block-comment keymap
           block = "gb",
         },
-
-        -- Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
         mappings = {
-
-          -- operator-pending mapping
-          -- Includes:
-          --  `gcc`               -> line-comment  the current line
-          --  `gcb`               -> block-comment the current line
-          --  `gc[count]{motion}` -> line-comment  the region contained in {motion}
-          --  `gb[count]{motion}` -> block-comment the region contained in {motion}
           basic = true,
-
-          -- extra mapping
-          -- Includes `gco`, `gcO`, `gcA`
           extra = true,
         },
-
-        -- LHS of toggle mapping in NORMAL + VISUAL mode
         toggler = {
-          -- line-comment keymap
-          --  Makes sense to be related to your opleader.line
           line = "gcc",
-
-          -- block-comment keymap
-          --  Make sense to be related to your opleader.block
           block = "gbc",
         },
-
-        -- Pre-hook, called before commenting the line
-        --    Can be used to determine the commentstring value
-        -- pre_hook = nil,
-
-        -- Post-hook, called after commenting is done
-        --    Can be used to alter any formatting / newlines / etc. after commenting
-        -- post_hook = nil,
-
-        -- Can be used to ignore certain lines when doing linewise motions.
-        --    Can be string (lua regex)
-        --    Or function (that returns lua regex)
-          -- ignore = nil,
-        }
-
-        -- local comment_ft = require "Comment.ft"
-        -- comment_ft.set("lua", { "--%s", "--[[%s]]" })
-      end,
-    },
+      }
+    end,
+  },
   {
     'ggandor/leap.nvim',
     enabled = false,
@@ -515,8 +548,8 @@ local plugins = {
     cmd = 'AsyncRun',
     init = function()
       local ft_map = require('core.autocmds').ft_map
-      ft_map( 'python', 'n', ',t', '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) -mode=term -pos=tmux python "$(VIM_FILEPATH)"<CR>')
-      ft_map( {'cpp', 'c'}, 'n', ',t', '<cmd>AsyncRun -cwd=$(VIM_FILEDIR) -mode=term -pos=tmux python "$(VIM_FILEPATH)"<CR>')
+      ft_map( 'python', 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)" ', {silent = false})
+      ft_map( {'cpp', 'c'}, 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) ./Debug/hello ', {silent = false})
       vim.cmd [[
       " automatically open quickfix window when AsyncRun command is executed
       " set the quickfix window 6 lines height.
@@ -667,14 +700,6 @@ local plugins = {
   --   cmd = 'ColorizerToggle',
   --   config = function()
   --     require('colorizer').setup()
-  --   end,
-  -- },
-  -- {
-  --   'echasnovski/mini.sessions',
-  --   version = false,
-  --   lazy = false,
-  --   config = function()
-  --     require('mini.sessions').setup()
   --   end,
   -- },
   -- {

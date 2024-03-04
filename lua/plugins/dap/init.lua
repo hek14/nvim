@@ -67,31 +67,35 @@ M.config = function()
       edit = '<C-e>',
       repl = 'r',
     },
-    -- icons = { expanded = '▾', collapsed = '▸' },
-    -- layouts = {
-    --   {
-    --     elements = {
-    --       'scopes',
-    --       'breakpoints',
-    --       'stacks',
-    --       'watches',
-    --     },
-    --     size = 80,
-    --     position = 'right',
-    --   },
-    --   {
-    --     elements = {
-    --       'repl',
-    --       'console',
-    --     },
-    --     size = 10,
-    --     position = 'bottom',
-    --   },
-    -- },
+    icons = { expanded = '▾', collapsed = '▸' },
+    layouts = {
+      {
+        elements = {
+          'scopes',
+          'breakpoints',
+          'stacks',
+          'watches',
+        },
+        size = 50,
+        position = 'right',
+      },
+      {
+        elements = {
+          'repl',
+        },
+        size = 20,
+        position = 'bottom',
+      },
+    },
   })
 
   -- Events Listeners
   local dap = require('dap')
+  -- dap.defaults.fallback.force_external_terminal = true
+  -- dap.defaults.fallback.external_terminal = {
+  --   command = '/opt/homebrew/bin/wezterm';
+  --   args = {'-e'};
+  -- }
   local keymaps = {
     ['i'] = {
       {"<C-w>h","<Esc><C-w>h"},

@@ -16,7 +16,7 @@ for _, module in ipairs(modules) do
   require(module)
 end
 
--- vim.loader.disable()
+vim.loader.disable()
 
 _G.treesitter_job = require('scratch.bridge_ts_parse')
 treesitter_job:batch(1)

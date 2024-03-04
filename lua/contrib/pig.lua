@@ -761,7 +761,7 @@ end
 
 M.on_attach = function(bufnr)
   vim.api.nvim_buf_set_keymap(bufnr,"n","<C-c>","",{noremap=true,callback=function ()
-    M.my_ctrl_c(bufnr)    
+    M.my_ctrl_c(bufnr)
   end})
 end
 

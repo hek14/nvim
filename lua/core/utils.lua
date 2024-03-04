@@ -600,7 +600,7 @@ end
 
 M.source_curr_file = function()
   if vim.bo.ft == "lua" then
-    vim.loader.reset()
+    -- vim.loader.reset()
     vim.cmd [[luafile %]]
   elseif vim.bo.ft == "vim" then
     vim.cmd [[so %]]
@@ -643,6 +643,15 @@ M.close_float_window = function()
           pcall(vim.api.nvim_win_close,win,false)
         end
     end
+end
+
+M.close_qf_window = function()
+  local info_list = M.get_all_window_buffer_filetype()
+  for i, w_info in ipairs(info_list) do
+    if(w_info.filetype == "qf") then
+      vim.api.nvim_win_close(w_info.winnr, false)
+    end
+  end
 end
 
 M.range_search = function(pattern,_start,_end)
@@ -914,6 +923,5 @@ M.reload_config = function()
   -- remove last search highlight
   vim.cmd("nohl")
 end
-
 
 return M

@@ -26,4 +26,5 @@ vim.opt.expandtab = true
 vim.opt.ts = 4
 vim.opt.sw = 4
 vim.opt.autoindent = true
+vim.g.no_plugin_maps = true
 ---> options end

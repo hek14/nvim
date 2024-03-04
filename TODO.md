@@ -1,19 +1,16 @@
-# 要分清楚每一个结构/class/function的指责, 不要越界
-
-# M: the out most public API(manage scatter/gather/done)
-M是一个prcoess manager的角色, send的时候按照file去分发,retrieve函数本质上是遍历各个child
-M没有send ticket的概念, 也不应该维护真正的data, 因为它只是一个proxy, 真正的活还是process干的
-
-maps: 
-file -> child  (created in send)
-
-# process(child)
-maps:
-file,pos -> latest ticket (always latest)
-ticket: {input,output}
-ticket.input 
-ticket.output -> tbl[file,position] = scope
-
-# tickets (corresponds to send, not filetick)
-每一次send都带有tick, return的时候也对应的有这个tick
-old ticket???
+# TODO: 
+- C++ printf luasnip node: 利用lsp symbols查看数据类型, integer -> %d, char -> %c
+- job_util: 封装成UI和copy
+- resume-layout.nvim: 看看哪一些event会change window layout, 用gpt4辅助写:
+1. 四组events需要insert hook，定义记录的data formats
+WinEnter and WinLeave, BufWinEnter and BufWinLeave, TabEnter and TabLeave, BufEnter and BufLeave
+2. 如何set window尺寸，函数是啥
+- implement `RemoteExecute qingdao command output_file`
+- check modern-unix shell tools: https://github.com/ibraheemdev/modern-unix
+- check: https://github.com/quarto-dev/quarto-nvim
+- check: https://github.com/3rd/image.nvim/
+- AsyncRun: https://github.com/skywind3000/asyncrun.vim/wiki/Better-way-for-C-and-Cpp-development-in-Vim-8
+- learn `async await`: https://github.com/ms-jpq/lua-async-await
+- refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
+- consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
+- implement TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not

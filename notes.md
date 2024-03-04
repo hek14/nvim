@@ -1,14 +1,48 @@
-# TODO: 
-- check modern-unix shell tools: https://github.com/ibraheemdev/modern-unix
-- check: https://github.com/quarto-dev/quarto-nvim
-- check: https://github.com/3rd/image.nvim/
-- look at dlvhdr tmux/nvim/kitty dotfiles: https://github.com/dlvhdr/dotfiles -->
-- hack telescope: https://github.com/prochri/telescope-all-recent.nvim
-- AsyncRun: https://github.com/skywind3000/asyncrun.vim/wiki/Better-way-for-C-and-Cpp-development-in-Vim-8
-- learn `async await`: https://github.com/ms-jpq/lua-async-await
-- refer to https://jdhao.github.io/2019/03/26/nvim_latex_write_preview/ to setup vimtex on mac OS
-- consider using https://github.com/justinmk/vim-dirvish to replace nvim-tree
-- TogglePrintScope, TogglePrintFile command: use the custom_capture `print` and ask the user to choose: comment or not
+# solve error: `treesitter_query parse error at xxx structure`
+删除`/usr/local/lib/nvim/parser/*.so`
+用`nvim-treesitter`去`TSIntall` all of the parsers
+
+# in nvim's terminal, the recipe for edit files in current nvim instance
+`nvr --remote FILE_NAME`
+
+# the recipe for running shell command async in neovim
+1. use my ~/.config/nvim/lua/scratch/job_util.lua
+```lua
+local M = require("scratch.job_util")
+local t = M.new([[rsync -avrzh qingdao:~/codes_med33/IMWUT2022/tmp/ /Users/hk/mnt/qingdao/codes_med33/IMWUT2022/tmp/]], function(out, err)
+  if out then
+    vim.notify(vim.inspect(out), vim.log.levels.WARN)
+    M.dump_to_file("~/log", out)
+  else
+    vim.notify("No stdout", vim.log.levels.ERROR)
+  end
+  if err then
+    vim.notify(string.format("Error: %s", vim.inspect(err)), vim.log.levels.ERROR)
+    M.dump_to_file("~/log2", err)
+  end
+end)
+t:run()
+```
+2. use `:AsyncRun CMD`
+
+# meta table pass through `self`
+```lua
+local M = {}
+M.new = function(cmd, exit_hook)
+  return setmetatable({
+    cmd = cmd,
+    sorted = false,
+    std_out = {},
+    std_err = {},
+    exit_hook = exit_hook,
+  }, {__index = M})
+end
+
+function M:on_exit(arg1, arg2)
+    这样写会自动pass self进来
+end
+详见: ~/.config/nvim/lua/scratch/job_util.lua
+```
 # minimal config to reproduce an issue
 https://github.com/folke/noice.nvim/wiki/Minimal-%60init.lua%60-to-Reproduce-an-Issue
 # lsp server installation guide
@@ -88,15 +122,19 @@ https://www.codingfont.com/
 https://www.nerdfonts.com/font-downloads
 # for newly installed:
 1. install nvim nightly
-  1.1 wget -c xxx.tar.gz (from the github release page)
-  1.2 extract xxx.tar.gz
-  1.3 cd nvim-xxx
-  1.4 cp bin/nvim /usr/local/bin/ (for mac-os)
-      cp bin/nvim /usr/bin/ (for linux)
-  1.5 cp -r share/nvim /usr/local/share/ (for mac-os)
-      cp -r share/nvim /usr/share/ (for linux)
-  1.6 cp -r lib/nvim /usr/local/lib/ (for mac-os)
-      cp -r lib/nvim /usr/lib/ (for linux)
+  1.1 wget -c nvim-macos.tar.gz (from the github release page)
+  1.2 xattr -c nvim-macos.tar.gz
+  1.3 extract xxx.tar.gz
+  1.4 cd nvim-xxx
+  1.5 rm -rf /usr/local/bin/nvim /usr/local/lib/nvim /usr/local/share/nvim
+  1.6 for mac-os:
+      cp bin/nvim /usr/local/bin/
+      cp -r share/nvim /usr/local/share/
+      cp -r lib/nvim /usr/local/lib/
+  1.7 for linux:
+      cp bin/nvim /usr/bin/
+      cp -r share/nvim /usr/share/
+      cp -r lib/nvim /usr/lib/
 要注意的是: mac-os不能使用从chrome浏览器点击下载nvim-macos.tar.gz的方式
 使用这种方式安装的nvim会经常报开发者不受信任的错误.
 mac上下载的正确方式是从safari或者直接复制链接之后wget.
@@ -117,7 +155,9 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 ## make
 `CMAKE_BUILD_TYPE=RelWithDebInfo`
 # refer to following dotfiles:
-- https://github.com/dlvhdr/dotfiles: 很好看的tmux+kitty配置, 值得一看 (介绍视频: https://www.youtube.com/watch?v=CHV0TWO-b4A&ab_channel=JoshMedeski)
+- https://github.com/coffebar/dotfiles: nice rsync plugin, transfer.nvim
+- https://github.com/omerxx/dotfiles: https://www.youtube.com/@devopstoolbox
+- https://github.com/dlvhdr/dotfiles: 很好看的tmux+kitty配置 https://www.youtube.com/@JoshMedeski
 - https://github.com/HCY-ASLEEP/NVIM-Config: 没有插件的nvim config
 - https://github.com/vsedov/nvim: really hacky about pylance config
 - https://github.com/max397574/omega-nvim: only hack pylance!!!
@@ -143,7 +183,7 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 - https://github.com/ibhagwan/nvim-lua: the author of fzf-lua
 - https://github.com/ibhagwan/dots: documented about configs, picky about plugins
 - https://github.com/XXiaoA/nvimrc
-# to try others' dotfiles
+# use docker to try a refreshed nvim
 ```shell
 docker run -it --volume ~/path/to/nvim/config:/root/.config/nvim ubuntu:latest bash -c "apt-get update -y && apt-get install git fzf ripgrep neovim -y && nvim"
 ```
@@ -228,7 +268,7 @@ relations with bufnr:
 1. 前面有很多行连续以'+'结尾的字符串, 也就是8.2中所提到的报错message.
 2. 一般而言, 就是最后的那个, 所以"G" goto the end, 然后 "?" 反向搜索这个pattern就行
 
-找到这一个之后再找 `(function () {`(这个pattern更好) 或者`/for (const`(别用这个)都行
+找到这一个之后再找 `(function () {`
 
 8.4. answer from askfiy: 
 ```markdown

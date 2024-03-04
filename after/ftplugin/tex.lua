@@ -1,7 +1,7 @@
 local map = require("core.utils").map
-local timer = vim.loop.new_timer()
-local map_reset = false
-local running = true
+-- local timer = vim.loop.new_timer()
+-- local map_reset = false
+-- local running = true
 -- vim.defer_fn(function()
 --   print('should override vimtex keymap')
 --   pcall(function ()
@@ -44,3 +44,6 @@ map('x', 'uc', '<plug>(vimtex-ic)',{buffer=true})
 map('x', 'ac', '<plug>(vimtex-ac)',{buffer=true})
 map('o', 'uc', '<plug>(vimtex-ic)',{buffer=true})
 map('o', 'ac', '<plug>(vimtex-ac)',{buffer=true})
+-- map('on', '%', '<plug>(vimtex-%)', {buffer=true})
+map('n', '<leader>so', '<Cmd>VimtexCompileSS<CR>',{buffer=true})
+map("n", "<leader>q", [[:s/。/。\r/g<CR>]], {silent=true,buffer=true})

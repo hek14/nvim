@@ -2,7 +2,7 @@ local M = {}
 require('core.utils').append_env_path(vim.fn.stdpath('config') .. '/bin/python') -- pyright, pylance
 local util = require'lspconfig'.util
 local root_dir = function(fname)
-  local root_files = {'pyproject.toml', 'pyrightconfig.json', '.root', '.python-version', '.envrc', '.vscode'}
+  local root_files = {'pyproject.toml', 'pyrightconfig.json'}
   return util.find_git_ancestor(fname) or
   util.root_pattern(unpack(root_files))(fname) or
   util.path.dirname(fname)
@@ -17,14 +17,6 @@ M.setup = function(options,server)
       on_attach = function(client, bufnr)
         options.on_attach(client,bufnr)
         -- vim.lsp.inlay_hint.enable(bufnr, true)
-        local launch_in_home = client.config.root_dir == vim.env["HOME"]
-        if launch_in_home then
-          local answer = vim.fn.input("really want to launch_in_home? y/n: ")
-          if answer == 'n' then
-            vim.lsp.buf_detach_client(bufnr,client.id)
-            return
-          end
-        end
       end,
       settings = require('plugins.lsp.pyright_config'),
       root_dir = root_dir

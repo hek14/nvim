@@ -7,26 +7,47 @@ local dap = require('dap')
 --   port = 13000
 -- }
 
-dap.adapters.codelldb = {
-  type = 'server',
-  port = "${port}",
-  executable = {
-    command = vim.fn.stdpath('config') .. '/bin/c/extension/adapter/codelldb',
-    args = {"--port", "${port}"},
-  }
+-- dap.adapters.codelldb = {
+--   type = 'server',
+--   port = "${port}",
+--   executable = {
+--     command = vim.fn.stdpath("config") .. "/bin/c/codelldb/adapter/codelldb",
+--     args = {"--port", "${port}"},
+--   }
+-- }
+--
+-- dap.configurations.cpp = {
+--   {
+--     name = "Launch file",
+--     type = "codelldb",
+--     request = "launch",
+--     program = function()
+--       return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+--     end,
+--     cwd = '${workspaceFolder}',
+--     stopOnEntry = false,
+--   },
+-- }
+
+dap.adapters.lldb = {
+  type = 'executable',
+  command = '/opt/homebrew/opt/llvm/bin/lldb-vscode', -- adjust as needed, must be absolute path
+  name = 'lldb'
 }
 
 dap.configurations.cpp = {
   {
-    name = "Launch file",
-    type = "codelldb",
-    request = "launch",
+    name = 'Launch',
+    type = 'lldb',
+    request = 'launch',
     program = function()
       return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
     end,
     cwd = '${workspaceFolder}',
     stopOnEntry = false,
+    args = {},
   },
 }
+
 dap.configurations.c = dap.configurations.cpp
 dap.configurations.rust = dap.configurations.cpp

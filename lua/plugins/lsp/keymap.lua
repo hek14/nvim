@@ -90,8 +90,6 @@ function M.setup(client,bufnr)
   buf_set_keymap("n", "<leader>rn", vim.lsp.buf.rename)
   buf_set_keymap("n", "E", M.show_documentation)
   buf_set_keymap("n", "<leader>fm",vim.lsp.buf.format)
-  buf_set_keymap("n", "<leader>[r",require'nvim-treesitter-refactor.navigation'.goto_previous_usage)
-  buf_set_keymap("n", "<leader>]r",require'nvim-treesitter-refactor.navigation'.goto_next_usage)
   buf_set_keymap('n', 'gi',vim.lsp.buf.incoming_calls)
   buf_set_keymap('n', 'go',vim.lsp.buf.outgoing_calls)
 end

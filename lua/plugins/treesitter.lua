@@ -84,6 +84,7 @@ function M.config()
     },
     highlight = {
       enable = true,
+      disable = {'tex'}
     },
     indent = {
       enable = false

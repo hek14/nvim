@@ -1,6 +1,12 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "willothy/flatten.nvim",
+    config = true,
+    lazy = false,
+    -- event = {'TermEnter', 'TermOpen'}
+  },
+  {
     "coffebar/transfer.nvim",
     dependencies = "nvim-neo-tree/neo-tree.nvim",
     cmd = { "TransferInit", "DiffRemote", "TransferUpload", "TransferDownload", "TransferDirDiff", "TransferRepeat" },
@@ -46,6 +52,11 @@ return {
     },
     config = function()
       require('noice').setup({
+        lsp = {
+          signature = {
+            enabled = false,
+          }
+        },
         routes = {
           {
             filter = {
@@ -537,8 +548,8 @@ return {
     cmd = 'AsyncRun',
     init = function()
       local ft_map = require('core.autocmds').ft_map
-      ft_map( 'python', 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)" ')
-      ft_map( {'cpp', 'c'}, 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) ./Debug/hello ')
+      ft_map( 'python', 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)" ', {silent = false})
+      ft_map( {'cpp', 'c'}, 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) ./Debug/hello ', {silent = false})
       vim.cmd [[
       " automatically open quickfix window when AsyncRun command is executed
       " set the quickfix window 6 lines height.

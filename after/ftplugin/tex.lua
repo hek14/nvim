@@ -44,6 +44,6 @@ map('x', 'uc', '<plug>(vimtex-ic)',{buffer=true})
 map('x', 'ac', '<plug>(vimtex-ac)',{buffer=true})
 map('o', 'uc', '<plug>(vimtex-ic)',{buffer=true})
 map('o', 'ac', '<plug>(vimtex-ac)',{buffer=true})
-map('on', '%', '<plug>(vimtex-%)', {buffer=true})
+-- map('on', '%', '<plug>(vimtex-%)', {buffer=true})
 map('n', '<leader>so', '<Cmd>VimtexCompileSS<CR>',{buffer=true})
-vim.cmd[[TSDisable highlight]]
+map("n", "<leader>q", [[:s/。/。\r/g<CR>]], {silent=true,buffer=true})

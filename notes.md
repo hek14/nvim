@@ -2,6 +2,9 @@
 删除`/usr/local/lib/nvim/parser/*.so`
 用`nvim-treesitter`去`TSIntall` all of the parsers
 
+# in nvim's terminal, the recipe for edit files in current nvim instance
+`nvr --remote FILE_NAME`
+
 # the recipe for running shell command async in neovim
 1. use my ~/.config/nvim/lua/scratch/job_util.lua
 ```lua

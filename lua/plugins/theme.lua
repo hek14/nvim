@@ -243,4 +243,4 @@ local tokyonight = {
   end
 }
 
-return catppuccin
+return kanagawa

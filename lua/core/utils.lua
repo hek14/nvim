@@ -645,6 +645,15 @@ M.close_float_window = function()
     end
 end
 
+M.close_qf_window = function()
+  local info_list = M.get_all_window_buffer_filetype()
+  for i, w_info in ipairs(info_list) do
+    if(w_info.filetype == "qf") then
+      vim.api.nvim_win_close(w_info.winnr, false)
+    end
+  end
+end
+
 M.range_search = function(pattern,_start,_end)
   if pattern == nil then
     pattern = vim.fn.input('Search pattern: ',vim.fn.expand('<cword>'))

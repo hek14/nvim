@@ -50,7 +50,7 @@ local function read_file(filepath)
     return lines
 end
 
-local file = vim.fn.expand("~/Documents/Notes/Vault/剑指offer刷题笔记.md")
+local file = vim.fn.expand("~/Documents/Notes/Vault/leetcode刷题笔记.md")
 local lines, err = read_file(file)
 if err then
   print(err)
@@ -66,4 +66,4 @@ for i, line in ipairs(lines) do
     end
   end
 end
-print(string.format("%s is ok", file))
+print(string.format("%s %d is ok", file, #lines))

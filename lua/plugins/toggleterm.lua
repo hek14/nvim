@@ -5,13 +5,13 @@ local M = {
 }
 
 M.init = function()
-  vim.keymap.set('n', ',1', ":1TermExec cmd=''<Left>", { silent = false, noremap = true })
+  vim.keymap.set('n', ',5', ":5TermExec cmd=''<Left>", { silent = false, noremap = true })
   vim.keymap.set('n', ',2', ":2TermExec cmd=''<Left>", { silent = false, noremap = true })
 end
 
 vim.api.nvim_create_user_command('QingdaoTerm',function()
   local Terminal = require('toggleterm.terminal').Terminal
-  local qingdao_term = Terminal:new({ hidden = true, count = 1 })
+  local qingdao_term = Terminal:new({ hidden = true, count = 5 })
   qingdao_term:toggle()
   qingdao_term:send("unset_proxy && clippy ssh qingdao")
 end,{})

@@ -3,7 +3,6 @@
 -- :lua =vim.lsp.get_active_clients()[1].server_capabilities
 -- To top-out one capability: client.server_capabilities.semanticTokensProvider = nil
 
-local au = require('core.autocmds').au
 local map = require('core.utils').map
 local M = {
   "neovim/nvim-lspconfig",
@@ -220,8 +219,6 @@ function M.config()
       require("nvim-navic").attach(client, bufnr)
     end
     require('plugins.lsp.keymap').setup(client,bufnr)
-    -- require("contrib.pig").on_attach(bufnr)
-    -- require('contrib.show_diagnostic_in_message').on_attach(bufnr)
   end
 
   local options = {

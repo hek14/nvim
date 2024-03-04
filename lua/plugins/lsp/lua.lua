@@ -18,11 +18,13 @@ M.setup = function(options)
         -- },
         diagnostics = {
           enable = true,
-          globals = { "vim" }
+          globals = { "vim" },
+          disable = { 'missing-fields' }
         },
         workspace = {
           library = {
             vim.env.VIMRUNTIME,
+            '${3rd}/luv/library',
             vim.env.HOME .. '/.local/share/nvim/lazy/emmylua-nvim',
             -- vim.api.nvim_get_runtime_file('', true),
           },

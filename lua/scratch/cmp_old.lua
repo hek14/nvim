@@ -242,30 +242,6 @@ function M.config()
     end
   end)
 
-  -- Set configuration for specific filetype. but the general sources are not added
-  -- local au = require('core.autocmds').au
-  -- au('Filetype', {
-  --   pattern = 'tex',
-  --   callback = function()
-  --     cmp.setup.buffer {
-  --       sources = {
-  --         { name = 'omni' },
-  --         { name = 'luasnip' },
-  --         { name = "latex_symbols" },
-  --       },
-  --     }
-  --   end})
-
-  -- au('Filetype', {
-  --   pattern = 'lua',
-  --   callback = function()
-  --     cmp.setup.buffer {
-  --       sources = {
-  --         { name = 'nvim_lua' }
-  --       },
-  --     }
-  --   end})
-
   -- local cmp_rg_complete = function()
   --   cmp.complete({
   --     config = {

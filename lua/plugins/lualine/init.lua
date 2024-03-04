@@ -1,12 +1,8 @@
-local theme = require('plugins.theme')
-local theme_plugin = theme.name and theme.name or theme[1]
 local M = {
   "nvim-lualine/lualine.nvim",
   enabled = true,
   dependencies = {
     "nvim-tree/nvim-web-devicons",
-    -- "folke/noice.nvim",
-    theme_plugin
   },
   event = "VeryLazy"
 }

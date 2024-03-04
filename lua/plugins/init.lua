@@ -4,7 +4,6 @@ local plugins = {
     "willothy/flatten.nvim",
     config = true,
     lazy = false,
-    -- event = {'TermEnter', 'TermOpen'}
   },
   {
     "coffebar/transfer.nvim",
@@ -76,13 +75,6 @@ return {
       map("n", "<Esc>", [[:noh | NoiceDismiss<CR>]])
       require('telescope').load_extension('noice')
     end
-  },
-  {
-    "giusgad/pets.nvim",
-    enabled = true,
-    dependencies = { "MunifTanjim/nui.nvim", "giusgad/hologram.nvim" },
-    lazy = false,
-    opts = {}
   },
   {
     "kawre/leetcode.nvim",
@@ -177,6 +169,10 @@ return {
     cmd = 'Messages',
   },
   {
+    "tpope/vim-sleuth",
+    event = "BufEnter"
+  },
+  {
     'tpope/vim-fugitive',
     cmd = {'Git', 'Gedit','Gdiffsplit','Gread','Gwrite','Ggrep','GMove','GDelete','GBrowse'}
   },
@@ -206,44 +202,10 @@ return {
     end
   },
   {
-    'echasnovski/mini.surround',
-    enabled = false,
-    keys = { 'sa', 'sd', 'sr', 'sf', 'sF', 'sh', 'sn' },
-    version = false,
-    config = function()
-      require('mini.surround').setup()
-    end,
-  },
-  {
     'lukas-reineke/indent-blankline.nvim',
-    enabled = false,
-    event = 'VimEnter',
-    config = function()
-      local default = {
-        indentLine_enabled = 1,
-        char = '▏',
-        filetype_exclude = {
-          'help',
-          'terminal',
-          'alpha',
-          'lspinfo',
-          'TelescopePrompt',
-          'TelescopeResults',
-        },
-        buftype_exclude = { 'terminal' },
-        show_trailing_blankline_indent = false,
-        show_first_indent_level = false,
-      }
-      require('indent_blankline').setup(default)
-    end,
-  },
-  {
-    'luukvbaal/statuscol.nvim',
-    enabled = false,
-    event = 'BufRead',
-    config = function()
-      require('statuscol').setup({ setopt = true })
-    end,
+    main = "ibl",
+    event = 'BufEnter',
+    opts = {}
   },
   {
     "cohama/lexima.vim",
@@ -308,7 +270,6 @@ return {
         label = {
           rainbow = {
             enabled = false,
-            -- number between 1 and 9
             shade = 5,
           },
         },
@@ -401,7 +362,8 @@ return {
   },
   {
     'stefandtw/quickfix-reflector.vim',
-    enabled = false, -- NOTE: use my own ~/.config/nvim/plugin/qf_refactor.vim
+    -- NOTE: use my own ~/.config/nvim/plugin/qf_refactor.vim
+    enabled = false,
     -- this plugin conflicts with the above nvim-bqf, it will ca nvim-bqf not working, there is two solutions:
     -- soluction 1: defer the nvim-bqf loading just like above
     -- solution 2: modify the quickfix-reflector.vim init_buffer like below:
@@ -547,22 +509,20 @@ return {
     },
     cmd = 'AsyncRun',
     init = function()
-      local ft_map = require('core.autocmds').ft_map
-      ft_map( 'python', 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)" ', {silent = false})
-      ft_map( {'cpp', 'c'}, 'n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) ./Debug/hello ', {silent = false})
-      vim.cmd [[
-      " automatically open quickfix window when AsyncRun command is executed
-      " set the quickfix window 6 lines height.
-      let g:asyncrun_open = 6
-
-      " ring the bell to notify you job finished
-      let g:asyncrun_bell = 1
-
-      " F10 to toggle quickfix window
-      nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>
-      nnoremap <silent> <F5> :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
-      nnoremap <silent> <F9> :AsyncRun clang++ -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
-      ]]
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = 'python',
+        callback = function()
+          map('n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)" ', {silent = false, buffer = true})
+        end
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {'cpp', 'c'},
+        callback = function()
+          map('n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) ./Debug/hello ', {silent = false, buffer = true})
+        end
+      })
+      vim.g.asyncrun_open = 6
+      vim.g.asyncrun_bell = 1
     end,
   },
   {
@@ -659,9 +619,6 @@ return {
         ['context (xetex)']  = [[-pdf -pdflatex=''texexec --xtx'']],
       }
       vim.g.vimtex_view_method = 'skim'
-      vim.cmd([[
-      let maplocalleader = ","
-      ]])
     end,
   },
   {

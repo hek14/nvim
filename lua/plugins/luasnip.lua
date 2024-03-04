@@ -4,6 +4,15 @@ local map = require("core.utils").map
 local M = {
   "L3MON4D3/LuaSnip",
   event = 'InsertEnter',
+  build = (function()
+    -- Build Step is needed for regex support in snippets
+    -- This step is not supported in many windows environments
+    -- Remove the below condition to re-enable on windows
+    if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
+      return
+    end
+    return 'make install_jsregexp'
+  end)(),
 }
 
 function M.config()
@@ -43,19 +52,13 @@ function M.config()
   local line_breaker = function()
     return ls.t({"",""})
   end
-  map({ "i", "s" }, "<c-y>", function()
-    if ls.expandable() then 
-      ls.expand()
-    end
-  end, { silent = true })
   map({ "i", "s" }, "<c-j>", function()
-    if ls.jumpable(1) then
-      ls.jump(1)
-    else
+    if ls.expand_or_locally_jumpable() then
+      ls.expand_or_jump()
     end
   end, { silent = true })
   map({ "i", "s" }, "<c-k>", function()
-    if ls.jumpable(-1) then
+    if ls.locally_jumpable(-1) then
       ls.jump(-1)
     end
   end, { silent = true })

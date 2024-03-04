@@ -65,8 +65,7 @@ local M = {
           },
         },
       })
-      local au = require('core.autocmds').au
-      au('FileType', {
+      vim.api.nvim_create_autocmd('FileType', {
         callback = function ()
           vim.defer_fn(function ()
             vim.keymap.set('n','e','k',{noremap=true,nowait=true,silent=true,buffer=true})

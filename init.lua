@@ -1,26 +1,30 @@
+-- NOTE:compatiable for 0.10
 if vim.uv then
   vim.loop = vim.uv
 end
-local modules = {
-  'core.options',
-  'core.autocmds',
-  'core.lazy',
-  'core.keymap',
-  'core.gui',
-  'scratch.repl',
-  -- 'contrib.indent'
-  -- 'contrib.statusline'
-}
 
-for _, module in ipairs(modules) do
-  require(module)
-end
+require'core.options'
+require'core.autocmds'
+require'core.lazy'
+require'core.keymap'
+require'core.gui'
 
-vim.loader.disable()
+--[[
+Some hacking scripts of this config
 
-_G.treesitter_job = require('scratch.bridge_ts_parse')
-treesitter_job:batch(1)
--- TODO: python repl follow the current buffer? continue to develop ~/.config/nvim/lua/scratch/repl.lua
--- TODO: don't spawn the quickfix window in vimtex when there is only warning.
--- TODO: from git chunks to skim/zathura pdf highlights notations, applescript?
--- TODO: write visual model @: repeat #selected_lines times(use utils.get_line), begin at the `[
+  - lua/scratch/bridge_ts_parse.lua
+    use another backend neovim process to do heavy treesitter stuff asynchronously.
+    To enable it:
+      _G.treesitter_job = require('scratch.bridge_ts_parse')
+      treesitter_job:batch(1)
+
+  - lua/scratch/repl.lua
+    send current line to repl, including python, lua, r, rust, etc.
+
+  - lua/contrib/statusline
+    my own statusline
+
+  - lua/scratch/job_util.lua
+    wrapper of the native vim.fn.jobstart
+
+--]]

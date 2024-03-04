@@ -1,90 +1,89 @@
-local opt = vim.opt
-local g = vim.g
-
-local os_name = vim.loop.os_uname().sysname
+_G.os_name = vim.loop.os_uname().sysname
 _G.is_mac = os_name == 'Darwin'
 _G.is_linux = os_name == 'Linux'
 _G.is_windows = os_name == 'Windows'
-_G.diagnostic_choice = "telescope" -- telescope or Trouble
 
-local clippy_found = vim.fn.executable("clippy")==1
+vim.g.mapleader = " "
+vim.g.maplocalleader = ','
 
-opt.laststatus = 3
-opt.title = true
-opt.clipboard = clippy_found and "unnamedplus" or ""
-g.clipboard = {
-  name = 'ClippyRemoteClipboard',
-  copy = {
-    ['+'] = 'clippy set',
-    ['*'] = 'clippy set',
-  },
-  paste= {
-    ['+'] = 'clippy get',
-    ['*'] = 'clippy get',
-  },
-  cache_enabled= 0,
-}
+vim.opt.laststatus = 3
+vim.opt.showmode = false
+vim.opt.title = true
 
-opt.cmdheight = 1
-opt.cul = true -- cursor line
+vim.opt.clipboard = "unnamedplus"
+if vim.fn.executable("clippy")==1 then
+  vim.g.clipboard = {
+    name = 'ClippyRemoteClipboard',
+    copy = {
+      ['+'] = 'clippy set',
+      ['*'] = 'clippy set',
+    },
+    paste= {
+      ['+'] = 'clippy get',
+      ['*'] = 'clippy get',
+    },
+    cache_enabled= 0,
+  }
+end
+
+vim.opt.cmdheight = 1
+vim.opt.cul = true -- cursor line
 
 -- Indentline
-opt.expandtab = true
-opt.shiftwidth = 2
-opt.smartindent = true
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+vim.opt.smartindent = true
 
 -- disable tilde on end of buffer: https://github.com/neovim/neovim/pull/8546#issuecomment-643643758
-opt.fillchars = { eob = " " }
+vim.opt.fillchars = { eob = " " }
 
-opt.hidden = true
-opt.ignorecase = true
-opt.smartcase = true
-opt.mouse = "a"
+vim.opt.hidden = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.mouse = "a"
 
 -- Numbers
-opt.number = true
-opt.relativenumber = false
-opt.numberwidth = 2
-opt.ruler = false
+vim.opt.number = true
+vim.opt.relativenumber = false
+vim.opt.numberwidth = 2
+vim.opt.ruler = false
 
 -- disable nvim intro
-opt.shortmess:append "sI"
-opt.shortmess:append "c"
+vim.opt.shortmess:append "sI"
+vim.opt.shortmess:append "c"
 
-opt.signcolumn = "yes"
-opt.splitbelow = true
-opt.splitright = true
-opt.tabstop = 8
-opt.termguicolors = true
-opt.timeoutlen = 400
-opt.undofile = true
-
-opt.listchars:append("space:⋅")
-opt.listchars:append("eol:↴")
-opt.listchars:append("tab:↹ ")
+vim.opt.signcolumn = "yes"
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.tabstop = 8
+vim.opt.termguicolors = true
+vim.opt.timeoutlen = 400
+vim.opt.undofile = true
 
 -- interval for writing swap file to disk, also used by gitsigns
-opt.updatetime = 750
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
 
 -- go to previous/next line with h,l,left arrow and right arrow
 -- when cursor reaches end/beginning of line
-opt.whichwrap:append "<>[]hl"
+vim.opt.whichwrap:append "<>[]hl"
 
 -- wrap to `textwidth`
-opt.wrap = false
+vim.opt.wrap = false
 
 -- indent: needed by ufo
 -- opt.foldcolumn = '1'
-opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
-opt.foldlevelstart = -1
-opt.foldenable = true
-opt.foldmethod = 'indent'
-opt.foldexpr = nil
+vim.opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.opt.foldlevelstart = -1
+vim.opt.foldenable = true
+vim.opt.foldmethod = 'indent'
+vim.opt.foldexpr = nil
 
 -- for nvim-cmp
-opt.completeopt = { "menu", "menuone", "noselect" }
+vim.opt.completeopt = { "menu", "menuone", "noselect" }
 
-opt.listchars = {
+vim.opt.list = true
+vim.opt.listchars = {
     -- tab = "⇥ ",
     tab = "  ",
     -- leadmultispace = "┊ ",
@@ -97,5 +96,20 @@ opt.listchars = {
     space = " ",
 }
 
-g.mapleader = " "
+-- or use append
+vim.opt.listchars:append("space:⋅")
+vim.opt.listchars:append("eol:↴")
+vim.opt.listchars:append("tab:↹ ")
+
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = 'split'
+
+-- Show which line your cursor is on
+vim.opt.cursorline = true
+
+-- Minimal number of screen lines to keep above and below the cursor.
+vim.opt.scrolloff = 10
+
+vim.opt.hlsearch = true
+
 vim.env['PATH'] = vim.fn.stdpath('config') .. '/bin:' .. vim.env['PATH']

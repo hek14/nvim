@@ -40,57 +40,10 @@ function M.peek_type(cursor)
   end)
 end
 
-function M.Smart_goto_definition()
-  local bufnr = vim.fn.bufnr()
-  vim.cmd [[normal! m`]]
-  require('contrib.pig').async_fn({
-    label = 'definition',
-    fallback = function()
-      print('using fallback, dumb goto definition')
-      require'nvim-treesitter-refactor.navigation'.goto_definition(bufnr,
-      function()
-        vim.cmd [[normal! gd]] -- dumb goto definition
-      end)
-    end
-  })
-end
-
-function M.definition_in_split()
-  if vim.fn.winnr('$')<4 then
-    if vim.fn.winwidth(0) < 120 then
-      vim.cmd[[split]]
-    else
-      vim.cmd[[vsplit]]
-    end
-  end
-  vim.lsp.buf.definition() -- built-in lsp
-  -- vim.cmd [[exe "normal \<Plug>(coc-definition)"]] -- or coc
-end
-
-function M.Smart_goto_next_ref(index)
-  local bufnr = vim.fn.bufnr()
-  -- vim.cmd [[normal! m`]] -- mark it inner the function, just before the jump
-  require('contrib.pig').async_fn({
-    label = 'next_reference',
-    index = index, 
-    fallback = function()
-      print('using fallback')
-      if index > 0 then
-        require"illuminate".next_reference()
-        -- require'nvim-treesitter-refactor.navigation'.goto_next_usage()
-      else
-        require"illuminate".next_reference({reverse=true})
-        -- require'nvim-treesitter-refactor.navigation'.goto_previous_usage()
-      end
-    end
-  })
-end
-
 -- NOTE: refer to https://github.com/lucasvianav/nvim
 function M.show_documentation()
   if vim.tbl_contains({ 'vim', 'help' }, vim.o.filetype) then
     local has_docs = pcall(vim.api.nvim_command, 'help ' .. vim.fn.expand('<cword>'))
-
     if not has_docs then
       vim.lsp.buf.hover()
     end
@@ -117,66 +70,29 @@ function M.setup(client,bufnr)
     end
   end,{})
 
-  buf_set_keymap('n', "<leader>dt","<Cmd>lua require('contrib.my_diagnostic').toggle_line_diagnostic()<CR>")
-  buf_set_keymap("n", "<leader>gd","<cmd>lua require('telescope.builtin').lsp_definitions()<CR>")
-  buf_set_keymap("n", "<leader>gr","<cmd>Lspsaga lsp_finder<CR>")
-  -- buf_set_keymap("n", "gd", "", {callback = M.Smart_goto_definition})
-  -- buf_set_keymap("n", "gd", "<cmd>Lspsaga peek_definition<CR>")
-  buf_set_keymap("n", "gd", ":<C-u>vsp | lua vim.lsp.buf.definition()<CR>")
-  buf_set_keymap("n", "gk", "", {callback = M.peek_type})
-  buf_set_keymap("n", "gD", "", {callback = M.definition_in_split})
-  -- buf_set_keymap("n", "gr","",{callback = function ()
-  --   require('contrib.pig').async_fn({
-  --     label = 'reference'
-  --   })
-  -- end})
-  buf_set_keymap("n", "gy", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
-  buf_set_keymap("n", "gr",function ()
-    vim.cmd [[Telescope lsp_references]]
-    -- require('scratch.my_lsp_symbols').references()
-    -- require('telescope.builtin').lsp_references()
-  end,map_opts)
-  -- buf_set_keymap("n", "gt","<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>",map_opts)
-  buf_set_keymap("n", "gt",function ()
-    require('scratch.my_lsp_symbols').lsp_symbols()
-  end,map_opts)
-  buf_set_keymap("n", "<leader>gt","<cmd>Telescope lsp_dynamic_workspace_symbols<CR>",map_opts)
-  buf_set_keymap("n", "<leader>ca","<cmd>lua vim.lsp.buf.code_action()<CR>",map_opts)
-  buf_set_keymap("n", "gl","<cmd>lua vim.diagnostic.open_float()<CR>",map_opts)
-  buf_set_keymap("n", "<leader>D","<cmd>TroubleToggle document_diagnostics<CR>",map_opts)
-  -- buf_set_keymap("n", "<leader>,", "<cmd>lua vim.lsp.buf.document_highlight()<CR>",map_opts)
-  -- buf_set_keymap("n", "<leader>.", "<cmd>lua vim.lsp.buf.clear_references()<CR>",map_opts)
-  buf_set_keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>",map_opts)
-  buf_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>",map_opts)
-  buf_set_keymap("n", "<C-g>r", "", {callback = function()
-    M.Smart_goto_next_ref(0)
-  end})
-  buf_set_keymap("n", "[r", "", {callback = function()
-    M.Smart_goto_next_ref(-1)
-  end})
-  buf_set_keymap("n", "]r", "", {callback = function()
-    M.Smart_goto_next_ref(1)
-  end})
-  -- buf_set_keymap("n", "[r", "<cmd>lua require'illuminate'.goto_prev_reference()<CR>",map_opts)
-  -- buf_set_keymap("n", "]r", "<cmd>lua require'illuminate'.goto_next_reference()<CR>",map_opts)
-  -- buf_set_keymap("n", "[r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",map_opts)
-  -- buf_set_keymap("n", "]r", "<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_previous_usage()<CR>",map_opts)
-  buf_set_keymap("n", "<C-k>","<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
-  -- buf_set_keymap("i", "<C-k>","<cmd>lua vim.lsp.buf.signature_help()<CR>", map_opts)
-  buf_set_keymap("n", "<leader>rn","",vim.tbl_deep_extend('force',map_opts,{callback=function()
-    require('contrib.pig').rename()
-  end}))
-  -- buf_set_keymap("n", "<leader>wa","<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",map_opts)
-  buf_set_keymap("n", "<leader>wr","<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>",map_opts)
-  buf_set_keymap("n", "<leader>wl","<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",map_opts)
-  buf_set_keymap("n", "K", "N", map_opts)
-  buf_set_keymap("n", "E", "", {callback = M.show_documentation})
-  buf_set_keymap("n", "<leader>fm","<cmd>lua vim.lsp.buf.format()<CR>", map_opts)
-  buf_set_keymap("n", "<leader>[r","<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_previous_usage()<CR>",map_opts)
-  buf_set_keymap("n", "<leader>]r","<cmd>lua require'nvim-treesitter-refactor.navigation'.goto_next_usage()<CR>",map_opts)
-  buf_set_keymap('n', 'gi',"<cmd>lua vim.lsp.buf.incoming_calls()<CR>",map_opts)
-  buf_set_keymap('n', 'go',"<cmd>lua vim.lsp.buf.outgoing_calls()<CR>",map_opts)
-  -- buf_set_keymap('n', '<C-b>',"",vim.tbl_deep_extend('force',map_opts,{callback = require('contrib.lsp_utils').scroll_docs_to_up('<C-b>')}))
-  -- buf_set_keymap('n', '<C-f>',"",vim.tbl_deep_extend('force',map_opts,{callback = require('contrib.lsp_utils').scroll_docs_to_down('<C-f>')}))
+  buf_set_keymap('n', "<leader>dt",require('contrib.my_diagnostic').toggle_line_diagnostic)
+  buf_set_keymap("n", "<leader>gd",require('telescope.builtin').lsp_definitions)
+  buf_set_keymap("n", "gd", vim.lsp.buf.definition)
+  buf_set_keymap("n", "gk", M.peek_type)
+  buf_set_keymap("n", "gD", vim.lsp.buf.declaration)
+  buf_set_keymap("n", "gy", vim.lsp.buf.type_definition)
+  buf_set_keymap("n", "gr", require('telescope.builtin').lsp_references)
+  buf_set_keymap("n", "gt", require('telescope.builtin').lsp_document_symbols)
+  buf_set_keymap("n", "<leader>gt","<cmd>Telescope lsp_dynamic_workspace_symbols<CR>")
+  buf_set_keymap("n", "<leader>D","<cmd>TroubleToggle document_diagnostics<CR>")
+  buf_set_keymap("n", "<leader>ca",vim.lsp.buf.code_action)
+  buf_set_keymap("n", "gl",vim.diagnostic.open_float)
+  buf_set_keymap("n", "[d", vim.diagnostic.goto_prev)
+  buf_set_keymap("n", "]d", vim.diagnostic.goto_next)
+  buf_set_keymap("n", "[r", require'illuminate'.goto_prev_reference)
+  buf_set_keymap("n", "]r", require'illuminate'.goto_next_reference)
+  buf_set_keymap("n", "<C-k>",vim.lsp.buf.signature_help)
+  buf_set_keymap("n", "<leader>rn", vim.lsp.buf.rename)
+  buf_set_keymap("n", "E", M.show_documentation)
+  buf_set_keymap("n", "<leader>fm",vim.lsp.buf.format)
+  buf_set_keymap("n", "<leader>[r",require'nvim-treesitter-refactor.navigation'.goto_previous_usage)
+  buf_set_keymap("n", "<leader>]r",require'nvim-treesitter-refactor.navigation'.goto_next_usage)
+  buf_set_keymap('n', 'gi',vim.lsp.buf.incoming_calls)
+  buf_set_keymap('n', 'go',vim.lsp.buf.outgoing_calls)
 end
 return M

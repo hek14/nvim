@@ -1,10 +1,4 @@
-local ft_map = require("core.autocmds").ft_map
-
-local utils = require "core.utils"
-
-local map = utils.map
-
-local cmd = vim.cmd
+local map = require("core.utils").map
 
 -- these mappings will only be called during initialization
 local colemak = function ()
@@ -24,7 +18,6 @@ local colemak = function ()
 end
 
 local function others()
-  -- map("i","<C-d>","<Del>")
   map('n','<C-j>','J',{noremap=true})
   vim.api.nvim_create_user_command('ProfileStart',function()
     local file = vim.fn.input("Log file: ","nvim_log.txt")
@@ -36,7 +29,6 @@ local function others()
     vim.cmd [[profile pause]]
     vim.cmd [[wa | qa]]
   end,{})
-  -- map({'n','x'},'<leader>ss',require('core.utils').range_search)
   -- Don't copy the replaced text after pasting in visual mode
   map("v", "p", "p:let @+=@0<CR>")
   map("n", "g/", [[<Cmd>execute "match Visual /" . @/ . "/"<CR>]])
@@ -46,10 +38,8 @@ local function others()
   -- http://www.reddit.com/r/vim/comments/2k4cbr/problem_with_gj_and_gk/
   -- empty mode is same as using :map
   -- also don't use g[j|k] when in operator pending mode, so it doesn't alter d, y or c behaviour
-  -- map({ "n", "x", "o" }, "j", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
-  -- map({ "n", "x", "o" }, "k", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
-  map("n", "<Down>", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true })
-  map("n", "<Up>", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true })
+  map({ "n", "x", "o" }, "n", 'v:count || mode(1)[0:1] == "no" ? "j" : "gj"', { expr = true, noremap = true })
+  map({ "n", "x", "o" }, "e", 'v:count || mode(1)[0:1] == "no" ? "k" : "gk"', { expr = true, noremap = true })
 
   -- don't yank text on cut ( x )
   -- map({ "n", "v" }, "x", '"_x')
@@ -58,18 +48,19 @@ local function others()
   -- map({ "n", "v" }, "d", '"_d')
 
   -- navigation within insert mode
+  map("i","<C-d>","<Del>")
+  map("i","<C-h>","<Backspace>")
   map("i", "<C-b>", "<Left>")
   map("i", "<C-f>", "<Right>")
   map("i", "<C-a>", "<ESC>^i")
   map("i", "<C-e>", "<End>")
   map("i", "<C-n>", "<Down>")
   map("i", "<C-p>", "<Up>")
+  -- map("i", "<C-n>", "<C-O>o",{noremap = true})
+  -- map("i", "<C-e>", "<C-O>O",{noremap = true})
 
   map("n", ',s',require('core.utils').ScopeSearch)
-  map("x", ',s',require('core.utils').ScopeSearch)
-
-  map("n", "<leadr>ts", [[ :keeppatterns<Bar>:%s/\s\+$//e<CR> ]] )
-  cmd [[ command! DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]
+  vim.cmd [[ command! DeleteTrailSpace keeppatterns<Bar>%s/\s\+$//e<Bar>noh ]]
   map("n", "<space>", "<Nop>", {noremap = true, silent = true})
   map("n", "<leader>cd", [[<cmd>lua require('core.utils').smart_current_dir()<cr>]], {silent = false}) -- example to delete the buffer
   map("n", "<F1>", "<Tab>", {noremap=true}) -- because I set <Ctrl-I> to send the same escape bytes as <F1>, so <Tab>/<Ctrl-I> can be used with this keymap
@@ -101,7 +92,6 @@ local function others()
   map("n", "<Down>", "5<C-w>-")
   map("n", "<left>", "5<C-w><")
   map("n", "<right>", "5<C-w>>")
-  -- map("n", "<C-q>", [[:noh <Bar> :lua require('core.utils').close_float_window()<CR>]])
   map("n", "<C-q>", function()
     vim.cmd("noh")
     require('core.utils').close_float_window()
@@ -155,14 +145,10 @@ local function others()
       end
     else
       vim.cmd [[ Messages ]]
-    end   
+    end
   end)
 
-  ft_map({'lua','vim'}, "n", "<leader>so", "<Cmd>lua require('core.utils').source_curr_file()<cr>")
   map("n",",q",":<C-u>cq 55<CR>")
-
-  -- map("i", "<C-n>", "<C-O>o",{noremap = true})
-  -- map("i", "<C-e>", "<C-O>O",{noremap = true})
 
   map("n", "N","mzJ`z")
   -- map("n", "k","nzzzv")
@@ -187,8 +173,6 @@ local function others()
       end)
     end
   end,{expr=true,silent=false})-- NOTE: should specify silent=false, because we need the cmdline to be appeared for <Left>
-  map("n",'<leader>rr',require('contrib.my_better_substitute').my_better_substitute)
-  -- line line_start line_end
 
   map("s","A","<Esc>A")
   map("s","U","<Esc>i")
@@ -216,8 +200,6 @@ local function others()
   -- map("c", '<C-b>','<Left>')
   map("c", '<C-p>','<Up>')
   map("c", '<C-n>','<Down>')
-  -- NOTE: <C-g> and <C-t> to forward and backward when search
-  -- ft_map("python",'n','<leader>p',[[:lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>]])
   map("n","<leader>p",":lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>",{silent=false})
 
   map("x", "ul", "g_o^")
@@ -271,8 +253,6 @@ local function others()
   map("n", "I","g_")
   map("x", "H","^")
   map("x", "I","g_")
-  -- map("n", "n","gj")
-  -- map("n", "e","gk")
 end
 
 colemak()

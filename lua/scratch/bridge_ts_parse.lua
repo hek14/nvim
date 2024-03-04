@@ -280,4 +280,11 @@ function M:with_output(cb,ratio)
   return cancel -- NOTE: just like lsp buf_request return value, you can cancel the cb call using `cancel`
 end
 
+
+vim.api.nvim_create_autocmd('VimLeavePre',{
+  callback = function ()
+    require('scratch.bridge_ts_parse'):kill_all()
+  end
+})
+
 return M

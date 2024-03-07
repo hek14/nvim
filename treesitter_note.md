@@ -76,6 +76,7 @@ for capture_ID, node, metadata in query:iter_captures(tree:root(), bufnr, first,
    local name = query.captures[capture_ID] -- name of the capture in the query
    local type = node:type() -- type of the captured node
    local row1, col1, row2, col2 = node:range() -- range of the capture
+   -- NOTE:if you want node:range() return a table, you should: `local t = {node:range()}`
 end
 ```
 # others

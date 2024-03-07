@@ -56,7 +56,7 @@ local class_generic_query_string = [[
           parameters: (parameters) @params)))
 ]]
 
-function M.goto_python_main(buffer)
+function M.goto_main(buffer)
   local buffer = buffer or vim.api.nvim_get_current_buf()
   local query = [[
 (if_statement 

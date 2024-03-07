@@ -8,4 +8,4 @@ vim.opt_local.smarttab = true
 vim.opt_local.softtabstop = 4
 vim.opt_local.tabstop = 4
 
-vim.keymap.set("n","gm","<Cmd>lua require('contrib.treesitter.python').goto_python_main()<CR>",{buffer=true})
+vim.keymap.set("n","gm",require('contrib.treesitter.python').goto_main,{buffer=true})

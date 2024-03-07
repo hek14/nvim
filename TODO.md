@@ -1,5 +1,4 @@
 # TODO: 
-- C++ printf luasnip node: 利用lsp symbols查看数据类型, integer -> %d, char -> %c
 - job_util: 封装成UI和copy
 - resume-layout.nvim: 看看哪一些event会change window layout, 用gpt4辅助写:
 1. 四组events需要insert hook，定义记录的data formats

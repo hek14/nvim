@@ -29,6 +29,9 @@ local function others()
     vim.cmd [[profile pause]]
     vim.cmd [[wa | qa]]
   end,{})
+  vim.api.nvim_create_user_command('CommentPrintCurrentScope', function()
+    require("contrib.treesitter.comment_print").comment_print_in_current_scope()
+  end,{})
   -- Don't copy the replaced text after pasting in visual mode
   map("v", "p", "p:let @+=@0<CR>")
   map("n", "g/", [[<Cmd>execute "match Visual /" . @/ . "/"<CR>]])

@@ -52,16 +52,27 @@ function M.config()
   local line_breaker = function()
     return ls.t({"",""})
   end
+
+  local function feedkeys(key, mode)
+    local keycode = vim.api.nvim_replace_termcodes(key, true, false, true)
+    vim.api.nvim_feedkeys(keycode, mode, false)
+  end
+
   map({ "i", "s" }, "<c-j>", function()
     if ls.expand_or_locally_jumpable() then
       ls.expand_or_jump()
+    else
+      feedkeys("<C-o>J", "n")
     end
-  end, { silent = true })
+  end)
+
   map({ "i", "s" }, "<c-k>", function()
     if ls.locally_jumpable(-1) then
       ls.jump(-1)
+    else
+      feedkeys("<C-o>C", "n")
     end
-  end, { silent = true })
+  end)
   map({"i","s"}, "<c-l>", function()
     if ls.choice_active() then
       ls.change_choice(1)

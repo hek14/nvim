@@ -138,7 +138,7 @@ return {
     end,
   },
   {
-    'hek14/vim-cmake',
+    'cdelledonne/vim-cmake',
     ft = {'c', 'cpp'},
     init = function()
       vim.g.cmake_link_compile_commands = 1
@@ -628,30 +628,6 @@ return {
       vim.g['grammarous#languagetool_cmd'] = 'languagetool -l en-US'
     end,
   },
-  -- {
-  --   'bfredl/nvim-luadev',
-  --   cmd = 'Luadev',
-  --   keys = {
-  --     '<Plug>(Luadev-RunLine)',
-  --     '<Plug>(Luadev-Run)',
-  --     '<Plug>(Luadev-RunWord)',
-  --     '<Plug>(Luadev-Complete)',
-  --   },
-  --   init = function()
-  --     map('n', '<C-x>l', '<Plug>(Luadev-RunLine)', { remap = true })
-  --     map('n', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
-  --     map('x', '<C-x>r', '<Plug>(Luadev-Run)', { remap = true })
-  --     map('n', '<C-x>w', '<Plug>(Luadev-RunWord)', { remap = true })
-  --     map('i', '<C-x>c', '<Plug>(Luadev-Complete)', { remap = true })
-  --   end,
-  -- },
-  -- {
-  --   'glepnir/nerdicons.nvim',
-  --   cmd = 'NerdIcons',
-  --   config = function()
-  --     require('nerdicons').setup({})
-  --   end,
-  -- },
   -- {
   --   'norcalli/nvim-colorizer.lua',
   --   cmd = 'ColorizerToggle',

@@ -426,6 +426,32 @@ M.stringSplit = function(inputstr, sep)
   end
 end
 
+local escape_pattern = function(text)
+  return vim.fn.escape(text, '\\/.$^~[]')
+end
+
+M.GetCwordInfo = function()
+  local node = vim.treesitter.get_node()
+  local text = nil
+  local range = nil
+  if node then
+    local srow, scol, erow, ecol = node:range()
+    text = vim.treesitter.get_node_text(node, vim.fn.bufnr())
+    range = {scol, ecol}
+  else
+    local old_cursor = vim.api.nvim_win_get_cursor(0) -- Save current cursor position
+    local line = vim.api.nvim_get_current_line()
+    local row, col = unpack(old_cursor)
+    local _, scol = unpack(vim.fn.searchpos('\\<', 'bW'))
+    local _, ecol = unpack(vim.fn.searchpos('\\>', 'W'))
+    text = string.sub(line, scol, ecol-1)
+    range = {scol, ecol}
+    vim.api.nvim_win_set_cursor(0, old_cursor)
+  end
+  return {text=text, range=range}
+end
+
+
 M.preview_qf = function ()
   local qflist = vim.fn.getqflist()
   local curr = vim.api.nvim_win_get_cursor(0)

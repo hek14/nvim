@@ -1,6 +1,16 @@
 # reference
-- refer: https://www.youtube.com/watch?v=86sgKa0jeO4&ab_channel=s1n7ax
-- refer: https://github.com/s1n7ax/youtube-neovim-treesitter-query
+- https://www.youtube.com/watch?v=86sgKa0jeO4&ab_channel=s1n7ax
+- https://www.youtube.com/watch?v=09-9LltqWLY
+- https://github.com/s1n7ax/youtube-neovim-treesitter-query
+
+# what is a "capture"?
+- see `/Users/hk/github/nvim-treesitter/queries/lua/highlights.scm` for example
+- 一个位置可能同时match多个结构(pattern), 而且不同的scm文件会定义自己的patterns,
+每一个匹配会给当前位置一个capture(就是@符号后面的name), 比方`@field`, `@variable`
+这就是capture
+- capture能用来干什么？比方说能用来高亮: `:highlight @function`中的 `@function` 就是
+treesitter的capture，如果你在`~/.config/nvim/queries/python/highlights.scm`:
+定义`(integer) @function`那么你就能改变integer的高亮，从number的样式变成function的样式
 
 # 以comment为例写highlight match
 这里匹配了所有含有`@...`的comment
@@ -81,10 +91,4 @@ end
 ```
 # others
 - `vim.treesitter.get_captures_at_pos(bufnr, row, col)` to get the capture information
-what is capture???
-see `/Users/hk/github/nvim-treesitter/queries/lua/highlights.scm` for example
-一个位置可能同时match多个结构(pattern), 而且不同的scm文件会定义自己的patterns,
-每一个匹配会给当前位置一个capture(就是@符号后面的name), 比方`@field`, `@variable`
-这就是capture
-
 - `require('nvim-treesitter.parsers').ft_to_lang`

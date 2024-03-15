@@ -11,6 +11,7 @@ local override_hl = function ()
   hi! link StatusRight StatusLine
   hi! link StatusMid StatusLine
   hi! Gray guifg=#52504c
+  hi! WinSeparator guibg=#4d5461 ctermbg=238
   ]])
 end
 
@@ -61,6 +62,7 @@ local kanagawa = {
   config = function ()
     require('kanagawa').setup()
     vim.cmd [[ colorscheme kanagawa ]]
+    override_hl()
   end
 }
 

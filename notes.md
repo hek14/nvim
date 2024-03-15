@@ -1,6 +1,10 @@
 # solve error: `treesitter_query parse error at xxx structure`
-删除`/usr/local/lib/nvim/parser/*.so`
+删除`/usr/local/lib/nvim/parser/query.so`
 用`nvim-treesitter`去`TSIntall` all of the parsers
+
+# solve vimdoc error: 发生在`:help xxx`打开文档时
+方法也是删除`/usr/local/lib/nvim/parser/vimdoc.so`
+然后`TSInstall vimdoc`
 
 # in nvim's terminal, the recipe for edit files in current nvim instance
 `nvr --remote FILE_NAME`

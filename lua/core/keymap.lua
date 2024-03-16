@@ -34,11 +34,11 @@ local function others()
   end,{})
   vim.api.nvim_create_user_command('SaveLayout', function()
     local data = require("scratch.restore_layout.save_layout").get_layout()
-    vim.notify(string.format("Layout: %d windows", #data), vim.log.levels.INFO)
+    vim.notify(string.format("Layout: %d windows", #data.wins), vim.log.levels.INFO)
     _G.data = data
   end,{})
   vim.api.nvim_create_user_command('RestoreLayout', function()
-    require("scratch.restore_layout.restore_layout").restore(_G.data)
+    require("scratch.restore_layout.restore_layout").restore(vim.deepcopy(_G.data))
   end,{})
   -- Don't copy the replaced text after pasting in visual mode
   map("v", "p", "p:let @+=@0<CR>")

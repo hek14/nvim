@@ -1,5 +1,6 @@
 local M = {
   "akinsho/bufferline.nvim",
+  enabled = true,
   version = '*',
   event = 'VimEnter',
   init = function()

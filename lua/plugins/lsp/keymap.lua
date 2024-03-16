@@ -40,6 +40,25 @@ function M.peek_type(cursor)
   end)
 end
 
+
+local function gotoDefinitionInVerticalSplit()
+    -- Save the original handler for 'textDocument/definition'
+    local original_handler = vim.lsp.handlers['textDocument/definition']
+
+    -- Set a custom handler for 'textDocument/definition'
+    vim.lsp.handlers['textDocument/definition'] = function(err, result, ctx, config)
+        if err or (not result or vim.tbl_isempty(result)) then
+            vim.notify("No Definition!",vim.log.levels.WARN)
+            return
+        end
+        vim.cmd('vsplit')
+        original_handler(err, result, ctx, config)
+    end
+    vim.lsp.buf.definition()
+
+    vim.lsp.handlers['textDocument/definition'] = original_handler
+end
+
 -- NOTE: refer to https://github.com/lucasvianav/nvim
 function M.show_documentation()
   if vim.tbl_contains({ 'vim', 'help' }, vim.o.filetype) then
@@ -71,7 +90,7 @@ function M.setup(client,bufnr)
   end,{})
 
   buf_set_keymap('n', "<leader>dt",require('contrib.my_diagnostic').toggle_line_diagnostic)
-  buf_set_keymap("n", "<leader>gd",require('telescope.builtin').lsp_definitions)
+  buf_set_keymap("n", "<leader>gd",gotoDefinitionInVerticalSplit)
   buf_set_keymap("n", "gd", vim.lsp.buf.definition)
   buf_set_keymap("n", "gk", M.peek_type)
   buf_set_keymap("n", "gD", vim.lsp.buf.declaration)

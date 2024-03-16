@@ -135,10 +135,12 @@ local function set_win_file(data)
         if(winnr == data.current_winnr) then
             final_win = winId
         end
+
+        vim.api.nvim_win_set_cursor(winId, data[i].cursor)
+
     end
     assert(final_win, "final_win is nil!")
     vim.api.nvim_set_current_win(final_win)
-    vim.api.nvim_win_set_cursor(final_win, data.current_cursor)
 end
 
 local restore_layout = function(data)

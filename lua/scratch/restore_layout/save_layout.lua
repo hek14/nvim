@@ -15,7 +15,7 @@ function M.get_layout()
         local file = vim.api.nvim_buf_get_name(bufnr)
         local config = vim.api.nvim_win_get_config(winId)
         config = vim.tbl_deep_extend("force", config, {winnr = winnr, x = pos[2], y = pos[1], isleaf = false, file = file})
-        if(config.focusable) then
+        if(config.focusable and config.relative == "") then -- NOTE:ignore the floating windows and buffers that don't attach to files
           table.insert(layoutInfo, config)
         end
     end

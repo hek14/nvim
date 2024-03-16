@@ -23,5 +23,4 @@ function M.get_layout()
     layoutInfo.current_cursor = cursor
     return layoutInfo
 end
-_G.data = M.get_layout()
 return M

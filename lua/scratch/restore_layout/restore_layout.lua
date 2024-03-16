@@ -1,5 +1,3 @@
-local stk = require("contrib.stack"):new()
-
 local function match(win1, win2)
     if(win1.x == win2.x and win1.width == win2.width) then
         return true
@@ -45,13 +43,13 @@ local function merge(win1, win2)
     return res
 end
 
-local function build_layout_tree()
-    for i,win in ipairs(_G.data) do 
+local function build_layout_tree(data, stk)
+    for _,win in ipairs(data) do
         -- vim.print(string.format("current: %d %s", i, vim.inspect(stk.items)))
         while(not stk:empty() and match(win, stk:top())) do
-            win2 = stk:top()
+            local win2 = stk:top()
             stk:pop()
-            res = merge(win2, win)
+            local res = merge(win2, win)
             if res == nil then
                 -- print(string.format("fail %d %d", win.winnr, win2.winnr))
                 break
@@ -65,14 +63,13 @@ local function build_layout_tree()
 end
 
 
-function winnr_to_winid(winnr)
+local function winnr_to_winid(winnr)
     local windows = vim.api.nvim_tabpage_list_wins(0)
     for _, winid in ipairs(windows) do
         if vim.api.nvim_win_get_number(winid) == winnr then
             return winid
         end
     end
-    
     return nil
 end
 
@@ -102,6 +99,11 @@ local bfs_layout_tree = function(root)
         vim.api.nvim_set_current_win(t.winid)
         assert(t.childs and #t.childs > 0, "Error in queue!")
         local new_id = vim.api.nvim_open_win(0, false, {split = t.method == "vsplit" and "right" or "below"})
+        if t.method == "vsplit" then
+            vim.api.nvim_win_set_config(new_id, {width = t.meta[2]})
+        else
+            vim.api.nvim_win_set_config(new_id, {height = t.meta[2]})
+        end
 
         local c1 = t.childs[1]
         c1.winid = t.winid
@@ -120,32 +122,37 @@ local bfs_layout_tree = function(root)
     end
 end
 
-local function set_win_file()
+local function set_win_file(data)
     local windows = vim.api.nvim_tabpage_list_wins(0)
-    assert(#windows == #_G.data, "Length not equal")
+    assert(#windows == #data, "Length not equal")
     local final_win = nil
     for i, winId in ipairs(windows) do
         local winnr = vim.api.nvim_win_get_number(winId)
-        assert (_G.data[i].winnr == winnr)
-        local file = _G.data[i].file
+        assert (data[i].winnr == winnr)
+        local file = data[i].file
         local bufnr = vim.fn.bufadd(file) -- TODO:if the buffer does not attach to any file, like NvimTree, need to hand these
         vim.api.nvim_win_set_buf(winId, bufnr)
-        if(winnr == _G.data.current_winnr) then
+        vim.api.nvim_buf_set_option(bufnr, "buflisted", true)
+
+        if(winnr == data.current_winnr) then
             final_win = winId
         end
     end
     assert(final_win, "final_win is nil!")
     vim.api.nvim_set_current_win(final_win)
-    vim.api.nvim_win_set_cursor(final_win, _G.data.current_cursor)
+    vim.api.nvim_win_set_cursor(final_win, data.current_cursor)
 end
 
-local restore_layout = function()
-    build_layout_tree()
+local restore_layout = function(data)
+    local stk = require("contrib.stack"):new()
+    build_layout_tree(data, stk)
     assert(stk:size() == 1, "stk size error")
     local root = stk:top()
     stk:pop()
     bfs_layout_tree(root)
-    set_win_file()
+    set_win_file(data)
 end
 
-restore_layout()
+return {
+    restore = restore_layout
+}

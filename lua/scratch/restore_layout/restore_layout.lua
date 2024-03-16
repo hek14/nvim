@@ -12,32 +12,26 @@ local function swapTables(t1, t2)
     return t2, t1
 end
 
-local function merge(win1, win2)
+local function merge(old_win, new_win)
     local res = nil
-    if(win1.x == win2.x and win1.width == win2.width) then
-        if(win1.y > win2.y) then
-            win1, win2 = swapTables(win1, win2)
-        end
-        res = vim.deepcopy(win1)
-        res.height = win1.height + win2.height + 1
+    if(old_win.x == new_win.x and old_win.width == new_win.width) then
+        res = vim.deepcopy(old_win)
+        res.height = old_win.height + new_win.height + 1 -- NOTE: 1 for the window separator
         res.split = "unknown"
         res.method = "split"
-        res.meta = {win1.height, win2.height}
-        res.childs = {vim.deepcopy(win1), vim.deepcopy(win2)}
+        res.meta = {old_win.height, new_win.height}
+        res.childs = {vim.deepcopy(old_win), vim.deepcopy(new_win)}
         res.isleaf = false
-        res.winnr = string.format("%s,%s", win1.winnr, win2.winnr)
+        res.winnr = string.format("%s,%s", old_win.winnr, new_win.winnr)
     end
-    if (win1.y == win2.y and win1.height == win2.height) then
-        if(win1.x > win2.x) then
-            win1, win2 = swapTables(win1, win2)
-        end
-        res = vim.deepcopy(win1)
-        res.width = win1.width + win2.width + 1
+    if (old_win.y == new_win.y and old_win.height == new_win.height) then
+        res = vim.deepcopy(old_win)
+        res.width = old_win.width + new_win.width + 1
         res.split = "unknown"
         res.method = "vsplit"
-        res.meta = {win1.width, win2.width}
-        res.childs = {vim.deepcopy(win1), vim.deepcopy(win2)}
-        res.winnr = string.format("%s,%s", win1.winnr, win2.winnr)
+        res.meta = {old_win.width, new_win.width}
+        res.childs = {vim.deepcopy(old_win), vim.deepcopy(new_win)}
+        res.winnr = string.format("%s,%s", old_win.winnr, new_win.winnr)
         res.isleaf = false
     end
     return res
@@ -47,9 +41,9 @@ local function build_layout_tree(data, stk)
     for _,win in ipairs(data) do
         -- vim.print(string.format("current: %d %s", i, vim.inspect(stk.items)))
         while(not stk:empty() and match(win, stk:top())) do
-            local win2 = stk:top()
+            local old_win = stk:top()
             stk:pop()
-            local res = merge(win2, win)
+            local res = merge(old_win, win)
             if res == nil then
                 -- print(string.format("fail %d %d", win.winnr, win2.winnr))
                 break
@@ -84,11 +78,11 @@ dfs_print_tree = function(win)
 end
 
 local bfs_layout_tree = function(root)
+    vim.cmd [[ silent exe "normal! \<C-w>\<C-o>" ]]
     if(not root.childs) then
         print("only one window saved, no need to restore")
         return
     end
-    vim.cmd [[ silent exe "normal! \<C-w>\<C-o>" ]]
     local q = require("contrib.queue"):new()
     root.level = 1
     root.winid = vim.api.nvim_get_current_win()
@@ -99,12 +93,6 @@ local bfs_layout_tree = function(root)
         vim.api.nvim_set_current_win(t.winid)
         assert(t.childs and #t.childs > 0, "Error in queue!")
         local new_id = vim.api.nvim_open_win(0, false, {split = t.method == "vsplit" and "right" or "below"})
-        if t.method == "vsplit" then
-            vim.api.nvim_win_set_config(new_id, {width = t.meta[2]})
-        else
-            vim.api.nvim_win_set_config(new_id, {height = t.meta[2]})
-        end
-
         local c1 = t.childs[1]
         c1.winid = t.winid
         c1.level = t.level + 1
@@ -119,6 +107,11 @@ local bfs_layout_tree = function(root)
           q:push(c2)
         end
 
+        if t.method == "vsplit" then
+            vim.api.nvim_win_set_config(c1.winid, {width = t.meta[1]})
+        else
+            vim.api.nvim_win_set_config(c1.winid, {height = t.meta[1]})
+        end
     end
 end
 
@@ -128,11 +121,16 @@ local function set_win_file(data)
     local final_win = nil
     for i, winId in ipairs(windows) do
         local winnr = vim.api.nvim_win_get_number(winId)
-        assert (data[i].winnr == winnr)
+        assert (data[i].winnr == winnr, string.format("%s vs %s", data[i].winnr, winnr))
         local file = data[i].file
-        local bufnr = vim.fn.bufadd(file) -- TODO:if the buffer does not attach to any file, like NvimTree, need to hand these
-        vim.api.nvim_win_set_buf(winId, bufnr)
-        vim.api.nvim_buf_set_option(bufnr, "buflisted", true)
+        if(vim.fn.filereadable(file)) then
+            local bufnr = vim.fn.bufadd(file) -- TODO:if the buffer does not attach to any file, like NvimTree, need to hand these
+            vim.api.nvim_win_set_buf(winId, bufnr)
+            vim.api.nvim_buf_set_option(bufnr, "buflisted", true)
+        else
+            -- local bufnr = vim.api.nvim_create_buf(true, true)
+            -- vim.api.nvim_win_set_buf(winId, bufnr)
+        end
 
         if(winnr == data.current_winnr) then
             final_win = winId

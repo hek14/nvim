@@ -1,6 +1,17 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "hek14/layman.nvim",
+    lazy = false,
+    config = function()
+      require("layman").setup()
+    end
+  },
+  {
+    "Shatur/neovim-session-manager",
+    cmd = "SessionManager"
+  },
+  {
     "willothy/flatten.nvim",
     config = true,
     lazy = false,

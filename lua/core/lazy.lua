@@ -48,6 +48,9 @@ local disabled_built_ins = {
 
 require('lazy').setup("plugins", {
   defaults = { lazy = true },
+  dev = {
+    path = "~/contrib",
+  },
   performance = {
     rtp = {
        reset = false,

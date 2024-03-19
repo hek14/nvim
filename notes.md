@@ -1,3 +1,24 @@
+# in Lazy.nvim, how to load a plugin after/before another plugin
+To load A after B:
+```lua
+local B = {
+    "author_B/repo_B",
+    event = "BufRead", -- NOTE: the trigger of B
+    config = function()
+        require("A") -- NOTE: this is what you want! Put this in `config`, require A will load the package A for the first time!
+    end
+}
+```
+To load A before B:
+```lua
+local B = {
+    "author_B/repo_B",
+    event = "BufRead", -- NOTE: the trigger of B
+    init = function()
+        require("A") -- NOTE: this is what you want! Put this in `init`, A will be loaded before B is loaded
+    end
+}
+```
 # solve error: `treesitter_query parse error at xxx structure`
 删除`/usr/local/lib/nvim/parser/query.so`
 用`nvim-treesitter`去`TSIntall` all of the parsers

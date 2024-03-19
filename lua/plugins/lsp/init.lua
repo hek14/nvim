@@ -103,19 +103,6 @@ local M = {
     },
     {
       'RRethy/vim-illuminate',
-      event = 'BufRead',
-      enabled = true,
-      config = function()
-        require('illuminate').configure({
-          -- providers: provider used to get references in the buffer, ordered by priority
-          providers = {
-            'lsp',
-            'treesitter',
-            -- 'regex',
-          },
-          delay = 200
-        })
-      end
     },
     {
       "utilyre/barbecue.nvim", -- NOTE: for this to work well, should use SFMono Nerd Font for terminal
@@ -209,10 +196,7 @@ function M.config()
     -- vim.schedule(function()
       -- vim.notify(string.format("🐷 %s catches buffer %s!",client.name,bufnr),vim.log.levels.INFO)
     -- end)
-    local illuminate_present,illuminate = pcall(require,'illuminate')
-    if illuminate_present then
-      require 'illuminate'.on_attach(client)
-    end
+    local illuminate = require'illuminate'
 
     local navic_present,navic = pcall(require,'nvim-navic')
     if client.server_capabilities.documentSymbolProvider and navic_present then

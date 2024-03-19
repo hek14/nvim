@@ -245,4 +245,14 @@ local tokyonight = {
   end
 }
 
-return kanagawa
+local darkplus = {
+  "LunarVim/darkplus.nvim",
+  event = 'VeryLazy',
+  priority = 999,
+  config = function ()
+    vim.cmd("colorscheme darkplus")
+    override_hl()
+  end
+}
+
+return darkplus

@@ -57,6 +57,9 @@ require('lazy').setup("plugins", {
        disabled_plugins = disabled_built_ins
     }
   },
+  install = {
+    colorscheme = { "darkplus", "default" },
+  },
   ui = {
     custom_keys = {
       -- open lazygit log

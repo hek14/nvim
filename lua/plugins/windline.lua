@@ -1,6 +1,6 @@
 return {
   "windwp/windline.nvim",
-  event = "BufRead",
+  -- event = "BufRead",
   priority = 1,
   config = function()
     require('wlsample.bubble')

@@ -1,4 +1,20 @@
 # in Lazy.nvim, how to load a plugin after/before another plugin
+一个实际的example: 在darkplus theme load之后再去加载windline statusline插件, 不然其颜色不对. 方法是
+首先去掉darkplus加载的任何`event`, `cmd`, `key`等lazy load的方式, 然后在darkplus的`config`中去加载windline:
+```lua
+local darkplus = {
+  "LunarVim/darkplus.nvim",
+  event = 'VeryLazy',
+  priority = 999,
+  config = function ()
+    vim.cmd("colorscheme darkplus")
+    override_hl()
+    -- NOTE: 这就是:Lazy load xxx所调用的api:
+    require("lazy").load({plugins = {"windline.nvim", "bufferline.nvim"}})
+  end
+}
+```
+
 To load A after B:
 ```lua
 local B = {

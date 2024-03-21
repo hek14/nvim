@@ -2,7 +2,7 @@ local M = {
   "akinsho/bufferline.nvim",
   enabled = true,
   version = '*',
-  event = 'VimEnter',
+  -- event = 'VimEnter',
   init = function()
     local map = require("core.utils").map
     map("n", {"<Tab>","]b"}, ":BufferLineCycleNext<CR>")
@@ -63,6 +63,28 @@ function M.config()
         end
       end,
     },
+    highlights = {
+      buffer_selected = {
+        fg = 'green',
+        bg = 'grey',
+        bold = true,
+        italic = true,
+      },
+      numbers_selected = {
+        fg = 'green',
+        bg = 'grey',
+        bold = true,
+        italic = true,
+      },
+      close_button_selected = {
+        fg = '#5442f5',
+        bg = 'grey',
+      },
+      -- modified_selected = {
+      --   fg = 'red',
+      --   bg = 'red',
+      -- },
+    };
   })
 
   map('n','<leader>0','<cmd>lua require("bufferline").go_to_buffer(-1, true)<cr>')

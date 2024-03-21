@@ -36,7 +36,7 @@ function M.config()
       always_show_bufferline = true,
       diagnostics = false, -- "or nvim_lsp"
       name_formatter = function(buf)  
-        return buf.bufnr .. '|' .. buf.name
+        return string.format("%s(%d)",buf.name,buf.bufnr)
         -- buf contains:
         -- name                | str        | the basename of the active file
         -- path                | str        | the full path of the active file
@@ -65,20 +65,20 @@ function M.config()
     },
     highlights = {
       buffer_selected = {
-        fg = 'green',
-        bg = 'grey',
-        bold = true,
-        italic = true,
+        fg = '#42fcd4',
+        bg = '#616161',
+        bold = false,
+        italic = false,
       },
       numbers_selected = {
-        fg = 'green',
-        bg = 'grey',
-        bold = true,
-        italic = true,
+        fg = '#42fcd4',
+        bg = '#616161',
+        bold = false,
+        italic = false,
       },
       close_button_selected = {
-        fg = '#5442f5',
-        bg = 'grey',
+        fg = '#42fcd4',
+        bg = '#616161',
       },
       -- modified_selected = {
       --   fg = 'red',

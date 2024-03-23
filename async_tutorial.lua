@@ -102,6 +102,19 @@ end
 local lsp_sync_but_not_blocking = a.wrap(lsp_async_request) -- NOTE: 变成awaitable
 
 
+local job_async = function(args, callback)
+  local M = require("scratch.job_util")
+  local t = M:new([[echo "hello world!"]], function(out, err)
+    table.insert(out, args)
+    callback(out)
+  end)
+  t:run()
+end
+
+
+local job_sync_but_not_blocking = a.wrap(job_async)
+
+
 local async_tasks_1 = function()
   -- NOTE: 这里 a.sync(function()...end) 就等价于python中`async def xxx`就是定义一个awaitable coroutine
   return a.sync(function ()
@@ -140,12 +153,10 @@ local async_example = function ()
     local v = a.wait(async_tasks_2(3)) -- NOTE: awaitable返回值可以是任何东西, 这和一般的function一样
     a.wait(main_loop)
     local my = a.wait(lsp_sync_but_not_blocking())
+    local my2 = a.wait(job_sync_but_not_blocking("Yeah!"))
     print(u + v())
-    if my then
-      vim.print({my = my})
-    else
-      print("my is nil")
-    end
+    print("my is: ", vim.inspect(my))
+    print("my2 is: ", vim.inspect(my2))
   end)
 end
 
@@ -156,11 +167,6 @@ end
 
 
 -- avoid textlock
-local main_loop = function (f)
-  vim.schedule(f)
-end
-
-
 local vim_command = function (args1, args2)
   local str = string.format("echom 'calling vim command with args: %s %s'", args1, args2)
   vim.api.nvim_command(str)

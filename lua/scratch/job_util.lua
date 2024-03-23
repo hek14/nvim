@@ -1,13 +1,13 @@
 ---------- NOTE: how to use this job_util
 -- local M = require("scratch.job_util")
--- local t = M.new([[ssh qingdao 'cd ~/codes_med33/CHI2024; fd --no-ignore ".*"']], function(out, err)
---   M.dump_to_file("~/log2", out)
+-- local t = M:new([[ssh qingdao 'cd ~/codes_med33/CHI2024; fd --no-ignore ".*"']], function(out, err)
+--   M:dump_to_file("~/log2", out)
 -- end)
 -- t:run()
 
 local M = {}
-M.new = function(cmd, exit_hook)
-  return setmetatable({
+function M:new(cmd, exit_hook)
+  local instance = {
     cmd = cmd,
     sorted = false,
     std_out = {},
@@ -15,12 +15,15 @@ M.new = function(cmd, exit_hook)
     begin_time = nil,
     end_time = nil,
     exit_hook = exit_hook,
-  }, {__index = M})
+  }
+  setmetatable(instance, self)
+  self.__index = self
+  return instance
 end
 
 local f = string.format
 
-M.dump_to_file = function(filename, content)
+function M:dump_to_file(filename, content)
   filename = vim.fn.expand(filename)
   local file = io.open(filename, "w")
   if file then

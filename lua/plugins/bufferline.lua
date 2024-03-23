@@ -77,15 +77,18 @@ function M.config()
         italic = false,
       },
       close_button_selected = {
-        fg = '#42fcd4',
+        fg = '#FFC0CB',
         bg = '#616161',
       },
-      -- modified_selected = {
-      --   fg = 'red',
-      --   bg = 'red',
-      -- },
+      indicator_selected = { -- NOTE: don't work because the theme override the indicator color, should override after setup
+        fg = '#FFC0CB',
+      },
+      modified_selected = {
+        fg = '#FFC0CB',
+      },
     };
   })
+  vim.cmd[[hi! BufferLineIndicatorSelected guifg='#FFC0CB']]
 
   map('n','<leader>0','<cmd>lua require("bufferline").go_to_buffer(-1, true)<cr>')
   map('n','<leader>1','<cmd>lua require("bufferline").go_to_buffer(1, true)<cr>')

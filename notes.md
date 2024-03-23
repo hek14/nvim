@@ -1,3 +1,8 @@
+# lua-async-await理解
+- repo: https://github.com/ms-jpq/lua-async-await
+- 作用: 实现python的`async await`关键词, 让libuv中常见的异步operation同步化, 同时仍然允许concurrent并发
+- `await([some awaitable defined by async])`作用是同步一个async op的结果, 它会pause当前的coroutine, 但是不会block整个nvim编辑器!
+- 具体解析: 见~/.config/nvim/async_await_tutorial.lua
 # in Lazy.nvim, how to load a plugin after/before another plugin
 一个实际的example: 在darkplus theme load之后再去加载windline statusline插件, 不然其颜色不对. 方法是
 首先去掉darkplus加载的任何`event`, `cmd`, `key`等lazy load的方式, 然后在darkplus的`config`中去加载windline:
@@ -336,14 +341,26 @@ callback执行环境是: main thread(or process)
 怎么去建模这件事情呢: `||`脑子里开始只有一条主线, 然后fork出去一条并行的线(child thread/process), 某时再交汇回来, 主线交叉的那个点就是callback function执行的点
 (当然, 对于vim这类有loop的程序而言, 这个点可能暂时不安全, 那么会schedule cb's execution later) 
 # coroutine and stack
-coroutine的特点: 不管一个context(我们叫coroutine.create()出来的东西context)中调用多深,
-co.yield(val)的val值始终是yield给resume这个context的context.
-yield之后, 这个context会保存state: 当前的位置(即便是多层的函数调用),别的context再resume它的时候,
+```lua
+local A = coroutine.create(function()
+  coroutine.resume(B)
+end)
+local B = coroutine.create(function()
+  coroutine.yield(3)
+end)
+上述代码中：A是caller，B是callee
+```
+coroutine的特点: 不管callee中函数栈多深，co.yield(val)的val值始终是yield给调用`coroutine.resume`的那个caller.
+caller和callee的关系和栈没关系！
+此时函数栈可以flatten：想象把函数中的代码全部copy出来写到callee中。
+
+yield之后, suspended的这个context会保存state: 当前的位置(即便是多层的函数调用),别的context再resume它的时候,
 它将直接从这个调用位置开始
-'yield'对应的是coroutine, 值直接给co.resume的主, `return`对应的是栈, 值给调用它的函数
+'yield'对应的是coroutine, 值直接给co.resume的caller, `return`对应的是栈, 值给调用它的函数
 想象这么一幅图: 两条生产线——两个coroutine, 每一个生产线从前到后有若干箱子从大到小——它们就是栈
 co.yield/resume 是直接从一条生产线跳到另外一条去换context干活, 而栈是在这条支线上做完直接扔掉一个箱子,
-把结果return给它的上层(仍在这条产线上). 协程是同一个线程内部的切换context, 不是多线程, 不可能两个产线同时在做
+把结果return给它的上层(仍在这条产线/context/coroutine上).
+协程是同一个线程内部的切换context, 不是多线程, 不可能两个产线同时在做
 (可以想象成, 不管咋切换, 干活的人还是一个人)
 # no-wait map
 When defining a buffer-local mapping for "," there may be a global mapping

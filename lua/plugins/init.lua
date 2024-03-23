@@ -1,6 +1,9 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    "ms-jpq/lua-async-await"
+  },
+  {
     "hek14/layman.nvim",
     lazy = false,
     config = function()

@@ -252,7 +252,7 @@ local darkplus = {
   config = function ()
     vim.cmd("colorscheme darkplus")
     override_hl()
-    require("lazy").load({plugins = {"windline.nvim", "bufferline.nvim"}})
+    require("lazy").load({plugins = {"windline.nvim", "bufferline.nvim", "todo-comments.nvim"}})
   end
 }
 

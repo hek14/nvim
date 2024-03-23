@@ -6,7 +6,7 @@ M.setup = function(options)
       client.server_capabilities.document_formatting = false
       client.server_capabilities.document_range_formatting = false
       options.on_attach(client, bufnr)
-      -- vim.lsp.inlay_hint(bufnr,true)
+      -- vim.lsp.inlay_hint.enable(bufnr,true)
     end,
     settings = {
       single_file_support = true,
@@ -16,10 +16,14 @@ M.setup = function(options)
         --   arrayIndex = 'enable',
         --   setType = true
         -- },
+        -- Version of Lua you're targeting, change as necessary
+        runtime = {
+          version = 'Lua 5.1',
+        },
         diagnostics = {
           enable = true,
           globals = { "vim" },
-          disable = { 'missing-fields' }
+          -- disable = { "missing-fields", "Deprecated" }
         },
         workspace = {
           library = {

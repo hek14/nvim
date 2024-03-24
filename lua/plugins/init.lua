@@ -522,19 +522,23 @@ return {
       end,
     },
     cmd = 'AsyncRun',
+    config = function()
+      vim.g.asyncrun_open = 10
+    end,
     init = function()
       vim.api.nvim_create_autocmd("FileType", {
         pattern = 'python',
         callback = function()
-          map('n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)" ', {silent = false, buffer = true})
+          map('n', ',t', ':AsyncRun -raw -cwd=$(VIM_FILEDIR) python "$(VIM_FILEPATH)" ', {silent = false, buffer = true})
         end
       })
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {'cpp', 'c'},
         callback = function()
-          map('n', ',t', ':AsyncRun -cwd=$(VIM_FILEDIR) ./Debug/hello ', {silent = false, buffer = true})
+          map('n', ',t', ':AsyncRun -raw -cwd=$(VIM_FILEDIR) ./Debug/main', {silent = false, buffer = true})
         end
       })
+      vim.api.nvim_create_user_command("AsyncRunToggle", [[:call asyncrun#quickfix_toggle(10)]],{})
       vim.g.asyncrun_open = 6
       vim.g.asyncrun_bell = 1
     end,
@@ -557,8 +561,6 @@ return {
   },
   {
     'folke/todo-comments.nvim',
-    event = 'BufRead',
-    dependencies = 'nvim-lua/plenary.nvim',
     config = function()
       local hl = require('todo-comments.highlight')
       local highlight_win = hl.highlight_win

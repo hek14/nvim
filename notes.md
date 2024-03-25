@@ -1,3 +1,10 @@
+# vim.keymap.set `expr` & `silent`
+如果是想把一个key映射成包含`<Left>`, `<CR>`等特殊含义的一连串key, "just as I typed them"的话, 就需要使用`expr = false`, `silent = false`
+```lua
+vim.keymap.set("n", ",w", [[/\<\><Left><Left>]], {expr = false, silent = false})
+```
+- `expr`: 如果映射的那个字符串是一个函数, 真正映射的keymap是`eval()`那个函数得到的结果, 那么`expr=true`
+- `silent`: 在这里, 我们希望弹出窗口供我们输入, 所以`silent=false`
 # lua-async-await理解
 - repo: https://github.com/ms-jpq/lua-async-await
 - 作用: 实现python的`async await`关键词, 让libuv中常见的异步operation同步化, 同时仍然允许concurrent并发

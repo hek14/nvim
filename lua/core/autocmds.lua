@@ -106,14 +106,10 @@ vim.api.nvim_create_autocmd("WinLeave",{
     vim.g.last_focused_win = vim.api.nvim_get_current_win()
     local ft = vim.api.nvim_buf_get_option(buf,'filetype')
     if not (string.match(ft,'Telescope')) then
-      local start = vim.loop.hrtime()
-      vim.g.current_word = vim.fn.expand('<cword>')
       local ok, err = pcall(function()
+        vim.g.current_word = vim.fn.expand('<cword>')
         vim.cmd(string.format(":call setreg('c','%s')",vim.g.current_word))
       end)
-      if not ok then
-        print("cannot set current_word")
-      end
     end
   end
 })

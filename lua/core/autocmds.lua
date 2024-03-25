@@ -102,15 +102,15 @@ vim.g.current_word = ""
 vim.g.last_focused_win = nil
 vim.api.nvim_create_autocmd("WinLeave",{
   callback=function ()
-    local buf = vim.api.nvim_get_current_buf()
-    vim.g.last_focused_win = vim.api.nvim_get_current_win()
-    local ft = vim.api.nvim_buf_get_option(buf,'filetype')
-    if not (string.match(ft,'Telescope')) then
-      local ok, err = pcall(function()
+    pcall(function()
+      local buf = vim.api.nvim_get_current_buf()
+      vim.g.last_focused_win = vim.api.nvim_get_current_win()
+      local ft = vim.api.nvim_buf_get_option(buf,'filetype')
+      if not (string.match(ft,'Telescope')) then
         vim.g.current_word = vim.fn.expand('<cword>')
         vim.cmd(string.format(":call setreg('c','%s')",vim.g.current_word))
-      end)
-    end
+      end
+    end)
   end
 })
 

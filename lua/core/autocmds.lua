@@ -6,6 +6,29 @@ local map = require("core.utils").map
 --                               file = vim.fn.expand('<afile>'),
 --                               match = vim.fn.expand('<amatch>')}
 
+local function writeToFile(filePath, content)
+    -- Open the file in write mode
+    local file, err = io.open(filePath, "w")
+    if not file then
+        error("Failed to open file: " .. err)
+    end
+
+    -- Write the content to the file
+    file:write(content)
+
+    -- Close the file
+    file:close()
+end
+
+vim.api.nvim_create_autocmd("VimLeavePre", {
+  desc = "write the current cwd",
+  group = vim.api.nvim_create_augroup('kk-vimleave', { clear = true }),
+  callback = function()
+    local filePath = "/tmp/cwd.txt"
+    local content = vim.uv.cwd()
+    writeToFile(filePath, content)
+  end
+})
 
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {

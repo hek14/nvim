@@ -1,7 +1,17 @@
 local map = require('core.utils').map
 local plugins = {
   {
-    "ms-jpq/lua-async-await"
+    "ms-jpq/lua-async-await",
+    lazy = false,
+    config = function()
+      local a = require("async")
+      _G.a = a
+      a.schedule = function()
+        a.wait(function(f)
+          vim.schedule(f)
+        end)
+      end
+    end
   },
   {
     "hek14/layman.nvim",
@@ -355,13 +365,12 @@ return {
         callback = function()
           local timer = vim.loop.new_timer()
           local bufnr = vim.api.nvim_get_current_buf()
-          local start = vim.loop.now()
+          assert(timer)
           timer:start(10,10,vim.schedule_wrap(function()
             vim.api.nvim_buf_call(bufnr, function()
               if vim.w.bqf_enabled then
                 vim.cmd [[ set modifiable ]]
                 vim.keymap.set('n','<C-s>','<cmd>call qf_refactor#replace()<CR>',{ buffer = bufnr })
-                vim.keymap.set('n','q',':bd!<CR>',{ buffer = bufnr })
                 if timer then
                   timer:stop()
                   timer:close()
@@ -397,7 +406,7 @@ return {
     'mbbill/undotree',
     cmd = 'UndotreeToggle',
     init = function()
-      map('n', '<C-x>u', function() 
+      map('n', '<C-x>u', function()
         vim.cmd [[ UndotreeToggle ]]
         for _,win in ipairs(require('core.utils').get_all_window_buffer_filetype()) do
           if win.filetype == 'undotree' then

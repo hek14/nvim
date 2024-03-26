@@ -67,7 +67,17 @@ return {
   },
   {
     "folke/noice.nvim",
-    event = "VeryLazy",
+    event = "CursorHold",
+    -- NOTE: You can write your own CursorHold autocmd to load the plugin at idling time of the main loop.
+    -- init = function()
+    --   vim.api.nvim_create_autocmd({"CursorHold", "CursorHoldI"}, {
+    --     group = vim.api.nvim_create_augroup("kk-cursorhold", {clear=true}),
+    --     callback = function()
+    --       require("lazy").load({plugins = {"noice.nvim"}})
+    --     end,
+    --     once = true
+    --   })
+    -- end,
     enabled = true,
     dependencies = {
       "MunifTanjim/nui.nvim",

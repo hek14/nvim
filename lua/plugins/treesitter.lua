@@ -1,5 +1,6 @@
 local M = {
   "nvim-treesitter/nvim-treesitter",
+  event = "BufRead",
   build = ":TSUpdate",
   init = function ()
     local group = vim.api.nvim_create_augroup('load_treesitter',{clear=true})

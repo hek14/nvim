@@ -4,6 +4,7 @@ bin/python/pyright-langserver
 bin/python/anakinls
 bin/python/jedi-language-server
 bin/python/pylance_latest
+bin/markdown
 ms-python*
 *.zip
 
@@ -43,3 +44,4 @@ Debug/.cmake/api/v1/query/client-vim-cmake
 
 bin/python/pylance_2023_10_20
 bin/python/pylance_2023_10_50
+bin/python/python-type-stubs

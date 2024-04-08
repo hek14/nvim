@@ -580,6 +580,7 @@ return {
   },
   {
     'folke/todo-comments.nvim',
+    enabled = false,
     config = function()
       local hl = require('todo-comments.highlight')
       local highlight_win = hl.highlight_win

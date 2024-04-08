@@ -84,20 +84,13 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
 
 vim.opt.list = true
 vim.opt.listchars = {
-    -- tab = "⇥ ",
-    tab = "  ",
     -- leadmultispace = "┊ ",
     leadmultispace = "  ",
     trail = "␣",
     nbsp = "⍽",
-    -- eol = "↴",
-    eol = " ",
     -- space = "⋅",
-    space = " ",
 }
-
 -- or use append
-vim.opt.listchars:append("space:⋅")
 vim.opt.listchars:append("eol:↴")
 vim.opt.listchars:append("tab:↹ ")
 

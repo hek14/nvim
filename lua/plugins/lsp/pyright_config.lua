@@ -28,7 +28,7 @@ local M = {
       autoImportCompletions = true,
       autoSearchPaths = true,
       diagnosticMode = 'openFilesOnly',
-      stubPath = 'typings',
+      extraPaths = { vim.fn.expand("~/.config/nvim/bin/python/python-type-stubs/stubs") },
       typeshedPaths = {},
       diagnosticSeverityOverrides = {},
       typeCheckingMode = 'basic',
@@ -50,7 +50,7 @@ local M = {
       yapfPath = 'yapf',
       yapfArgs = {},
       autopep8Path = 'autopep8',
-      autopep8Args = {}, 
+      autopep8Args = {},
     },
     linting = {
       enabled = true,

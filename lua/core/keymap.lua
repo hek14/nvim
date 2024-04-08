@@ -95,10 +95,27 @@ local function others()
   map("n", "<Down>", "5<C-w>-")
   map("n", "<left>", "5<C-w><")
   map("n", "<right>", "5<C-w>>")
+  local function copyCurrentFilePath()
+    local filePath = vim.api.nvim_buf_get_name(0)
+    local home = os.getenv("HOME")
+    filePath = filePath:gsub("^" .. home, "~")
+    vim.fn.setreg('+', filePath)
+    print("Copied file path to clipboard: " .. filePath)
+  end
+  map('n', '<leader>cp', copyCurrentFilePath, {desc = "Copy current file path"})
+
   map("n", "<C-q>", function()
     vim.cmd("noh")
-    require('core.utils').close_float_window()
-    require('core.utils').close_qf_window()
+    local info_list = require("core.utils").get_all_window_buffer_filetype()
+    for _, w_info in ipairs(info_list) do
+      local config = vim.api.nvim_win_get_config(w_info.winid)
+      if config.relative ~= "" then
+        pcall(vim.api.nvim_win_close,w_info.winid,false)
+      end
+      if(w_info.filetype == "qf" or w_info.filetype == "vimcmake") then
+        vim.api.nvim_win_close(w_info.winid, false)
+      end
+    end
   end)
   map("n", "<Esc>", [[:noh<CR>]])
   map("n", "<leader>mc", function ()

@@ -38,6 +38,11 @@ local M = {
     },
     {
       "dhruvmanila/telescope-bookmarks.nvim", -- this plugin is for searching browser bookmarks
+      config = function()
+        require('browser_bookmarks').setup({
+          selected_browser = "chrome"
+        })
+      end
     },
     {
       'nvim-telescope/telescope-live-grep-args.nvim',
@@ -218,10 +223,6 @@ function M.config()
       set_env = { ["COLORTERM"] = "truecolor" },
     },
     extensions = {
-      bookmarks = {
-        -- Available: 'brave', 'chrome', 'edge', 'firefox', 'safari'
-        selected_browser = 'chrome'
-      },
       fzf = {
         fuzzy = true, -- false will only do exact matching
         override_generic_sorter = true, -- override the generic sorter

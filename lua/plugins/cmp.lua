@@ -136,7 +136,7 @@ M[1].config = function()
     },
     mapping = cmp.mapping.preset.insert {
       ["<C-a>"] = cmp.mapping.close(), -- or abort
-      ['<C-y>'] = cmp.mapping.confirm({
+      ['<C-y>'] = cmp.mapping.confirm({ -- NOTE:<C-y> is the default mapping for accepting completion
         behavior = cmp.ConfirmBehavior.Replace,
         select = true,
       }),
@@ -229,6 +229,34 @@ M[1].config = function()
       { name = "luasnip" },
       { name = "path" },
       { name = "nvim_lsp" },
+      {
+        name = 'buffer',
+        option = {
+          get_bufnrs = function()
+            local win_bufs = require('core.utils').get_all_window_buffer_filetype()
+            local bufs = {}
+            for i, win_buf in ipairs(win_bufs) do
+              table.insert(bufs, win_buf.bufnr)
+            end
+            return bufs
+          end
+        }
+      }
+    },
+  })
+  cmp.setup.filetype({ 'markdown' }, {
+    sources = {
+      -- NOTE:https://github.com/Feel-ix-343/markdown-oxide?tab=readme-ov-file#neovim
+      {
+        name = 'nvim_lsp',
+        option = {
+          markdown_oxide = {
+            keyword_pattern = [[\(\k\| \|\/\|#\)\+]]
+          }
+        }
+      },
+      { name = "luasnip" },
+      { name = "path" },
       {
         name = 'buffer',
         option = {

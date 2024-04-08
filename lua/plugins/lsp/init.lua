@@ -190,7 +190,7 @@ function M.config()
 
   local on_attach = function(client, bufnr)
     if vim.fn.has('nvim-0.10') then
-      client.server_capabilities.semanticTokensProvider = nil -- disable
+      -- client.server_capabilities.semanticTokensProvider = nil -- disable
       -- vim.lsp.semantic_tokens.start(bufnr, client) -- enable
     end
     -- vim.schedule(function()
@@ -217,15 +217,8 @@ function M.config()
   require('plugins.lsp.lua').setup(options)
   require('plugins.lsp.c').setup(options)
   require('plugins.lsp.latex').setup(options)
-  -- NOTE: python: currently use jedi for navigation and ruff for diagnostics
-  -- require('plugins.lsp.python').setup(options,'jedi_language_server')
-  -- require('plugins.lsp.python').setup(options,'ruff_lsp')
-  -- require('plugins.lsp.python').setup(options,'diagnosticls')
-  -- require('plugins.lsp.python').setup(options,'anakin_language_server')
-  require('plugins.lsp.python').setup(options,'pylance')
-  -- require('plugins.lsp.python').setup(options,'pyright')
-  -- require('plugins.lsp.python').setup(options,'coc-pyright')
-  -- require('plugins.lsp.python').setup(options,'pylyzer')
+  require('plugins.lsp.markdown').setup(options)
+  require('plugins.lsp.python').setup(options,'pylance') -- NOTE:available: {"pyright", "coc-pyright", "pylyzer", "jedi_language_server", "ruff_lsp", "anakin_language_server"}
   require("plugins.lsp.diagnostics").setup()
 end
 return M

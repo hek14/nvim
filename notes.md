@@ -1,3 +1,7 @@
+# I don't use Mason.nvim, but I use its website for searching tools
+- https://mason-registry.dev/registry/list
+- https://github.com/williamboman/mason-lspconfig.nvim?tab=readme-ov-file#available-lsp-servers
+
 # vim.keymap.set `expr` & `silent`
 如果是想把一个key映射成包含`<Left>`, `<CR>`等特殊含义的一连串key, "just as I typed them"的话, 就需要使用`expr = false`, `silent = false`
 ```lua
@@ -9,8 +13,27 @@ vim.keymap.set("n", ",w", [[/\<\><Left><Left>]], {expr = false, silent = false})
 # lua-async-await理解
 - repo: https://github.com/ms-jpq/lua-async-await
 - 作用: 实现python的`async await`关键词, 让libuv中常见的异步operation同步化, 同时仍然允许concurrent并发
-- `await([some awaitable defined by async])`作用是同步一个async op的结果, 它会pause当前的coroutine, 但是不会block整个nvim编辑器!
-- 具体解析: 见~/.config/nvim/async_await_tutorial.lua
+- `await([some awaitable defined by async])`作用是同步一个async op的结果, 它会pause当前的coroutine, 但是当前main threading有多个coroutine, 因此使用await不会block整个nvim编辑器!
+- 例如lsp_request, 如果我们想在拿到异步request的结果执行一段代码, 我们怎么办呢? 以前我们需要将这段代码写在callback函数里面, 但是有了`async await`之后, 我们只需要做如下修改:
+将其wrap成一个sync op, 然后`local result = await(wrapped)`
+```lua
+local function lsp_request(callback)
+  vim.lsp.buf_request(buf, "textDocument/references", params, function(err, result, ctx, config) -- 这个callback的signature原本是怎样就怎样写, 根据具体的async op的规定来
+    if(err or result == nil or vim.tbl_isempty(result)) then
+      callback("error") -- 相当于yield "error"
+    else
+      callback(result) -- 相当于yield result
+    end
+  end)
+end
+local wrapped = a.wrap(lsp_request)
+
+in Another async def:
+  ...
+  local result = await(wrapped)
+  ...
+```
+- 具体解析: 见 ~/.config/nvim/async_tutorial.lua
 
 # in Lazy.nvim, how to load a plugin after/before another plugin
 一个实际的example: 在darkplus theme load之后再去加载windline statusline插件, 不然其颜色不对. 方法是
@@ -222,12 +245,26 @@ https://www.youtube.com/playlist?list=PLOe6AggsTaVvsguiM_LAbdkm7dFCxYxe3
 - Andrew Courter
 https://www.youtube.com/@ascourter
 
-# for pyright completion stubs
-https://github.com/bschnurr/python-type-stubs or https://github.com/microsoft/python-type-stubs
-example: how to use it for cv2 module completion:
+# Config pyright/pylance stubs
+Opencv see:
+- https://github.com/opencv/opencv/issues/14590
+- https://github.com/bschnurr/python-type-stubs
+- https://github.com/microsoft/python-type-stubs
+第一种方法: 将pyi文件下载到对应环境对应module的路径下, 但是每一个环境每一个module都需要单独下载, 很麻烦, 推荐下一个方法
 ```shell
 curl -sSL https://raw.githubusercontent.com/bschnurr/python-type-stubs/add-opencv/cv2/__init__.pyi \
-  -o $(python -c 'import cv2, os; print(os.path.dirname(cv2.__file__))')/cv2.pyi
+  -o $(python -c 'import cv2, os; print(os.path.dirname(cv2.__file__))')/__init__.pyi
+```
+第二种方法: `git clone --depth=1 https://github.com/microsoft/python-type-stubs.git`到`~/.config/nvim/bin/python/python-type-stubs` 
+然后配置 `python.analysis.extraPaths`:
+- nvim: 见`~/.config/nvim/lua/plugins/lsp/pyright_config.lua`
+- vscode: 
+```json
+{
+    "python.analysis.extraPaths": [
+        "/Users/hk/.config/nvim/bin/python/python-type-stubs/stubs"
+    ]
+}
 ```
 
 # fillchars: change fold/endOfBuffer appearance

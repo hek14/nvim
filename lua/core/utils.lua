@@ -651,7 +651,7 @@ function M.get_all_window_buffer_filetype()
     if vim.api.nvim_win_is_valid(window_id) then
       local bufnr = vim.api.nvim_win_get_buf(window_id)
       table.insert(window_buffer_filetype, {
-        winnr = window_id,
+        winid = window_id,
         bufnr = bufnr,
         filetype = vim.api.nvim_buf_get_option(bufnr, "filetype"),
       })
@@ -675,7 +675,7 @@ M.close_qf_window = function()
   local info_list = M.get_all_window_buffer_filetype()
   for i, w_info in ipairs(info_list) do
     if(w_info.filetype == "qf") then
-      vim.api.nvim_win_close(w_info.winnr, false)
+      vim.api.nvim_win_close(w_info.winid, false)
     end
   end
 end

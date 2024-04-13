@@ -44,6 +44,7 @@ local M = {
     },
     {
       'folke/trouble.nvim',
+      branch = "dev",
       config = function()
         require('trouble').setup({})
       end,
@@ -190,7 +191,7 @@ function M.config()
 
   local on_attach = function(client, bufnr)
     if vim.fn.has('nvim-0.10') then
-      -- client.server_capabilities.semanticTokensProvider = nil -- disable
+      client.server_capabilities.semanticTokensProvider = nil -- disable
       -- vim.lsp.semantic_tokens.start(bufnr, client) -- enable
     end
     -- vim.schedule(function()

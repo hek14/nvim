@@ -1,6 +1,25 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    'stevearc/oil.nvim',
+    opts = {},
+    cmd = "Oil",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    init = function()
+      map("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+    end
+  },
+  {
+    "chrishrb/gx.nvim",
+    keys = { { "gx", "<cmd>Browse<cr>", mode = { "n", "x" } } },
+    cmd = { "Browse" },
+    init = function ()
+      vim.g.netrw_nogx = 1 -- disable netrw gx
+    end,
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = true, -- default settings
+  },
+  {
     "ms-jpq/lua-async-await",
     lazy = false,
     config = function()

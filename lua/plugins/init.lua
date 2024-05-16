@@ -655,10 +655,19 @@ return {
   },
   {
     'lervag/vimtex',
+    --[[
+    如何实现从skim跳转到latex源码：
+    在skim->preferences->sync->选择custom，commands: nvim，arguments: --headless -c "VimtexInverseSearch %line '%file'"
+    要注意把'VimtexInverseSearch'加入到lazy load的trigger中，不然插件未加载，这是通过跑一遍nvim --headless -c "VimtexInverseSearch 236 '/path/to/example/latex_file.tex'"发现的
+    重启skim和nvim，重新用'VimtexCompile'编译一次，再打开pdf，按住"Shift+Command"，然后鼠标左键点击任何地方就能跳转到tex源码了
+    --]]
     ft = 'tex',
+    cmd = {'VimtexInverseSearch'},
     init = function()
       vim.g.vimtex_motion_enabled = 0
       vim.g.vimtex_text_obj_enabled = 0
+      vim.g.vimtex_view_skim_activate = 1
+      vim.g.vimtex_view_skim_sync = 1
     end,
     config = function()
       vim.g.vimtex_compiler_latexmk_engines = {

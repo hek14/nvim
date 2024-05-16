@@ -44,6 +44,7 @@ local M = {
     },
     {
       'folke/trouble.nvim',
+      enabled = false,
       branch = "dev",
       config = function()
         require('trouble').setup({})

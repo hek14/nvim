@@ -356,64 +356,6 @@ return {
     end,
   },
   {
-    'kevinhwang91/nvim-bqf',
-    ft = 'qf',
-    -- config = function()
-    --   local group = vim.api.nvim_create_augroup('hack_bqf',{clear=true})
-    --   vim.api.nvim_create_autocmd('ExitPre',{
-    --     group = group,
-    --     callback = function()
-    --       for b in ipairs(vim.api.nvim_list_bufs()) do
-    --         if vim.api.nvim_buf_is_valid(b) and vim.api.nvim_buf_get_option(b, 'filetype') == 'qf' then
-    --           vim.api.nvim_buf_delete(b, {force = true})
-    --         end
-    --       end
-    --     end
-    --   })
-    --   vim.api.nvim_create_autocmd('FileType',{
-    --     pattern = 'qf',
-    --     group = group,
-    --     callback = function()
-    --       local timer = vim.loop.new_timer()
-    --       local bufnr = vim.api.nvim_get_current_buf()
-    --       assert(timer)
-    --       timer:start(10,10,vim.schedule_wrap(function()
-    --         vim.api.nvim_buf_call(bufnr, function()
-    --           if vim.w.bqf_enabled then
-    --             vim.cmd [[ set modifiable ]]
-    --             vim.keymap.set('n','<C-s>','<cmd>call qf_refactor#replace()<CR>',{ buffer = bufnr })
-    --             if timer then
-    --               timer:stop()
-    --               timer:close()
-    --               timer = nil
-    --             end
-    --           end
-    --         end)
-    --       end))
-    --     end
-    --   })
-    -- end
-  },
-  {
-    'stefandtw/quickfix-reflector.vim',
-    ft = 'qf',
-    -- NOTE: use my own ~/.config/nvim/plugin/qf_refactor.vim
-    -- this plugin conflicts with the above nvim-bqf, there is two solutions:
-    -- soluction 1: defer the nvim-bqf loading just like above
-    -- solution 2: modify the quickfix-reflector.vim init_buffer like below:
-    -- function! s:PrepareBuffer()
-    --   try
-    --     lua require('bqf').enable()
-    --   catch
-    --     echom "nvim-bqf is not installed"
-    --   endtry
-    --   if g:qf_modifiable == 1
-    --     setlocal modifiable
-    --   endif
-    --   let s:qfBufferLines = getline(1, '$')
-    -- endfunction
-  },
-  {
     'mbbill/undotree',
     cmd = 'UndotreeToggle',
     init = function()
@@ -742,5 +684,65 @@ return {
   --     })
   --   end,
   -- },
+  -- {
+  --   'stefandtw/quickfix-reflector.vim',
+  --   NOTE: use :cdo instead
+  --   ft = 'qf',
+  --   -- NOTE: use my own ~/.config/nvim/plugin/qf_refactor.vim
+  --   -- this plugin conflicts with the above nvim-bqf, there is two solutions:
+  --   -- soluction 1: defer the nvim-bqf loading just like above
+  --   -- solution 2: modify the quickfix-reflector.vim init_buffer like below:
+  --   -- function! s:PrepareBuffer()
+  --   --   try
+  --   --     lua require('bqf').enable()
+  --   --   catch
+  --   --     echom "nvim-bqf is not installed"
+  --   --   endtry
+  --   --   if g:qf_modifiable == 1
+  --   --     setlocal modifiable
+  --   --   endif
+  --   --   let s:qfBufferLines = getline(1, '$')
+  --   -- endfunction
+  -- },
+  -- {
+  --   'kevinhwang91/nvim-bqf',
+  --   NOTE: use :Cfilter instead
+  --   ft = 'qf',
+  --   config = function()
+  --     local group = vim.api.nvim_create_augroup('hack_bqf',{clear=true})
+  --     vim.api.nvim_create_autocmd('ExitPre',{
+  --       group = group,
+  --       callback = function()
+  --         for b in ipairs(vim.api.nvim_list_bufs()) do
+  --           if vim.api.nvim_buf_is_valid(b) and vim.api.nvim_buf_get_option(b, 'filetype') == 'qf' then
+  --             vim.api.nvim_buf_delete(b, {force = true})
+  --           end
+  --         end
+  --       end
+  --     })
+  --     vim.api.nvim_create_autocmd('FileType',{
+  --       pattern = 'qf',
+  --       group = group,
+  --       callback = function()
+  --         local timer = vim.loop.new_timer()
+  --         local bufnr = vim.api.nvim_get_current_buf()
+  --         assert(timer)
+  --         timer:start(10,10,vim.schedule_wrap(function()
+  --           vim.api.nvim_buf_call(bufnr, function()
+  --             if vim.w.bqf_enabled then
+  --               vim.cmd [[ set modifiable ]]
+  --               vim.keymap.set('n','<C-s>','<cmd>call qf_refactor#replace()<CR>',{ buffer = bufnr })
+  --               if timer then
+  --                 timer:stop()
+  --                 timer:close()
+  --                 timer = nil
+  --               end
+  --             end
+  --           end)
+  --         end))
+  --       end
+  --     })
+  --   end
+  -- }
 }
 return plugins

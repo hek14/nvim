@@ -1,5 +1,6 @@
 local M = {
   "goolord/alpha-nvim",
+  enabled = false,
   event = "VimEnter"
 }
 local function button(sc, txt, keybind)

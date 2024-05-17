@@ -16,7 +16,6 @@ local M = {
         require"osv".launch({port = 8086})
         return
       end
-      print('not nlua')
     end},
     { '<F4>', ':lua require"dap".run_last()<CR>'}, 
     { '<F5>', ':lua require"dap".continue()<CR>' },
@@ -111,7 +110,6 @@ M.config = function()
           vim.api.nvim_set_current_win(vim.g.last_focused_win) 
           local ft = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(vim.g.last_focused_win), 'filetype')
           if ft == 'dap-repl' or ft == 'dapui_watches' then
-            print('is dap')
             vim.cmd [[startinsert]]
           end
         end
@@ -119,7 +117,6 @@ M.config = function()
     }
   }
   dap.listeners.after.event_initialized['dapui_config'] = function()
-    print('dap event_initialized')
     require('dapui').open()
     local wins = vim.api.nvim_list_wins()
     local target = nil

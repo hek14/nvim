@@ -134,12 +134,16 @@ M[1].config = function()
         require("luasnip").lsp_expand(args.body)
       end,
     },
+    -- NOTE: according to TJ DeVries, the good principle for keymaps is: One key always does one thing. 
     mapping = cmp.mapping.preset.insert {
       ["<C-a>"] = cmp.mapping.close(), -- or abort
-      ['<C-y>'] = cmp.mapping.confirm({ -- NOTE:<C-y> is the default mapping for accepting completion
-        behavior = cmp.ConfirmBehavior.Replace,
-        select = true,
-      }),
+      ['<C-y>'] = cmp.mapping(
+        cmp.mapping.confirm({ -- NOTE:<C-y> is the default mapping for accepting completion
+          behavior = cmp.ConfirmBehavior.Insert,
+          select = true,
+        },
+        {"i", "c"}
+      )),
       ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       ['<C-n>'] = cmp.mapping(cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert }, { 'i', 'c' }),
       ["<C-d>"] = cmp.mapping.scroll_docs(-4),

@@ -1,8 +1,3 @@
--- NOTE:compatiable for 0.10
-if vim.uv then
-  vim.loop = vim.uv
-end
-
 require'core.options'
 require'core.autocmds'
 require'core.lazy'

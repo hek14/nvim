@@ -193,6 +193,7 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
   5.3. zoxide
 
 # referred dotfiles:
+- https://github.com/tjdevries/config.nvim: TJ
 - https://github.com/coffebar/dotfiles: nice rsync plugin, transfer.nvim
 - https://github.com/omerxx/dotfiles: https://www.youtube.com/@devopstoolbox
 - https://github.com/dlvhdr/dotfiles: 很好看的tmux+kitty配置 https://www.youtube.com/@JoshMedeski
@@ -200,7 +201,6 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
 - https://github.com/vsedov/nvim: really hacky about pylance config
 - https://github.com/max397574/omega-nvim: only hack pylance!!!
 - https://github.com/abzcoding/lvim: a lot of things to refer
-- https://github.com/tjdevries/config_manager/tree/master/xdg_config/nvim
 - https://github.com/RRethy/dotfiles/tree/master/nvim: the author of vim-illuminate
 - https://github.com/lucasvianav/nvim: nice hacking about lspconfig handlers
 - https://github.com/leaxoy/dotfiles/tree/main/.config/nvim

@@ -50,6 +50,7 @@ local plugins = {
   },
   {
     "coffebar/transfer.nvim",
+    -- NOTE: really important for remote development @ HUAWEI
     dependencies = "nvim-neo-tree/neo-tree.nvim",
     cmd = { "TransferInit", "DiffRemote", "TransferUpload", "TransferDownload", "TransferDirDiff", "TransferRepeat" },
     keys = {
@@ -130,43 +131,6 @@ return {
     end
   },
   {
-    "kawre/leetcode.nvim",
-    lazy = vim.fn.argv()[1] ~= "leetcode.nvim",
-    build = ":TSUpdate html",
-    dependencies = {
-      "nvim-telescope/telescope.nvim",
-      "nvim-lua/plenary.nvim", -- required by telescope
-      "MunifTanjim/nui.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "rcarriga/nvim-notify",
-      "nvim-tree/nvim-web-devicons",
-    },
-    opts = {
-      clang = "cpp",
-      cn = { -- leetcode.cn
-        enabled = true, ---@type boolean
-        translator = true, ---@type boolean
-        translate_problems = true, ---@type boolean
-      },
-      hooks = {
-        LeetQuestionNew = {
-          function()
-            local buf = vim.api.nvim_get_current_buf()
-            local file_name = vim.fn.expand("%:t")
-            local first_line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)
-            if(#first_line == 0 or not string.match(first_line[1], "^#include<bits/stdc++.h>")) then
-              local lines = {"#include<bits/stdc++.h>", "using namespace std;"}
-              vim.api.nvim_buf_set_lines(buf, 0, 0, false, lines)
-              vim.cmd[[write]]
-            end
-            local command = string.format( [[!sed -i 's/[^ ]*\.cpp/%s/g' CMakeLists.txt]], file_name )
-            vim.cmd(command)
-          end
-        },
-      },
-    },
-  },
-  {
     "MunifTanjim/nui.nvim"
   },
   {
@@ -182,8 +146,26 @@ return {
     end
   },
   {
+    'windwp/nvim-autopairs',
+    enabled = false,
+    event = 'InsertEnter',
+    config = function()
+      require('nvim-autopairs').setup{
+        check_ts = true,
+        ts_config = { -- will not add a pair on that treesitter node
+          lua = { "string", "source" },
+        },
+        disable_filetype = { "TelescopePrompt", "spectre_panel" },
+        ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
+      }
+      local cmp = require('cmp')
+      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+      cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())
+    end
+  },
+  {
     "utilyre/sentiment.nvim",
-    version = "*",
+    -- NOTE: alternative for nvim-autopairs
     event = "VeryLazy", -- keep for lazy loading
     opts = {},
     init = function()
@@ -206,28 +188,44 @@ return {
   {
     'alepez/vim-gtest',
     ft = {'c', 'cpp'},
+    cmd = {"GTestCmd"},
     keys = {
       {',g', ':GTestCmd '}
     },
   },
   {
-    "Pocco81/true-zen.nvim",
-    cmd = {'TZNarrow', 'TZFocus', 'TZMinimalist', 'TZAtaraxis'},
-    config = function()
-      require("true-zen").setup({})
-    end,
-  },
-  {
-    'tpope/vim-scriptease',
-    cmd = 'Messages',
-  },
-  {
-    "tpope/vim-sleuth",
-    event = "BufEnter"
-  },
-  {
     'tpope/vim-fugitive',
     cmd = {'Git', 'Gedit','Gdiffsplit','Gread','Gwrite','Ggrep','GMove','GDelete','GBrowse'}
+  },
+  {
+    "lewis6991/gitsigns.nvim",
+    event = 'BufRead',
+    config = function()
+      require"gitsigns".setup {
+        signs = {
+          add = { hl = "DiffAdd", text = "│", numhl = "GitSignsAddNr" },
+          change = { hl = "DiffChange", text = "│", numhl = "GitSignsChangeNr" },
+          delete = { hl = "DiffDelete", text = "", numhl = "GitSignsDeleteNr" },
+          topdelete = { hl = "DiffDelete", text = "‾", numhl = "GitSignsDeleteNr" },
+          changedelete = { hl = "DiffChangeDelete", text = "~", numhl = "GitSignsChangeNr" },
+        },
+        on_attach = function(bufnr)
+          -- if vim.api.nvim_buf_get_name(bufnr):match(<PATTERN>) then
+          --   -- Don't attach to specific buffers whose name matches a pattern
+          --   return false
+          -- end
+          require('core.utils').map('n', '<leader>hs', '<cmd>Gitsigns stage_hunk<CR>', {buffer=bufnr})
+          require('core.utils').map('n', '<leader>hu', '<cmd>Gitsigns undo_stage_hunk<CR>',{buffer=bufnr})
+          require('core.utils').map('n', '<leader>hr', '<cmd>Gitsigns reset_hunk<CR>',{buffer=bufnr})
+          require('core.utils').map('n', '<leader>hb', '<cmd>lua require"gitsigns".blame_line{full=true}<CR>',{buffer=bufnr})
+          require('core.utils').map('n', '<leader>hp', '<cmd>Gitsigns preview_hunk<CR>',{buffer=bufnr})
+          vim.cmd("nnoremap <expr> <silent> <buffer> ]c &diff ? ']c' : '<Cmd>Gitsigns next_hunk<CR>'")
+          vim.cmd("nnoremap <expr> <silent> <buffer> [c &diff ? '[c' : '<Cmd>Gitsigns prev_hunk<CR>'")
+          require('core.utils').map('x', 'uh','<Cmd>Gitsigns select_hunk<CR>',{buffer=bufnr})
+          require('core.utils').map('o', 'uh','<Cmd>Gitsigns select_hunk<CR>',{buffer=bufnr})
+        end
+      }
+    end
   },
   {
     "tpope/vim-surround",
@@ -244,6 +242,7 @@ return {
   { 'nvim-tree/nvim-web-devicons' },
   {
     'glepnir/template.nvim',
+    -- NOTE: useful for CMakeLists.txt
     cmd = {'Template','TemProject'},
     config = function()
       require('template').setup({
@@ -262,26 +261,8 @@ return {
   },
   {
     "cohama/lexima.vim",
+    -- NOTE: auto close parentheses
     lazy = false,
-  },
-  {
-    'windwp/nvim-autopairs',
-    version = "*",
-    enabled = false,
-    event = 'InsertEnter',
-    config = function()
-      require('nvim-autopairs').setup{
-        check_ts = true,
-        ts_config = { -- will not add a pair on that treesitter node
-          lua = { "string", "source" },
-        },
-        disable_filetype = { "TelescopePrompt", "spectre_panel" },
-        ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
-      }
-      local cmp = require('cmp')
-      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-      cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done())
-    end
   },
   {
     'numToStr/Comment.nvim',
@@ -366,6 +347,7 @@ return {
         searchreg = 1,
         next_tool = '<leader>gw',
       }
+      -- NOTE: how to search the word under cursor(<cword>) faster? Select the word, then type <leader>gs!
       vim.cmd([[
       nnoremap <leader>gw :Grepper<cr>
       nmap <leader>gs  <plug>(GrepperOperator)
@@ -376,47 +358,47 @@ return {
   {
     'kevinhwang91/nvim-bqf',
     ft = 'qf',
-    config = function()
-      local group = vim.api.nvim_create_augroup('hack_bqf',{clear=true})
-      vim.api.nvim_create_autocmd('ExitPre',{
-        group = group,
-        callback = function()
-          for b in ipairs(vim.api.nvim_list_bufs()) do
-            if vim.api.nvim_buf_is_valid(b) and vim.api.nvim_buf_get_option(b, 'filetype') == 'qf' then
-              vim.api.nvim_buf_delete(b, {force = true})
-            end
-          end
-        end
-      })
-      vim.api.nvim_create_autocmd('FileType',{
-        pattern = 'qf',
-        group = group,
-        callback = function()
-          local timer = vim.loop.new_timer()
-          local bufnr = vim.api.nvim_get_current_buf()
-          assert(timer)
-          timer:start(10,10,vim.schedule_wrap(function()
-            vim.api.nvim_buf_call(bufnr, function()
-              if vim.w.bqf_enabled then
-                vim.cmd [[ set modifiable ]]
-                vim.keymap.set('n','<C-s>','<cmd>call qf_refactor#replace()<CR>',{ buffer = bufnr })
-                if timer then
-                  timer:stop()
-                  timer:close()
-                  timer = nil
-                end
-              end
-            end)
-          end))
-        end
-      })
-    end
+    -- config = function()
+    --   local group = vim.api.nvim_create_augroup('hack_bqf',{clear=true})
+    --   vim.api.nvim_create_autocmd('ExitPre',{
+    --     group = group,
+    --     callback = function()
+    --       for b in ipairs(vim.api.nvim_list_bufs()) do
+    --         if vim.api.nvim_buf_is_valid(b) and vim.api.nvim_buf_get_option(b, 'filetype') == 'qf' then
+    --           vim.api.nvim_buf_delete(b, {force = true})
+    --         end
+    --       end
+    --     end
+    --   })
+    --   vim.api.nvim_create_autocmd('FileType',{
+    --     pattern = 'qf',
+    --     group = group,
+    --     callback = function()
+    --       local timer = vim.loop.new_timer()
+    --       local bufnr = vim.api.nvim_get_current_buf()
+    --       assert(timer)
+    --       timer:start(10,10,vim.schedule_wrap(function()
+    --         vim.api.nvim_buf_call(bufnr, function()
+    --           if vim.w.bqf_enabled then
+    --             vim.cmd [[ set modifiable ]]
+    --             vim.keymap.set('n','<C-s>','<cmd>call qf_refactor#replace()<CR>',{ buffer = bufnr })
+    --             if timer then
+    --               timer:stop()
+    --               timer:close()
+    --               timer = nil
+    --             end
+    --           end
+    --         end)
+    --       end))
+    --     end
+    --   })
+    -- end
   },
   {
     'stefandtw/quickfix-reflector.vim',
+    ft = 'qf',
     -- NOTE: use my own ~/.config/nvim/plugin/qf_refactor.vim
-    enabled = false,
-    -- this plugin conflicts with the above nvim-bqf, it will ca nvim-bqf not working, there is two solutions:
+    -- this plugin conflicts with the above nvim-bqf, there is two solutions:
     -- soluction 1: defer the nvim-bqf loading just like above
     -- solution 2: modify the quickfix-reflector.vim init_buffer like below:
     -- function! s:PrepareBuffer()
@@ -535,7 +517,7 @@ return {
       -- which means it will not be executed immediately, so when we first call [[Telescope projects]]
       -- it will call this config part first, `config` will load project and *schedule* the read_projects_from_history, but the project lists are empty right now. 
       -- we can use vim.wait to sync the callback, see notes.md
-      -- :help vim.wait says: ` Nvim still processes other events during this time.`
+      -- :help vim.wait says: ` Nvim still processes other events during this time.`. In this case, the `uv.fs_read` is a scheduled work in the main loop.
     end,
   },
   {
@@ -579,22 +561,6 @@ return {
       vim.api.nvim_create_user_command("AsyncRunToggle", [[:call asyncrun#quickfix_toggle(10)]],{})
       vim.g.asyncrun_open = 6
       vim.g.asyncrun_bell = 1
-    end,
-  },
-  {
-    'folke/persistence.nvim',
-    enabled = false,
-    event = 'BufReadPre',
-    init = function()
-      map('n', '<space>qs', [[<cmd>lua require("persistence").load()<cr>]])
-      map('n', '<space>ql', [[<cmd>lua require("persistence").load({ last = true })<cr>]])
-      map('n', '<space>qd', [[<cmd>lua require("persistence").stop()<cr>]])
-    end,
-    config = function()
-      require('persistence').setup({
-        dir = vim.fn.expand(vim.fn.stdpath('data') .. '/sessions/'),
-        options = { 'buffers', 'curdir', 'tabpages', 'winsize' },
-      })
     end,
   },
   {
@@ -685,13 +651,50 @@ return {
       vim.g.vimtex_view_method = 'skim'
     end,
   },
-  {
-    'rhysd/vim-grammarous',
-    enabled = false,
-    init = function()
-      vim.g['grammarous#languagetool_cmd'] = 'languagetool -l en-US'
-    end,
-  },
+  -- {
+  --   'rhysd/vim-grammarous',
+  --   init = function()
+  --     vim.g['grammarous#languagetool_cmd'] = 'languagetool -l en-US'
+  --   end,
+  -- },
+  -- {
+  --   "kawre/leetcode.nvim",
+  --   enabled = false,
+  --   lazy = vim.fn.argv()[1] ~= "leetcode.nvim",
+  --   build = ":TSUpdate html",
+  --   dependencies = {
+  --     "nvim-telescope/telescope.nvim",
+  --     "nvim-lua/plenary.nvim", -- required by telescope
+  --     "MunifTanjim/nui.nvim",
+  --     "nvim-treesitter/nvim-treesitter",
+  --     "rcarriga/nvim-notify",
+  --     "nvim-tree/nvim-web-devicons",
+  --   },
+  --   opts = {
+  --     clang = "cpp",
+  --     cn = { -- leetcode.cn
+  --       enabled = true, ---@type boolean
+  --       translator = true, ---@type boolean
+  --       translate_problems = true, ---@type boolean
+  --     },
+  --     hooks = {
+  --       LeetQuestionNew = {
+  --         function()
+  --           local buf = vim.api.nvim_get_current_buf()
+  --           local file_name = vim.fn.expand("%:t")
+  --           local first_line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)
+  --           if(#first_line == 0 or not string.match(first_line[1], "^#include<bits/stdc++.h>")) then
+  --             local lines = {"#include<bits/stdc++.h>", "using namespace std;"}
+  --             vim.api.nvim_buf_set_lines(buf, 0, 0, false, lines)
+  --             vim.cmd[[write]]
+  --           end
+  --           local command = string.format( [[!sed -i 's/[^ ]*\.cpp/%s/g' CMakeLists.txt]], file_name )
+  --           vim.cmd(command)
+  --         end
+  --       },
+  --     },
+  --   },
+  -- },
   -- {
   --   'norcalli/nvim-colorizer.lua',
   --   cmd = 'ColorizerToggle',
@@ -706,6 +709,37 @@ return {
   --   config = function()
   --     vim.g.choosewin_overlay_enable = 1
   --     map('core.utils').map('n', '-', '<Plug>(choosewin)', { noremap = false })
+  --   end,
+  -- },
+  -- {
+  --   "Pocco81/true-zen.nvim",
+  --   cmd = {'TZNarrow', 'TZFocus', 'TZMinimalist', 'TZAtaraxis'},
+  --   config = function()
+  --     require("true-zen").setup({})
+  --   end,
+  -- },
+  -- {
+  --   'tpope/vim-scriptease',
+  --   enabled = false,
+  --   cmd = 'Messages',
+  -- },
+  -- {
+  --   "tpope/vim-sleuth",
+  --   event = "BufEnter"
+  -- },
+  -- {
+  --   'folke/persistence.nvim',
+  --   event = 'BufReadPre',
+  --   init = function()
+  --     map('n', '<space>qs', [[<cmd>lua require("persistence").load()<cr>]])
+  --     map('n', '<space>ql', [[<cmd>lua require("persistence").load({ last = true })<cr>]])
+  --     map('n', '<space>qd', [[<cmd>lua require("persistence").stop()<cr>]])
+  --   end,
+  --   config = function()
+  --     require('persistence').setup({
+  --       dir = vim.fn.expand(vim.fn.stdpath('data') .. '/sessions/'),
+  --       options = { 'buffers', 'curdir', 'tabpages', 'winsize' },
+  --     })
   --   end,
   -- },
 }

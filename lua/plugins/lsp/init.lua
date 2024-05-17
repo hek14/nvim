@@ -115,12 +115,7 @@ local M = {
       end
     },
     {
-      'Bekaboo/dropbar.nvim',
-      enabled = false,
-    },
-    {
       'hek14/symbol-overlay.nvim',
-      enabled = false,
       config = function ()
         require('symbol-overlay').setup()
         require'telescope'.load_extension('symbol_overlay')
@@ -179,6 +174,7 @@ function M.config()
     }),
   }
 
+  require("lazy").load({plugins = {"symbol-overlay.nvim"}})
   local cmp_present, cmp = pcall(require, 'cmp')
   local capabilities
   if cmp_present then

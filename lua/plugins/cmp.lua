@@ -195,24 +195,6 @@ M[1].config = function()
     },
   }
   vim.cmd('hi! CmpFloatBorder guifg=red')
-
-  -- NOTE: don't have to do this, because when cmp is not enabled, the keymap will not be overrided
-  -- require('core.utils').map("i","<C-n>",function()
-  --   if(cmp.visible()) then
-  --     cmp.select_next_item { behavior = cmp.SelectBehavior.Insert }
-  --   else
-  --     feedkeys('<C-o>o','n')
-  --   end
-  -- end)
-  --
-  -- require('core.utils').map("i","<C-p>",function()
-  --   if(cmp.visible()) then
-  --     cmp.select_prev_item { behavior = cmp.SelectBehavior.Insert }
-  --   else
-  --     feedkeys('<C-o>O','n')
-  --   end
-  -- end)
-
   local mine_config_yaml = require("contrib.cmp_config_yaml")
   cmp.register_source("mine_config_yaml", mine_config_yaml.new())
   cmp.register_source('remote_path', require('contrib.parse_remote_path').new())

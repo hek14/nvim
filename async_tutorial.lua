@@ -42,7 +42,7 @@ end
 --#################### Async Region ####################
 --#################### ############ ####################
 
-
+-- NOTE: 典型的需要异步的情形有三种：network request, file IO, database query，特点是CPU通常需要等待其他resources返回结果，CPU存在闲置，此时需要异步让CPU执行其他人物以提高CPU利用率
 -- NOTE: 这里用timeout来模拟一个async op: 需要经过一段时间之后才能拿到结果, 拿到结果时调用callback
 local timeout = function (ms, callback)
   local timer = uv.new_timer()

@@ -1,4 +1,4 @@
-local override_hl = function ()
+local hook = function ()
   vim.api.nvim_set_hl(0,'Visual',{bg = '#36497d', bold = true})
   vim.api.nvim_set_hl(0,'MatchParen',{bg = '#264f78', bold = true})
   vim.cmd([[
@@ -13,6 +13,8 @@ local override_hl = function ()
   hi! Gray guifg=#52504c
   " hi! WinSeparator guibg=#4d5461 ctermbg=238
   ]])
+  -- NOTE: load plugins that rely on theme
+  require("lazy").load({plugins = {"windline.nvim", "bufferline.nvim", "todo-comments.nvim"}})
 end
 
 local catppuccin = {
@@ -53,6 +55,7 @@ local catppuccin = {
       },
     }
     vim.cmd [[ colorscheme catppuccin ]]
+    hook()
   end
 }
 
@@ -62,7 +65,7 @@ local kanagawa = {
   config = function ()
     require('kanagawa').setup()
     vim.cmd [[ colorscheme kanagawa ]]
-    override_hl()
+    hook()
   end
 }
 
@@ -71,6 +74,7 @@ local flipped = {
   event = "VeryLazy",
   config = function ()
     vim.cmd [[ colorscheme flipped ]]
+    hook()
   end
 }
 
@@ -82,6 +86,7 @@ local newpaper = {
       style = "light",
       lualine_style = "light"
     })
+    hook()
   end
 }
 
@@ -90,6 +95,7 @@ local abscs = {
   event = "VimEnter",
   config = function ()
     vim.cmd[[colorscheme abscs]]
+    hook()
   end
 }
 
@@ -98,7 +104,7 @@ local everforest = {
   event = "VimEnter",
   config = function ()
     vim.cmd[[colorscheme everforest]]
-    override_hl()
+    hook()
   end
 }
 
@@ -109,12 +115,13 @@ local vscode = {
       require("visual_studio_code").setup({
         mode = "dark",
       })
-      override_hl()
+      hook()
     end)
   end,
   -- priority = 100,
-  config = function()
+  config = function ()
     vim.cmd([[colorscheme visual_studio_code]])
+    hook()
   end,
 }
 
@@ -124,7 +131,7 @@ local material = {
     vim.schedule(function ()
       vim.g.material_style = "palenight"
       vim.cmd 'colorscheme material'
-      override_hl()
+      hook()
     end)
   end,
 }
@@ -132,10 +139,10 @@ local material = {
 local srcery = {
   "srcery-colors/srcery-vim",
   event = "VeryLazy",
-  config = function()
+  config = function ()
     vim.g.srcery_italic = 1
     vim.cmd.colorscheme('srcery')
-    override_hl()
+    hook()
   end
 }
 
@@ -143,8 +150,9 @@ local rose_pine = {
   'rose-pine/neovim',
   name = 'rose-pine',
   event = "VeryLazy",
-  config = function()
+  config = function ()
     vim.cmd.colorscheme('rose-pine')
+    hook()
   end
 }
 
@@ -153,96 +161,15 @@ local tokyonight = {
   name = "tokyonight",
   priority = 1000,
   event = "VeryLazy",
-  config = function()
+  config = function ()
     local status_ok, tokyonight = pcall(require, "tokyonight")
     if not status_ok then
       return
     end
-    tokyonight.setup({
-      style = "storm",
-      terminal_colors = true,
-      styles = {
-        comments = { italic = true },
-        keywords = { italic = true },
-        functions = {},
-        variables = {},
-      },
-      sidebars = {
-        "terminal",
-        "packer",
-        "help",
-        "NvimTree",
-        "Trouble",
-        "LspInfo",
-      },
-      dim_inactive = false,
-      lualine_bold = false,
-      on_highlights = function(hl, c)
-        local util = require("tokyonight.util")
-        local darker_bg = util.darken(c.bg_popup, 2.5)
-        hl.LineNr.fg = c.comment
-        hl.CursorLineNr = {
-          fg = c.fg,
-          bold = true,
-        }
-        hl.WhichKeyGroup = {
-          fg = c.green,
-          bold = true,
-        }
-        hl.BufferVisibleMod = { fg = c.yellow, bg = c.bg }
-        hl.WinSeparator = {
-          fg = util.darken(c.border_highlight, 0.3),
-        }
-        hl.NvimTreeSpecialFile = {
-          fg = c.yellow,
-          bold = true,
-        }
-        hl.EndOfBuffer = { bg = "NONE" }
-        hl.CmpDocumentation = { bg = darker_bg }
-        hl.CmpDocumentationBorder = { bg = darker_bg }
-        hl.TelescopeMatching = { fg = c.warning, bold = true }
-        hl.TreesitterContext = { bg = c.bg_highlight }
-        hl.NvimTreeFolderIcon = { fg = c.blue }
-        hl.CmpBorder = { fg = c.fg_gutter, bg = "NONE" }
-        hl.CmpDocBorder = { fg = c.fg_gutter, bg = "NONE" }
-        hl.TelescopeBorder = { fg = c.fg_gutter, bg = "NONE" }
-        hl.TelescopePromptTitle = { fg = c.blue, bg = "NONE" }
-        hl.TelescopeResultsTitle = { fg = c.teal, bg = "NONE" }
-        hl.TelescopePreviewTitle = { fg = c.fg, bg = "NONE" }
-        hl.TelescopePromptPrefix = { fg = c.blue, bg = "NONE" }
-        hl.TelescopeResultsDiffAdd = { fg = c.green, bg = "NONE" }
-        hl.TelescopeResultsDiffChange = { fg = c.yellow, bg = "NONE" }
-        hl.TelescopeResultsDiffDelete = { fg = c.red, bg = "NONE" }
-        hl.TelescopeMatching = { fg = c.green, bold = true, bg = "NONE" }
-        hl.FoldColumn = { fg = c.blue }
-        hl.DevIconFish = { fg = c.green }
-        hl.GHThreadSep = { bg = c.bg_float }
-        hl.markdownH1 = { bg = c.bg_float }
-        hl.DiagnosticUnnecessary = { fg = util.lighten(c.comment, 0.7), undercurl = true }
-        hl.Directory = { fg = c.comment }
-        hl.GitSignsAddNr = { fg = c.green }
-        hl.GitSignsAddLn = { fg = c.green }
-        hl.GitSignsAdd = { fg = c.green }
-        hl.MatchParen = { bg = c.fg_gutter }
-      end,
-    })
+    tokyonight.setup({})
     tokyonight.load()
+    hook()
   end,
-  colors = function()
-    local colors_ok, colors = pcall(require, "tokyonight.colors")
-    if not colors_ok then
-      return
-    end
-    return colors.setup({})
-  end,
-  util = function()
-    local util_ok, util = pcall(require, "tokyonight.util")
-    if not util_ok then
-      return
-    end
-
-    return util
-  end
 }
 
 local darkplus = {
@@ -251,9 +178,8 @@ local darkplus = {
   priority = 999,
   config = function ()
     vim.cmd("colorscheme darkplus")
-    override_hl()
-    require("lazy").load({plugins = {"windline.nvim", "bufferline.nvim", "todo-comments.nvim"}})
+    hook()
   end
 }
 
-return darkplus
+return rose_pine

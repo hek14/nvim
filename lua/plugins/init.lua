@@ -202,13 +202,13 @@ return {
     event = 'BufRead',
     config = function()
       require"gitsigns".setup {
-        signs = {
-          add = { hl = "DiffAdd", text = "│", numhl = "GitSignsAddNr" },
-          change = { hl = "DiffChange", text = "│", numhl = "GitSignsChangeNr" },
-          delete = { hl = "DiffDelete", text = "", numhl = "GitSignsDeleteNr" },
-          topdelete = { hl = "DiffDelete", text = "‾", numhl = "GitSignsDeleteNr" },
-          changedelete = { hl = "DiffChangeDelete", text = "~", numhl = "GitSignsChangeNr" },
-        },
+        -- signs = {
+        --   add = { hl = "DiffAdd", text = "│", numhl = "GitSignsAddNr" },
+        --   change = { hl = "DiffChange", text = "│", numhl = "GitSignsChangeNr" },
+        --   delete = { hl = "DiffDelete", text = "", numhl = "GitSignsDeleteNr" },
+        --   topdelete = { hl = "DiffDelete", text = "‾", numhl = "GitSignsDeleteNr" },
+        --   changedelete = { hl = "DiffChangeDelete", text = "~", numhl = "GitSignsChangeNr" },
+        -- },
         on_attach = function(bufnr)
           -- if vim.api.nvim_buf_get_name(bufnr):match(<PATTERN>) then
           --   -- Don't attach to specific buffers whose name matches a pattern
@@ -219,10 +219,10 @@ return {
           require('core.utils').map('n', '<leader>hr', '<cmd>Gitsigns reset_hunk<CR>',{buffer=bufnr})
           require('core.utils').map('n', '<leader>hb', '<cmd>lua require"gitsigns".blame_line{full=true}<CR>',{buffer=bufnr})
           require('core.utils').map('n', '<leader>hp', '<cmd>Gitsigns preview_hunk<CR>',{buffer=bufnr})
-          vim.cmd("nnoremap <expr> <silent> <buffer> ]c &diff ? ']c' : '<Cmd>Gitsigns next_hunk<CR>'")
-          vim.cmd("nnoremap <expr> <silent> <buffer> [c &diff ? '[c' : '<Cmd>Gitsigns prev_hunk<CR>'")
           require('core.utils').map('x', 'uh','<Cmd>Gitsigns select_hunk<CR>',{buffer=bufnr})
           require('core.utils').map('o', 'uh','<Cmd>Gitsigns select_hunk<CR>',{buffer=bufnr})
+          vim.cmd("nnoremap <expr> <silent> <buffer> ]c &diff ? ']c' : '<Cmd>Gitsigns next_hunk<CR>'")
+          vim.cmd("nnoremap <expr> <silent> <buffer> [c &diff ? '[c' : '<Cmd>Gitsigns prev_hunk<CR>'")
         end
       }
     end
@@ -684,10 +684,10 @@ return {
   --     })
   --   end,
   -- },
-  -- {
-  --   'stefandtw/quickfix-reflector.vim',
+  {
+    'stefandtw/quickfix-reflector.vim',
   --   NOTE: use :cdo instead
-  --   ft = 'qf',
+    ft = 'qf',
   --   -- NOTE: use my own ~/.config/nvim/plugin/qf_refactor.vim
   --   -- this plugin conflicts with the above nvim-bqf, there is two solutions:
   --   -- soluction 1: defer the nvim-bqf loading just like above
@@ -703,7 +703,7 @@ return {
   --   --   endif
   --   --   let s:qfBufferLines = getline(1, '$')
   --   -- endfunction
-  -- },
+  },
   -- {
   --   'kevinhwang91/nvim-bqf',
   --   NOTE: use :Cfilter instead

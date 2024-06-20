@@ -42,6 +42,7 @@ local M = {
   dependencies = {
     'theHamsta/nvim-dap-virtual-text',
     'rcarriga/nvim-dap-ui',
+    "nvim-neotest/nvim-nio",
     'mfussenegger/nvim-dap-python',
     'nvim-telescope/telescope-dap.nvim',
     {'rcarriga/cmp-dap',enabled = function()
@@ -90,88 +91,18 @@ M.config = function()
 
   -- Events Listeners
   local dap = require('dap')
-  -- dap.defaults.fallback.force_external_terminal = true
-  -- dap.defaults.fallback.external_terminal = {
-  --   command = '/opt/homebrew/bin/wezterm';
-  --   args = {'-e'};
-  -- }
-  local keymaps = {
-    ['i'] = {
-      {"<C-w>h","<Esc><C-w>h"},
-      {"<C-w>n","<Esc><C-w>j"},
-      {"<C-w>e","<Esc><C-w>k"},
-      {"<C-w>i","<Esc><C-w>l"},
-      {"<C-LEFT>","<Esc><C-w>h"},
-      {"<C-DOWN>","<Esc><C-w>j"},
-      {"<C-UP>","<Esc><C-w>k"},
-      {"<C-RIGHT>","<Esc><C-w>l"},
-      {"<C-w>l",function ()
-        if vim.api.nvim_win_is_valid(vim.g.last_focused_win)then
-          vim.api.nvim_set_current_win(vim.g.last_focused_win) 
-          local ft = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(vim.g.last_focused_win), 'filetype')
-          if ft == 'dap-repl' or ft == 'dapui_watches' then
-            vim.cmd [[startinsert]]
-          end
-        end
-      end}
-    }
-  }
-  dap.listeners.after.event_initialized['dapui_config'] = function()
-    require('dapui').open()
-    local wins = vim.api.nvim_list_wins()
-    local target = nil
-    local curr_win = vim.api.nvim_get_current_win()
-    for _,win in ipairs(wins) do
-      vim.api.nvim_win_call(win,function ()
-        local buffer = vim.api.nvim_win_get_buf(win)
-        local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
-        if filetype:match('dap') then
-          if "dap-repl"==filetype then
-            target = win
-            vim.g.dap_repl_buffer = vim.api.nvim_win_get_buf(win)
-          end
-          if filetype=="dap-repl" or filetype=='dapui_watches' then
-            vim.api.nvim_create_autocmd({'BufWinEnter','WinEnter'}, {command='startinsert',group=group,buffer=buffer})
-            vim.api.nvim_create_autocmd({'WinLeave'}, {command='stopinsert',group=group,buffer=buffer})
-          end
-          for mode, maps in pairs(keymaps) do
-            for i, mapargs in ipairs(maps) do
-              vim.keymap.set(mode, mapargs[1], mapargs[2], {noremap=true,silent=true,buffer=buffer})
-            end
-          end
-        end
-      end)
-    end
-    if target then
-      vim.api.nvim_set_current_win(target)
-    end
+  local ui = require("dapui")
+  dap.listeners.before.attach.dapui_config = function()
+    ui.open()
   end
-  dap.listeners.after.event_terminated['dapui_config'] = function()
-    require('dapui').close()
-    vim.schedule(function()
-      vim.cmd [[stopinsert]]
-      pcall(function ()
-        vim.cmd (string.format('bwipe! %s',vim.g.dap_repl_buffer))
-      end)
-    end)
+  dap.listeners.before.launch.dapui_config = function()
+    ui.open()
   end
-  dap.listeners.after.event_exited['dapui_config'] = function()
-    require('dapui').close()
-    vim.schedule(function()
-      vim.cmd [[stopinsert]]
-      pcall(function ()
-        vim.cmd (string.format('bwipe! %s',vim.g.dap_repl_buffer))
-      end)
-    end)
+  dap.listeners.before.event_terminated.dapui_config = function()
+    ui.close()
   end
-  dap.listeners.after.disconnect['dapui_config'] = function()
-    require('dapui').close()
-    vim.schedule(function()
-      vim.cmd [[stopinsert]]
-      pcall(function ()
-        vim.cmd (string.format('bwipe! %s',vim.g.dap_repl_buffer))
-      end)
-    end)
+  dap.listeners.before.event_exited.dapui_config = function()
+    ui.close()
   end
 
   require('telescope').load_extension('dap')
@@ -185,38 +116,5 @@ M.config = function()
       }),
     })
   end
-
-  local function focus_hover()
-    local found = nil
-    for win = 1, vim.fn.winnr('$') do
-      local winid = vim.fn.win_getid(win)
-      local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(winid))
-      local config = vim.api.nvim_win_get_config(winid)
-      if config['focusable'] and config['relative'] ~= '' then
-        --  and bufname=='DAP Hover'
-        found = win
-        break
-      end
-    end
-    return found
-  end
-
-  require('core.utils').map('n', ',e', function()
-    local found_hover = focus_hover()
-    if found_hover ~= nil then
-      return string.format([[:<C-u>%s wincmd w<CR>]], found_hover)
-    else
-      return [[:<C-u>lua require('dapui').eval('')<Left><Left>]]
-    end
-  end, { expr = true })
-
-  require('core.utils').map('x', ',e', function()
-    local found_hover = focus_hover()
-    if found_hover ~= nil then
-      return string.format([[:<C-u>%s wincmd w<CR>]], found_hover)
-    else
-      return [[<Cmd>lua require("dapui").eval()<CR>]]
-    end
-  end, { expr = true })
 end
 return M

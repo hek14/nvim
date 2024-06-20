@@ -58,7 +58,7 @@ function M.config()
     vim.api.nvim_feedkeys(keycode, mode, false)
   end
 
-  map({ "i", "s" }, "<c-j>", function()
+  map({ "i", "s" }, "<C-j>", function()
     if ls.expand_or_locally_jumpable() then
       ls.expand_or_jump()
     else
@@ -66,14 +66,14 @@ function M.config()
     end
   end)
 
-  map({ "i", "s" }, "<c-k>", function()
+  map({ "i", "s" }, "<C-k>", function()
     if ls.locally_jumpable(-1) then
       ls.jump(-1)
     else
       feedkeys("<C-o>C", "n")
     end
   end)
-  map({"i","s"}, "<c-l>", function()
+  map({"i","s"}, "<C-l>", function()
     if ls.choice_active() then
       ls.change_choice(1)
     end

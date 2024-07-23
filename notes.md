@@ -1,3 +1,16 @@
+# nvim's good shell companion/dependencies
+- nodejs(node+npm) >= 16, required by Lsp
+- pyright
+- lua-language-server
+- clangd
+- ripgrep
+- fdfind
+- z/zoxide
+- fzf
+- lazygit
+- [clippy](https://bitpowder.com:2443/bvgastel/clippy)
+- prettier: format tools
+
 # I don't use Mason.nvim, but I use its website for searching tools
 - https://mason-registry.dev/registry/list
 - https://github.com/williamboman/mason-lspconfig.nvim?tab=readme-ov-file#available-lsp-servers
@@ -187,10 +200,6 @@ mac上下载的正确方式是从safari或者直接复制链接之后wget.
   4.2. sudo bash nodesource_setup.sh
   4.3. sudo apt-get update && sudo apt install nodejs
   4.4. node -v # check the version 
-5. install shell dependencies:
-  5.1. ripgrep
-  5.2. fdfind
-  5.3. zoxide
 
 # referred dotfiles:
 - https://github.com/tjdevries/config.nvim: TJ

@@ -19,6 +19,18 @@ end
 
 local function others()
   map('n','<C-j>','J',{noremap=true})
+  map('n', '<leader>ha', function()
+    local cur_word = vim.fn.expand("<cword>")
+    local cmd = string.format(":match  /%s/", cur_word)
+    local left = "<Left>"
+    for i = 1,#cur_word+3 do
+      cmd = cmd .. left
+    end
+    local key = vim.api.nvim_replace_termcodes(cmd, true, false, true)
+    vim.api.nvim_feedkeys(key, "normal", false)
+  end)
+  map('n', "<leader>hc", "<cmd>match none<cr>")
+
   vim.api.nvim_create_user_command('ProfileStart',function()
     local file = vim.fn.input("Log file: ","nvim_log.txt")
     vim.cmd(string.format('profile start %s',file))

@@ -2,7 +2,7 @@ local M = {}
 local util = require'lspconfig'.util
 M.setup = function(options)
   local root_dir = function(fname)
-    local root_files = {'CMakeLists.txt'}
+    local root_files = {'.clangd', 'compile_commands.json'}
     return util.find_git_ancestor(fname) or
     util.root_pattern(unpack(root_files))(fname) or
     util.path.dirname(fname)
@@ -15,7 +15,7 @@ M.setup = function(options)
       -- vim.lsp.inlay_hint(bufnr, true)
     end,
     cmd = {
-      '/opt/homebrew/opt/llvm/bin/clangd',
+      'clangd',
       '--background-index',
       '--clang-tidy',
       '--header-insertion=iwyu',

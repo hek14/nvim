@@ -3,6 +3,7 @@ require'core.autocmds'
 require'core.lazy'
 require'core.keymap'
 require'core.gui'
+require'core.clipboard'
 
 --[[
 Some hacking scripts of this config

@@ -1,4 +1,6 @@
 # TODO: 
+- lsp/init.lua中需要check相应的lsp-server是否已经安装, 如果没有则提示去`mason-registry`安装
+- 利用vimux去send another tmux pane commands
 - 利用`lua-async-await` refactor `pig`
 - check modern-unix shell tools: https://github.com/ibraheemdev/modern-unix
 - check: https://github.com/quarto-dev/quarto-nvim

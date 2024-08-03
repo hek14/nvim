@@ -122,10 +122,13 @@ end)
 
 vim.api.nvim_create_autocmd("BufEnter",{
   callback=function ()
-    local is_dir = vim.fn.expand('%') == "."
-    if is_dir then
-      vim.cmd("NvimTreeClose")
-      vim.cmd("NvimTreeOpen .")
+    local ok, _ = require("nvim-tree")
+    if ok then
+      local is_dir = vim.fn.expand('%') == "."
+      if is_dir then
+        vim.cmd("NvimTreeClose")
+        vim.cmd("NvimTreeOpen .")
+      end
     end
   end
 })

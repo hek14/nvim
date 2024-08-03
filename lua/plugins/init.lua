@@ -1,8 +1,18 @@
 local map = require('core.utils').map
 local plugins = {
   {
+    'ojroques/vim-oscyank',
+    lazy = false,
+    config = function()
+      vim.keymap.set('n', '<leader>c', '<Plug>OSCYankOperator')
+      vim.keymap.set('n', '<leader>cc', '<leader>c_', {remap = true})
+      vim.keymap.set('v', '<leader>c', '<Plug>OSCYankVisual')
+    end
+  },
+  {
     'stevearc/oil.nvim',
     opts = {},
+    event = 'VimEnter',
     cmd = "Oil",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     init = function()
@@ -174,7 +184,7 @@ return {
   },
   {
     'cdelledonne/vim-cmake',
-    ft = {'c', 'cpp'},
+    ft = {'c', 'cpp', 'make', 'cmake'},
     init = function()
       vim.g.cmake_link_compile_commands = 1
     end,
@@ -360,13 +370,15 @@ return {
     cmd = 'UndotreeToggle',
     init = function()
       map('n', '<C-x>u', function()
-        vim.cmd [[ UndotreeToggle ]]
-        for _,win in ipairs(require('core.utils').get_all_window_buffer_filetype()) do
-          if win.filetype == 'undotree' then
-            vim.api.nvim_set_current_win(win.winnr)
-            break
+        pcall(function()
+          vim.cmd [[ UndotreeToggle ]]
+          for _,win in ipairs(require('core.utils').get_all_window_buffer_filetype()) do
+            if win.filetype == 'undotree' then
+              vim.api.nvim_set_current_win(win.winnr)
+              break
+            end
           end
-        end
+        end)
       end)
     end,
   },

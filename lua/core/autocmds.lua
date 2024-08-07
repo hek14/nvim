@@ -20,15 +20,15 @@ local function writeToFile(filePath, content)
     file:close()
 end
 
-vim.api.nvim_create_autocmd("VimLeavePre", {
-  desc = "write the current cwd",
-  group = vim.api.nvim_create_augroup('kk-vimleave', { clear = true }),
-  callback = function()
-    local filePath = "/tmp/cwd.txt"
-    local content = vim.uv.cwd()
-    writeToFile(filePath, content)
-  end
-})
+-- vim.api.nvim_create_autocmd("VimLeavePre", {
+--   desc = "write the current cwd",
+--   group = vim.api.nvim_create_augroup('kk-vimleave', { clear = true }),
+--   callback = function()
+--     local filePath = "/tmp/cwd.txt"
+--     local content = vim.uv.cwd()
+--     writeToFile(filePath, content)
+--   end
+-- })
 
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {

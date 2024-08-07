@@ -232,7 +232,7 @@ local function others()
   -- map("c", '<C-b>','<Left>')
   map("c", '<C-p>','<Up>')
   map("c", '<C-n>','<Down>')
-  map("n","<leader>p",":lua vim.env['CUDA_VISIBLE_DEVICES']=''<Left>",{silent=false})
+  map("n","<leader>p",":lua vim.env['ASCEND_RT_VISIBLE_DEVICES']=''<Left>",{silent=false})
 
   map("x", "ul", "g_o^")
   map("o", "ul", ":normal vul<CR>")

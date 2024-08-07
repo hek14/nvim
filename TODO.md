@@ -1,4 +1,6 @@
 # TODO: 
+- 用lsp来生成当前函数/变量的调用图: 从当前函数出发一直回溯看谁调用了当前函数, 直至是文件或者类的成员函数为止, 应该会生成一棵树
+- 能不能生成一颗代码树以html格式保存到当前目录, 点击节点能够跳转到源代码
 - lsp/init.lua中需要check相应的lsp-server是否已经安装, 如果没有则提示去`mason-registry`安装
 - 利用vimux去send another tmux pane commands
 - 利用`lua-async-await` refactor `pig`

@@ -10,8 +10,9 @@ vim.opt.laststatus = 3
 vim.opt.showmode = false
 vim.opt.title = true
 
-vim.opt.clipboard = "unnamedplus"
-if vim.fn.executable("clippy")==1 then
+local use_clippy = false
+if vim.fn.executable("clippy")==1 and use_clippy then
+  vim.opt.clipboard = "unnamedplus"
   vim.g.clipboard = {
     name = 'ClippyRemoteClipboard',
     copy = {

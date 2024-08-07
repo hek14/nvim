@@ -28,7 +28,6 @@ local M = {
     { '<leader>dn', ':lua require"dap".down()<CR>' },
     { '<leader>de', ':lua require"dap".up()<CR>' },
     { '<leader>ds', ':Telescope dap configurations<CR>' },
-    { '<leader><F5>', 'lua require"dap".run_last()<CR>' },
     { '<leader>dq', ':lua require"dap".terminate()<CR>:lua require("dapui").close()<CR>' },
     { '<leader>dr', ':lua require"dap".repl.toggle({},"10 split")<CR>' },
     { '<leader>di', ':lua require"dap.ui.widgets".hover()<CR>' },
@@ -57,7 +56,8 @@ M.config = function()
   for _, ft_path in ipairs(vim.api.nvim_get_runtime_file('lua/plugins/dap/configs/*.lua', true)) do
     loadfile(ft_path)()
   end
-  require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'}, debugpy = 'py' })
+  -- require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'}, debugpy = 'py' })
+  require('dap.ext.vscode').load_launchjs()
   require('nvim-dap-virtual-text').setup({})
   require('dapui').setup({
     mappings = {

@@ -1,4 +1,9 @@
+# dap use .vscode/launch.json
+- 确保在.vscode/launch.json在当前的cwd下
+- 用jsonlint确保launch.json是合理的
+
 # nvim's good shell companion/dependencies
+- jsonlint: check json is valid or not
 - nodejs(node+npm) >= 16, required by Lsp
 - pyright
 - lua-language-server

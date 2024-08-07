@@ -216,7 +216,7 @@ function M.config()
   require('plugins.lsp.c').setup(options)
   require('plugins.lsp.latex').setup(options)
   require('plugins.lsp.markdown').setup(options)
-  require('plugins.lsp.python').setup(options,'pyright') -- NOTE:available: {"pyright", "coc-pyright", "pylyzer", "jedi_language_server", "ruff_lsp", "anakin_language_server"}
+  require('plugins.lsp.python').setup(options,'pylance') -- NOTE:available: {"pyright", "coc-pyright", "pylyzer", "jedi_language_server", "ruff_lsp", "anakin_language_server"}
   require("plugins.lsp.diagnostics").setup()
 end
 return M

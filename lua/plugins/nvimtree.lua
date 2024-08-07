@@ -15,7 +15,7 @@ local function on_attach(bufnr)
 end
 local M = {
   "nvim-tree/nvim-tree.lua",
-  enabled = true,
+  enabled = false,
   cmd = { "NvimTreeToggle", "NvimTreeFocus", "NvimTreeClose", "NvimTreeOpen"},
   keys = {
     { ",e", "<Cmd>NvimTreeToggle<CR>" },

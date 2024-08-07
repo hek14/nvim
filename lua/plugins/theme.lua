@@ -182,4 +182,4 @@ local darkplus = {
   end
 }
 
-return rose_pine
+return vscode

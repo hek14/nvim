@@ -86,7 +86,7 @@ local M = {
       },
       { "jvgrootveld/telescope-zoxide" },
       { "nvim-telescope/telescope-file-browser.nvim" },
-      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }, -- NOTE: 出现error的话就进入到 ~/.local/share/nvim/lazy/telescope-fzf-native.nvim下手动`make`
       { 'IllustratedMan-code/telescope-conda.nvim' }
     },
 }

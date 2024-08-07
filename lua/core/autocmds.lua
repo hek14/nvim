@@ -122,7 +122,7 @@ end)
 
 vim.api.nvim_create_autocmd("BufEnter",{
   callback=function ()
-    local ok, _ = require("nvim-tree")
+    local ok, _ = pcall(function() require("nvim-tree") end)
     if ok then
       local is_dir = vim.fn.expand('%') == "."
       if is_dir then
